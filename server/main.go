@@ -65,7 +65,7 @@ func handlerRecords(w http.ResponseWriter, r *http.Request) {
 		httpSendError(w, err)
 		return
 	}
-	if toIdx < fromIdx || fromIdx < 0 || fromIdx > recordCount-1 || toIdx < 0 || toIdx > recordCount-1 {
+	if toIdx < fromIdx || fromIdx < 0 || fromIdx > recordCount-1 || toIdx < 0 || toIdx > recordCount {
 		httpSendError(w, errors.New("Invalid from or to parameter"))
 		return
 	}
