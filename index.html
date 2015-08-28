@@ -1,13 +1,19 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
 <head>
-	<title>JS Onboard Project</title>
-	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+    <meta charset="utf-8" />
+    <title>TypeScript HTML App</title>
+    <script src="third_party/jquery-2.0.3.min.js"></script>
+    <link rel="stylesheet" href="app.css" type="text/css" />
 </head>
-
 <body>
-	<p>Hello</p>
+    <h1>IMQS onboarding Typescript Assignment</h1>
+
+    <table class="maintable" id="maintable" style="width:100%"></table>
+    <p id="rowText"></p>
+    <input type="button" id="buttonPrev" value="Previous" onclick="onClickPrev()" />
+    <input type="button" id="buttonNext" value="Next" onclick="onClickNext()" />
+    <script src="app.js"></script>
 </body>
-
 </html>
-

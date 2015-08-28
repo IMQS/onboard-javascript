@@ -1,4 +1,6 @@
-﻿class SetupTable {
+﻿/// <reference path="jquery.d.ts" />
+
+class SetupTable {
 	constructor(element: HTMLTableElement) {
 		this.tableElement = element;
 		this.rowsUsed = 0;

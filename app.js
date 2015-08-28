@@ -1,3 +1,4 @@
+/// <reference path="jquery.d.ts" />
 var SetupTable = (function () {
     function SetupTable(element) {
         this.tableElement = element;
