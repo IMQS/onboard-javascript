@@ -1,11 +1,13 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
-	"math/rand"
 	"net/http"
 	"strconv"
 )
@@ -46,12 +48,10 @@ func handlerColumns(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func randSeq(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
+func shortHash(val string) string {
+	h256 := sha256.New()
+	io.WriteString(h256, val)
+	return base64.StdEncoding.EncodeToString(h256.Sum(nil)[0:2])
 }
 
 func handlerRecords(w http.ResponseWriter, r *http.Request) {
@@ -70,14 +70,15 @@ func handlerRecords(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	records := make([][]string, toIdx-fromIdx)
+	records := make([][]string, toIdx-fromIdx+1)
 	for i := range records {
 		records[i] = make([]string, columnCount)
 		for j := range records[i] {
 			if j == 0 {
-				records[i][j] = fmt.Sprintf("%v", i)
+				records[i][j] = fmt.Sprintf("%v", i+fromIdx)
 			} else {
-				records[i][j] = fmt.Sprintf("%s%v-%s", columns[j], i, randSeq(3))
+				val := fmt.Sprintf("%s%v", columns[j], i+fromIdx)
+				records[i][j] = fmt.Sprintf("%v-%v", val, shortHash(val))
 			}
 		}
 	}
