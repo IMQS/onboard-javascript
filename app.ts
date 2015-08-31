@@ -166,4 +166,3 @@ window.onresize = () => {
     control.getRowsDisplayable();
     control.showPage();
 };
-};
