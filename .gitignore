@@ -1,0 +1,5 @@
+*.js.map
+*.suo
+app.js
+/bin/
+/obj/
