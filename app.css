@@ -1,0 +1,31 @@
+﻿body {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+span {
+    font-style: italic;
+}
+
+table.maintable {
+    max-width: 100%;
+    border-left: 2px solid #dddddd;
+    border-right: 2px solid #dddddd;
+    border-bottom: 2px solid #dddddd;
+    border-top: 2px solid #dddddd;
+    background-color: transparent;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+table.maintable tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+table.maintable tr:nth-child(even) {
+    background-color: #f1f1f1;
+}
+
+table.maintable tr {
+    text-align: center;
+}
+
