@@ -1,5 +1,3 @@
-//project was created By Augustine.Anosike 
-/// <reference path="third_party/jquery.d.ts" />
 var $tbody;
 $(document).ready(function () {
     //Simulate Ajax call here to get customer data
