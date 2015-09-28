@@ -1,13 +1,93 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
-	<title>JS Onboard Project</title>
-	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
-</head>
-
-<body>
-	<p>Hello</p>
+    <meta charset="utf-8">
+    <title>click demo</title>
+    <script src="third_party/jquery-2.0.3.min.js"></script>
+    <script src="apps.js"></script>
+    <link href="app.css" rel="stylesheet" />
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // number of records per page
+            var pageSize = 25;
+            // reset current page counter on load
+            $("#hdnActivePage").val(1);
+            // calculate number of pages
+            var numberOfPages = $('tbody tr').length / pageSize;
+            numberOfPages = numberOfPages.toFixed();
+            // action on 'next' click
+            $("a.next").on('click', function () {
+                // show only the necessary rows based upon activePage and Pagesize
+                $("tbody tr:nth-child(-n+" + (($("#hdnActivePage").val() * pageSize) + pageSize) + ")").show();
+                $("tbody tr:nth-child(-n+" + $("#hdnActivePage").val() * pageSize + ")").hide();
+                var currentPage = Number($("#hdnActivePage").val());
+                $("#hdnActivePage").val(Number($("#hdnActivePage").val()) + 1);
+                // check if previous page button is necessary (not on first page)
+                if ($("#hdnActivePage").val() != 1) {
+                    $("a.previous").show();
+                    $("span").show();
+                }
+                // check if next page button is necessary (not on last page)
+                if ($("#hdnActivePage").val() === numberOfPages) {
+                    $("a.next").hide();
+                    $("span").hide();
+                }                
+            });
+            // action on 'previous' click
+            $("a.previous").on('click', function () {
+                var currentPage = Number($("#hdnActivePage").val());
+                $("#hdnActivePage").val(currentPage - 1);
+                // first hide all rows
+                $("tbody tr").hide();
+                // and only turn on visibility on necessary rows
+                $("tbody tr:nth-child(-n+" + ($("#hdnActivePage").val() * pageSize) + ")").show();
+                $("tbody tr:nth-child(-n+" + (($("#hdnActivePage").val() * pageSize) - pageSize) + ")").hide();
+                // check if previous button is necessary (not on first page)
+                if ($("#hdnActivePage").val() === "1") {
+                    $("a.previous").hide();
+                    $("span").hide();
+                }
+                // check if next button is necessary (not on last page)
+                if ($("#hdnActivePage").val() < numberOfPages) {
+                    $("a.next").show();
+                    $("span").show();
+                }
+                if ($("#hdnActivePage").val() === 1) {
+                    $("span").hide();
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        $('.tbody').on('clicked.rs.row', function (evt) {
+            // Now it's safe to check what was selected
+            var rows = $(this).selectedrows();
+        });
+    </script>
+   
+    <script type="text/javascript">
+        //display what was selected using the alart function 
+        $(document).ready(function () {
+            $('table tbody tr').click(function () {
+                alert($(this).text());
+            });
+        });
+    </script>
+    </head>
+ <body> 
+     <div id="tableheader" class="thead"></div>
+   <div id="content">
+   <table class="table" style="width:100%;" border="1" cellspacing="5">    
+       <thead id="thead">
+       </thead>   
+     <tbody id="tBody" width="100%"></tbody>
+  </table>         
+</div>  
+    <div id="div2" ></div>
+     <div class="paging">         
+      <a class="previous">Previous</a>                    
+      <a class="next">Next</a>                
+      <input type="hidden" id="hdnActivePage" value="1">              
+     </div>
 </body>
-
 </html>
-
