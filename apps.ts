@@ -1,12 +1,16 @@
-﻿let $tbody;
+/// <reference path="third_party/jquery.d.ts" />
+let $tbody;
 $(document).ready(function () {
-    //Simulate Ajax call here to get customer data
-    getCustomerData();  
-    getAllRecords();
+    //Web services Project to get services from main.go.
+	//you must run this command "go run main.go" from the command line to start the services. then start this program
+    getColumns();  
+    getAllRecordsPaginated();
     getRecordsCount();
+	getPagination();
+	
 });
 
-function getCustomerData() {  	   
+function getColumns() {  	   
 	$.ajax({
 		type: "GET",
 		dataType: "json",
@@ -18,12 +22,15 @@ function getCustomerData() {
 			});
 			table += '</thead>';
 		$('#tableheader').append(table);   			            
-       }
+		},
+		error: function (msg) {
+			alert(" Error occured  \n" + JSON.stringify(msg));
+		}
    });    
 }
-function getAllRecords() {
+function getAllRecordsPaginated() {
 	$.ajax({
-		url: '/records?from=0&to=100',
+		url: '/records?from=0&to=10000',
 		type:'GET',
 		dataType: 'json',
 		contentType: 'application/json', 
@@ -50,11 +57,7 @@ function getRecordsCount() {
 		url: '/recordCount',
 		type: 'GET',
 		dataType: 'json',
-		/*data: {
-			format: 'json'
-		},*/
 		success: function (data2) {
-			//console.log(data2)
             $('#div2').append('Total Records : '+ data2);
 		},
 		error: function (msg) {
@@ -64,6 +67,57 @@ function getRecordsCount() {
 
 }
 function getPagination() {
-  
+	//highlighting the column selected
+	$('.tbody').on('clicked.rs.row', function (evt) {
+		let rows = $(this).select;
+	});
+	// Pagination started 
+	let pageSize = 25;
+	let x = 1;
+	let x10 = x.toString().trim();
+	$("#hdnActivePage").val(x10);
+	let numberOfPages = $('tbody tr').length / pageSize;
+
+	//what should happen when Next Button is clicked
+	$("a.next").on('click', function () {
+		$("tbody tr:nth-child(-n+" + (($("#hdnActivePage").val() * pageSize) + pageSize) + ")").show();
+		$("tbody tr:nth-child(-n+" + $("#hdnActivePage").val() * pageSize + ")").hide();
+		let currentPage = Number($("#hdnActivePage").val());
+		let newpage: number;
+		newpage = currentPage;
+		let x4: number;
+		x4 = newpage + 1;
+		let x8 = x4.toString().trim();
+		$("#hdnActivePage").val(x8);
+		if ($("#hdnActivePage").val() != 1) {
+			$("a.previous").show();
+			$("span").show();
+		}
+		if ($("#hdnActivePage").val() === numberOfPages) {
+			$("a.next").hide();
+			$("span").hide();
+		}
+	});
+	//what should happen when Previous Button is clicked
+	$("a.previous").on('click', function () {
+		let currentPage = Number($("#hdnActivePage").val() - 1);
+		let presult = "" + currentPage.toString().trim();
+		$("#hdnActivePage").val(presult);
+		$("tbody tr").hide();
+		$("tbody tr:nth-child(-n+" + ($("#hdnActivePage").val() * pageSize) + ")").show();
+		$("tbody tr:nth-child(-n+" + (($("#hdnActivePage").val() * pageSize) - pageSize) + ")").hide();
+
+		if ($("#hdnActivePage").val() === 1) {
+			$("a.previous").hide();
+			$("span").hide();
+		}
+		if ($("#hdnActivePage").val() < numberOfPages) {
+			$("a.next").hide();
+			$("span").show();
+		}
+		if ($("#hdnActivePage").val() === 1) {
+			$("span").hide();
+		}
+	});
 }
 
