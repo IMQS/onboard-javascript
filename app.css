@@ -1,4 +1,4 @@
-﻿body
+body
 {
     font-family: 'Segoe UI', sans-serif
    
@@ -29,7 +29,7 @@ tbody tr:nth-child(-n+8) {
 
 }
 tbody tbody tr:hover {
-    background-color: orange;
+    background-color:darkkhaki;
     cursor: pointer;
 }
 a:hover {    
