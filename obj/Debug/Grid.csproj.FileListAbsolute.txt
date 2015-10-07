@@ -1,6 +1,0 @@
-C:\Users\RoanB\onboard-javascript\bin\Grid.dll.config
-C:\Users\RoanB\onboard-javascript\bin\Grid.dll
-C:\Users\RoanB\onboard-javascript\bin\Grid.pdb
-C:\Users\RoanB\onboard-javascript\obj\Debug\Grid.dll
-C:\Users\RoanB\onboard-javascript\obj\Debug\Grid.pdb
-C:\Users\RoanB\onboard-javascript\obj\Debug\Grid.csprojResolveAssemblyReference.cache
