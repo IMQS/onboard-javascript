@@ -1,0 +1,8 @@
+bin/*
+obj/*
+packages/*
+Scripts/*
+app.js
+app.js.map
+packages.config
+*.suo
