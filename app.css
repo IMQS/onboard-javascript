@@ -1,0 +1,46 @@
+﻿body
+{
+    font-family: 'Segoe UI', sans-serif
+   
+}
+
+span {
+    font-style: italic
+}
+
+.table {
+background-color:white;
+
+}
+
+thead th{
+    /*box-shadow: 0 1px 10px #808080;*/
+    padding-left:2px;
+    text-align:center;
+    width:100px; 
+}
+tbody tr { 
+    display: none; 
+
+}
+
+tbody tr:nth-child(-n+8) {
+     display: table-row;
+
+}
+tbody tbody tr:hover {
+    background-color:darkkhaki;
+    cursor: pointer;
+}
+a:hover {    
+    color:blue;
+    height:auto;
+}
+a {
+ display:block;
+ color:red;
+ height:auto;
+ width:auto;
+}
+
+
