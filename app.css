@@ -1,11 +1,16 @@
 ﻿html {
     height : 100%;
+    width : 100%;
+    padding : 0px 0px 0px 0px;
+    margin : 0px 0px 0px 0px;
 }
 body {
     font-family: 'Segoe UI', sans-serif;
     overflow : hidden;
     height : 100%;
-    //width : 100%;
+    width : 100%;
+    padding : 0px 0px 0px 0px;
+    margin : 0px 0px 0px 0px;
 }
 
 span {
@@ -13,11 +18,26 @@ span {
 }
 
 table {
-    table-layout : fixed;
     width : 100%;
+    height : 94%;
     text-align : center;
-    height : 100%;
-    align-content : center;
-    align-items : center;
-    align-self : center;
+    padding : 0px 0px 0px 0px;
+    margin : 0px 0px 0px 0px;
+}
+
+th, td {
+    padding: 0px;
+}
+
+#navigator {
+    width : 100%;
+    height : 3%;
+    text-align : center;
+    padding : 0px 0px 0px 0px;
+    margin : 0px 0px 0px 0px;
+}
+
+#currentIndex {
+    font-weight : bold;
+    font-size : 20px; 
 }

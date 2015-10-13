@@ -6,3 +6,4 @@ app.js
 app.js.map
 packages.config
 *.suo
+Grid.csproj.user
