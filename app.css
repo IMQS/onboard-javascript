@@ -1,0 +1,31 @@
+﻿body {
+    font-family: Calibri;
+    background-color: azure;
+
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+tr {
+    background-color: white;
+}
+
+tr:nth-child(even) {
+    background-color: lightgray;
+}
+
+th {
+    padding: 10px;
+    background-color: darkblue;
+    color: azure;
+    text-align:center;
+}
+
+h1 {
+    font-family: Arial;
+    font-size: x-large;
+    color: GrayText;
+}

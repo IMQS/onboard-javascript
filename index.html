@@ -1,13 +1,28 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+
+<html lang="en">
 <head>
-	<title>JS Onboard Project</title>
-	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+    <meta charset="utf-8" />
+    <title>Onboarding Project</title>
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <script src="third_party/jquery-2.0.3.min.js"></script>
+    <script src="app.js"></script>
 </head>
-
 <body>
-	<p>Hello</p>
+    <div id="content">
+        <div id="headings"></div>
+        <div id="gridTable">
+            <table class="table" width="100%">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>       
+        <div id="tableControls">
+            <button id="beginBtn">|<<</button>
+            <button id="previousBtn"><</button>
+            <button id="nextBtn">></button>
+            <button id="endBtn">>>|</button>
+        </div>
+    </div>
 </body>
-
 </html>
-
