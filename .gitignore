@@ -1,0 +1,16 @@
+*.js.map
+*.js
+*.suo
+*.config
+*.scproj
+.idea*
+*.txt
+*.cs
+*.nupkg
+*.ps1
+/js/
+/app.d.ts
+/bin/
+/obj/
+/www.csproj.user
+/third-party/

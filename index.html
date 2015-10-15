@@ -1,13 +1,27 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
-	<title>JS Onboard Project</title>
-	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
-</head>
+    <meta charset="utf-8">
+    <title>On-Boarding Javascript</title>
+    <script src="third_party/jquery-2.0.3.min.js"></script>
+    <script src="apps.js"></script>
+    <link href="app.css" rel="stylesheet" />   
 
-<body>
-	<p>Hello</p>
+    </head>
+ <body> 
+     <div id="tableheader" class="thead"></div>
+   <div id="content">
+   <table class="table" style="width:100%;" border="1" cellspacing="5">    
+       <thead id="thead">
+       </thead>   
+     <tbody id="tBody" width="100%"></tbody>
+  </table>         
+</div>  
+    <div id="div2" ></div>
+     <div class="paging" style="text-align:center">            
+      <a class="previous">Previous</a>                    
+      <a class="next">Next</a>                
+      <input type="hidden" id="hdnActivePage" value="1">              
+     </div>
 </body>
-
 </html>
-
