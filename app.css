@@ -1,46 +1,31 @@
-body
-{
-    font-family: 'Segoe UI', sans-serif
-   
-}
-
-span {
-    font-style: italic
-}
-
-.table {
-background-color:white;
+﻿body {
+    font-family: Calibri;
+    background-color: azure;
 
 }
 
-thead th{
-    /*box-shadow: 0 1px 10px #808080;*/
-    padding-left:2px;
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+tr {
+    background-color: white;
+}
+
+tr:nth-child(even) {
+    background-color: lightgray;
+}
+
+th {
+    padding: 10px;
+    background-color: darkblue;
+    color: azure;
     text-align:center;
-    width:100px; 
-}
-tbody tr { 
-    display: none; 
-
 }
 
-tbody tr:nth-child(-n+8) {
-     display: table-row;
-
+h1 {
+    font-family: Arial;
+    font-size: x-large;
+    color: GrayText;
 }
-tbody tbody tr:hover {
-    background-color:darkkhaki;
-    cursor: pointer;
-}
-a:hover {    
-    color:blue;
-    height:auto;
-}
-a {
- display:block;
- color:red;
- height:auto;
- width:auto;
-}
-
-

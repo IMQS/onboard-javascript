@@ -1,27 +1,28 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>On-Boarding Javascript</title>
+    <meta charset="utf-8" />
+    <title>Onboarding Project</title>
+    <link rel="stylesheet" href="app.css" type="text/css" />
     <script src="third_party/jquery-2.0.3.min.js"></script>
-    <script src="apps.js"></script>
-    <link href="app.css" rel="stylesheet" />   
-
-    </head>
- <body> 
-     <div id="tableheader" class="thead"></div>
-   <div id="content">
-   <table class="table" style="width:100%;" border="1" cellspacing="5">    
-       <thead id="thead">
-       </thead>   
-     <tbody id="tBody" width="100%"></tbody>
-  </table>         
-</div>  
-    <div id="div2" ></div>
-     <div class="paging" style="text-align:center">            
-      <a class="previous">Previous</a>                    
-      <a class="next">Next</a>                
-      <input type="hidden" id="hdnActivePage" value="1">              
-     </div>
+    <script src="app.js"></script>
+</head>
+<body>
+    <div id="content">
+        <div id="headings"></div>
+        <div id="gridTable">
+            <table class="table" width="100%">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>       
+        <div id="tableControls">
+            <button id="beginBtn">|<<</button>
+            <button id="previousBtn"><</button>
+            <button id="nextBtn">></button>
+            <button id="endBtn">>>|</button>
+        </div>
+    </div>
 </body>
 </html>
