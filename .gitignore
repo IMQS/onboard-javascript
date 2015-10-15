@@ -1,0 +1,4 @@
+obj/*
+bin/*
+*.js
+*.js.map
