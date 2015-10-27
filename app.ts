@@ -1,86 +1,92 @@
-﻿/// <reference path="Scripts\typings\jquery\jquery.d.ts" />
+﻿/* Onboard-javascript project for Roan Brand */
 
-var maxEntries;	        // How many rows should we fit on a page
-var curIndex = 0;		// Current index of data displayed in table
+namespace onboard {
+	let nrDisplayedEntries;			// How many rows should we fit on a page
+	let curIndex = 0;				// Current index of data displayed in table
+	let recCountTotal;				// Total number of records
+	let resizeTimer;				// Used to debounce/delay window resize event
 
-window.onload = () => {
-    createColumns();	// Retrieve and create Column names
-    NumofRows();
-	populateTable();	// Load initial data on page
-};
+	window.onload = () => {
+		$.getJSON("/recordCount", function (count) {
+			recCountTotal = count;
+			createColumns();		// Retrieve and create Column names
+			NumofRows();
+		}).fail(function () {
+			alert("Cannot connect to server!");
+		});
+	};
 
-// Run this function when window resizes
-function NumofRows() {
-    var height = $(window).height();
-    maxEntries = Math.round((height-40) / 34);
-    populateTable();
-}
-
-window.onresize = NumofRows;
-
-//  Browse lower index
-var scrollUp = function () {
-	$("#scrollLeft").off();	// Disable button until routine completion
-	curIndex -= maxEntries;
-	if (curIndex < 0) {	// Lower limit protection
-		curIndex = 0;
+	// Run this function when window resizes
+	function NumofRows() {
+		clearTimeout(resizeTimer);
+		resizeTimer = setTimeout(function () {
+			let availableHeight = $("body").height() - $("#navigator").height();
+			$("#MainTable").height(availableHeight)
+			nrDisplayedEntries = Math.floor(availableHeight / 30);
+			populateTable();
+		}, 200);
 	}
-	populateTable();
-}
 
-//	Browse higher index
-var scrollDown = function () {
-	$("#scrollRight").off();
-    $.getJSON("/recordCount", function (numRecords) {	// Upper limit protection
-        if ((curIndex + 2 * maxEntries) > (numRecords - 1)) {
-            curIndex = numRecords - 1 - maxEntries;
-        } else {
-            curIndex += maxEntries;
-        }
-        populateTable();
-    })
-        .fail(function () {
-            alert("Cannot connect to server!");
-        });
-}
+	window.onresize = NumofRows;
 
-//	Populate Table given current Index
-var populateTable = function () {
-    $.getJSON("/records?from=" + curIndex + "&to=" + (curIndex + maxEntries), function (data) {
-        $("#MainTable tbody").empty();
-        for (var i = 0; i < data.length; i++) {
-            insertDataRow(data[i]);
-        }
-    })
-        .fail(function () {
-            alert("Cannot connect to server!");
-        });
-	$("#currentIndex").html(curIndex + " - " + (curIndex + maxEntries));	// Display current index
-	$("#scrollLeft").off().on('click', scrollUp);	// Bind buttons to navbar, only after data insertion
-	$("#scrollRight").off().on('click', scrollDown);
-}
-
-//	Create Table columns
-var createColumns = function () {
-    $.getJSON("/columns", function (data) {
-        var colHeadings = "<tr>";
-        for (var i = 0; i < data.length; i++) {
-            colHeadings += "<th>" + data[i] + "</th>";
-        }
-        colHeadings += "</tr>";
-        $("#MainTable thead").append(colHeadings);
-    })
-        .fail(function () {
-            alert("Cannot connect to server!");
-        })
-};
-
-//	Append single datarow
-var insertDataRow = function (rowData) {
-	var buildRow = "<tr>";
-	for (var i = 0; i < rowData.length; i++) {
-		buildRow += "<td>" + rowData[i] + "</td>";
+	//  Browse lower index
+	function scrollUp() {
+		$("#scrollLeft").off();		// Disable button until routine completion
+		curIndex -= nrDisplayedEntries;
+		if (curIndex < 0) {			// Lower limit protection
+			curIndex = 0;
+		}
+		populateTable();
 	}
-	buildRow += "</tr>";
-	$("#MainTable tbody").append(buildRow);
+
+	//	Browse higher index
+	function scrollDown() {
+		$("#scrollRight").off();
+		if ((curIndex + 2 * nrDisplayedEntries) > (recCountTotal - 1)) {
+			curIndex = recCountTotal - 1 - nrDisplayedEntries;
+		} else {
+			curIndex += nrDisplayedEntries;
+		}
+		populateTable();
+	}
+
+	//	Populate Table given current Index
+	function populateTable() {
+		let topIndex = curIndex + nrDisplayedEntries - 1;
+		if (topIndex <= curIndex) topIndex = curIndex + 1;
+		$.getJSON("/records?from=" + curIndex + "&to=" + topIndex, function (data) {
+			$("#MainTable tbody").empty();
+			for (let i = 0; i < data.length; i++) {
+				insertDataRow(data[i]);
+			}
+		});
+		$("#currentIndex").html(curIndex + ' - ' + topIndex);	// Display current index
+		$("#scrollLeft").off().on('click', scrollUp);	// Bind buttons to navbar, only after data insertion
+		$("#scrollRight").off().on('click', scrollDown);
+	}
+
+	//	Create Table columns
+	function createColumns() {
+		$.getJSON("/columns", function (data) {
+			let colHeadings = "<tr>";
+			for (let i = 0; i < data.length; i++) {
+				colHeadings += `<th>${data[i]}</th>`;
+			}
+			colHeadings += "</tr>";
+			$("#MainTable thead").append(colHeadings);
+		})
+			.fail(function () {
+				alert("Cannot connect to server!");
+			})
+	};
+
+	//	Append single datarow
+	function insertDataRow(rowData) {
+		let buildRow = "<tr>";
+		for (let i = 0; i < rowData.length; i++) {
+			buildRow += `<td>${rowData[i]}</td>`;
+		}
+		buildRow += "</tr>";
+		$("#MainTable tbody").append(buildRow);
+	}
 }
