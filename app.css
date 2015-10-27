@@ -1,0 +1,34 @@
+﻿html {
+    height : 100%;
+    width : 100%;
+}
+body {
+    font-family: 'Segoe UI', sans-serif;
+    overflow : hidden;
+    height : 100%;
+    margin : 0px;
+}
+
+span {
+    font-style: italic;
+}
+
+table {
+    width : 100%;
+    text-align : center;
+}
+
+th, td {
+	white-space: nowrap;
+    padding: 0px;
+}
+
+#navigator {
+    text-align : center;
+	height : 30px;
+}
+
+#currentIndex {
+    font-weight : bold;
+    font-size : 20px; 
+}
