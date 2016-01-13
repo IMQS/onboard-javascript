@@ -1,0 +1,6 @@
+C:\Code\onboard-javascript\bin\Grid.dll.config
+C:\Code\onboard-javascript\bin\Grid.dll
+C:\Code\onboard-javascript\bin\Grid.pdb
+C:\Code\onboard-javascript\obj\Debug\Grid.csprojResolveAssemblyReference.cache
+C:\Code\onboard-javascript\obj\Debug\Grid.dll
+C:\Code\onboard-javascript\obj\Debug\Grid.pdb
