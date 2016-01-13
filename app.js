@@ -24,10 +24,10 @@ window.onload = function () {
     var el = document.getElementById('content');
     var greeter = new Greeter(el);
     greeter.start();
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "http://localhost:2050/recordCount", false);
-    xhr.send();
-    console.log(xhr.response);
+    //var xhr = new XMLHttpRequest();
+    //xhr.open("GET", "http://localhost:2050/recordCount", false);
+    //xhr.send();
+    //console.log(xhr.response);
     //var xhr = new XMLHttpRequest();
     //xhr.open("GET", "http://localhost:2050/columns", false);
     //xhr.send();
