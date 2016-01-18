@@ -1,0 +1,76 @@
+﻿body {
+    font-family: sans-serif;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+div {
+    padding: 0px;
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0px;
+}
+
+tr {
+    font-family: Consolas, Lato;
+    text-align: center;
+    font-size: 14px;
+}
+
+    tr:nth-child(even) {
+        background: #f9fbea;
+    }
+
+    tr:nth-child(odd) {
+        background: #FFFFFF;
+    }
+
+th {
+    font-weight: bold;
+    height: 30px;
+    border: 1px solid white;
+    border-collapse: collapse;
+    overflow: hidden;
+    padding: 0px;
+    background: #4a5969;
+    color: #C3D52E;
+}
+
+td {
+    height: 20px;
+    border: 1px solid #e1e5ea;
+    border-collapse: collapse;
+    overflow: hidden;
+    padding: 0px;
+    color: #1E242B;
+}
+
+input {
+    float: right;
+    background: #f9fbea;
+    text-align: right;
+    width: 100px;
+}
+
+button {
+    width: 120px;
+    height: 60px;
+    background: #FFFFFF;
+    color: #1E242B;
+    float: left;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.search {
+    float: right;
+    margin-right: 10px;
+}
+
+.search {
+    display: inline-block;
+}

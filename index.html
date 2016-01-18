@@ -1,13 +1,31 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+
+<html lang="en">
 <head>
-	<title>JS Onboard Project</title>
-	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Style-Type" content="text/css">
+
+    <title>Onboarding TypeScript Data Grid</title>
+    <link href="app.css" rel="stylesheet" type="text/css" />
+
+    <script src="app.js"></script>
+    <script src="third_party/jquery-2.0.3.min.js"></script>
+
 </head>
-
 <body>
-	<p>Hello</p>
+    <div id="grid">
+        <button id="grid-first">First</button>
+        <button id="grid-prev">Previous</button>
+        <button id="grid-next">Next</button>
+        <button id="grid-last">Last</button>
+
+        <img id="logo" src="IMQS_logo.png" style="float:right; width:120px;" />
+
+        <input id="grid-text" type="text" name="recordsid" />
+        <button id="grid-search" class="search">Search</button>
+
+        <table id="grid-view"></table>
+
+    </div>
 </body>
-
 </html>
-
