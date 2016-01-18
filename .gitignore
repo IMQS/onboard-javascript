@@ -1,0 +1,14 @@
+# Exclude all binary and object files
+bin/*.*
+obj/*/*.*
+# Exclude the user specific options files for Visual Studio projects
+# .suo Solution User Options (binary)
+# .user Text based user options file
+*.suo
+*.user
+# Exclude specific .config files for different builds
+# Retain the original we.config though
+web.Debug.config
+web.Release.config
+# Exclude any upgrade logs
+UpgradeLog.htm
