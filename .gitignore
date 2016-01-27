@@ -1,0 +1,5 @@
+bin/*
+obj/*
+app.js
+app.js.map
+*.config
