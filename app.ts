@@ -22,11 +22,15 @@ class AjaxCall {
 	}
 
 	onRStateChange(callback: Function) {
-		if (this.objHttpReq.readyState === 4 && this.objHttpReq.status === 200) {
-			let data = JSON.parse(this.objHttpReq.responseText);
-			(callback)(data, this.indexStart, this.indexFinish);
+		if (this.objHttpReq.readyState === XMLHttpRequest.DONE) {
+			if (this.objHttpReq.status === 200) {
+				let data = JSON.parse(this.objHttpReq.responseText);
+				(callback)(data, this.indexStart, this.indexFinish);
+			}
+			else {
+				console.log("AJAX error with the following status occurred: " + this.objHttpReq.status);
+			}
 		}
-		// Handle error responses here if required
 	}
 }
 
@@ -71,12 +75,18 @@ function updateGrid(records: JSON, start: number, finish: number) {
 		}
 		tableContent.appendChild(tr);
 	}
+	// Enable all buttons on successful ajax return
+	let allButtons = document.getElementsByClassName("nav-button");
+	for (let x = 0; x < allButtons.length; x++) {
+		allButtons[x].removeAttribute("disabled");
+	};
 }
 
 window.onload = () => {
 	// Get brower height and calculate number of rows to display
 	let browserHeight = window.innerHeight - 205;
 	let pageSize = Math.floor(browserHeight / 33);
+	let resizeTimer;
 
 	// Initialise Ajax calls and retrieve initial data
 	let ajColumns = new AjaxCall();
@@ -92,22 +102,38 @@ window.onload = () => {
 	let buttonNext = document.getElementById('button-next');
 	let buttonLast = document.getElementById('button-last');
 
-	// Assign button listeners to handle clicks
+	// Assign button listeners to handle clicks, disables button on click
 	buttonFirst.onclick = () => {
+		buttonFirst.setAttribute("disabled", "disabled");
 		ajRecords.doAjaxCall("records", updateGrid, 0, pageSize);
 	};
 	buttonPrevious.onclick = () => {
+		buttonPrevious.setAttribute("disabled", "disabled");
 		let previousStart = indexPos - pageSize - 1;
 		if (previousStart < 0) ajRecords.doAjaxCall("records", updateGrid, 0, pageSize);
 		else ajRecords.doAjaxCall("records", updateGrid, previousStart, indexPos - 1);
 	};
 	buttonNext.onclick = () => {
+		buttonNext.setAttribute("disabled", "disabled");
 		let nextFinish = indexPos + pageSize * 2 + 1;
 		if (nextFinish >= totalRecords) ajRecords.doAjaxCall("records", updateGrid, totalRecords - pageSize - 1, totalRecords - 1);
 		else ajRecords.doAjaxCall("records", updateGrid, indexPos + pageSize + 1, nextFinish);
 	};
 	buttonLast.onclick = () => {
+		buttonLast.setAttribute("disabled", "disabled");
 		ajRecords.doAjaxCall("records", updateGrid, totalRecords - pageSize - 1, totalRecords - 1);
 	};
+
+	// Adjust amount of rows to display and request data from server
+	window.onresize = () => {
+		// Timer to wait for resize to complete
+		clearTimeout(resizeTimer);
+		resizeTimer = setTimeout(function () {
+			browserHeight = window.innerHeight - 205;
+			pageSize = Math.floor(browserHeight / 33);
+			if ((indexPos + pageSize) >= totalRecords) ajRecords.doAjaxCall("records", updateGrid, totalRecords - pageSize - 1, totalRecords - 1);
+			else ajRecords.doAjaxCall("records", updateGrid, indexPos, indexPos + pageSize);
+		}, 150);
+	}
 };
 
