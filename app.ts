@@ -2,18 +2,20 @@
 let indexPos = 0;
 
 class AjaxCall {
-	url: string = "http://localhost:2050";
-	indexStart: number;
-	indexFinish: number;
-	fullQuery: string;
-	request: string;
-	objHttpReq: any;
+	private url: string = "http://localhost:2050";
+	private indexStart: number;
+	private indexFinish: number;
+	private fullQuery: string;
+	private request: string;
+	private objHttpReq: any;
 
 	doAjaxCall(request: string, callback: Function, start?: number, finish?: number) {
 		this.request = request;
 		this.indexStart = start;
 		this.indexFinish = finish;
-		if (start >= 0) { this.fullQuery = this.url + "/" + request + "?from=" + start + "&to=" + finish; }
+		if (start >= 0) {
+			this.fullQuery = `${this.url}/${request}?from=${start}&to=${finish}`;
+		}
 		else { this.fullQuery = this.url + "/" + request; }
 		this.objHttpReq = new XMLHttpRequest();
 		this.objHttpReq.onreadystatechange = () => this.onRStateChange(callback);
@@ -21,7 +23,7 @@ class AjaxCall {
 		this.objHttpReq.send();
 	}
 
-	onRStateChange(callback: Function) {
+	private onRStateChange(callback: Function) {
 		if (this.objHttpReq.readyState === XMLHttpRequest.DONE) {
 			if (this.objHttpReq.status === 200) {
 				let data = JSON.parse(this.objHttpReq.responseText);
@@ -36,8 +38,8 @@ class AjaxCall {
 
 // Create table header row based on columns received
 function populateColumns(columns: JSON) {
-	let columnArray = Object.keys(columns).map(function (k) { return columns[k]; });
-	let htmlTable = document.getElementById("table-header");
+	let columnArray = Object.keys(columns).map((k) => { return columns[k]; });
+	const htmlTable = document.getElementById("table-header");
 	let tr = document.createElement('tr');
 	let columnCount = columnArray.length;
 	for (let i = 0; i < columnCount; i++) {
@@ -50,16 +52,16 @@ function populateColumns(columns: JSON) {
 
 // Total record counter update.  Only called once on page load
 function updateRecordCounter(recordCount: JSON) {
-	totalRecords = Number(JSON.stringify(recordCount));
-	document.getElementById("page-total").innerHTML = String(totalRecords);
+	totalRecords = Number(recordCount);
+	document.getElementById("page-total").innerHTML = recordCount.toString();
 }
 
 // Update table with content received from API call
 function updateGrid(records: JSON, start: number, finish: number) {
 	indexPos = start;
-	document.getElementById("page-progress").innerHTML = "Displaying " + start + " to " + finish + " of ";
-	let recordArray = Object.keys(records).map(function (k) { return records[k]; });
-	let tableContent = document.getElementById("table-body");
+	document.getElementById("page-progress").innerHTML = `Displaying ${start} to ${finish} of `;
+	let recordArray = Object.keys(records).map((k) => { return records[k]; });
+	const tableContent = document.getElementById("table-body");
 	// Clear old table content
 	while (tableContent.firstChild) {
 		tableContent.removeChild(tableContent.firstChild);
@@ -76,7 +78,7 @@ function updateGrid(records: JSON, start: number, finish: number) {
 		tableContent.appendChild(tr);
 	}
 	// Enable all buttons on successful ajax return
-	let allButtons = document.getElementsByClassName("nav-button");
+	const allButtons = document.getElementsByClassName("nav-button");
 	for (let x = 0; x < allButtons.length; x++) {
 		allButtons[x].removeAttribute("disabled");
 	};
@@ -89,18 +91,18 @@ window.onload = () => {
 	let resizeTimer;
 
 	// Initialise Ajax calls and retrieve initial data
-	let ajColumns = new AjaxCall();
-	let ajRecordCount = new AjaxCall();
-	let ajRecords = new AjaxCall();
+	const ajColumns = new AjaxCall();
+	const ajRecordCount = new AjaxCall();
+	const ajRecords = new AjaxCall();
 	ajColumns.doAjaxCall("columns", populateColumns);
 	ajRecordCount.doAjaxCall("recordCount", updateRecordCounter);
 	ajRecords.doAjaxCall("records", updateGrid, 0, pageSize);
 
 	// Get paging buttons
-	let buttonFirst = document.getElementById('button-first');
-	let buttonPrevious = document.getElementById('button-previous');
-	let buttonNext = document.getElementById('button-next');
-	let buttonLast = document.getElementById('button-last');
+	const buttonFirst = document.getElementById('button-first');
+	const buttonPrevious = document.getElementById('button-previous');
+	const buttonNext = document.getElementById('button-next');
+	const buttonLast = document.getElementById('button-last');
 
 	// Assign button listeners to handle clicks, disables button on click
 	buttonFirst.onclick = () => {
@@ -109,15 +111,23 @@ window.onload = () => {
 	};
 	buttonPrevious.onclick = () => {
 		buttonPrevious.setAttribute("disabled", "disabled");
-		let previousStart = indexPos - pageSize - 1;
-		if (previousStart < 0) ajRecords.doAjaxCall("records", updateGrid, 0, pageSize);
-		else ajRecords.doAjaxCall("records", updateGrid, previousStart, indexPos - 1);
+		const previousStart = indexPos - pageSize - 1;
+		if (previousStart < 0) {
+			ajRecords.doAjaxCall("records", updateGrid, 0, pageSize);
+		}
+		else {
+			ajRecords.doAjaxCall("records", updateGrid, previousStart, indexPos - 1);
+		}
 	};
 	buttonNext.onclick = () => {
 		buttonNext.setAttribute("disabled", "disabled");
-		let nextFinish = indexPos + pageSize * 2 + 1;
-		if (nextFinish >= totalRecords) ajRecords.doAjaxCall("records", updateGrid, totalRecords - pageSize - 1, totalRecords - 1);
-		else ajRecords.doAjaxCall("records", updateGrid, indexPos + pageSize + 1, nextFinish);
+		const nextFinish = indexPos + pageSize * 2 + 1;
+		if (nextFinish >= totalRecords) {
+			ajRecords.doAjaxCall("records", updateGrid, totalRecords - pageSize - 1, totalRecords - 1);
+		}
+		else {
+			ajRecords.doAjaxCall("records", updateGrid, indexPos + pageSize + 1, nextFinish);
+		}
 	};
 	buttonLast.onclick = () => {
 		buttonLast.setAttribute("disabled", "disabled");
@@ -131,8 +141,12 @@ window.onload = () => {
 		resizeTimer = setTimeout(function () {
 			browserHeight = window.innerHeight - 205;
 			pageSize = Math.floor(browserHeight / 33);
-			if ((indexPos + pageSize) >= totalRecords) ajRecords.doAjaxCall("records", updateGrid, totalRecords - pageSize - 1, totalRecords - 1);
-			else ajRecords.doAjaxCall("records", updateGrid, indexPos, indexPos + pageSize);
+			if ((indexPos + pageSize) >= totalRecords) {
+				ajRecords.doAjaxCall("records", updateGrid, totalRecords - pageSize - 1, totalRecords - 1);
+			}
+			else {
+				ajRecords.doAjaxCall("records", updateGrid, indexPos, indexPos + pageSize);
+			}
 		}, 150);
 	}
 };
