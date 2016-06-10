@@ -52,7 +52,7 @@ function populateColumns(columns: JSON) {
 
 // Total record counter update.  Only called once on page load
 function updateRecordCounter(recordCount: JSON) {
-	totalRecords = Number(recordCount);
+	totalRecords = +recordCount;
 	document.getElementById("page-total").innerHTML = recordCount.toString();
 }
 
