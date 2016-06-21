@@ -1,0 +1,25 @@
+﻿body {
+	font-family: 'Segoe UI', sans-serif;
+	background: white; 
+}
+
+.t1class {
+		padding-top: 20px;
+		padding-bottom: 0px;
+		margin: 0 auto auto auto;
+		background-color: #5690b2;    
+		 border-radius: 25px;    
+		-moz-border-radius: 15px;    
+		-webkit-border-radius: 15px;
+		color: white;
+		padding:15px;
+		border: 2px solid #;
+	}
+
+table {
+		 background-color : #fff; color : #453; width: 100%
+	}
+
+	thead { background-color: #446bb3  ; color :#fff; padding:4px; line-height:30px; width: auto }
+	tbody tr:nth-child(even) {background: #f3f3f3; text-align: center; width: auto}
+	tbody tr:nth-child(odd) {background: #FFF;  text-align: center; width: auto}

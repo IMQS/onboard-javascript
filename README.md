@@ -88,3 +88,6 @@ Once you are done and happy with your solution, submit your code for code review
 	- Under `Debuggers` section, untick ASP.NET  
 	- If you debug from Visual Studio now, Internet Explorer should open up with a demo TypeScript project.  
 1. Get coding!  
+
+
+# KM test1 for initial commit into develop branch...
