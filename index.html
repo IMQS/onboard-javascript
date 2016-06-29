@@ -1,13 +1,26 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+
+<html lang="en">
 <head>
-	<title>JS Onboard Project</title>
-	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+	<meta charset="utf-8" />
+	<title>IMQS onboarding project: Javascript Onboarding</title>
+	<link rel="stylesheet" href="app.css" type="text/css" />
+	<script src="app.js"></script>
+	<script src="jquery-2.0.3.min.js"></script>
 </head>
 
 <body>
-	<p>Hello</p>
+
+	<div class="t1class" id="content">
+		Show from ID: <input id ="grid_show_from" type="text" value="0" name="grid_show_from_input" size="5"> 
+		<button id="but_go">GO</button>
+		<button id="but_pagedown">NEXT</button>
+		<button id="but_pageup">PREVIOUS</button>
+		<button id="but_home">HOME</button>
+		<br> <br />
+		<table id="table1"> </table>
+	</div>
+
 </body>
 
 </html>
-
