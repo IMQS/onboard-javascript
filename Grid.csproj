@@ -25,7 +25,6 @@
     <Content Include="app.css" />
     <Content Include="app.js" />
     <Content Include="index.html" />
-    <Content Include="packages.config" />
     <Content Include="third_party\jquery-2.0.3.min.js" />
     <Content Include="web.config" />
   </ItemGroup>
