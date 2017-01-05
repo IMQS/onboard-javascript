@@ -1,5 +1,7 @@
 ﻿body {
     font-family: 'Segoe UI', sans-serif;
+	padding-bottom: 0px;
+	margin-bottom: 0px;
 }
 
 span {
@@ -38,4 +40,5 @@ button {
 }
 
 input {
+	
 }

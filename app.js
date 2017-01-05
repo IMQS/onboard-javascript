@@ -103,7 +103,7 @@ function createNavigation() {
     footer.appendChild(upButton);
 }
 function resize() {
-    NumToFetch = Math.floor((window.innerHeight - (41 + 30)) / 24) - 1;
+    NumToFetch = Math.floor((window.innerHeight - (41 + 42)) / 24) - 1;
     if (NumToFetch < 0) {
         table.update([]);
         return;
@@ -129,7 +129,7 @@ function search() {
         return;
     }
     searchedId = value;
-    rowNum = value - Math.floor(((window.innerHeight - (41 + 30)) / 24 - 1) / 2);
+    rowNum = value - Math.floor(((window.innerHeight - (41 + 40)) / 24 - 1) / 2);
     resize();
 }
 function moveDown() {
