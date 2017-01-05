@@ -2,11 +2,24 @@
 var rowNum = 0;
 var table;
 var timeout = 0;
+var maxRecords = 0;
+var NumToFetch = 0;
+var searchedId = -1;
 var Table = (function () {
     function Table() {
-        this.table = document.getElementById("mainTable");
+        this.table = document.getElementById('mainTable');
         this.tableHead = this.table.createTHead();
         this.tableBody = this.table.createTBody();
+        var bold = document.createElement('b');
+        var title = document.createTextNode("Search ID:");
+        bold.appendChild(title);
+        this.table.appendChild(bold);
+        var searchField = document.createElement("input");
+        searchField.id = "search";
+        searchField.type = 'number';
+        searchField.min = "0";
+        searchField.oninput = search;
+        this.table.appendChild(searchField);
     }
     Table.prototype.getHead = function () {
         return this.tableHead;
@@ -15,7 +28,7 @@ var Table = (function () {
         var newTableBody = document.createElement('tbody');
         var row;
         for (var i = 0; i < data.length; i++) {
-            row = new Row(newTableBody, rowNum + i);
+            row = new Row(newTableBody, i);
             row.addRow(data[i]);
         }
         this.tableBody.parentNode.replaceChild(newTableBody, this.tableBody);
@@ -34,7 +47,12 @@ var Row = (function () {
         var cell;
         for (var i = 0; i < values.length; i++) {
             cell = row.insertCell(i);
-            cell.innerHTML = values[i];
+            if (values[0] == searchedId) {
+                cell.innerHTML = "<b>" + values[i] + "</b>";
+            }
+            else {
+                cell.innerHTML = values[i];
+            }
         }
     };
     return Row;
@@ -56,6 +74,10 @@ var Headings = (function () {
 window.onload = function () {
     table = new Table();
     var tableHead = new Headings(table.getHead());
+    $.get("http://localhost:2050/recordCount", function (data) {
+        maxRecords = data - 1;
+        $(window).resize();
+    });
     $.getJSON("http://localhost:2050/columns", function (data) {
         tableHead.makeColumnHeadings(data);
     });
@@ -63,17 +85,65 @@ window.onload = function () {
         clearTimeout(timeout);
         timeout = setTimeout(resize, 250);
     });
-    $(window).resize();
+    createNavigation();
 };
+function createNavigation() {
+    var footer = document.getElementById('mainFooter');
+    var downButton = document.createElement('button');
+    var upButton = document.createElement('button');
+    var imgDown = document.createElement('img');
+    var imgUp = document.createElement('img');
+    imgDown.setAttribute('src', "icons/button_down.png");
+    imgUp.setAttribute('src', "icons/button_up.png");
+    downButton.appendChild(imgDown);
+    upButton.appendChild(imgUp);
+    downButton.onclick = moveDown;
+    upButton.onclick = moveUp;
+    footer.appendChild(downButton);
+    footer.appendChild(upButton);
+}
 function resize() {
-    var NumToFetch = 0;
-    NumToFetch = Math.floor((window.innerHeight - 41) / 24) - 1;
+    NumToFetch = Math.floor((window.innerHeight - (41 + 30)) / 24) - 1;
     if (NumToFetch < 0) {
         table.update([]);
         return;
     }
+    if (rowNum < 0) {
+        rowNum = 0;
+    }
+    if (rowNum + NumToFetch > maxRecords) {
+        rowNum -= rowNum + NumToFetch - maxRecords;
+        if (rowNum < 0) {
+            rowNum = 0;
+            NumToFetch = maxRecords;
+        }
+    }
     $.getJSON("http://localhost:2050/records", { from: rowNum, to: rowNum + NumToFetch }, function (data) {
         table.update(data);
     });
+}
+function search() {
+    var searchField = document.getElementById('search');
+    var value = +searchField.value;
+    if (value < 0 || value > maxRecords) {
+        return;
+    }
+    searchedId = value;
+    rowNum = value - Math.floor(((window.innerHeight - (41 + 30)) / 24 - 1) / 2);
+    resize();
+}
+function moveDown() {
+    if (rowNum + NumToFetch == maxRecords) {
+        return;
+    }
+    rowNum++;
+    resize();
+}
+function moveUp() {
+    if (rowNum == 0) {
+        return;
+    }
+    rowNum--;
+    resize();
 }
 //# sourceMappingURL=app.js.map
