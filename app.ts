@@ -2,31 +2,34 @@
 
 let rowNum = 0;
 let table: Table;
+let timeout = 0;
 
 class Table {
+	table
 	tableHead;
 	tableBody;
 
 	constructor() {
-		let table = <HTMLTableElement>document.getElementById("mainTable");
-		this.tableHead = table.createTHead();
-		this.tableBody = table.createTBody();
+		this.table = <HTMLTableElement>document.getElementById("mainTable");
+		this.tableHead = this.table.createTHead();
+		this.tableBody = this.table.createTBody();
 	}
 
 	getHead() {
 		return this.tableHead;
 	}
 
-	getBody() {
-		return this.getBody;
-	}
-
 	update(data) {
+		let newTableBody = document.createElement('tbody');
+
 		let row;
-		for (let i = 0; i < data.length; i++){
-			row = new Row(this.tableBody, rowNum + i);
+		for (let i = 0; i < data.length; i++) {
+			row = new Row(newTableBody, rowNum + i);
 			row.addRow(data[i]);
 		}
+
+		this.tableBody.parentNode.replaceChild(newTableBody, this.tableBody);
+		this.tableBody = newTableBody;
 	}
 }
 
@@ -63,7 +66,7 @@ class Headings {
 		let cell;
 		for (let i = 0; i < headings.length; i++) {
 			cell = row.insertCell(i);
-			cell.innerHTML = "<b>" + headings[i] + "<b>";
+			cell.innerHTML = "<b>" + headings[i] + "</b>";
 		}
 	}
 }
@@ -72,20 +75,32 @@ window.onload = () => {
 
 	table = new Table();
 	let tableHead = new Headings(table.getHead());
-	let NumToFetch: number = 0;
-
-	NumToFetch = Math.floor(window.innerHeight / 25) - 1;
 	
 	$.getJSON("http://localhost:2050/columns", function (data) {
 		tableHead.makeColumnHeadings(data);
 	});
 
+	$(window).resize(function () {		
+		clearTimeout(timeout);
+
+		timeout = setTimeout(resize, 250);
+	});
+
+	$(window).resize();
+};
+
+function resize() {
+	let NumToFetch: number = 0;
+
+	NumToFetch = Math.floor((window.innerHeight - 41) / 24) - 1;
+
+	if (NumToFetch < 0) {
+		table.update([]);
+		return;
+	}
+
 	$.getJSON("http://localhost:2050/records", { from: rowNum, to: rowNum + NumToFetch },
 		function (data) {
 			table.update(data);
-		});	
-};
-
-window.onresize = function (event) {
-    
-};
+		});
+}
