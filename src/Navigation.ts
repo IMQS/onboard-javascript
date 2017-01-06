@@ -6,6 +6,11 @@
 	private searchedId: number;
 	private maxRecords: number;
 
+	private headerRowHeight = 23;
+	private bodyMargin = 8;
+	private searchBarHeight = 52;
+	private rowHeight = 24;
+
 	constructor(newTable: Table) {
 		this.table = newTable;
 		this.rowNum = 0;
@@ -15,7 +20,7 @@
 	}
 
 	/**
-	 * Create a bold textnode and an input field that will search through the
+	 * Create a bold text node and an input field that will search through the
 	 * data.
 	 */
 	createSearchField() {
@@ -35,7 +40,7 @@
 	}
 
 	/**
-	 * Create buttons for moving throught the data one row at a time and
+	 * Create buttons for moving through the data one row at a time and
 	 * add them to the footer.
 	 */
 	createNavigationArrows() {
@@ -62,12 +67,13 @@
 
 	/**
 	 * Calculates how much data should be fetched from the server based on
-	 * the height of the webpage.
-	 * The id's from value 'rowNum' untill 'numToFetch' is then fetched from
+	 * the height of the web page.
+	 * The id's from value 'rowNum' until 'numToFetch' is then fetched from
 	 * the server and the table is then updated.
 	 */
 	update() {
-		this.numToFetch = Math.floor((window.innerHeight - (41 + 42)) / 24) - 1;
+		this.numToFetch = Math.floor((window.innerHeight - (this.headerRowHeight +
+			this.bodyMargin + this.searchBarHeight)) / this.rowHeight) - 1;
 
 		if (this.numToFetch < 0) {
 			this.table.update([], this.searchedId);
@@ -109,7 +115,8 @@
 		}
 	
 		this.searchedId = value;
-		this.rowNum = value - Math.floor(((window.innerHeight - (41 + 42)) / 24 - 1) / 2);
+		this.rowNum = value - Math.floor(((window.innerHeight - (this.headerRowHeight +
+			this.bodyMargin + this.searchBarHeight)) / this.rowHeight - 1) / 2);
 
 		this.update();
 	}

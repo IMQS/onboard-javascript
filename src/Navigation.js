@@ -1,5 +1,9 @@
 var Navigation = (function () {
     function Navigation(newTable) {
+        this.headerRowHeight = 23;
+        this.bodyMargin = 8;
+        this.searchBarHeight = 52;
+        this.rowHeight = 24;
         this.table = newTable;
         this.rowNum = 0;
         this.numToFetch = 0;
@@ -7,7 +11,7 @@ var Navigation = (function () {
         this.maxRecords = 0;
     }
     /**
-     * Create a bold textnode and an input field that will search through the
+     * Create a bold text node and an input field that will search through the
      * data.
      */
     Navigation.prototype.createSearchField = function () {
@@ -26,7 +30,7 @@ var Navigation = (function () {
         this.table.getMainTable().appendChild(searchField);
     };
     /**
-     * Create buttons for moving throught the data one row at a time and
+     * Create buttons for moving through the data one row at a time and
      * add them to the footer.
      */
     Navigation.prototype.createNavigationArrows = function () {
@@ -51,13 +55,14 @@ var Navigation = (function () {
     };
     /**
      * Calculates how much data should be fetched from the server based on
-     * the height of the webpage.
-     * The id's from value 'rowNum' untill 'numToFetch' is then fetched from
+     * the height of the web page.
+     * The id's from value 'rowNum' until 'numToFetch' is then fetched from
      * the server and the table is then updated.
      */
     Navigation.prototype.update = function () {
         var _this = this;
-        this.numToFetch = Math.floor((window.innerHeight - (41 + 42)) / 24) - 1;
+        this.numToFetch = Math.floor((window.innerHeight - (this.headerRowHeight +
+            this.bodyMargin + this.searchBarHeight)) / this.rowHeight) - 1;
         if (this.numToFetch < 0) {
             this.table.update([], this.searchedId);
             return;
@@ -90,7 +95,8 @@ var Navigation = (function () {
             return;
         }
         this.searchedId = value;
-        this.rowNum = value - Math.floor(((window.innerHeight - (41 + 42)) / 24 - 1) / 2);
+        this.rowNum = value - Math.floor(((window.innerHeight - (this.headerRowHeight +
+            this.bodyMargin + this.searchBarHeight)) / this.rowHeight - 1) / 2);
         this.update();
     };
     /**
