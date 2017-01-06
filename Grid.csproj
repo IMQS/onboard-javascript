@@ -22,14 +22,16 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="app.css" />
-    <Content Include="app.js" />
     <Content Include="index.html" />
+    <Content Include="src\Main.css" />
     <Content Include="third_party\jquery-2.0.3.min.js" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="app.ts" />
+    <TypeScriptCompile Include="src\Navigation.ts" />
+    <TypeScriptCompile Include="src\Row.ts" />
+    <TypeScriptCompile Include="src\Table.ts" />
+    <TypeScriptCompile Include="src\Main.ts" />
     <TypeScriptCompile Include="third_party\jquery.d.ts" />
   </ItemGroup>
   <ItemGroup>

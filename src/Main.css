@@ -2,6 +2,7 @@
     font-family: 'Segoe UI', sans-serif;
 	padding-bottom: 0px;
 	margin-bottom: 0px;
+	overflow: hidden;
 }
 
 span {
@@ -37,8 +38,4 @@ tr:hover {
 button {
 	border: none;
 	background: none;
-}
-
-input {
-	
 }
