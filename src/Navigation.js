@@ -2,7 +2,7 @@ var Navigation = (function () {
     function Navigation(newTable) {
         this.table = newTable;
         this.rowNum = 0;
-        this.NumToFetch = 0;
+        this.numToFetch = 0;
         this.searchedId = -1;
         this.maxRecords = 0;
     }
@@ -49,27 +49,38 @@ var Navigation = (function () {
         upButton.appendChild(imgUp);
         footer.appendChild(upButton);
     };
+    /**
+     * Calculates how much data should be fetched from the server based on
+     * the height of the webpage.
+     * The id's from value 'rowNum' untill 'numToFetch' is then fetched from
+     * the server and the table is then updated.
+     */
     Navigation.prototype.update = function () {
         var _this = this;
-        this.NumToFetch = Math.floor((window.innerHeight - (41 + 42)) / 24) - 1;
-        if (this.NumToFetch < 0) {
+        this.numToFetch = Math.floor((window.innerHeight - (41 + 42)) / 24) - 1;
+        if (this.numToFetch < 0) {
             this.table.update([], this.searchedId);
             return;
         }
         if (this.rowNum < 0) {
             this.rowNum = 0;
         }
-        if (this.rowNum + this.NumToFetch > this.maxRecords) {
-            this.rowNum -= this.rowNum + this.NumToFetch - this.maxRecords;
+        if (this.rowNum + this.numToFetch > this.maxRecords) {
+            this.rowNum -= this.rowNum + this.numToFetch - this.maxRecords;
             if (this.rowNum < 0) {
                 this.rowNum = 0;
-                this.NumToFetch = this.maxRecords;
+                this.numToFetch = this.maxRecords;
             }
         }
-        $.getJSON("http://localhost:2050/records", { from: this.rowNum, to: this.rowNum + this.NumToFetch }, function (data) {
+        $.getJSON("http://localhost:2050/records", { from: this.rowNum, to: this.rowNum + this.numToFetch }, function (data) {
             _this.table.update(data, _this.searchedId);
         });
     };
+    /**
+     * Gets a value from the input field with id 'search' and then adjusts
+     * the value 'rowNum' to make the searched row appear as close to the middle
+     * of the window as possible.
+     */
     Navigation.prototype.search = function () {
         console.log();
         var searchField = document.getElementById('search');
@@ -82,13 +93,19 @@ var Navigation = (function () {
         this.rowNum = value - Math.floor(((window.innerHeight - (41 + 42)) / 24 - 1) / 2);
         this.update();
     };
+    /**
+     * Increments the 'rowNum' value and updates the table.
+     */
     Navigation.prototype.moveDown = function () {
-        if (this.rowNum + this.NumToFetch == this.maxRecords) {
+        if (this.rowNum + this.numToFetch == this.maxRecords) {
             return;
         }
         this.rowNum++;
         this.update();
     };
+    /**
+     * Decrements the 'rowNum' value and updates the table.
+     */
     Navigation.prototype.moveUp = function () {
         if (this.rowNum == 0) {
             return;
@@ -98,9 +115,6 @@ var Navigation = (function () {
     };
     Navigation.prototype.setMaxRecords = function (max) {
         this.maxRecords = max;
-    };
-    Navigation.prototype.getRowNum = function () {
-        return this.rowNum;
     };
     return Navigation;
 }());

@@ -1,15 +1,15 @@
 ﻿class Navigation {
 	private table: Table;
 
-	private rowNum: number;
-	private NumToFetch: number;
+	private rowNum: number;			// The first Id to be fetched.
+	private numToFetch: number;		// The last Id to be fetched.
 	private searchedId: number;
 	private maxRecords: number;
 
 	constructor(newTable: Table) {
 		this.table = newTable;
 		this.rowNum = 0;
-		this.NumToFetch = 0;
+		this.numToFetch = 0;
 		this.searchedId = -1;
 		this.maxRecords = 0;
 	}
@@ -60,11 +60,16 @@
 		footer.appendChild(upButton);
 	}
 
-
+	/**
+	 * Calculates how much data should be fetched from the server based on
+	 * the height of the webpage.
+	 * The id's from value 'rowNum' untill 'numToFetch' is then fetched from
+	 * the server and the table is then updated.
+	 */
 	update() {
-		this.NumToFetch = Math.floor((window.innerHeight - (41 + 42)) / 24) - 1;
+		this.numToFetch = Math.floor((window.innerHeight - (41 + 42)) / 24) - 1;
 
-		if (this.NumToFetch < 0) {
+		if (this.numToFetch < 0) {
 			this.table.update([], this.searchedId);
 			return;
 		}
@@ -73,21 +78,26 @@
 			this.rowNum = 0;
 		}
 
-		if (this.rowNum + this.NumToFetch > this.maxRecords) {
-			this.rowNum -= this.rowNum + this.NumToFetch - this.maxRecords;
+		if (this.rowNum + this.numToFetch > this.maxRecords) {
+			this.rowNum -= this.rowNum + this.numToFetch - this.maxRecords;
 	
 			if (this.rowNum < 0) {
 				this.rowNum = 0;
-				this.NumToFetch = this.maxRecords;
+				this.numToFetch = this.maxRecords;
 			}
 		}
 		
-		$.getJSON("http://localhost:2050/records", { from: this.rowNum, to: this.rowNum + this.NumToFetch },
+		$.getJSON("http://localhost:2050/records", { from: this.rowNum, to: this.rowNum + this.numToFetch },
 			(data) => {
 				this.table.update(data, this.searchedId);
 			});
 	}
 
+	/**
+	 * Gets a value from the input field with id 'search' and then adjusts
+	 * the value 'rowNum' to make the searched row appear as close to the middle
+	 * of the window as possible.
+	 */
 	search() {
 		console.log();
 		let searchField = <HTMLInputElement>document.getElementById('search');
@@ -104,8 +114,11 @@
 		this.update();
 	}
 
+	/**
+	 * Increments the 'rowNum' value and updates the table.
+	 */
 	moveDown() {
-		if (this.rowNum + this.NumToFetch == this.maxRecords) {
+		if (this.rowNum + this.numToFetch == this.maxRecords) {
 			return;
 		}
 
@@ -114,6 +127,9 @@
 		this.update();
 	}
 
+	/**
+	 * Decrements the 'rowNum' value and updates the table.
+	 */
 	moveUp() {
 		if (this.rowNum == 0) {
 			return;
@@ -126,9 +142,5 @@
 
 	setMaxRecords(max: number) {
 		this.maxRecords = max;
-	}
-
-	getRowNum(): number {
-		return this.rowNum;
 	}
 }

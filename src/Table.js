@@ -1,7 +1,4 @@
 var Table = (function () {
-    /**
-     *
-     */
     function Table() {
         this.mainTable = document.getElementById('mainTable');
         this.tableHead = this.mainTable.createTHead();
@@ -13,6 +10,14 @@ var Table = (function () {
     Table.prototype.getHead = function () {
         return this.tableHead;
     };
+    /**
+     * Creates a new table body and populates it with row
+     * made from the new content and replaces the old
+     * table body.
+     *
+     * @param data The content for the new rows
+     * @param searchedId The id of the row that was searched.
+     */
     Table.prototype.update = function (data, searchedId) {
         var newTableBody = document.createElement('tbody');
         var row;
