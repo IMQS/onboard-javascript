@@ -1,0 +1,22 @@
+﻿html {
+	height: 100%;
+}
+
+body {
+	font-family: 'Segoe UI', sans-serif;
+	overflow-y: hidden;
+	height: 100%;
+}
+
+span {
+	font-style: italic;
+}
+
+table, td, th, tr {
+	border: 1px solid black;
+	width: 100%;
+	height: inherit;
+	table-layout: fixed;
+	border-collapse: collapse;
+	text-align: center;
+}
