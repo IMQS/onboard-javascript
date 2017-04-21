@@ -32,7 +32,7 @@
     background-color: lightsteelblue;
 }
 
-#btns {
+.btn_container {
     z-index:9999;
     margin-left:4px;
     margin-top: 391px;
