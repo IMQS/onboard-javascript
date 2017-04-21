@@ -37,24 +37,18 @@ class Grid {
 
     // iterates through records and adds them as rows to the grid
     private drawGrid(records: string[][]): void {
-        for (let record of records) {
+        for (let record of records) 
             this.drawRow("column", record);
-        }
     }
 
     // draws individual rows by appending column objects to it and appending the row object to the grid.
-    private drawRow(css_class: string, record: string[]): void {
-        let $colu = $("<div />", {
-            class: css_class
-        });
-
+    private drawRow(cssClass: string, record: string[]): void {
         let row = this.newRow();
 
-        for (let col of record) {
-            row.append($colu.clone().text(col));
-        }
+        for (let col of record) 
+            row.append(this.newColumn(cssClass).text(col));
 
-        $("#grid").append(row.clone());
+        $("#grid").append(row);
     }
 
     // the draw grid function where the 'from' and 'to' values are that of the class variables.
@@ -106,9 +100,8 @@ class Grid {
             this.recordRollover(this.recordCount);
         }
         else {
-            if (this.from == this.recordCount) {
+            if (this.from == this.recordCount) 
                 this.from = 0;
-            }
 
             if (this.from < 0 && this.to < 0) {
                 this.from = this.from + this.recordCount;
@@ -123,6 +116,12 @@ class Grid {
     private newRow() {
         return $("<div />", {
             class: 'row'
+        });
+    }
+
+    private newColumn(cssClass: string) {
+        return $("<div />", {
+            class: cssClass
         });
     }
 
@@ -141,9 +140,8 @@ class Grid {
                 $.getJSON(this.getRecordsUrl(0, this.to), (res) => {
                 })
                     .done((res) => {
-                        for (let record of res) {
+                        for (let record of res)
                             records.push(record);
-                        }
 
                         this.drawGrid(records);
                     });
