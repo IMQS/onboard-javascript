@@ -113,13 +113,13 @@ class Grid {
     }
 
     // (re)instantiates the row object and returns it.
-    private newRow() {
+    private newRow(): JQuery{
         return $("<div />", {
             class: 'row'
         });
     }
 
-    private newColumn(cssClass: string) {
+    private newColumn(cssClass: string): JQuery{
         return $("<div />", {
             class: cssClass
         });
