@@ -1,0 +1,48 @@
+﻿body {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+#grid {
+    margin-left: 2px;
+    z-index: 9999; 
+    width: 100%; 
+    height: 100%; 
+    position: fixed; 
+    top: 0; 
+    left: 0;
+    background-color: gray;
+}
+
+.row {
+    width: auto;
+    height: 40px;
+}
+
+.header, .column {
+    text-align:center;
+    width: 174px;
+    height: 40px;
+    margin: 0px;
+    outline: 1px solid;
+    display: inline-block;
+    background: #FFFFFF;
+}
+
+.header {
+    background-color: lightsteelblue;
+}
+
+.btn_container {
+    z-index:9999;
+    margin-left:4px;
+    margin-top: 391px;
+    position:fixed;
+    height:170px;
+    width:50px;
+}
+
+#prevbtn, #nextbtn {
+    height:80px;
+    width:45px;
+    font-size:30px
+}
