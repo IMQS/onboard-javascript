@@ -1,0 +1,20 @@
+﻿body { font-family: 'Segoe UI', sans-serif; }
+
+span { font-style: italic; }
+
+table { table-layout: fixed; }
+
+#recordsTable {
+	text-align: center;
+	width: 100%;
+}
+
+#recordsTable td{
+	height: 30px;
+}
+
+html, body {
+	height: 100%;
+	margin: 0;
+	overflow: hidden
+}
