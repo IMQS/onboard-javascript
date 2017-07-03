@@ -22,9 +22,6 @@ var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func main() {
 
-	fs := http.FileServer(http.Dir("../"))
-	http.Handle("/", fs)
-
 	http.HandleFunc("/recordCount", handlerRecordCount)
 	http.HandleFunc("/columns", handlerColumns)
 	http.HandleFunc("/records", handlerRecords)
