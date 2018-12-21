@@ -1,36 +1,37 @@
-﻿let firstIndex:number, lastIndex:number; // stores the indices of the first and last rows in the table
-let recordCount:number; // stores the number of records in the database
+﻿let firstIndex: number, lastIndex: number; // stores the indices of the first and last rows in the table
+let recordCount: number; // stores the number of records in the database
+let table, columns, thead, tbody, headRow; // stores column headers
 let resizeTimer; // stores time since last window resize
 
 // builds the grid table from the column headers and row data
-function buildTable(columns, records) {
+function buildTable(rows) {
 
-	// create table
-	let table = document.createElement("table");
+	// initialise table
+	table = document.createElement("table");
 	table.className = "gridtable";
-    let thead = document.createElement("thead");
-    let tbody = document.createElement("tbody");
-	let headRow = document.createElement("tr");
+	thead = document.createElement("thead");
+	tbody = document.createElement("tbody");
+	headRow = document.createElement("tr");
 
-	// create column headers
-    for(const header of columns) {
-		var th = document.createElement("th");
+	// build column headers
+	for (const header of columns) {
+		let th = document.createElement("th");
 		th.appendChild(document.createTextNode(header));
 		headRow.appendChild(th);
-    };
-    thead.appendChild(headRow);
+	};
+	thead.appendChild(headRow);
 	table.appendChild(thead);
 
 	// create rows
-    records.forEach(function (el) {
+	for (const el of rows) {
 		let tr = document.createElement("tr");
-		for (var o in el) {
+		for (let o in el) {
 			let td = document.createElement("td");
 			td.appendChild(document.createTextNode(el[o]))
 			tr.appendChild(td);
 		}
 		tbody.appendChild(tr);
-	});
+	}
 	table.appendChild(tbody);
 
 	// builds footer elements (buttons, search field)
@@ -40,92 +41,75 @@ function buildTable(columns, records) {
 
 	document.getElementById("loader").remove();
 
-    return table;
+	return table;
 }
 
 // filters rows by user input ID
-function search(e){
+function search(e) {
 	let input = $("#search").val().toString();
 	let $table = $("tbody tr").toArray();
 
-	for(const record of $table){
+	for (const record of $table) {
 		let td = record.getElementsByTagName("td")[0];
-		record.style.display="block";
-		if(td){
+		record.style.display = "block";
+		if (td) {
 			let val = td.innerText || td.textContent;
-			if(val.indexOf(input) > -1){
-				record.style.display = "";
-			}
-			else{
-				record.style.display = "none";
-			} 		
+			record.style.display = val.indexOf(input) > -1 ? "" : "none";
 		}
 	}
 
 	// if record doesn't exist on current page, query database and display results
-	if(e.which == 13)
-	{
-		let end = parseInt(input) + calculateRows();
-		clearTable();
-		loadPage(parseInt(input), end);
+	if (e.which == 13) {
+		loadPage(parseInt(input));
 	}
 }
 
 // load the previous page
-function goPrevious(){
+function goPrevious() {
 	let numRows = calculateRows();
-	if(lastIndex > numRows){
-		clearTable();
-		loadPage(firstIndex-numRows, firstIndex-1);
+	if (lastIndex >= numRows) {
+		loadPage(firstIndex - numRows);
 	}
 }
 
 // load the next page
-function goNext(){
-	if(lastIndex < recordCount-1)
-	{
-		clearTable();
-		loadPage(lastIndex+1, lastIndex+calculateRows());
+function goNext() {
+	if (lastIndex < recordCount - 1) {
+		loadPage(lastIndex + 1);
 	}
 }
 
-// clears the table and footer elements
-function clearTable(){
-	document.getElementById("content").innerHTML="";
-	document.getElementById("footer").innerHTML="";
-}
-
-// loads the columns and rows to be displayed based on start and end row indices
-function loadPage(start:number, end:number){
+// loads the columns and rows to be displayed based on index of the first row
+function loadPage(start: number) {
 	firstIndex = start;
-	lastIndex = end;
+	lastIndex = calculateRows();
+
+	// clear table
+	document.getElementById("content").innerHTML = "";
+	document.getElementById("footer").innerHTML = "";
 
 	// check bounds
-	if(firstIndex<0) firstIndex = 0;
-	if(lastIndex>=recordCount) lastIndex = recordCount-1;
-	if(firstIndex>=recordCount){
+	if (firstIndex < 0) firstIndex = 0;
+	if (lastIndex >= recordCount) lastIndex = recordCount - 1;
+	if (firstIndex >= recordCount) {
 		firstIndex = recordCount - calculateRows();
-	} 
+	}
 
 	// create loader
 	let loader = document.createElement("loader");
 	document.getElementById("content").appendChild(loader);
-	loader.innerHTML=`<div class="loader" id="loader"></div>`;
-	
-	// outter function to fetch column headers from server
-	$.get("http://localhost:2050/columns", function(columns){
+	loader.innerHTML = `<div class="loader" id="loader"></div>`;
 
-		// inner function to fetch rows from server and invoke table build function
-		$.get("http://localhost:2050/records?from="+firstIndex+"&to="+lastIndex, function(rows){
-			document.getElementById("content").appendChild(buildTable(JSON.parse(columns), JSON.parse(rows)));
-		});
+	// inner function to fetch rows from server and invoke table build function
+	$.get("http://localhost:2050/records?from=" + firstIndex + "&to=" + lastIndex, function (rows) {
+		document.getElementById("content").appendChild(buildTable(JSON.parse(rows)));
 	});
 }
 
 // determines the number of rows to display based on the window height
-function calculateRows(){
-	let x = (window.innerHeight - document.getElementById("footer").offsetHeight - document.getElementById("tableHeading").offsetHeight - 64)/36;
-	return Math.floor(x)-1;
+function calculateRows() {
+	let x = (window.innerHeight - document.getElementById("footer").offsetHeight - document.getElementById("tableHeading").offsetHeight - 64) / 37;
+	return Math.floor(x);
 }
 
 window.onload = function () {
@@ -133,21 +117,24 @@ window.onload = function () {
 	document.body.style.overflow = "hidden";
 
 	// get record count
-	$.get("http://localhost:2050/recordCount", function(data){
+	$.get("http://localhost:2050/recordCount", function (numRecords) {
 
-		// load the first page
-		loadPage(0, calculateRows());
-		recordCount = JSON.parse(data);
+		// get column headers from server
+		$.get("http://localhost:2050/columns", function (cols) {
+			columns = JSON.parse(cols);
+
+			// load the first page
+			loadPage(0);
+			recordCount = JSON.parse(numRecords);
+		});
 	});
-	
 }
 
 // updates the table display when the window is resized
 // debounce function to reduce frequency of queries made
 window.onresize = () => {
 	clearTimeout(resizeTimer);
-	resizeTimer = setTimeout(function(){
-		clearTable();
-		loadPage(firstIndex, firstIndex + calculateRows());
+	resizeTimer = setTimeout(function () {
+		loadPage(firstIndex);
 	}, 250);
 }
