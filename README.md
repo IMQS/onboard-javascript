@@ -72,14 +72,13 @@ Once you are done and happy with your solution, submit your code for code review
 ## Pre-requisites  
 
 1. You need to have set up your development environment [as described here](https://imqssoftware.atlassian.net/wiki/display/AR/Dev+Environment).  
-1. You can use either Microsoft Visual Studio Pro or Microsoft Visual Studio Express for Web as IDE.  
+1. We suggest using VSCode, but you can use your IDE of choice.   
 
 ## Getting Started  
 These steps include just enough detail to guide you. Each step will require some additional research on your part:
 1. Fork this GIT repository under your own GIT account  
 1. Start up the backend server:
     - Open console and change directory to `server` directory  
-    - Run `env.bat`  
     - Run `go run main.go`  
     - Open up your browser and point it to [http://localhost:2050](http://localhost:2050). You should see "Hello"  
 1. Create the frontend project:  
