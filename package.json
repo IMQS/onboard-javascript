@@ -1,0 +1,24 @@
+{
+  "name": "default",
+  "version": "1.0.0",
+  "description": "Onboarding project",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jquery": "^3.3.29"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -w --project ./"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IMQS/onboard-javascript.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IMQS/onboard-javascript/issues"
+  },
+  "homepage": "https://github.com/IMQS/onboard-javascript#readme"
+}
