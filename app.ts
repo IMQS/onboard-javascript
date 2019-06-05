@@ -13,7 +13,7 @@ function getColumnNames() {
         });
 }
 async function getRecords(fromID: number, toID: number) {
-    const request = 'http://localhost:2050/records?from=' + fromID.toString() + '&to=' + toID.toString();
+    const request = 'http://localhost:2050/records?from=' + (fromID - 1).toString() + '&to=' + (toID - 1).toString();
     return await fetch(request)
         .then(function (response) {
             return response.json();
@@ -119,8 +119,12 @@ window.onload = () => {
         var fromId: number = nextPageResize(previousCursor) as number;
         getRecordCount()
             .then((value) => {
-                var toId: number = fromId + step < value ? fromId + step : value;
-                previousCursor = placeRecords(fromId, toId);
+                if ( fromId > value - 1 ) {
+                    alert('Step size is too large')
+                } else {
+                    var toId: number = fromId + step < value ? fromId + step : value;
+                    previousCursor = placeRecords(fromId, toId);
+                }
             });
     });
 
