@@ -51,7 +51,6 @@ function placeRecordsFromCursor(cursor: Array<number>) {
 
 //#region Handlers
 function getPageContent(fromID: number, toID: number) {
-    const cursor = [fromID as number, toID as number];
     $("#HeaderRow").empty();
     getColumnNames()
         .then((columns: Array<string>) => {
@@ -60,8 +59,8 @@ function getPageContent(fromID: number, toID: number) {
                 $("#HeaderRow").append(writable);
             }
         });
-    placeRecords(fromID, toID);
-    return cursor;
+    
+    return placeRecords(fromID, toID);
 }
 
 function toNumber(input: string | number, output: any = 1) {
