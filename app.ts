@@ -161,6 +161,12 @@ $(window).on('resize', (e) => {
 
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-        $('#body').height(5000 * previousScale);
-    }, 250);
+    getRecordCount()
+        .then((value) => {   
+            if ( previousCursor[1] == value - 1 ) {
+                previousCursor = placeRecords(previousCursor[1]- step, previousCursor[1]);
+            }
+            $('#body').height(5000 * previousScale);
+        })
+    }, 250)
 });
