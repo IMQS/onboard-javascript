@@ -78,7 +78,7 @@ function toNumber(input: string | number, output: any = 1) : number {
 
 function calculateToId(fromId: number): number {
     const possibleRecords = Math.floor((window.innerHeight - ($("#form-content").innerHeight() as number)) / 37);
-    const possibleId = (fromId + possibleRecords);
+    const possibleId = fromId + possibleRecords;
 
     let recordDisplayOffset = 0;
     if (window.innerHeight <= 646) {
@@ -102,7 +102,7 @@ function nextPageResize(previousCursor: number[]): number {
         for (let i = fromID; i <= toID; i++) {
             const elementHeightOffset = ($(`#table-row-${i.toString()}`).offset() as JQueryCoordinates).top;
 
-            if ( elementHeightOffset >= documentHeight ){
+            if (elementHeightOffset >= documentHeight){
                 return i;
             } else {
                 continue;
@@ -138,7 +138,7 @@ window.onload = async () => {
         const recordCount = await getRecordCount();
         const fromId = nextPageResize(previousCursor);
         const possibleStep = calculateToId(fromId) - fromId;
-        if ( fromId <= recordCount - possibleStep - 1 ) {
+        if (fromId <= recordCount - possibleStep - 1) {
             const toId = fromId + possibleStep <= recordCount - 1 ? fromId + possibleStep : recordCount - 1;
             previousCursor = await placeRecords(fromId, toId);
         } else if (fromId <= recordCount - 1)  {
@@ -175,7 +175,7 @@ window.onresize = () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(async () => {
         const recordCount = await getRecordCount();
-        if ( nextToId >= recordCount - 1 ) {
+        if (nextToId >= recordCount - 1) {
             const fromId = recordCount - 1 - (calculateToId(previousCursor[0]) - previousCursor[0]);
             const toId = recordCount - 1;
             previousCursor = await placeRecords(fromId, toId);
