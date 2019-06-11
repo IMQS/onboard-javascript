@@ -32,7 +32,7 @@ async function placeRecords(fromID: number, toID: number): Promise<number[]> {
     for (const record of records) {
             appendable += `<tr id="table-row-${record[0]}">`;
         for (const column of record) {
-            appendable += `<td align="center">${column.toString()}</td>`;     
+            appendable += `<td align="center">${column}</td>`;     
         }
         appendable += '</tr>';
     }
@@ -97,10 +97,10 @@ function calculateToId(fromId: number): number {
 function nextPageResize(previousCursor: number[]): number {
         const fromID = toNumber(previousCursor.sort((a, b) => {return a - b})[0]);
         const toID = toNumber(previousCursor.sort((a, b) => {return a - b})[1]);
-        const documentHeight = $(window).innerHeight() as number - ($(`#table-row-${fromID.toString()}`).height() as number);
+        const documentHeight = $(window).innerHeight() as number - ($(`#table-row-${fromID}`).height() as number);
 
         for (let i = fromID; i <= toID; i++) {
-            const elementHeightOffset = ($(`#table-row-${i.toString()}`).offset() as JQueryCoordinates).top;
+            const elementHeightOffset = ($(`#table-row-${i}`).offset() as JQueryCoordinates).top;
 
             if (elementHeightOffset < documentHeight) continue; 
             return i;
@@ -155,7 +155,7 @@ window.onload = async () => {
         } else {
             if (Math.floor(fromId).toString() == fromId.toString() === true) {
                 if ( fromId > recordCount - possibleStep ) {
-                    alert(`You may not insert a desired Id greater than ${(recordCount - possibleStep).toString()}`);
+                    alert(`You may not insert a desired Id greater than ${recordCount - possibleStep}`);
                 } else {
                     let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
                     previousCursor = await placeRecords(fromId, toId);
