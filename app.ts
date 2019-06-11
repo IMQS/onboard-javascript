@@ -18,7 +18,7 @@ async function getColumnNames() : Promise<string[]>{
 }
 
 async function getRecords(fromID: number, toID: number): Promise<string[][]> {
-    const response = await fetch(`http://localhost:2050/records?from=${(fromID).toString()}&to=${(toID).toString()}`);
+    const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
     return await response.json();
 }
 
@@ -38,7 +38,7 @@ async function placeRecords(fromID: number, toID: number): Promise<number[]> {
     }
     $("#WrapperTable-ContentBody").empty();
     $("#WrapperTable-ContentBody").append(appendable);
-    return await [fromID as number, toID as number];
+    return [fromID, toID];
 }
 
 // Credit: https://gist.github.com/ca0v/73a31f57b397606c9813472f7493a940
@@ -62,10 +62,10 @@ async function getPageContent(fromID: number, toID: number): Promise<number[]> {
     return await placeRecords(fromID, toID);
 }
 
-function toNumber(input: string | number, output: any = 1) : number {
+function toNumber(input: string | number, parseAsInt: boolean = true) : number {
     switch (typeof input) {
         case ('string'):
-            if (output == 1) {
+            if (parseAsInt == true) {
                 return parseInt(input as string);
             }
             return parseFloat(input as string);
@@ -102,11 +102,8 @@ function nextPageResize(previousCursor: number[]): number {
         for (let i = fromID; i <= toID; i++) {
             const elementHeightOffset = ($(`#table-row-${i.toString()}`).offset() as JQueryCoordinates).top;
 
-            if (elementHeightOffset >= documentHeight){
-                return i;
-            } else {
-                continue;
-            }
+            if (elementHeightOffset < documentHeight) continue; 
+            return i;
         }
         return toID;
 }
