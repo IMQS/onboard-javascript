@@ -52,13 +52,11 @@ async function placeRecordsFromCursor(cursor: number[]): Promise<number[]> {
 //#region Handlers
 async function getPageContent(fromID: number, toID: number): Promise<number[]> {
     $("#WrapperTable-HeaderRow").empty();
-    getColumnNames()
-        .then((columns: string[]) => {
-            for (const column of columns) {
-                let writable: string = `<th align="center">${column}</th>`;
-                $("#WrapperTable-HeaderRow").append(writable);
-            }
-        });
+    const columns = await getColumnNames();
+    for (const column of columns) {
+        let writable: string = `<th align="center">${column}</th>`;
+        $("#WrapperTable-HeaderRow").append(writable);
+    }
     return await placeRecords(fromID, toID);
 }
 
@@ -148,7 +146,7 @@ window.onload = async () => {
 
     $("#go-to-button").click(async () => {
         const recordCount = await getRecordCount();
-        const fromId = toNumber($("#go-to-index").val() as string, 2);
+        const fromId = toNumber($("#go-to-index").val() as string, false);
         const possibleStep = calculateToId(fromId) - fromId;
         if (fromId < 0){
             alert('You may only insert Id greater than or equal to 0');
