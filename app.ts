@@ -16,33 +16,31 @@ async function getRecords(fromID: number, toID: number): Promise<string[][]> {
 
 //#region Data Loading methods
 
-function placeRecords(fromID: number, toID: number): number[] {
-    getRecords(fromID, toID)
-        .then((records: string[][]) => {
-            let appendable = '';
-            for (const record of records) {
-                 appendable += `<tr id="table-row-${record[0]}">`;
-                for (const column of record) {
-                    appendable += `<td align="center">${column.toString()}</td>`;     
-                }
-                appendable += '</tr>';
-            }
-            $("#WrapperTable-ContentBody").empty();
-            $("#WrapperTable-ContentBody").append(appendable);
-        });
-    return [fromID as number, toID as number];
+async function placeRecords(fromID: number, toID: number): Promise<number[]> {
+    const records = await getRecords(fromID, toID)
+    let appendable = '';
+    for (const record of records) {
+            appendable += `<tr id="table-row-${record[0]}">`;
+        for (const column of record) {
+            appendable += `<td align="center">${column.toString()}</td>`;     
+        }
+        appendable += '</tr>';
+    }
+    $("#WrapperTable-ContentBody").empty();
+    $("#WrapperTable-ContentBody").append(appendable);
+    return await [fromID as number, toID as number];
 }
 
 // Credit: https://gist.github.com/ca0v/73a31f57b397606c9813472f7493a940
 
-function placeRecordsFromCursor(cursor: number[]): number[] {
+async function placeRecordsFromCursor(cursor: number[]): Promise<number[]> {
     cursor = cursor.sort((a,b) => {return a-b});
-    return placeRecords(cursor[0], cursor[1]);
+    return await placeRecords(cursor[0], cursor[1]);
 }
 //#endregion
 
 //#region Handlers
-function getPageContent(fromID: number, toID: number): number[] {
+async function getPageContent(fromID: number, toID: number): Promise<number[]> {
     $("#WrapperTable-HeaderRow").empty();
     getColumnNames()
         .then((columns: string[]) => {
@@ -51,7 +49,7 @@ function getPageContent(fromID: number, toID: number): number[] {
                 $("#WrapperTable-HeaderRow").append(writable);
             }
         });
-    return placeRecords(fromID, toID);
+    return await placeRecords(fromID, toID);
 }
 
 function toNumber(input: string | number, output: any = 1) : number {
@@ -111,8 +109,8 @@ function previousPageResize(previousCursor: number[]): number[] {
 let previousCursor: number[];
 let previousScale: number;
 
-window.onload = () => {     
-    previousCursor = getPageContent(0, calculateToId(0));
+window.onload = async () => {     
+    previousCursor = await getPageContent(0, calculateToId(0));
     
     $("#previous-page").click(async () => { 
         previousCursor = previousPageResize(previousCursor);
@@ -122,7 +120,7 @@ window.onload = () => {
         const recordCount = await getRecordCount();
         fromId = fromId == recordCount - 1 ? fromId - possibleStep : fromId;
         toId = toId <= recordCount - 1 ? toId : recordCount - 1;
-        previousCursor = placeRecords(fromId, toId);
+        previousCursor = await placeRecords(fromId, toId);
         
     });
 
@@ -132,9 +130,9 @@ window.onload = () => {
             const recordCount = await getRecordCount();
             if ( fromId <= recordCount - possibleStep - 1 ) {
                 const toId = fromId + possibleStep <= recordCount - 1 ? fromId + possibleStep : recordCount - 1;
-                previousCursor = placeRecords(fromId, toId);
+                previousCursor = await placeRecords(fromId, toId);
             } else if (fromId <= recordCount - 1)  {
-                previousCursor = placeRecords(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
+                previousCursor = await placeRecords(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
                 alert('You reached the last record - which is shown at the bottom of the screen');
             } else {
                 alert('You have reached the end of the list');
@@ -153,7 +151,7 @@ window.onload = () => {
                     alert(`You may not insert a desired Id greater than ${(recordCount - possibleStep).toString()}`);
                 } else {
                     let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
-                    previousCursor = placeRecords(fromId, toId);
+                    previousCursor = await placeRecords(fromId, toId);
                 }
             } else {
                 alert('It seems you are not inserting an integer - please ensure that you are.');
@@ -168,10 +166,10 @@ window.onresize = () => {
     resizeTimer = setTimeout(async () => {
         const recordCount = await getRecordCount();
         if ( x >= recordCount - 1 ) {
-            previousCursor = placeRecords(recordCount - 1 - (calculateToId(previousCursor[0]) - previousCursor[0]), recordCount - 1);
+            previousCursor = await placeRecords(recordCount - 1 - (calculateToId(previousCursor[0]) - previousCursor[0]), recordCount - 1);
             alert('Note that since you were on the last page, the final record is still at the bottom of your page');
         } else {
-            previousCursor = placeRecords(previousCursor[0], x)
+            previousCursor = await placeRecords(previousCursor[0], x)
         }
     }, 250);
 }
