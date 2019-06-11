@@ -114,7 +114,7 @@ window.onload = async () => {
     
     $("#previous-page").click(async () => { 
         previousCursor = previousPageResize(previousCursor);
-        let fromId = (previousCursor[0] >= 0 ? previousCursor[0] : 0);
+        let fromId = previousCursor[0] >= 0 ? previousCursor[0] : 0;
         const possibleStep = calculateToId(fromId) - fromId;
         let toId = (previousCursor[0] >= 0 ? previousCursor[1] : possibleStep);
         const recordCount = await getRecordCount();
