@@ -138,7 +138,7 @@ window.onload = () => {
                         previousCursor = placeRecords(fromId, toId);
                     } else if (fromId <= recordCount - 1)  {
                         previousCursor = placeRecords(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
-                        alert('You reached the last record - which is shown at the bottom of the screen')
+                        alert('You reached the last record - which is shown at the bottom of the screen');
                     } else {
                         alert('You have reached the end of the list');
                     }
@@ -176,7 +176,7 @@ window.onresize = () => {
             .then((recordCount) => {   
                 if ( x >= recordCount - 1 ) {
                     previousCursor = placeRecords(recordCount - 1 - (calculateToId(previousCursor[0]) - previousCursor[0]), recordCount - 1);
-                    alert('Note that since you were on the last page, the final record is still at the bottom of your page')
+                    alert('Note that since you were on the last page, the final record is still at the bottom of your page');
                 } else {
                     previousCursor = placeRecords(previousCursor[0], x)
                 }
