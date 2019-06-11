@@ -91,17 +91,17 @@ function calculateToId(fromId: number): number {
 }
 
 function nextPageResize(previousCursor: number[]): number {
-        const fromID = toNumber(previousCursor.sort((a, b) => {return a - b})[0]);
-        const toID = toNumber(previousCursor.sort((a, b) => {return a - b})[1]);
-        const documentHeight = $(window).innerHeight() as number - ($(`#table-row-${fromID}`).height() as number);
+    const fromID = toNumber(previousCursor.sort((a, b) => {return a - b})[0]);
+    const toID = toNumber(previousCursor.sort((a, b) => {return a - b})[1]);
+    const documentHeight = $(window).innerHeight() as number - ($(`#table-row-${fromID}`).height() as number);
 
-        for (let i = fromID; i <= toID; i++) {
-            const elementHeightOffset = ($(`#table-row-${i}`).offset() as JQueryCoordinates).top;
+    for (let i = fromID; i <= toID; i++) {
+        const elementHeightOffset = ($(`#table-row-${i}`).offset() as JQueryCoordinates).top;
 
-            if (elementHeightOffset < documentHeight) continue; 
-            return i;
-        }
-        return toID;
+        if (elementHeightOffset < documentHeight) continue; 
+        return i;
+    }
+    return toID;
 }
 
 function previousPageResize(previousCursor: number[]): number[] {
