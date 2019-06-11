@@ -114,56 +114,50 @@ let previousScale: number;
 window.onload = () => {     
     previousCursor = getPageContent(0, calculateToId(0));
     
-    $("#previous-page").click(() => { 
+    $("#previous-page").click(async () => { 
         previousCursor = previousPageResize(previousCursor);
         let fromId = (previousCursor[0] >= 0 ? previousCursor[0] : 0);
         const possibleStep = calculateToId(fromId) - fromId;
         let toId = (previousCursor[0] >= 0 ? previousCursor[1] : possibleStep);
-        getRecordCount()
-            .then((recordCount) => {
-                fromId = fromId == recordCount - 1 ? fromId - possibleStep : fromId;
-                toId = toId <= recordCount - 1 ? toId : recordCount - 1;
-                previousCursor = placeRecords(fromId, toId);
-            });
+        const recordCount = await getRecordCount();
+        fromId = fromId == recordCount - 1 ? fromId - possibleStep : fromId;
+        toId = toId <= recordCount - 1 ? toId : recordCount - 1;
+        previousCursor = placeRecords(fromId, toId);
         
     });
 
-    $("#next-page").click(() => {
+    $("#next-page").click(async () => {
             const fromId = nextPageResize(previousCursor);
             const possibleStep = calculateToId(fromId) - fromId;
-            getRecordCount()
-                .then((recordCount) => {
-                    if ( fromId <= recordCount - possibleStep - 1 ) {
-                        const toId = fromId + possibleStep <= recordCount - 1 ? fromId + possibleStep : recordCount - 1;
-                        previousCursor = placeRecords(fromId, toId);
-                    } else if (fromId <= recordCount - 1)  {
-                        previousCursor = placeRecords(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
-                        alert('You reached the last record - which is shown at the bottom of the screen');
-                    } else {
-                        alert('You have reached the end of the list');
-                    }
-                });        
+            const recordCount = await getRecordCount();
+            if ( fromId <= recordCount - possibleStep - 1 ) {
+                const toId = fromId + possibleStep <= recordCount - 1 ? fromId + possibleStep : recordCount - 1;
+                previousCursor = placeRecords(fromId, toId);
+            } else if (fromId <= recordCount - 1)  {
+                previousCursor = placeRecords(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
+                alert('You reached the last record - which is shown at the bottom of the screen');
+            } else {
+                alert('You have reached the end of the list');
+            }
         });
 
-    $("#go-to-button").click(() => {
+    $("#go-to-button").click(async () => {
         const fromId = toNumber($("#go-to-index").val() as string, 2);
         const possibleStep = calculateToId(fromId) - fromId;
         if (fromId < 0){
             alert('You may only insert Id greater than or equal to 0');
         } else {
-            getRecordCount()
-            .then((recordCount) => {
-                if (Math.floor(fromId).toString() == fromId.toString() === true) {
-                    if ( fromId > recordCount - possibleStep ) {
-                        alert(`You may not insert a desired Id greater than ${(recordCount - possibleStep).toString()}`);
-                    } else {
-                        let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
-                        previousCursor = placeRecords(fromId, toId);
-                    }
+            const recordCount = await getRecordCount();
+            if (Math.floor(fromId).toString() == fromId.toString() === true) {
+                if ( fromId > recordCount - possibleStep ) {
+                    alert(`You may not insert a desired Id greater than ${(recordCount - possibleStep).toString()}`);
                 } else {
-                    alert('It seems you are not inserting an integer - please ensure that you are.');
+                    let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
+                    previousCursor = placeRecords(fromId, toId);
                 }
-            });
+            } else {
+                alert('It seems you are not inserting an integer - please ensure that you are.');
+            }
         }
     });
 }
@@ -171,15 +165,13 @@ let resizeTimer = 50;
 window.onresize = () => {
     const x = calculateToId(previousCursor[0]);
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-        getRecordCount()
-            .then((recordCount) => {   
-                if ( x >= recordCount - 1 ) {
-                    previousCursor = placeRecords(recordCount - 1 - (calculateToId(previousCursor[0]) - previousCursor[0]), recordCount - 1);
-                    alert('Note that since you were on the last page, the final record is still at the bottom of your page');
-                } else {
-                    previousCursor = placeRecords(previousCursor[0], x)
-                }
-            })
+    resizeTimer = setTimeout(async () => {
+        const recordCount = await getRecordCount();
+        if ( x >= recordCount - 1 ) {
+            previousCursor = placeRecords(recordCount - 1 - (calculateToId(previousCursor[0]) - previousCursor[0]), recordCount - 1);
+            alert('Note that since you were on the last page, the final record is still at the bottom of your page');
+        } else {
+            previousCursor = placeRecords(previousCursor[0], x)
+        }
     }, 250);
 }
