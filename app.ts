@@ -41,8 +41,6 @@ async function placeRecords(fromID: number, toID: number): Promise<number[]> {
     return [fromID, toID];
 }
 
-// Credit: https://gist.github.com/ca0v/73a31f57b397606c9813472f7493a940
-
 async function placeRecordsFromCursor(cursor: number[]): Promise<number[]> {
     cursor = cursor.sort((a,b) => {return a-b});
     return await placeRecords(cursor[0], cursor[1]);
