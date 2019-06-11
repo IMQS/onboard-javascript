@@ -49,12 +49,14 @@ async function placeRecordsFromCursor(cursor: number[]): Promise<number[]> {
 
 //#region Handlers
 async function getPageContent(fromID: number, toID: number): Promise<number[]> {
-    $("#wrapper-table-header-row").empty();
+    let appendable = "";
     const columns = await getColumnNames();
     for (const column of columns) {
-        let writable: string = `<th align="center">${column}</th>`;
-        $("#wrapper-table-header-row").append(writable);
+        appendable += `<th align="center">${column}</th>`;
+        
     }
+    $("#wrapper-table-header-row").empty();
+    $("#wrapper-table-header-row").append(appendable);
     return await placeRecords(fromID, toID);
 }
 
