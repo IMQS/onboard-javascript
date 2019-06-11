@@ -36,8 +36,8 @@ async function placeRecords(fromID: number, toID: number): Promise<number[]> {
         }
         appendable += '</tr>';
     }
-    $("#WrapperTable-ContentBody").empty();
-    $("#WrapperTable-ContentBody").append(appendable);
+    $("#wrapper-table-content-body").empty();
+    $("#wrapper-table-content-body").append(appendable);
     return [fromID, toID];
 }
 
@@ -51,11 +51,11 @@ async function placeRecordsFromCursor(cursor: number[]): Promise<number[]> {
 
 //#region Handlers
 async function getPageContent(fromID: number, toID: number): Promise<number[]> {
-    $("#WrapperTable-HeaderRow").empty();
+    $("#wrapper-table-header-row").empty();
     const columns = await getColumnNames();
     for (const column of columns) {
         let writable: string = `<th align="center">${column}</th>`;
-        $("#WrapperTable-HeaderRow").append(writable);
+        $("#wrapper-table-header-row").append(writable);
     }
     return await placeRecords(fromID, toID);
 }
