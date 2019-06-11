@@ -102,7 +102,7 @@ function nextPageResize(previousCursor: number[]): number {
         for (let i = fromID; i <= toID; i++) {
             const elementHeightOffset = ($(`#table-row-${i.toString()}`).offset() as JQueryCoordinates).top;
 
-            if ( elementHeightOffset >= documentHeight ){
+            if (elementHeightOffset >= documentHeight){
                 return i;
             } else {
                 continue;
