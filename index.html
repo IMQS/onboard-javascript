@@ -37,32 +37,34 @@
 		display: block;
 	}
 	thead tr {
-	display: none;
+		display: none;
 	}
 	tr {
-	 border: 1px solid #ccc; 
+		border: 1px solid #ccc; 
 	}
 	td {
-	border: none;
-	border-bottom: 1px solid #eee;
-	position: relative;
-	padding-left: 50%;
-	white-space: normal;
-	text-align:left;
-	min-height: 10px;
-	overflow: hidden;
-	word-break:break-all;
+		border: none;
+		border-bottom: 1px solid #eee;
+		position: relative;
+		padding-left: 50%;
+		white-space: normal;
+		text-align:left;
+		min-height: 10px;
+		overflow: hidden;
+		word-break:break-all;
 	}
 	td:before {
-	position: absolute;
-	top: 6px;
-	left: 6px;
-	width: 45%;
-	padding-right: 10px;
-	text-align:left;
-	font-weight: bold;
+		position: absolute;
+		top: 6px;
+		left: 6px;
+		width: 45%;
+		padding-right: 10px;
+		text-align:left;
+		font-weight: bold;
 	}
-	td:before { content: attr(data-title); }
+	td:before { 
+		content: attr(data-title);
+	}
 }
 </style>
 </html>
