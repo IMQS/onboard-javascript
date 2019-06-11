@@ -30,7 +30,7 @@ async function placeRecords(fromID: number, toID: number): Promise<number[]> {
     const records = await getRecords(fromID, toID)
     let appendable = '';
     for (const record of records) {
-            appendable += `<tr id="table-row-${record[0]}">`;
+        appendable += `<tr id="table-row-${record[0]}">`;
         for (const column of record) {
             appendable += `<td align="center">${column}</td>`;     
         }
