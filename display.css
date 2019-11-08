@@ -1,0 +1,66 @@
+table{
+width:100%;
+
+}
+
+th{
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	display: inline-flex;
+	background-image: radial-gradient(green, black);
+	border: 1px solid rgba(0, 0, 0, 0.8);
+	padding: 20px;
+	font-size: 20px;
+	width:6.8%;
+	color:white;
+	scrollbar-width: none;
+}
+
+td{
+	display: inline-flex;
+	border: 1px solid rgba(0, 0, 0, 0.8);
+	padding: 20px;
+	font-size: 15px;
+	width:6.8%;
+	scrollbar-width: none;
+}
+
+tr:hover {
+	background-color:#e1eaea
+}
+
+html {
+	overflow:hidden;
+}
+
+
+#btns{
+	position: absolute;
+	bottom: 5px;
+	float:left;
+
+}
+.pagination {
+	display:inline-flex;
+	position: absolute;
+	float:left;
+	bottom: 5px;
+	padding: 10px 18px;
+  }
+
+  .pagination:hover {
+
+	text-decoration: underline;
+  }
+
+
+img{
+	position: absolute;
+	bottom: 5px;
+	right: 10px;
+}
+
+label{
+
+	color:black;
+}
