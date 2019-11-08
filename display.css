@@ -1,6 +1,13 @@
-table{
-width:100%;
-
+@media  screen and (min-width:460px){
+	table,tr,body {
+	Width: 100%!important;
+	}
+	th{
+		width:6.8%;
+	}
+	td{
+		width:6.8%;
+	}
 }
 
 th{
@@ -11,8 +18,8 @@ th{
 	border: 1px solid rgba(0, 0, 0, 0.8);
 	padding: 20px;
 	font-size: 20px;
-	width:6.8%;
 	color:white;
+	height: auto;
 	scrollbar-width: none;
 }
 
@@ -21,16 +28,12 @@ td{
 	border: 1px solid rgba(0, 0, 0, 0.8);
 	padding: 20px;
 	font-size: 15px;
-	width:6.8%;
 	scrollbar-width: none;
+
 }
 
 tr:hover {
 	background-color:#e1eaea
-}
-
-html {
-	overflow:hidden;
 }
 
 #btns{
@@ -54,7 +57,17 @@ img{
 	right: 10px;
 }
 
+html{
+	overflow: hidden;
+}
+
 label{
 
 	color:black;
+}
+
+body{
+padding: 0;
+margin: 0;
+
 }
