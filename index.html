@@ -3,29 +3,19 @@
 <head>
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
-	<script type="text/javascript" charset="utf-8" src="./app.js"></script>
+	<script type="text/javascript" charset="utf-8" src="./app.js?v=1"></script>
 	<link rel="stylesheet" href="./display.css">
 </head>
 <body id="body">
-
-
-<br/>
 <section>
-
-
-		<div id="content">
-
-			</div>
-
-
+	<div id="content">
+	</div>
 </section>
-
-<div class="pagination">
-	<button type="button" id="secondPage" value ="secondPage" onclick=readNext()>Next</button>
-	<button type="button" id="thirdPage" value ="thirdPage" onclick=readPrevious()>Previous</button>
+<div class="buttons">
+	<button type="button" id="previousPage" value ="previousPage" onclick=readPrevious()>Previous</button>
+	<button type="button" id="nextPage" value ="nextPage" onclick=readNext()>Next</button>
   </div>
 </div>
 <img src="source.gif">
 </body>
-
 </html>

@@ -33,24 +33,18 @@ html {
 	overflow:hidden;
 }
 
-
 #btns{
 	position: absolute;
 	bottom: 5px;
 	float:left;
 
 }
-.pagination {
+.buttons {
 	display:inline-flex;
 	position: absolute;
 	float:left;
 	bottom: 5px;
 	padding: 10px 18px;
-  }
-
-  .pagination:hover {
-
-	text-decoration: underline;
   }
 
 
