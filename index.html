@@ -3,7 +3,6 @@
 <head>
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
-	<script type="text/javascript" charset="utf-8" src="./app.js?v=1"></script>
 	<link rel="stylesheet" href="./display.css">
 </head>
 <body id="body">
@@ -12,8 +11,9 @@
 	</div>
 </section>
 <div class="buttons">
-	<button type="button" id="previousPage" value ="previousPage" onclick=readPrevious()>Previous</button>
-	<button type="button" id="nextPage" value ="nextPage" onclick=readNext()>Next</button>
+	<button type="button" id="previousPage"  onclick="readPrevious()">Previous</button>
+	<button type="button" id="nextPage" onclick="readNext()">Next</button>
+	<script src="./app.js"></script>
   </div>
 </div>
 <img src="source.gif">
