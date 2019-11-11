@@ -20,15 +20,14 @@ td{
 	font-size: 15px;
 	scrollbar-width: none;
 	width:6.8%;
-
 }
 
 table,tr{
 	width:100%;
-
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
 }
-
-
 
 
 tr:hover {
@@ -39,8 +38,8 @@ tr:hover {
 	position: absolute;
 	bottom: 5px;
 	float:left;
-
 }
+
 .buttons {
 	display:inline-flex;
 	position: relative;
@@ -50,22 +49,13 @@ tr:hover {
   }
 
 
-img{
-	position: absolute;
-	bottom: 5px;
-	right: 10px;
-}
-
 html{
 	overflow: hidden;
 }
 
-
-
 body{
-padding: 0;
-margin: 0;
-position:relative;
-
-
+	padding: 0;
+	margin: 0px;
+	position:relative;
+	padding-bottom: 20px;
 }
