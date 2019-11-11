@@ -1,6 +1,6 @@
 "use strict";
 let from = 0;
-let to = 13;
+let to = 12;
 
 
 function resizeBody() {
@@ -8,38 +8,49 @@ function resizeBody() {
 	let $tdElement = $("td");
 	let $trElement = $("tr");
 	let $tableElement = $("table");
-
+	let $btnElement = $("button");
 
 	let elHeight = window.outerHeight;
+	let adaptedHeigth = elHeight - ($btnElement.height());
 	let elWidth = window.outerWidth;
 
+	let trArray = trEl
 
-
+	$btnElement.css({
+		'height': elHeight / 30 + "px",
+		'font-size': elHeight / 65 + "px",
+		'width': elWidth / 13 + "px",
+	})
 
 	$trElement.css({
-		'height': elHeight / 19.25 + "px",
-		'font-size': elHeight / 25 + "px",
-		'width': elWidth + "px",
+		'height': "auto",
+		'font-size': adaptedHeigth / 28 + "px",
+		'width': elWidth + "px"
 	})
 
 	$thElement.css({
-		'width': elWidth / 11.5 + "px",
+		'width': elWidth / 11.45 + "px",
 		'padding': "0px",
-		'height': elHeight / 19.25 + "px"
+		'height': (adaptedHeigth / 100) * 5.5 + "px",
+		'font-size': adaptedHeigth / 50 + "px"
 
 	})
+
 	$tdElement.css({
-		'width': elWidth / 11.5 + "px",
+		'width': elWidth / 11.45 + "px",
 		'padding': "0px",
-		'height': elHeight / 19.25 + "px"
+		'height': (adaptedHeigth / 100) * 5.5 + "px",
+		'font-size': adaptedHeigth / 60 + "px"
 	})
 
 	$tableElement.css({
 		'width': elWidth + "px",
 		'padding': "0px",
-		'margin': "0"
-
+		'margin': "0px",
 	})
+
+
+
 
 }
 
@@ -64,22 +75,22 @@ function retrieveRows(number) {
 	let indexNumber = 0;
 	if (number == 1) {
 		from = 0;
-		to = 13
+		to = 12
 	} else if (number == 2) {
 		if (from == 0) {
 			from = 0;
-			to = 13;
+			to = 12;
 		} else {
-			from = from - 13;
-			to = to - 13;
+			from = from - 12;
+			to = to - 12;
 		}
 	} else if (number == 3) {
 		if (to == 10000) {
-			from = 9987;
+			from = 9988;
 			to = 10000;
 		} else {
-			from = from + 13;
-			to = to + 13;
+			from = from + 12;
+			to = to + 12;
 		}
 	}
 
@@ -92,7 +103,7 @@ function retrieveRows(number) {
 		//check if the status is 200(means everything is okay)
 		let columnData = Array.from(rowsRequest.responseText.split(','));
 
-		for (let j = 0; j < 14; j++) {
+		for (let j = 0; j < 13; j++) {
 			let newRow = document.createElement('tr');
 			newRow.setAttribute('id', 'rowNumber' + j);
 			document.getElementById("intialTable").appendChild(newRow);
