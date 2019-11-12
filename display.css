@@ -6,20 +6,20 @@ th{
 	background-image: radial-gradient(green, black);
 	border: 1px solid rgba(0, 0, 0, 0.8);
 	padding: 20px;
-	font-size: 20px;
+	font-size: 18px;
 	color:white;
 	height: auto;
 	scrollbar-width: none;
-	width:6.8%;
+	width:6.7%;
 }
 
 td{
 	display: inline-flex;
 	border: 1px solid rgba(0, 0, 0, 0.8);
 	padding: 20px;
-	font-size: 15px;
+	font-size: 13px;
 	scrollbar-width: none;
-	width:6.8%;
+	width:6.7%;
 }
 
 table,tr{
@@ -58,4 +58,9 @@ body{
 	margin: 0px;
 	position:relative;
 	padding-bottom: 20px;
+}
+
+.searchButtons{
+float: right;
+
 }
