@@ -1,75 +1,37 @@
 "use strict";
 window.onload = () => { retrieveRows(1) };
 let from = 0;
-let to = 12;
-
+let to = 13;
 
 let resizeBody = () => {
 	let $thElement = $("th");
 	let $tdElement = $("td");
 	let $trElement = $("tr");
 	let $tableElement = $("table");
-	let $btnElement = $("button");
-	let $lblElement = $("label");
-	let $inputElement = $("input");
 
-	let elHeight = window.outerHeight;
-	let adaptedHeigth = elHeight - ($btnElement.height()!);
-	let elWidth = window.outerWidth;
+	let elWidth = window.innerWidth;
 
-
-
-	$btnElement.css({
-		'height': elHeight / 30 + "px",
-		'font-size': elHeight / 65 + "px",
-		'width': elWidth / 13 + "px",
-	})
-
-	$lblElement.css({
-		'height': elHeight / 30 + "px",
-		'font-size': elHeight / 65 + "px",
-		'width': elWidth / 13 + "px",
-	})
-
-	$inputElement.css({
-		'height': elHeight / 30 + "px",
-		'font-size': elHeight / 65 + "px",
-		'width': elWidth / 13 + "px",
-	})
 	$trElement.css({
-		'height': "auto",
-		'font-size': adaptedHeigth / 28 + "px",
 		'width': elWidth + "px"
 	})
 
 	$thElement.css({
-		'width': elWidth / 11.20 + "px",
-		'padding': "0px",
-		'height': (adaptedHeigth / 100) * 6 + "px",
-		'font-size': adaptedHeigth / 50 + "px"
-
+		'width': elWidth / 11 + "px"
 	})
 
 	$tdElement.css({
-		'width': elWidth / 11.20 + "px",
-		'padding': "0px",
-		'height': (adaptedHeigth / 100) * 6 + "px",
-		'font-size': adaptedHeigth / 60 + "px"
+		'width': elWidth / 11 + "px"
+
 	})
 
 	$tableElement.css({
-		'width': elWidth + "px",
-		'padding': "0px",
-		'margin': "0px",
+		'width': elWidth + "px"
 	})
 
 	//remove unnecesary rows
 	let trRows = $("tr").toArray();
-	let initialTable: HTMLElement | null = document.getElementById('initialTable');
 	try {
 		jQuery.each(trRows, function (tr) {
-
-
 			let row = document.getElementById("rowNumber" + tr)!;
 
 			let bounding = row.getBoundingClientRect();
@@ -83,14 +45,12 @@ let resizeBody = () => {
 		});
 	} catch (Error) {
 		console.log("Oof")
-
 	}
 
 }
 
 //retrieves column names
 function callHeaders() {
-	console.log("headers called");
 	let xhr = new XMLHttpRequest;
 	//Call the open function, GET-type of request,
 	xhr.open('GET', 'http://localhost:2050/columns', true)
@@ -103,7 +63,6 @@ function callHeaders() {
 	}
 	//call send
 	xhr.send();
-
 }
 
 function retrieveRows(number: number) {
@@ -111,28 +70,28 @@ function retrieveRows(number: number) {
 	let indexNumber = 0;
 	if (number == 1) {
 		from = 0;
-		to = 12
+		to = 13
 	} else if (number == 2) {
 		if (from == 0) {
 			from = 0;
-			to = 12;
+			to = 13;
 		} else {
-			from = from - 12;
-			to = to - 12;
+			from = from - 13;
+			to = to - 13;
 		}
 	} else if (number == 3) {
 		if (to == 10000) {
-			from = 9988;
+			from = 9987;
 			to = 10000;
 		} else {
-			from = from + 12;
-			to = to + 12;
+			from = from + 13;
+			to = to + 13;
 		}
 	} else if (number == 4) {
-		from = parseInt((<HTMLInputElement>document.getElementById("myValue")).value);
-		console.log(from);
+		let fromValue = <HTMLInputElement>document.getElementById("fromValue");
+		from = parseInt(fromValue.value);
+		console.log("From value: " + from);
 		to = from + 12;
-
 	}
 
 	//validate input
@@ -144,7 +103,7 @@ function retrieveRows(number: number) {
 		//check if the status is 200(means everything is okay)
 		let columnData = Array.from(rowsRequest.responseText.split(','));
 
-		for (let j = 1; j < 14; j++) {
+		for (let j = 1; j < 15; j++) {
 			let newRow: HTMLElement = document.createElement('tr');
 			newRow.setAttribute('id', 'rowNumber' + j);
 			document.getElementById("intialTable")!.appendChild(newRow);
@@ -163,15 +122,15 @@ function retrieveRows(number: number) {
 	//call send
 	rowsRequest.send();
 
-
-
 }
 
 function create(input: string[]) {
-	if (document.getElementById("intialTable") != null) {
-		let table = document.getElementById("intialTable");
-
+	let tableRetrieved = <HTMLInputElement>document.getElementById("intialTable");
+	console.log(tableRetrieved);
+	if (tableRetrieved != null) {
+		tableRetrieved.remove();
 	}
+
 
 	let table = document.createElement('table');
 	table.setAttribute('id', 'intialTable');

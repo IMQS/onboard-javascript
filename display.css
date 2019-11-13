@@ -1,33 +1,24 @@
 
 th{
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	display: inline-flex;
-	background-image: radial-gradient(green, black);
-	border: 1px solid rgba(0, 0, 0, 0.8);
-	padding: 20px;
-	font-size: 18px;
-	color:white;
-	height: auto;
-	scrollbar-width: none;
-	width:6.7%;
+	background-color:#99ff99;
+	width:6.8%;
+	border-bottom: 1px solid;
+	padding:20px;
+
 }
 
 td{
-	display: inline-flex;
-	border: 1px solid rgba(0, 0, 0, 0.8);
-	padding: 20px;
-	font-size: 13px;
-	scrollbar-width: none;
-	width:6.7%;
+	width:6.8%;
+	padding:18px;
+	border-bottom: 1px solid;
 }
 
-table,tr{
-	width:100%;
-	padding: 0;
-	margin: 0;
-	overflow: hidden;
-}
+
+table {
+	position: relative;
+	width: 100%;
+	text-align: left;
+  }
 
 
 tr:hover {
@@ -35,8 +26,7 @@ tr:hover {
 }
 
 #btns{
-	position: absolute;
-	bottom: 5px;
+	position: relative;
 	float:left;
 }
 
@@ -44,23 +34,15 @@ tr:hover {
 	display:inline-flex;
 	position: relative;
 	float:left;
-	bottom: 5px;
 	padding: 10px 18px;
   }
 
-
 html{
-	overflow: hidden;
-}
+	overflow:hidden;
 
-body{
-	padding: 0;
-	margin: 0px;
-	position:relative;
-	padding-bottom: 20px;
 }
 
 .searchButtons{
-float: right;
+	float: right;
 
 }
