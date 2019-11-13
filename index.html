@@ -3,20 +3,21 @@
 <head>
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+	<script type="text/typescript" src="app.ts"></script>
 	<link rel="stylesheet" href="./display.css">
 </head>
 <body id="body">
 
 
 <div class="buttons">
-	<button type="button" id="previousPage"  onclick="readPrevious()">Previous</button>
-	<button type="button" id="nextPage" onclick="readNext()">Next</button>
-	<script src="./app.js"></script>
+	<button type="button" id="previousPage"  onclick="retrieveRows(2)">Previous</button>
+	<button type="button" id="nextPage" onclick="retrieveRows(3)">Next</button>
+
   </div>
 
 <div class="searchButtons">
 	<label>Start:</label><input type="text" id="fromValue">
-	<button type="button" id="btnSubmitFrom" onclick="readFrom()">Submit</button>
+	<button type="button" id="btnSubmitFrom" onclick="retrieveRows(4)">Submit</button>
 </div>
 
 </body>
