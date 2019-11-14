@@ -32,22 +32,23 @@ let resizeBody = () => {
 	let trRows = $("tr").toArray();
 	try {
 		jQuery.each(trRows, function (tr) {
+
 			let row = document.getElementById("rowNumber" + tr)!;
 
 			let bounding = row.getBoundingClientRect();
 
-			if (bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) && row != null) {
+			if (isElementXPercentInViewport(row, 100) == true && row != null) {
 				document.getElementById("rowNumber" + tr)!.style.display = "block";
 			} else {
-				document.getElementById("rowNumber" + tr)!.style.display = "none";;
+				document.getElementById("rowNumber" + tr)!.style.display = "none";
 			}
-
 		});
+
 	} catch (Error) {
 		console.log("Oof")
 	}
-
 }
+
 
 //retrieves column names
 function callHeaders() {
@@ -66,8 +67,21 @@ function callHeaders() {
 }
 
 function retrieveRows(number: number) {
+
+	let trRows = $("tr").toArray();
+	let rowCount = -1;
+	jQuery.each(trRows, function (tr) {
+		let row = document.getElementById("rowNumber" + tr)!;
+		let bounding = row.getBoundingClientRect();
+
+		if (isElementXPercentInViewport(row, 100) == true && row != null) {
+			rowCount++;
+		}
+	});
+
 	callHeaders();
 	let indexNumber = 0;
+
 	if (number == 1) {
 		from = 0;
 		to = 13
@@ -76,24 +90,32 @@ function retrieveRows(number: number) {
 			from = 0;
 			to = 13;
 		} else {
-			from = from - 13;
-			to = to - 13;
+			from = from - rowCount + 1;
+			to = to - 1;
 		}
 	} else if (number == 3) {
-		if (to == 10000) {
-			from = 9987;
-			to = 10000;
+		if (from == 9987) {
+			from = 999987;
+			to = 1000000;
 		} else {
-			from = from + 13;
-			to = to + 13;
+			from = from + rowCount;
+			to = to + rowCount;
+			console.log("Rows:" + rowCount);
 		}
 	} else if (number == 4) {
 		let fromValue = <HTMLInputElement>document.getElementById("fromValue");
-		from = parseInt(fromValue.value);
-		console.log("From value: " + from);
-		to = from + 12;
+		if (/[0-9]/.test(fromValue.value) == false) {
+			window.alert("Nee,Stout \(>.<)/");
+		} else {
+			from = parseInt(fromValue.value);
+			if (from == 10000) {
+				from = 9987;
+				to = 10000;
+			} else {
+				to = from + rowCount;
+			}
+		}
 	}
-
 	//validate input
 	let rowsRequest = new XMLHttpRequest;
 	//Call the open function, GET-type of request,
@@ -124,6 +146,21 @@ function retrieveRows(number: number) {
 
 }
 
+const isElementXPercentInViewport = function (el: HTMLElement, percentVisible: number) {
+	let
+		rect = el.getBoundingClientRect(),
+		windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+	console.log("row: " + el.id);
+	console.log(!(Math.floor(100 - (((rect.top >= 0 ? 0 : rect.top) / +-(rect.height / 1)) * 100)) < percentVisible || Math.floor(100 - ((rect.bottom - windowHeight) / rect.height) * 100) < percentVisible));
+
+	return !(
+		Math.floor(100 - (((rect.top >= 0 ? 0 : rect.top) / +-(rect.height / 1)) * 100)) < percentVisible ||
+		Math.floor(100 - ((rect.bottom - windowHeight) / rect.height) * 100) < percentVisible
+
+	)
+
+};
+
 function create(input: string[]) {
 	let tableRetrieved = <HTMLInputElement>document.getElementById("intialTable");
 	console.log(tableRetrieved);
@@ -147,7 +184,5 @@ function create(input: string[]) {
 		document.getElementById("rowNumber0")!.appendChild(columnName);
 	}
 }
-
-
 
 window.onresize = resizeBody;
