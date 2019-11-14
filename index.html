@@ -1,13 +1,30 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>JS Onboard Project</title>
-	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
-</head>
+  <title>ONBoardingProject</title>
 
-<body>
-	<p>Hello</p>
-</body>
+  <head>
+    <script
+      type="text/javascript"
+      charset="utf-8"
+      src="third_party/jquery-2.0.3.min.js"
+    ></script>
+    <script type="text/javascript" src="app.js"></script>
+    <link rel="stylesheet" type="text/css" href="app.css" />
+  </head>
+  <body>
+    <button id="nextPage" onclick="NextPage()">NEXT PAGE >></button>
+    <button id="previousPage" onclick="PreviousPage()"><< PREVIOUS PAGE</button>
 
+    <div class="searchButtons">
+      <label>SEARCH:</label
+      ><input
+        type="text"
+        id="userInput"
+        placeholder="Enter a record number here"
+      />
+      <button type="button" id="submitButton" onclick="SearchBar()">
+        SUBMIT
+      </button>
+    </div>
+  </body>
 </html>
-
