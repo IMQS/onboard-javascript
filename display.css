@@ -1,18 +1,20 @@
 
 th{
 	background-color:#cc66ff;
-	width:6.8%;
 	border-bottom: 1px solid;
 	padding:20px;
 
 }
 
 td{
-	width:6.8%;
 	padding:18px;
 	border-bottom: 1px solid;
 }
 
+tr{
+height: 56px;
+
+}
 
 table {
 	position: relative;
