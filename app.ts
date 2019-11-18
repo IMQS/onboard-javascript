@@ -1,53 +1,64 @@
 "use strict";
-window.onload = () => { retrieveRows(1) };
+window.onload = () => {onloadValues() };
+
+const rowHeight = 56;
 let from = 0;
-let to = 13;
+let to = 0;
 
-let resizeBody = () => {
-	let $thElement = $("th");
-	let $tdElement = $("td");
-	let $trElement = $("tr");
-	let $tableElement = $("table");
 
-	let elWidth = window.innerWidth;
+function amountOfRowsThatFit(){
+	let $buttonEl = $("button");
 
-	$trElement.css({
-		'width': elWidth + "px"
-	})
+	let windowHeigt = window.innerHeight;
+	let buttonDivheigth = $buttonEl.innerHeight;
+	let adaptedHeight = windowHeigt-buttonDivheigth;
 
-	$thElement.css({
-		'width': elWidth / 11 + "px"
-	})
+	return (adaptedHeight/rowHeight)-1;
 
-	$tdElement.css({
-		'width': elWidth / 11 + "px"
-
-	})
-
-	$tableElement.css({
-		'width': elWidth + "px"
-	})
-
-	//remove unnecesary rows
-	let trRows = $("tr").toArray();
-	try {
-		jQuery.each(trRows, function (tr) {
-
-			let row = document.getElementById("rowNumber" + tr)!;
-
-			let bounding = row.getBoundingClientRect();
-
-			if (isElementXPercentInViewport(row, 100) == true && row != null) {
-				document.getElementById("rowNumber" + tr)!.style.display = "block";
-			} else {
-				document.getElementById("rowNumber" + tr)!.style.display = "none";
-			}
-		});
-
-	} catch (Error) {
-		console.log("Oof")
-	}
 }
+
+
+function onloadValues(){
+	let $to = $("toValue");
+	let $from = $("toValue");
+	callHeaders();
+	from = 0;
+	let rowsFittable =amountOfRowsThatFit();
+	to = from+rowsFittable;
+
+}
+
+
+function pressedNext(){
+	 callHeaders();
+	 let $to = $("toValue");
+	 let $from = $("toValue");
+ 
+	 let rowsThatFit = amountOfRowsThatFit();
+
+	from = ($to.value)+1;
+     to = from+rowsThatFit;
+ 
+
+}
+
+function pressedPrevious(){
+	//werk eers current from en to uit
+	//temp = to - from 
+	//from = from-fittable rows
+	//flipp around for next
+	//update label values
+	callHeaders();
+	let $to = $("toValue");
+	let $from = $("toValue");
+	let rowsThatFit = amountOfRowsThatFit();
+
+	from = ($from.value)-rowsThatFit;
+     to = from-1;
+ 
+
+}
+
 
 
 //retrieves column names
@@ -66,56 +77,9 @@ function callHeaders() {
 	xhr.send();
 }
 
-function retrieveRows(number: number) {
-
-	let trRows = $("tr").toArray();
-	let rowCount = -1;
-	jQuery.each(trRows, function (tr) {
-		let row = document.getElementById("rowNumber" + tr)!;
-		let bounding = row.getBoundingClientRect();
-
-		if (isElementXPercentInViewport(row, 100) == true && row != null) {
-			rowCount++;
-		}
-	});
-
-	callHeaders();
+function retrieveRows() {
 	let indexNumber = 0;
 
-	if (number == 1) {
-		from = 0;
-		to = 13
-	} else if (number == 2) {
-		if (from == 0) {
-			from = 0;
-			to = 13;
-		} else {
-			from = from - rowCount + 1;
-			to = to - 1;
-		}
-	} else if (number == 3) {
-		if (from == 9987) {
-			from = 999987;
-			to = 1000000;
-		} else {
-			from = from + rowCount;
-			to = to + rowCount;
-			console.log("Rows:" + rowCount);
-		}
-	} else if (number == 4) {
-		let fromValue = <HTMLInputElement>document.getElementById("fromValue");
-		if (/[0-9]/.test(fromValue.value) == false) {
-			window.alert("Nee,Stout \(>.<)/");
-		} else {
-			from = parseInt(fromValue.value);
-			if (from == 10000) {
-				from = 9987;
-				to = 10000;
-			} else {
-				to = from + rowCount;
-			}
-		}
-	}
 	//validate input
 	let rowsRequest = new XMLHttpRequest;
 	//Call the open function, GET-type of request,
@@ -144,22 +108,9 @@ function retrieveRows(number: number) {
 	//call send
 	rowsRequest.send();
 
+
 }
 
-const isElementXPercentInViewport = function (el: HTMLElement, percentVisible: number) {
-	let
-		rect = el.getBoundingClientRect(),
-		windowHeight = (window.innerHeight || document.documentElement.clientHeight);
-	console.log("row: " + el.id);
-	console.log(!(Math.floor(100 - (((rect.top >= 0 ? 0 : rect.top) / +-(rect.height / 1)) * 100)) < percentVisible || Math.floor(100 - ((rect.bottom - windowHeight) / rect.height) * 100) < percentVisible));
-
-	return !(
-		Math.floor(100 - (((rect.top >= 0 ? 0 : rect.top) / +-(rect.height / 1)) * 100)) < percentVisible ||
-		Math.floor(100 - ((rect.bottom - windowHeight) / rect.height) * 100) < percentVisible
-
-	)
-
-};
 
 function create(input: string[]) {
 	let tableRetrieved = <HTMLInputElement>document.getElementById("intialTable");
@@ -183,6 +134,5 @@ function create(input: string[]) {
 		columnName.setAttribute('id', 'th');
 		document.getElementById("rowNumber0")!.appendChild(columnName);
 	}
+	retrieveRows();
 }
-
-window.onresize = resizeBody;
