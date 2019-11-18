@@ -89,30 +89,22 @@ function retrieveRows() {
 		//check if the status is 200(means everything is okay)
 		let columnData = Array.from(rowsRequest.responseText.split(','));
 
-		for (let j = 1; j < 15; j++) {
-			let newRow: HTMLElement = document.createElement('tr');
-			newRow.setAttribute('id', 'rowNumber' + j);
-			document.getElementById("intialTable")!.appendChild(newRow);
+function pressedNext() {
+	fittableRows = retrieveRowsThatCanFit();
+	callHeaders();
 
-			for (let i = 0; i < 11; i++) {
-				let columnName = document.createElement('td');
-				columnName.textContent = columnData[indexNumber].replace(/[`~!@#$%^&*()_|=+;:'",.<>\{\}\[\]\\\/]/gi, '');
-				document.getElementById("rowNumber" + j)!.appendChild(columnName);
+}
 
-				indexNumber++;
-			}
-		}
-	}
-	//call the onload
-	rowsRequest.onload = generateRows;
-	//call send
-	rowsRequest.send();
+function pressedPrevious() {
+	fittableRows = retrieveRowsThatCanFit();
+	callHeaders();
 
 
 }
 
 
 function create(input: string[]) {
+	//create table
 	let tableRetrieved = <HTMLInputElement>document.getElementById("intialTable");
 	console.log(tableRetrieved);
 	if (tableRetrieved != null) {

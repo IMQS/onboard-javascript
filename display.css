@@ -11,6 +11,10 @@ td{
 	border-bottom: 1px solid;
 }
 
+tr{
+height: 56px;
+
+}
 
 table {
 	position: relative;
