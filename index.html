@@ -7,19 +7,19 @@
 </head>
 <body id="body">
 
-
 <div class="buttons" id="buttons">
-
 	<button type="button" id="previousPage"  onclick="pressedPrevious()">Previous</button>
 	<button type="button" id="nextPage" onclick="pressedNext()">Next</button>
 	<script type="text/javascript" src="./app.js"></script>
+</div>
 
-  </div>
-	<img src="./source.gif">
+<!--adds the cute cat gif-->
+<img src="./source.gif">
+
 <div class="searchButtons">
 	<label>Start:</label><input type="text" id="fromValue">
-	<label>End:</label><label id="toValue"></label>
-	<button type="button" id="btnSubmitFrom" onclick="retrieveRows(4)">Submit</button>
+	<label>End:</label><input type="text" id="toValue"  style="background-color:#d1cccb" readonly ></label>
+	<button type="button" id="btnSubmitFrom" onclick="fromAndToValuesAdjustment()">Submit</button>
 </div>
 
 </body>

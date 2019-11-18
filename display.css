@@ -3,7 +3,6 @@ th{
 	background-color:#cc66ff;
 	border-bottom: 1px solid;
 	padding:20px;
-
 }
 
 td{
@@ -12,15 +11,14 @@ td{
 }
 
 tr{
-height: 56px;
-
+	height: 56px;
 }
 
 table {
 	position: relative;
 	width: 100%;
 	text-align: left;
-  }
+}
 
 
 tr:hover {
@@ -37,20 +35,19 @@ tr:hover {
 	position: relative;
 	float:left;
 	padding: 10px 18px;
-  }
+}
 
+/*prevents the screen from showing a scrollbar*/
 html{
 	overflow:hidden;
-
 }
 
 .searchButtons{
 	float: right;
 	padding: 10px 18px;
 }
+
 img{
 	height: 50px;
 	width:350px;
-
-
 }

@@ -1,68 +1,99 @@
 "use strict";
-window.onload = () => {onloadValues() };
+window.onload = () => { onloadValues() };
+window.onresize = () => { fromAndToValuesAdjustment() };
 
-const rowHeight = 56;
+const rowHeight = 56 + 5;
 let from = 0;
 let to = 0;
+let fittableRows = 0;
 
-
-function amountOfRowsThatFit(){
-	let $buttonEl = $("button");
+//calculates the amount of rows that can fit on the screen given its current height
+function amountOfRowsThatFit() {
+	let buttonEl = (<HTMLInputElement>document.getElementById("previousPage"))
 
 	let windowHeigt = window.innerHeight;
-	let buttonDivheigth = $buttonEl.innerHeight;
-	let adaptedHeight = windowHeigt-buttonDivheigth;
+	let buttonDivheigth = 57;
+	let adaptedHeight = windowHeigt - buttonDivheigth;
 
-	return (adaptedHeight/rowHeight)-1;
+	return Math.floor((adaptedHeight / rowHeight) - 1);
 
 }
 
+//these are the starting values for when the screen loads
+function onloadValues() {
+	let toValue = (<HTMLInputElement>document.getElementById("toValue")).value;
+	let fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value;
 
-function onloadValues(){
-	let $to = $("toValue");
-	let $from = $("toValue");
-	callHeaders();
 	from = 0;
-	let rowsFittable =amountOfRowsThatFit();
-	to = from+rowsFittable;
-
+	fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value = from.toString();
+	let rowsFittable = amountOfRowsThatFit();
+	to = from + rowsFittable;
+	toValue = (<HTMLInputElement>document.getElementById("toValue")).value = to.toString();
+	callHeaders(from, to);
 }
 
+//adjust the values in the start and end boxes according to the screen heigth whenever it resizes
+function fromAndToValuesAdjustment() {
+	let toValue = (<HTMLInputElement>document.getElementById("toValue")).value;
+	let fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value;
 
-function pressedNext(){
-	 callHeaders();
-	 let $to = $("toValue");
-	 let $from = $("toValue");
- 
-	 let rowsThatFit = amountOfRowsThatFit();
+	from = parseInt(fromValue);
+	let rowsThatFit = amountOfRowsThatFit();
+	to = from + rowsThatFit;
 
-	from = ($to.value)+1;
-     to = from+rowsThatFit;
- 
 
+	if (to >= 1000000) {
+		window.alert("Nee, stout >.<,your search has exceeded the maximum rows")
+	} else {
+		fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value = from.toString();
+		toValue = (<HTMLInputElement>document.getElementById("toValue")).value = to.toString();
+		callHeaders(from, to);
+	}
 }
 
-function pressedPrevious(){
-	//werk eers current from en to uit
-	//temp = to - from 
-	//from = from-fittable rows
-	//flipp around for next
-	//update label values
-	callHeaders();
-	let $to = $("toValue");
-	let $from = $("toValue");
+//executes when the user presses the next button
+function pressedNext() {
+
+	let toValue = (<HTMLInputElement>document.getElementById("toValue")).value;
+	let fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value;
+
 	let rowsThatFit = amountOfRowsThatFit();
 
-	from = ($from.value)-rowsThatFit;
-     to = from-1;
- 
+	from = parseInt(toValue) + 1;
+	to = from + rowsThatFit;
 
+	if (to > 1000000) {
+		window.alert("Nee, stout >.<,your search has exceeded the maximum rows")
+	} else {
+		fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value = from.toString();
+		toValue = (<HTMLInputElement>document.getElementById("toValue")).value = to.toString();
+		callHeaders(from, to);
+	}
+}
+
+//executes when the user presses the previous button
+function pressedPrevious() {
+
+	let toValue = (<HTMLInputElement>document.getElementById("toValue")).value;
+	let fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value;
+	let rowsThatFit = amountOfRowsThatFit();
+
+	to = from - 1;
+	from = parseInt(fromValue) - rowsThatFit;
+	if (from <= -1) {
+		window.alert("Nee, stout >.<,your search has exceeded the minimum rows")
+	} else {
+		fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value = from.toString();
+		toValue = (<HTMLInputElement>document.getElementById("toValue")).value = to.toString();
+		callHeaders(from, to);
+	}
 }
 
 
 
 //retrieves column names
-function callHeaders() {
+function callHeaders(from: number, to: number) {
+
 	let xhr = new XMLHttpRequest;
 	//Call the open function, GET-type of request,
 	xhr.open('GET', 'http://localhost:2050/columns', true)
@@ -75,29 +106,42 @@ function callHeaders() {
 	}
 	//call send
 	xhr.send();
+	retrieveRows(from, to);
 }
 
-function retrieveRows() {
+//retrieves the table rows with data
+function retrieveRows(from: number, to: number) {
 	let indexNumber = 0;
+
 
 	//validate input
 	let rowsRequest = new XMLHttpRequest;
 	//Call the open function, GET-type of request,
+	console.log(from + " : " + to)
 	rowsRequest.open('GET', 'http://localhost:2050/records?from=' + from + '&to=' + to, true)
 
 	let generateRows = () => {
 		//check if the status is 200(means everything is okay)
 		let columnData = Array.from(rowsRequest.responseText.split(','));
 
-function pressedNext() {
-	fittableRows = retrieveRowsThatCanFit();
-	callHeaders();
+		for (let j = 1; j < 15; j++) {
+			let newRow: HTMLElement = document.createElement('tr');
+			newRow.setAttribute('id', 'rowNumber' + j);
+			document.getElementById("intialTable")!.appendChild(newRow);
 
-}
+			for (let i = 0; i < 11; i++) {
+				let columnName = document.createElement('td');
+				columnName.textContent = columnData[indexNumber].replace(/[`~!@#$%^&*()_|=+;:'",.<>\{\}\[\]\\\/]/gi, '');
+				document.getElementById("rowNumber" + j)!.appendChild(columnName);
 
-function pressedPrevious() {
-	fittableRows = retrieveRowsThatCanFit();
-	callHeaders();
+				indexNumber++;
+			}
+		}
+	}
+	//call the onload
+	rowsRequest.onload = generateRows;
+	//call send
+	rowsRequest.send();
 
 
 }
@@ -126,5 +170,4 @@ function create(input: string[]) {
 		columnName.setAttribute('id', 'th');
 		document.getElementById("rowNumber0")!.appendChild(columnName);
 	}
-	retrieveRows();
 }
