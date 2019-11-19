@@ -31,10 +31,11 @@ tr:hover {
 }
 
 .buttons {
-	display:inline-flex;
+	display:flex;
 	position: relative;
 	float:left;
 	padding: 10px 18px;
+
 }
 
 /*prevents the screen from showing a scrollbar*/
@@ -42,10 +43,6 @@ html{
 	overflow:hidden;
 }
 
-.searchButtons{
-	float: right;
-	padding: 10px 18px;
-}
 
 img{
 	height: 50px;
