@@ -3,19 +3,19 @@ th{
 	background-color:#cc66ff;
 	border-bottom: 1px solid;
 	padding:20px;
+	white-space: nowrap;
 }
 
 td{
 	padding:18px;
 	border-bottom: 1px solid;
+	white-space: nowrap;
 }
 
-tr{
-	height: 56px;
-}
 
 table {
 	position: relative;
+	table-layout: fixed;
 	width: 100%;
 	text-align: left;
 }
