@@ -12,19 +12,22 @@
     <link rel="stylesheet" type="text/css" href="app.css" />
   </head>
   <body>
-    <button id="nextPage" onclick="NextPage()">NEXT PAGE >></button>
-    <button id="previousPage" onclick="PreviousPage()"><< PREVIOUS PAGE</button>
+    <div style="height: 50px">
+      <button id="nextPage" onclick="NextPage()">NEXT PAGE</button>
+      <button id="previousPage" onclick="PreviousPage()">PREVIOUS PAGE</button>
 
-    <div class="searchButtons">
-      <label>SEARCH:</label
-      ><input
-        type="text"
-        id="userInput"
-        placeholder="Enter a record number here"
-      />
-      <button type="button" id="submitButton" onclick="SearchBar()">
-        SUBMIT
-      </button>
+      <div class="searchButtons">
+        <label>SEARCH:</label>
+        <input
+          type="text"
+          id="userInput"
+          placeholder="Enter a record number here"
+          onkeypress="return restrictAlphabets(event)"
+        />
+        <button type="button" id="submitButton" onclick="SearchBar()">
+          SUBMIT
+        </button>
+      </div>
     </div>
   </body>
 </html>

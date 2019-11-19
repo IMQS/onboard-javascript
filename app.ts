@@ -1,15 +1,19 @@
 //Loads the table to the screen
-window.onload = () => GetColumnNames();
+window.onload = () => GetTotalNumberOfRecords();
+//Resizes page during window resizing
+window.onresize = () => Resize();
 
 //Variable declarations
-let totalRecordCount;
-let columnNames: string[];
+let totalRecordCount: number;
+let columnNames: any[];
 let records: any[];
-let from: number = 1;
-let to: number = 30;
+let from: number = 0;
+let to: number = 0;
+let NumberOfRows = Math.floor((window.innerHeight - 50) / 24) - 1;
+let timeout: any;
 
 //Function to retrieve total amount of records
-function GetNumberOfRecords() {
+function GetTotalNumberOfRecords() {
   $.ajax({
     url: "/recordCount",
     type: "GET",
@@ -18,7 +22,10 @@ function GetNumberOfRecords() {
   })
     .done(function(responseText: any) {
       totalRecordCount = responseText;
+      console.log(totalRecordCount);
+      Resize();
     })
+
     .fail(function() {
       alert("Could not retrieve total record number");
     });
@@ -30,51 +37,45 @@ function GetColumnNames() {
     url: "/columns",
     type: "GET",
     timeout: 12000,
-    dataType: "JSON"
+    dataType: "json"
   })
-    .done(function(responseJSON: any) {
-      columnNames = responseJSON;
-      Sync();
+    .done((responsejson: any) => {
+      columnNames = responsejson;
+      GetActualRecordsAmount();
     })
-    .fail(function() {
+    .fail(() => {
       alert("Could not display column names");
     });
 }
 
 //Function to retrieve the record data
-function GetActualRecords() {
+function GetActualRecordsAmount() {
   $.ajax({
     url: "/records?from=" + from + "&to=" + to,
     timeout: 12000,
     dataType: "JSON"
   })
-    .done(function(responseRecords: any) {
+    .done((responseRecords: any) => {
       records = responseRecords;
-      NextSync();
+      BuildTable();
     })
-    .fail(function() {
+    .fail(() => {
       alert("No available records for your selection");
     });
 }
 
-//Function to sync API calls
-function Sync() {
-  GetActualRecords();
-}
-
-//Function to sync API calls
-function NextSync() {
-  BuildTable();
-}
-
 //Function builds the table and populates with data from the API calls
 function BuildTable() {
-  RemoveTable();
+  if (document.getElementById("Table") != null) {
+    $("Table").remove();
+  }
 
   const body = document.getElementsByTagName("body")[0];
 
   const ourTable = document.createElement("table");
   ourTable.setAttribute("id", "Table");
+  //ourTable.style.borderCollapse = "collapse";
+  ourTable.style.borderSpacing = "0";
 
   const thead = document.createElement("thead");
   ourTable.appendChild(thead);
@@ -85,9 +86,11 @@ function BuildTable() {
       .appendChild(document.createElement("th"))
       .appendChild(document.createTextNode(columnNames[c]));
   }
+
   //Cells are created and populated with data
   for (let i = 0; i < records.length; i++) {
     const tableRow = document.createElement("tr");
+    tableRow.setAttribute("id", "rows");
     ourTable.appendChild(tableRow);
 
     const innerArrayLength = records[i].length;
@@ -101,43 +104,90 @@ function BuildTable() {
   body.appendChild(ourTable);
 }
 
-//Pages to the next set of data in increments of 30
+//Pages to the next set of data
 function NextPage() {
-  from = from + 30;
-  to = to + 30;
-  GetActualRecords();
+  let NumberOfRows = Math.floor((window.innerHeight - 50) / 24) - 1;
+  if (from < from - NumberOfRows) {
+    from = totalRecordCount - NumberOfRows;
+    to = Math.min(from + (NumberOfRows - 1), totalRecordCount);
+    console.log(from + " " + to);
+    //Resize();
+    GetActualRecordsAmount();
+  } else {
+    from = from + NumberOfRows;
+    to = to + NumberOfRows;
+    //Resize();
+    GetActualRecordsAmount();
+  }
 }
 
-//Pages backwards through data in increments of 30
+//Pages backwards through data
 function PreviousPage() {
-  from = from - 30;
-  to = to - 30;
-  GetActualRecords();
-}
-
-//Removes current table to enable pagination (Called in build table function)
-function RemoveTable() {
-  if (document.getElementById("Table") != null) {
-    $("Table").remove();
+  let NumberOfRows = Math.floor((window.innerHeight - 50) / 24) - 1;
+  if (NumberOfRows > from) {
+    from = Math.max(0, from - NumberOfRows);
+    to = NumberOfRows - from;
+    console.log(from);
+    Resize();
+    GetActualRecordsAmount();
+  } else {
+    from = from - NumberOfRows;
+    to = from + NumberOfRows;
+    Resize();
+    GetActualRecordsAmount();
   }
 }
 
 //Activates the submit button to produce users search results
 function SearchBar() {
   let userInput = <HTMLInputElement>document.getElementById("userInput");
-  from = parseInt(userInput.value);
-  console.log("userInput: " + from);
-  to = from + 30;
+  let NumberOfRows = Math.floor((window.innerHeight - 50) / 24) - 1;
 
-  GetActualRecords();
+  from = Math.min(parseInt(userInput.value), totalRecordCount - NumberOfRows);
+
+  console.log("userInput: " + from);
+
+  to = Math.min(from + NumberOfRows, totalRecordCount - 1);
+
+  console.log("NumberOfRows:" + NumberOfRows);
+
+  Resize();
+  GetActualRecordsAmount();
 }
 
-//Enables mouse hover over table rows for readability
-$("td").hover(
-  function() {
-    $(this).css("background-color", "yellow");
-  },
-  function() {
-    $(this).css("background-color", "pink");
-  }
-);
+function Resize() {
+  if (timeout) clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    let NumberOfRows = Math.floor((window.innerHeight - 50 - 24) / 24) - 1;
+    if (!from) {
+      from = 0;
+    } else {
+      from = from;
+    }
+    console.log(from);
+
+    if (NumberOfRows * (totalRecordCount - 1) > to) {
+      to = Math.min(from + NumberOfRows, totalRecordCount - 1);
+      from = to - NumberOfRows;
+    }
+    console.log(from + " " + to);
+    GetColumnNames();
+
+    if (to > from + NumberOfRows) {
+      to = Math.min(from + NumberOfRows, totalRecordCount - 1);
+      from = to - NumberOfRows;
+    } else if (to <= from + NumberOfRows) {
+      to = from + NumberOfRows;
+    }
+
+    console.log("userInput: " + from);
+    GetColumnNames();
+  }, 500);
+}
+
+function restrictAlphabets(e: any) {
+  var x = e.which || e.keycode;
+  if ((x >= 48 && x <= 57) || x == 8 || (x >= 35 && x <= 40) || x == 46)
+    return true;
+  else return false;
+}
