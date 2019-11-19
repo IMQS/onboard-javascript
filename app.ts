@@ -20,7 +20,6 @@ function eligableRowCount() {
 	let windowHeight = window.innerHeight;
 	let buttonDivHeight = (<HTMLInputElement>document.getElementById("buttons")).offsetHeight;
 	let adaptedHeight = windowHeight - buttonDivHeight;
-	console.log(Math.floor((adaptedHeight / ROWHEIGHT) - 1));
 	return Math.floor((adaptedHeight / ROWHEIGHT) - 1);
 
 }
