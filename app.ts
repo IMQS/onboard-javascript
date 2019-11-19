@@ -2,7 +2,7 @@
 window.onload = () => { onloadValues() };
 window.onresize = () => { fromAndToValuesAdjustment() };
 
-const rowHeight = 49 + 15;
+const rowHeight = 62;
 let from = 0;
 let to = 0;
 let fittableRows = 0;
@@ -15,7 +15,7 @@ function amountOfRowsThatFit() {
 	let buttonEl = (<HTMLInputElement>document.getElementById("previousPage"))
 
 	let windowHeigt = window.innerHeight;
-	let buttonDivheigth = 57;
+	let buttonDivheigth = 67;
 	let adaptedHeight = windowHeigt - buttonDivheigth;
 
 	return Math.floor((adaptedHeight / rowHeight) - 1);
@@ -41,26 +41,29 @@ function onloadValues() {
  *Adjust the values in the start and end boxes according to the screen heigth whenever it resizes
  */
 function fromAndToValuesAdjustment() {
-	let toValue = (<HTMLInputElement>document.getElementById("toValue")).value;
-	let fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value;
+	var timeout;
+	if (timeout) clearTimeout(timeout);
+	timeout = setTimeout(() => {
+		let toValue = (<HTMLInputElement>document.getElementById("toValue")).value;
+		let fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value;
 
-	from = parseInt(fromValue);
-	let rowsThatFit = amountOfRowsThatFit();
-	to = from + rowsThatFit;
-
-	if (to > 100000) {
-		window.alert("Nee, stout >.<,your search has exceeded the maximum rows")
-		from = 100000 - rowsThatFit;
-		to = 100000;
-	} else if (from < 0) {
-		window.alert("Nee, stout >.<,your search has exceeded the minimum rows")
-		from = 0;
+		from = parseInt(fromValue);
+		let rowsThatFit = amountOfRowsThatFit();
 		to = from + rowsThatFit;
-	}
-	fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value = from.toString();
-	toValue = (<HTMLInputElement>document.getElementById("toValue")).value = to.toString();
-	callHeaders(from, to);
 
+		if (to > 100000) {
+			window.alert("Nee, stout >.<,your search has exceeded the maximum rows")
+			from = 100000 - rowsThatFit;
+			to = 100000;
+		} else if (from < 0) {
+			window.alert("Nee, stout >.<,your search has exceeded the minimum rows")
+			from = 0;
+			to = from + rowsThatFit;
+		}
+		fromValue = (<HTMLInputElement>document.getElementById("fromValue")).value = from.toString();
+		toValue = (<HTMLInputElement>document.getElementById("toValue")).value = to.toString();
+		callHeaders(from, to);
+	}, 200);
 }
 /**
  *Executes when the user presses the next button
@@ -130,39 +133,37 @@ function callHeaders(from: number, to: number) {
  */
 function retrieveRows(from: number, to: number) {
 	let indexNumber = 0;
+	let j = 1;
 
 	fetch('http://localhost:2050/records?from=' + from + '&to=' + to)
 		.then((resp) => {
+
 			return resp.json();
 		})
 		.then((rowsRequest) => {
 
-			//check if the status is 200(means everything is okay)
 			let columnData = <string[]>rowsRequest;
 
-
-			for (let j = 1; j < 15; j++) {
+			columnData.forEach(function (item) {
 				let newRow: HTMLElement = document.createElement('tr');
 				newRow.setAttribute('id', 'rowNumber' + j);
 				document.getElementById("intialTable")!.appendChild(newRow);
-				console.log("new row");
-
-				for (let i = 0; i < 11; i++) {
-					console.log("here");
+				let content = Array.from(item);
+				content.forEach(function (index) {
 					let columnName = document.createElement('td');
-					console.log("evolving");
-					columnName.textContent = columnData[indexNumber];
-					console.log(columnData[indexNumber]);
+					columnName.textContent = index;
 					document.getElementById("rowNumber" + j)!.appendChild(columnName);
 
 					indexNumber++;
-				}
-			}
+				});
+				j++;
+			});
 		});
 
 
-}
 
+
+}
 
 function create(input: string[]) {
 	//create table
@@ -170,7 +171,7 @@ function create(input: string[]) {
 	if (tableRetrieved != null) {
 		tableRetrieved.remove();
 	}
-	let table = document.createElement('table');
+	const table = document.createElement('table');
 	table.setAttribute('id', 'intialTable');
 	document.getElementById("body")!.appendChild(table);
 
