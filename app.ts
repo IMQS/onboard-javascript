@@ -5,6 +5,7 @@ window.onload = () => {
     let recordCount: number;
     let startIndex = 0; // Default value = 0;
     let tableRecordCount = 20; // Default value = 20;
+    let timer: number;
 
     // Canvas:
     let canvas = document.createElement("div");
@@ -25,13 +26,19 @@ window.onload = () => {
     fromField.placeholder = "from";
 
     window.onresize = () => {
-        adjustTableRecordCount();
-        let end = tableRecordCount - 1;
-        if (recordCount < startIndex + tableRecordCount) {
-            startIndex = recordCount - tableRecordCount;
-        }
-        getRecords(startIndex, startIndex + end);
+        let time = 500;
+        clearInterval(timer);
+        timer = setInterval(function () {
+            clearInterval(timer);
+            adjustTableRecordCount();
+            let end = tableRecordCount - 1;
+            if (recordCount < startIndex + tableRecordCount) {
+                startIndex = recordCount - tableRecordCount;
+            }
+            getRecords(startIndex, startIndex + end);
+        }, time);
     }
+    
 
     // on clicks:
     searchbtn.onclick = function() {
