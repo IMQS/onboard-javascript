@@ -3,7 +3,7 @@ window.onload = () => {
     let numColumns: number;
     let columns: any;
     let recordCount: number;
-    let startIndex = 0; // Default value = 20;
+    let startIndex = 0; // Default value = 0;
     let tableRecordCount = 20; // Default value = 20;
 
     // Canvas:
@@ -28,7 +28,7 @@ window.onload = () => {
         adjustTableRecordCount();
         let end = tableRecordCount - 1;
         if (recordCount < startIndex + tableRecordCount) {
-            end = recordCount - startIndex - 1;
+            startIndex = recordCount - tableRecordCount;
         }
         getRecords(startIndex, startIndex + end);
     }
@@ -41,9 +41,9 @@ window.onload = () => {
             let end = tableRecordCount - 1;
             startIndex = from;
             if (recordCount < startIndex + tableRecordCount) {
-                end = recordCount - startIndex - 1;
+                startIndex = recordCount - tableRecordCount;
             }
-            getRecords(from, startIndex + end);
+            getRecords(startIndex, startIndex + end);
         }
     };
 
@@ -52,7 +52,7 @@ window.onload = () => {
         if (recordCount > startIndex + tableRecordCount) {
             startIndex += tableRecordCount;
             if (recordCount < startIndex + tableRecordCount) {
-                end = recordCount - startIndex - 1;
+                startIndex = recordCount - tableRecordCount;
             }
             getRecords(startIndex, startIndex + end);
         }
