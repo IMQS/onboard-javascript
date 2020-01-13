@@ -1,6 +1,6 @@
 input, button {
     display: inline;
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 #canvas {
@@ -12,11 +12,13 @@ table {
     border-collapse: collapse;
     width: 100%;
     height: 90%;
+    table-layout: fixed;
+    overflow: hidden;
 }
 
 td {
     width: 9%;
-    padding: 0.7rem;
+    height: 2.5rem;
     border-left: 1px darkgrey solid;
 }
 

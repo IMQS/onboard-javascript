@@ -24,14 +24,23 @@ window.onload = () => {
     let fromField = document.createElement("input");
     fromField.placeholder = "from";
 
+    window.onresize = () => {
+        adjustTableRecordCount();
+        let end = tableRecordCount - 1;
+        if (recordCount < startIndex + tableRecordCount) {
+            end = recordCount - startIndex - 1;
+        }
+        getRecords(startIndex, startIndex + end);
+    }
+
     // on clicks:
     searchbtn.onclick = function() {
         let from = parseInt(fromField.value, 10);
         // validate field:
         if (validate(from)) {
-            let end = 19;
+            let end = tableRecordCount - 1;
             startIndex = from;
-            if (recordCount < startIndex + 20) {
+            if (recordCount < startIndex + tableRecordCount) {
                 end = recordCount - startIndex - 1;
             }
             getRecords(from, startIndex + end);
@@ -39,10 +48,10 @@ window.onload = () => {
     };
 
     nextbtn.onclick = function() {
-        let end = 19;
-        if (recordCount > startIndex + 20) {
-            startIndex += 20;
-            if (recordCount < startIndex + 20) {
+        let end = tableRecordCount - 1;
+        if (recordCount > startIndex + tableRecordCount) {
+            startIndex += tableRecordCount;
+            if (recordCount < startIndex + tableRecordCount) {
                 end = recordCount - startIndex - 1;
             }
             getRecords(startIndex, startIndex + end);
@@ -50,15 +59,15 @@ window.onload = () => {
     };
 
     prevbtn.onclick = function() {
-        if (startIndex >= 20) {
-            startIndex -= 20;
-        } else if (startIndex < 20) {
+        if (startIndex >= tableRecordCount) {
+            startIndex -= tableRecordCount;
+        } else if (startIndex < tableRecordCount) {
             startIndex = 0;
         }
-        getRecords(startIndex, startIndex+19);
+        getRecords(startIndex, startIndex + tableRecordCount - 1);
     };
 
-    $("#canvas").append(searchbtn, fromField, prevbtn, nextbtn);
+    $("#canvas").append(fromField,searchbtn, prevbtn, nextbtn);
 
     initiate();
 
@@ -78,7 +87,8 @@ window.onload = () => {
                         columns = JSON.parse(result);
                         numColumns = getSize(columns);
                         // get first page of records and display them:
-                        getRecords(0, 19);
+                        adjustTableRecordCount();
+                        getRecords(0, tableRecordCount - 1);
                     },
                     error: function (err) {
                         $("body").text("Error: " + err.status + " " + err.statusText);
@@ -102,7 +112,7 @@ window.onload = () => {
         let table = document.createElement("table");
         let tbdy = document.createElement("tbody");
         table.appendChild(generateHeadings(columns));
-        for (let i = 0; i < 20; i++){
+        for (let i = 0; i < tableRecordCount; i++){
             let tr = document.createElement("tr");
             for (let j = 0; j < numColumns; j++){
                 let td = document.createElement("td");
@@ -180,6 +190,14 @@ window.onload = () => {
             return false;
         }
         return true;
+    }
+
+    function adjustTableRecordCount() {
+        let height = window.innerHeight;
+        let fontSize = getComputedStyle(document.documentElement).fontSize + "";
+        let rowHeight = parseFloat(fontSize)*2.5;
+        if (rowHeight !== undefined)
+            tableRecordCount = Math.trunc(height/rowHeight) - 4;
     }
 
 }
