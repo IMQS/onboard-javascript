@@ -25,6 +25,7 @@ window.onload = () => {
     let fromField = document.createElement("input");
     fromField.placeholder = "from";
 
+    // Window resizing (using a debouncing method):
     window.onresize = () => {
         let time = 500;
         clearInterval(timer);
@@ -39,7 +40,6 @@ window.onload = () => {
         }, time);
     }
     
-
     // on clicks:
     searchbtn.onclick = function() {
         let from = parseInt(fromField.value, 10);
@@ -206,8 +206,11 @@ window.onload = () => {
         let height = window.innerHeight;
         let fontSize = getComputedStyle(document.documentElement).fontSize + "";
         let rowHeight = parseFloat(fontSize)*2.5;
-        if (rowHeight !== undefined)
-            tableRecordCount = Math.trunc(height/rowHeight) - 4;
+        if (rowHeight !== undefined){
+            tableRecordCount = Math.trunc(height/rowHeight)-2;
+            if (tableRecordCount < 1)
+                tableRecordCount = 1;
+        }
     }
 
 }
