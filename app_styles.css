@@ -14,11 +14,13 @@ table {
     height: 90%;
     table-layout: fixed;
     overflow: hidden;
+    font-size: 0.8rem;
 }
 
 td {
     width: 9%;
-    height: 2.5rem;
+    height: 2rem;
+    padding: 0.2rem;
     border-left: 1px darkgrey solid;
 }
 

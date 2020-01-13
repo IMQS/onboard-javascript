@@ -192,6 +192,9 @@ window.onload = () => {
         return true;
     }
 
+    /**
+     * Adjust the number of records shown in the table according to the window size.
+     */
     function adjustTableRecordCount() {
         let height = window.innerHeight;
         let fontSize = getComputedStyle(document.documentElement).fontSize + "";
