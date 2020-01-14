@@ -8,6 +8,13 @@ let timer: number;
 // Canvas:
 let canvas = document.createElement("div");
 
+// Table:
+let table = document.createElement("table");
+let tbdy = document.createElement("tbody");
+let thead = document.createElement("thead");
+table.appendChild(thead);
+table.appendChild(tbdy);
+
 // Buttons and fields:
 let searchbtn = document.createElement("button");
 searchbtn.innerText = "Search";
@@ -26,6 +33,7 @@ canvas.appendChild(fromField);
 canvas.appendChild(searchbtn);
 canvas.appendChild(prevbtn);
 canvas.appendChild(nextbtn);
+canvas.appendChild(table);
 
 // on clicks:
 searchbtn.onclick = function () {
@@ -93,6 +101,8 @@ const initiate = () => {
 				success: function (result) {
 					columns = JSON.parse(result);
 					numColumns = getSize(columns);
+					// generate and append the headings to the table:
+					generateHeadings(columns);
 					// get first page of records and display them:
 					adjustTableRecordCount();
 					getRecords(0, tableRecordCount - 1);
@@ -109,15 +119,12 @@ const initiate = () => {
 }
 
 /**
- * Generates a table populated with data, distrubuted evenly.
+ * Populates the table with data, distrubuted evenly.
  * @param data The data records retrieved from the server, structured as a 2D object array.
  * @param columns An object array containing the column heading values.
  */
-const generateTable = (data: any, columns: any) => {
-	$("table").remove(); // Remove previous table
-	let table = document.createElement("table");
-	let tbdy = document.createElement("tbody");
-	table.appendChild(generateHeadings(columns));
+const fillTable = (data: any) => {
+	$("tbody").empty();
 	for (let i = 0; i < tableRecordCount; i++) {
 		let tr = document.createElement("tr");
 		for (let j = 0; j < numColumns; j++) {
@@ -127,8 +134,6 @@ const generateTable = (data: any, columns: any) => {
 		}
 		tbdy.appendChild(tr);
 	}
-	table.appendChild(tbdy);
-	canvas.appendChild(table);
 }
 
 /**
@@ -154,7 +159,7 @@ const getRecords = (from: number, to: number) => {
 		data: { from: from, to: to },
 		success: function (result) {
 			let data = JSON.parse(result);
-			generateTable(data, columns);
+			fillTable(data);
 		},
 		error: function (err) {
 			$("body").text("Error: " + err.status + " " + err.statusText);
@@ -167,7 +172,6 @@ const getRecords = (from: number, to: number) => {
  * @param columns An object array containing the column heading values.
  */
 const generateHeadings = (columns: any) => {
-	let thead = document.createElement("thead");
 	let tr = document.createElement("tr");
 	for (let j = 0; j < numColumns; j++) {
 		let td = document.createElement("td");
@@ -175,7 +179,6 @@ const generateHeadings = (columns: any) => {
 		tr.appendChild(td);
 	}
 	thead.appendChild(tr);
-	return thead;
 }
 
 /**
