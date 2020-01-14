@@ -53,11 +53,7 @@ nextbtn.onclick = function () {
 };
 
 prevbtn.onclick = function () {
-	if (startIndex >= tableRecordCount) {
-		startIndex -= tableRecordCount;
-	} else if (startIndex < tableRecordCount) {
-		startIndex = 0;
-	}
+	startIndex = startIndex >= tableRecordCount ? startIndex -= tableRecordCount : startIndex = 0;
 	getRecords(startIndex, startIndex + tableRecordCount - 1);
 };
 
@@ -69,7 +65,7 @@ window.onload = () => {
 
 // Window resizing (using a debouncing method):
 window.onresize = () => {
-	let time = 100;
+	const time = 100;
 	clearInterval(timer);
 	timer = setInterval(function () {
 		clearInterval(timer);
@@ -85,7 +81,7 @@ window.onresize = () => {
 /**
  * Initiates the HTTP requests to obtain the records and column values necessary for the table.
  */
-function initiate() {
+const initiate = () => {
 	// get number of records:
 	$.ajax({
 		url: "http://localhost:2050/recordCount",
@@ -117,9 +113,8 @@ function initiate() {
  * @param data The data records retrieved from the server, structured as a 2D object array.
  * @param columns An object array containing the column heading values.
  */
-function generateTable(data: any, columns: any) {
+const generateTable = (data: any, columns: any) => {
 	$("table").remove(); // Remove previous table
-	let dataSize = getSize(data);
 	let table = document.createElement("table");
 	let tbdy = document.createElement("tbody");
 	table.appendChild(generateHeadings(columns));
@@ -127,8 +122,7 @@ function generateTable(data: any, columns: any) {
 		let tr = document.createElement("tr");
 		for (let j = 0; j < numColumns; j++) {
 			let td = document.createElement("td");
-			if (dataSize > i)
-				td.appendChild(document.createTextNode(data[i][j]));
+			td.appendChild(document.createTextNode(data[i][j]));
 			tr.appendChild(td);
 		}
 		tbdy.appendChild(tr);
@@ -141,10 +135,9 @@ function generateTable(data: any, columns: any) {
  * Finds the number of entries within a data set.
  * @param data An array of data, type is unknown (any).
  */
-function getSize(data: any) {
+const getSize = (data: any) => {
 	let i = 0;
-	let entry;
-	for (entry in data) {
+	for (let entry in data) {
 		i++;
 	}
 	return i;
@@ -155,7 +148,7 @@ function getSize(data: any) {
  * @param from The ID value from which to start searching.
  * @param to The ID value from which to stop searching.
  */
-function getRecords(from: number, to: number) {
+const getRecords = (from: number, to: number) => {
 	$.ajax({
 		url: "http://localhost:2050/records",
 		data: { from: from, to: to },
@@ -173,7 +166,7 @@ function getRecords(from: number, to: number) {
  * Generates and returns a "thead" object containing column headings.
  * @param columns An object array containing the column heading values.
  */
-function generateHeadings(columns: any) {
+const generateHeadings = (columns: any) => {
 	let thead = document.createElement("thead");
 	let tr = document.createElement("tr");
 	for (let j = 0; j < numColumns; j++) {
@@ -189,15 +182,15 @@ function generateHeadings(columns: any) {
  * Validates that the field value is a number.
  * @param from The ID value from which to start searching.
  */
-function validate(from: number) {
+const validate = (from: number) => {
 	if (isNaN(from)) {
-		alert("\"From\" field does not have a number value.");
+		alert('"From" field does not have a number value.');
 		return false;
 	} else if (from < 0) {
-		alert("\"From\" value cannot be negative.");
+		alert('"From" value cannot be negative.');
 		return false;
 	} else if (from > recordCount - 1) {
-		alert("\"From\" value exceeds the record count.");
+		alert('"From" value exceeds the record count.');
 		return false;
 	}
 	return true;
@@ -206,13 +199,12 @@ function validate(from: number) {
 /**
  * Adjust the number of records shown in the table according to the window size.
  */
-function adjustTableRecordCount() {
+const adjustTableRecordCount = () => {
 	let height = window.innerHeight;
 	let fontSize = getComputedStyle(document.documentElement).fontSize + "";
 	let rowHeight = parseFloat(fontSize) * 2.5;
 	if (rowHeight !== undefined) {
-		tableRecordCount = Math.trunc(height / rowHeight) - 2;
-		if (tableRecordCount < 1)
-			tableRecordCount = 1;
+		const count = tableRecordCount = Math.trunc(height / rowHeight) - 2;
+		tableRecordCount = count >= 1 ? count : 1;
 	}
 }
