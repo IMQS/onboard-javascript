@@ -27,7 +27,7 @@ window.onload = () => {
 
     // Window resizing (using a debouncing method):
     window.onresize = () => {
-        let time = 500;
+        let time = 100;
         clearInterval(timer);
         timer = setInterval(function () {
             clearInterval(timer);
