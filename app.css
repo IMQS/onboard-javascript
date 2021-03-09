@@ -1,0 +1,122 @@
+.maindiv
+{     
+    height: 100%;
+    width: 100%;
+    background-color: #f8f8f8;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    overflow: hidden;
+}
+
+#captiondiv
+{    
+    position: absolute;
+    top: 0%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 5%;
+    width: 100%;
+    text-align: center;    
+    font-family: sans-serif;
+    font-weight: bold;
+    color: #FFFFFF;
+    background-color: #282C34;
+}
+
+#tablediv
+{     
+    display: inline;
+    position: absolute;
+    top: 5%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 90%;
+    width: 100%;
+}
+
+table
+{   
+    position: absolute;
+    top: 0%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;    
+    color: #000000;
+    font-family: Courier, monospace;
+    font-weight: bold;
+    background-color: #FFFFFF;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+#buttondiv
+{   
+    display: block;
+    position: absolute;
+    top: 95%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 5%;
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
+    background-color: #282C34;
+}
+
+td
+{
+  border: 1px solid #000000;  
+  font-family: sans-serif;
+  font-size: small;
+  color: #202020;
+  text-align: center;
+}
+
+th
+{
+  border: 1px solid #000000;  
+  font-family: sans-serif;
+  color: #FFFFFF;
+  font-weight: bold;
+  background-color: #282C34;
+}
+
+.tableCell
+{
+  width: 9%;
+  height: 9%;
+}
+
+button
+{
+  width:10%;
+  height:100%;
+  text-align:center;
+}
+
+@media screen and (max-height:400px) {
+  #captiondiv 
+  {
+      display: none !important;
+  }
+  #buttondiv
+  {
+    top:90%;
+    height:10%;
+    
+  }
+  #tablediv
+  {
+    top:0%;
+  }
+}
+
+
