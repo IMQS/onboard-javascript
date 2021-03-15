@@ -14,11 +14,11 @@
 #captiondiv
 {    
     position: absolute;
-    top: 0%;
+    top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    height: 5%;
+    height: 25px;
     width: 100%;
     text-align: center;    
     font-family: sans-serif;
@@ -28,21 +28,34 @@
 }
 
 #tablediv
-{     
-    display: inline;
+{ 
     position: absolute;
-    top: 5%;
+    top: 25px;
     right: 0;
     bottom: 0;
     left: 0;
-    height: 90%;
+    height: calc(100% - 50px);
     width: 100%;
+}
+
+#buttondiv
+{
+    position: absolute;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 25px;
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
+    background-color: #282C34;
 }
 
 table
 {   
     position: absolute;
-    top: 0%;
+    top: 0;
     right: 0;
     bottom: 0;
     left: 0;
@@ -56,50 +69,36 @@ table
     border-spacing: 0;
 }
 
-#buttondiv
-{   
-    display: block;
-    position: absolute;
-    top: 95%;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 5%;
-    width: 100%;
-    text-align: center;
-    color: #FFFFFF;
-    background-color: #282C34;
-}
-
 td
 {
   border: 1px solid #000000;  
   font-family: sans-serif;
-  font-size: small;
+  font-size: 8%;
   color: #202020;
   text-align: center;
+  padding: 0;
+  /*white-space:nowrap;*/
 }
 
 th
 {
   border: 1px solid #000000;  
   font-family: sans-serif;
+  font-size: 8%;
   color: #FFFFFF;
   font-weight: bold;
   background-color: #282C34;
-}
-
-.tableCell
-{
-  width: 9%;
-  height: 9%;
+  max-height: 25px;
+  padding: 0;
+  /*white-space: nowrap;*/
 }
 
 button
 {
-  width:10%;
-  height:100%;
-  text-align:center;
+  width: 8%;
+  height: 25px;
+  font-size: xx-small;
+  text-align: center;
 }
 
 @media screen and (max-height:400px) {
@@ -107,16 +106,58 @@ button
   {
       display: none !important;
   }
-  #buttondiv
-  {
-    top:90%;
-    height:10%;
-    
-  }
   #tablediv
   {
-    top:0%;
+    top:0;
+    height: calc(100% - 25px);
   }
+}
+
+@media screen and (max-width:800px) {
+  #next10
+  {
+    display: none !important;
+  }
+  #previous10
+  {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width:500px) {
+  #next5
+  {
+    display: none !important;
+  }
+  #previous5
+  {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width:300px) {
+  #next
+  {
+    display: none !important;
+  }
+  #previous
+  {
+    display: none !important;
+  }
+}
+
+#jumpToButton
+{
+  width: 13%;
+  min-width: 50px;
+  font-size: 6px;
+  white-space: nowrap;
+}
+
+#jumpToValue
+{
+  width: 13%;
+  min-width: 30px;
 }
 
 

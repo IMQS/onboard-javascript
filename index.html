@@ -10,16 +10,17 @@
 <body>
 	<div class="maindiv">
 		<div id="captiondiv">Data Grid</div>
-		<div id="tablediv"></div>
+		<div id="tablediv"><table id="dataTable"><tbody id="dataTableBody"></tbody></table></div>
 		<div id="buttondiv">
-      <button onclick="previousButton(100)" id="previous100" class="buttonClass">&lt&lt&lt&lt 100 </button>
+      
 			<button onclick="previousButton(10)" id="previous10" class="buttonClass">&lt&lt&lt 10 </button>
 			<button onclick="previousButton(5)" id="previous5" class="buttonClass">&lt&lt 5</button>
 			<button onclick="previousButton(1)" id="previous" class="buttonClass">&lt</button>
 			<button onclick="nextButton(1)" id="next" class="buttonClass">&gt</button>
 			<button onclick="nextButton(5)" id="next5" class="buttonClass">5 &gt&gt</button>
 			<button onclick="nextButton(10)" id="next10" class="buttonClass">10 &gt&gt&gt</button>
-      <button onclick="nextButton(100)" id="next100" class="buttonClass">100 &gt&gt&gt&gt</button>
+      <button onclick="jumpToButton()" class="buttonClass" id="jumpToButton">Jump To:</button>
+      <input type="number" id="jumpToValue" value="0"></input>
 		</div>
 	</div>
 </body>

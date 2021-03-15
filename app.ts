@@ -1,110 +1,210 @@
-var from:number, to:number, totalRecords:number;
+class table
+{
+
+  constructor()
+  {
+    this.from = 0;
+    this._to = this.to;
+  }
+
+  private _from:number = 0;
+  private _to:number;
+
+  get from()
+  {
+    return this._from;
+  }
+
+  set from(from:number)
+  { 
+    let totalRecordsIndex:number = getTotalRecords() - 1;
+
+    if((from + this.getNumberOfRows()) > totalRecordsIndex)
+      this._from = (totalRecordsIndex - this.getNumberOfRows());
+    else if(from < 0 )
+      this._from = 0;
+    else
+      this._from = from;
+
+    this._to = this.to;
+
+  }
+
+  get to():number
+  {
+    let to:number;
+
+    to = this._from + this.getNumberOfRows()
+
+    if (to > getTotalRecords())
+      return getTotalRecords() - 1;
+    else
+      return to;
+  }
+
+
+  //determine the amount of rows to add to the table based on the size on the window
+  getNumberOfRows()
+  {
+    let height = (parseInt(((window.innerHeight-75)/20).toFixed(0)) - 1);
+    let width = (parseInt(((window.innerWidth-75)/20).toFixed(0)) - 1);
+
+    if (height < width)
+     return height;
+    else
+      return width;
+  
+  }
+
+  getTotalRecords()
+  {
+    const HttpRequest = new XMLHttpRequest();
+    const url='http://localhost:2050//recordCount';
+    HttpRequest.open("GET", url, false);
+    HttpRequest.send();
+
+    const responseText = HttpRequest.responseText
+    
+    return parseInt(responseText);
+  }
+
+  buildTable(from:number,to:number) 
+  { 
+    $("#dataTableBody").find("tr").remove();
+
+    let tableBody = <HTMLTableSectionElement> document.getElementById("dataTableBody");  
+
+    //make the ajax call to retrieve the records and build the table
+    $.ajax({
+      url: `http://localhost:2050/records?from=${from}&to=${to}`,
+      dataType:'json',
+      success:function(data) {
+
+        $.each(data, function(row)
+          {
+            const dataRow = tableBody.insertRow(-1);
+            $.each(data[row], function(cell)
+              {
+                const newCell = dataRow.insertCell(-1);
+                newCell.innerHTML = data[row][cell];
+              }
+            )
+          }
+        )
+      }
+    });
+
+    tableBody = <HTMLTableSectionElement> document.getElementById("dataTableBody");
+
+    const dataRow = tableBody.insertRow(0);
+
+    //make the ajax call to retrieve the records and build the table header
+    $.ajax({
+      url: `http://localhost:2050/columns`,
+      dataType:'json',
+      async:false,
+      success:function(data) {
+  
+        //const dataRow = tableBody.insertRow(0);
+        $.each(data, function(cell)
+          {
+            const newCell = dataRow.insertCell(-1);
+            newCell.outerHTML = `<th>${data[cell]}</th>`;
+             
+          }
+        )
+      }
+    });
+
+    //call the button property set fucntion to set disable/enably buttons appropriately 
+    buttonPropertySet();
+  
+  }
+
+}
+
+class utility
+{
+  timeout:number = 0;
+
+  debounce(func: Function, wait:number){
+    //let timeout:number;
+  
+    return (...args:any[]) => {
+      const later = () => {
+        clearTimeout(this.timeout);
+        func(...args);
+      };
+  
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(later, wait);
+    };
+  };
+}
+
+const myTable = new table();
+const myUtility = new utility();
 
 window.onload = function()
 {
-  from = 0
-  to = 9
-  totalRecords = getTotalRecords();
-  buttonPropertySet();
-  createTable(from,to);
-  populateTableData(from,to);
-  fontResize();
+
+  const request = myUtility.debounce(myTable.buildTable,250);
+
+  request(myTable.from,myTable.to);
+
 }
 
-$(window).on('ready resize', function() 
+//on resize funtionalty to rebuild the table
+$(window).on('resize', function() 
 {
-  fontResize();
-});
+  const request = myUtility.debounce(myTable.buildTable,250);
 
-function fontResize()
-{
-  $('td').css('font-size', $('td').width() + '%');
-  $('td').css('font-size', $('td').height() + '%');
-  $('th').css('font-size', $('th').width() + '%');
-  $('th').css('font-size', $('th').height() + '%');
-  $('button').css('font-size', $('button').width() + '%');
+  request(myTable.from,myTable.to);
 }
+);
 
 function buttonPropertySet()
 {
-  var previous = <HTMLInputElement> document.getElementById("previous");
-  var previous5 = <HTMLInputElement> document.getElementById("previous5");
-  var previous10 = <HTMLInputElement> document.getElementById("previous10");
-  var previous100 = <HTMLInputElement> document.getElementById("previous100");
-  var next = <HTMLInputElement> document.getElementById("next");
-  var next5 = <HTMLInputElement> document.getElementById("next5");
-  var next10 = <HTMLInputElement> document.getElementById("next10");
-  var next100 = <HTMLInputElement> document.getElementById("next100");
-  
+  let previous = <HTMLInputElement> document.getElementById("previous");
+  let previous5 = <HTMLInputElement> document.getElementById("previous5");
+  let previous10 = <HTMLInputElement> document.getElementById("previous10");
+  let next = <HTMLInputElement> document.getElementById("next");
+  let next5 = <HTMLInputElement> document.getElementById("next5");
+  let next10 = <HTMLInputElement> document.getElementById("next10");
+
+  let from = myTable.from;
+  let totalRecords = getTotalRecords();
+
   // disable previous buttons when out of range
-  if(from < 9)
+  if(from === 0)
+  {
     previous.disabled=true;
+    previous5.disabled = true;
+    previous10.disabled = true;
+  }
   else
+  {
     previous.disabled=false;
-
-  if(from < 49)  
-    previous5.disabled=true;
-  else
     previous5.disabled=false;
-
-  if(from < 99)  
-    previous10.disabled=true;
-  else
     previous10.disabled=false;
-
-  if(from < 999)  
-    previous100.disabled=true;
-  else
-    previous100.disabled=false;
+  }
 
   // disable next buttons when out of range
-  if(from >= (totalRecords - 10))
+  if(from + myTable.getNumberOfRows() === (totalRecords -1))
+  {
     next.disabled=true;
-  else
-    next.disabled=false;
-
-  if(from >= (totalRecords - 50))
     next5.disabled=true;
-  else
-    next5.disabled=false;
-
-  if(from >= (totalRecords - 100))
     next10.disabled=true;
+  }
   else
+  {
+    next.disabled=false;
+    next5.disabled=false;
     next10.disabled=false;
-
-  if(from >= (totalRecords - 1000))
-    next100.disabled=true;
-  else
-    next100.disabled=false;
+  }
 }
 
-function getColumnHeaders()
-{
-    const HttpRequest = new XMLHttpRequest();
-    const url='http://localhost:2050/columns';
-    HttpRequest.open("GET", url, false);
-    HttpRequest.send();
-
-    const responseText = HttpRequest.responseText
-    const JSONObject = JSON.parse(responseText);
-    
-    return JSONObject;
-}
-
-function getColumnData(from:number,to:number)
-{
-    const HttpRequest = new XMLHttpRequest();
-    const url=`http://localhost:2050/records?from=${from}&to=${to}`;
-    HttpRequest.open("GET", url, false);
-    HttpRequest.send();
-
-    const responseText = HttpRequest.responseText
-    const JSONObject = JSON.parse(responseText);
-    
-    return JSONObject;
-}
-
+//function to retrieve the total record count used when building the table
 function getTotalRecords()
 {
     const HttpRequest = new XMLHttpRequest();
@@ -117,67 +217,57 @@ function getTotalRecords()
     return parseInt(responseText);
 }
 
-function populateTableData(from:number,to:number)
-{
-    var dataJSONObject = getColumnData(from,to);
-
-    for (let index = 0; index < Object.keys(dataJSONObject).length; index++) 
-    {
-        for (let index2 = 0; index2 < Object.keys(dataJSONObject[index]).length; index2++) 
-        {
-            document.getElementById("row_" + index + "_cell_" + index2)!.innerHTML = dataJSONObject[index][index2]            
-        }
-       
-    } 
-}
-
-function createTable(from:number, to:number)
-{
-
-    var headerJSONObject = getColumnHeaders();
-    var dataJSONObject = getColumnData(0,9);
-
-    const table = document.createElement("table");
-
-   // insert a row and add headings to it
-   const hrow = table.insertRow();
-   for (let index = 0; index < Object.keys(headerJSONObject).length; index++) 
-   {
-        var newCell = hrow.insertCell(-1);
-        newCell.outerHTML = `<th>${headerJSONObject[index]}</th>`;
-        newCell.className = "tableCell";   
-   }
-
-   for (let index = 0; index < Object.keys(dataJSONObject).length; index++) 
-   {
-        const drow = table.insertRow(-1);
-
-        for (let index2 = 0; index2 < Object.keys(dataJSONObject[index]).length; index2++) 
-        {
-            var newCell = drow.insertCell(-1);
-            newCell.className = "tableCell";
-            newCell.id = "row_" + index + "_cell_" + index2;
-        }
-   }
-
-   // add table to div
-   document.getElementById("tablediv")!.appendChild(table); // ** Check die code die ! suppress 'n "possibly null"
-
-}
-
+//previous button function that takes a multiplier indicating the amount of pages to page at a time
 function previousButton(multiplier:number) 
 {
-    from -= (10 * multiplier);
-    to -= (10 * multiplier);
-    buttonPropertySet();
-    populateTableData(from,to);
+  // wrap the logic within a debounce funtion to prevent unnecesary calls. 
+  let request = myUtility.debounce(function(){
+  
+    myTable.from = myTable.from - ((myTable.getNumberOfRows() + 1) * multiplier);
+
+    myTable.buildTable(myTable.from,myTable.to);
+
+  },250);
+
+  request();
+  
 }
 
-function nextButton(multiplier:number) 
+//next button function that takes a multiplier indicating the amount of pages to page at a time
+function nextButton(multiplier:number)
 {
-    from += (10 * multiplier);
-    to += (10 * multiplier);
-    buttonPropertySet();
-    populateTableData(from,to);
+  // wrap the logic within a debounce funtion to prevent unnecesary calls. 
+  let request = myUtility.debounce(function(){
+  
+    myTable.from = myTable.from + ((myTable.getNumberOfRows() + 1) * multiplier);
+
+    myTable.buildTable(myTable.from,myTable.to);
+
+  },250);
+
+  request();
+
 }
 
+function jumpToButton()
+{
+  let inputElement = <HTMLInputElement> document.getElementById("jumpToValue");
+  let from:number;
+
+  // wrap the logic within a debounce funtion to prevent unnecesary calls. 
+  let request = myUtility.debounce(function(){
+
+    if (inputElement.value === "")
+      from = 0;
+    else 
+      from = parseInt(inputElement.value);
+
+    myTable.from = from;
+
+    myTable.buildTable(myTable.from,myTable.to);
+
+  },250);
+
+  request();
+
+}
