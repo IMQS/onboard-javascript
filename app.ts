@@ -26,11 +26,6 @@ class table
   { 
     let totalRecordsIndex:number = this._totalRecords - 1;
 
-    console.log("test");
-    console.log(this._from);
-    console.log(totalRecordsIndex);
-    console.log(this.getNumberOfRows());
-
     if((from + this.getNumberOfRows()) > totalRecordsIndex)
       this._from = (totalRecordsIndex - this.getNumberOfRows());
     else if(from < 0 )
@@ -141,7 +136,7 @@ class table
     });
 
     //call the button property set fucntion to set disable/enably buttons appropriately 
-    //buttonPropertySet();
+    buttonPropertySet();
   
   }
 
