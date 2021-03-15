@@ -19,6 +19,11 @@ class table
   { 
     let totalRecordsIndex:number = getTotalRecords() - 1;
 
+    console.log("test");
+    console.log(this._from);
+    console.log(totalRecordsIndex);
+    console.log(this.getNumberOfRows());
+
     if((from + this.getNumberOfRows()) > totalRecordsIndex)
       this._from = (totalRecordsIndex - this.getNumberOfRows());
     else if(from < 0 )
@@ -45,14 +50,22 @@ class table
 
   //determine the amount of rows to add to the table based on the size on the window
   getNumberOfRows()
-  {
-    let height = (parseInt(((window.innerHeight-75)/20).toFixed(0)) - 1);
-    let width = (parseInt(((window.innerWidth-75)/20).toFixed(0)) - 1);
+  { 
+    let rows:number;
+
+    //subtract - 1 to cater for header row.
+    let height = (parseInt(((window.innerHeight-75)/30).toFixed(0)) - 1);
+    let width = (parseInt(((window.innerWidth-75)/30).toFixed(0)) - 1);
 
     if (height < width)
-     return height;
+      rows = height;
     else
-      return width;
+      rows = width;
+
+    if (rows < 0)
+      return 0;
+    else
+      return rows; 
   
   }
 
@@ -157,9 +170,16 @@ window.onload = function()
 //on resize funtionalty to rebuild the table
 $(window).on('resize', function() 
 {
-  const request = myUtility.debounce(myTable.buildTable,250);
+  // wrap the logic within a debounce funtion to prevent unnecesary calls. 
+  let request = myUtility.debounce(function(){
 
-  request(myTable.from,myTable.to);
+    myTable.from = myTable.from;
+
+    myTable.buildTable(myTable.from,myTable.to);
+
+  },250);
+
+  request();
 }
 );
 
