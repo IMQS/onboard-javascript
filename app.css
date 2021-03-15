@@ -76,8 +76,8 @@ td
   color: #202020;
   text-align: center;
   padding: 0;
-  /*white-space:nowrap;*/
-  font-size: small;
+  white-space:nowrap;
+  font-size: x-small;
 }
 
 th
@@ -89,7 +89,8 @@ th
   background-color: #282C34;
   max-height: 25px;
   padding: 0;
-  /*white-space: nowrap;*/
+  font-size: x-small;
+  white-space: nowrap;
 }
 
 button

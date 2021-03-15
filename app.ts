@@ -5,10 +5,17 @@ class table
   {
     this.from = 0;
     this._to = this.to;
+    this._totalRecords = getTotalRecords();
   }
 
   private _from:number = 0;
   private _to:number;
+  private _totalRecords:number;
+
+  get totalRecords()
+  {
+    return this._totalRecords
+  }
 
   get from()
   {
@@ -17,7 +24,7 @@ class table
 
   set from(from:number)
   { 
-    let totalRecordsIndex:number = getTotalRecords() - 1;
+    let totalRecordsIndex:number = this._totalRecords - 1;
 
     console.log("test");
     console.log(this._from);
@@ -41,8 +48,8 @@ class table
 
     to = this._from + this.getNumberOfRows()
 
-    if (to > getTotalRecords())
-      return getTotalRecords() - 1;
+    if (to > this._totalRecords)
+      return this._totalRecords- 1;
     else
       return to;
   }
@@ -65,7 +72,7 @@ class table
     if (rows < 0)
       return 0;
     else
-      return rows; 
+      return rows;
   
   }
 
@@ -85,7 +92,9 @@ class table
   { 
     $("#dataTableBody").find("tr").remove();
 
-    let tableBody = <HTMLTableSectionElement> document.getElementById("dataTableBody");  
+    let tableBody = <HTMLTableSectionElement> document.getElementById("dataTableBody");
+
+    console.log("test speed 1");
 
     //make the ajax call to retrieve the records and build the table
     $.ajax({
@@ -106,6 +115,8 @@ class table
         )
       }
     });
+
+    console.log("test speed 2");
 
     tableBody = <HTMLTableSectionElement> document.getElementById("dataTableBody");
 
@@ -130,7 +141,7 @@ class table
     });
 
     //call the button property set fucntion to set disable/enably buttons appropriately 
-    buttonPropertySet();
+    //buttonPropertySet();
   
   }
 
@@ -141,7 +152,6 @@ class utility
   timeout:number = 0;
 
   debounce(func: Function, wait:number){
-    //let timeout:number;
   
     return (...args:any[]) => {
       const later = () => {
@@ -193,7 +203,7 @@ function buttonPropertySet()
   let next10 = <HTMLInputElement> document.getElementById("next10");
 
   let from = myTable.from;
-  let totalRecords = getTotalRecords();
+  let totalRecords = myTable.totalRecords;
 
   // disable previous buttons when out of range
   if(from === 0)
