@@ -1,163 +1,146 @@
-.maindiv
-{     
-    height: 100%;
-    width: 100%;
-    background-color: #f8f8f8;
-    position: absolute;
-    left: 0px;
-    right: 0px;
-    top: 0px;
-    bottom: 0px;
-    overflow: hidden;
+.maindiv {
+	height: 100%;
+	width: 100%;
+	background-color: #f8f8f8;
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	overflow: hidden;
 }
 
-#captiondiv
-{    
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 25px;
-    width: 100%;
-    text-align: center;    
-    font-family: sans-serif;
-    font-weight: bold;
-    color: #FFFFFF;
-    background-color: #282C34;
+#captiondiv {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 25px;
+	width: 100%;
+	text-align: center;
+	font-family: sans-serif;
+	font-weight: bold;
+	color: #ffffff;
+	background-color: #282c34;
 }
 
-#tablediv
-{ 
-    position: absolute;
-    top: 25px;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: calc(100% - 50px);
-    width: 100%;
+#tablediv {
+	position: absolute;
+	top: 25px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: calc(100% - 50px);
+	/*height: 100%;*/
+	width: 100%;
 }
 
-#buttondiv
-{
-    position: absolute;
-    top: auto;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 25px;
-    width: 100%;
-    text-align: center;
-    color: #FFFFFF;
-    background-color: #282C34;
+#buttondiv {
+	position: absolute;
+	top: auto;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 25px;
+	width: 100%;
+	text-align: center;
+	color: #ffffff;
+	background-color: #282c34;
 }
 
-table
-{   
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;    
-    color: #000000;
-    font-family: Courier, monospace;
-    font-weight: bold;
-    background-color: #FFFFFF;
-    border-collapse: collapse;
-    border-spacing: 0;
+table {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	color: #000000;
+	font-family: Courier, monospace;
+	font-weight: bold;
+	background-color: #ffffff;
+	border-collapse: collapse;
+	border-spacing: 0;
 }
 
-td
-{
-  border: 1px solid #000000;  
-  font-family: sans-serif;
-  color: #202020;
-  text-align: center;
-  padding: 0;
-  white-space:nowrap;
-  font-size: x-small;
+td {
+	border: 1px solid #000000;
+	font-family: sans-serif;
+	color: #202020;
+	text-align: center;
+	padding: 0;
+	white-space: nowrap;
+	font-size: x-small;
 }
 
-th
-{
-  border: 1px solid #000000;
-  font-family: sans-serif;
-  color: #FFFFFF;
-  font-weight: bold;
-  background-color: #282C34;
-  max-height: 25px;
-  padding: 0;
-  font-size: x-small;
-  white-space: nowrap;
+th {
+	border: 1px solid #000000;
+	font-family: sans-serif;
+	color: #ffffff;
+	font-weight: bold;
+	background-color: #282c34;
+	max-height: 25px;
+	padding: 0;
+	font-size: x-small;
+	white-space: nowrap;
 }
 
-button
-{
-  width: 8%;
-  height: 25px;
-  font-size: small;
-  text-align: center;
+button {
+	width: 8%;
+	height: 25px;
+	font-size: small;
+	text-align: center;
 }
 
 /*@media screen and (max-height:400px) {
-  #captiondiv 
-  {
-      display: none !important;
-  }
-  #tablediv
-  {
-    top:0;
-    height: calc(100% - 25px);
-  }
+	#captiondiv
+	{
+			display: none !important;
+	}
+	#tablediv
+	{
+		top:0;
+		height: calc(100% - 25px);
+	}
 }*/
 
-@media screen and (max-width:800px) {
-  #next10
-  {
-    display: none !important;
-  }
-  #previous10
-  {
-    display: none !important;
-  }
+@media screen and (max-width: 800px) {
+	#next10 {
+		display: none !important;
+	}
+	#previous10 {
+		display: none !important;
+	}
 }
 
-@media screen and (max-width:500px) {
-  #next5
-  {
-    display: none !important;
-  }
-  #previous5
-  {
-    display: none !important;
-  }
+@media screen and (max-width: 500px) {
+	#next5 {
+		display: none !important;
+	}
+	#previous5 {
+		display: none !important;
+	}
 }
 
-@media screen and (max-width:300px) {
-  #next
-  {
-    display: none !important;
-  }
-  #previous
-  {
-    display: none !important;
-  }
+@media screen and (max-width: 300px) {
+	#next {
+		display: none !important;
+	}
+	#previous {
+		display: none !important;
+	}
 }
 
-#jumpToButton
-{
-  width: 13%;
-  min-width: 50px;
-  font-size: small;
-  white-space: nowrap;
+#jumpToButton {
+	width: 13%;
+	min-width: 50px;
+	font-size: small;
+	white-space: nowrap;
 }
 
-#jumpToValue
-{
-  width: 13%;
-  min-width: 30px;
+#jumpToValue {
+	width: 13%;
+	min-width: 30px;
 }
-
-
