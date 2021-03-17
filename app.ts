@@ -1,63 +1,15 @@
-function getColumnData(): string[] {
-	let headerArray: string[];
-
-	headerArray = [];
-
-	$.ajax({
-		url: 'http://localhost:2050/columns',
-		dataType: 'json',
-		async: false,
-		success: function (data) {
-
-			for (let index = 0; index < data.length; index++) {
-				headerArray[index] = data[index];
-			}
-		}
-	});
-
-	return headerArray;
-}
-
-class Utility {
-	timeout: number = 0;
-
-	debounce(func: Function, wait: number) {
-
-		return (...args: any[]) => {
-			const later = () => {
-				clearTimeout(this.timeout);
-				func(...args);
-			};
-
-			clearTimeout(this.timeout);
-			this.timeout = setTimeout(later, wait);
-		};
-	};
-}
 
 const myTable = new Table();
-const myUtility = new Utility();
+
 
 window.onload = function () {
-
-	const request = myUtility.debounce(myTable.buildTable, 250);
-
-	request();
-
+	addButtons();
+	myTable.initialTableBuild();
 }
 
-//on resize funtionalty to rebuild the table
 $(window).on('resize', function () {
-	// wrap the logic within a debounce funtion to prevent unnecesary calls.
-	let request = myUtility.debounce(function () {
 
-		myTable.from = myTable.from;
-
-		myTable.buildTable();
-
-	}, 250);
-
-	request();
+	myTable.buildTable();
 }
 );
 
@@ -68,6 +20,7 @@ function buttonPropertySet() {
 	let next = <HTMLInputElement>document.getElementById("next");
 	let next5 = <HTMLInputElement>document.getElementById("next5");
 	let next10 = <HTMLInputElement>document.getElementById("next10");
+	let jumpToButton = <HTMLInputElement>document.getElementById("jumpToButton");
 
 	let from = myTable.from;
 	let totalRecords = myTable.totalRecords;
@@ -95,73 +48,96 @@ function buttonPropertySet() {
 		next5.disabled = false;
 		next10.disabled = false;
 	}
-}
 
-//function to retrieve the total record count used when building the table
-function getTotalRecords() {
-	const HttpRequest = new XMLHttpRequest();
-	const url = 'http://localhost:2050//recordCount';
-	HttpRequest.open("GET", url, true);
-	HttpRequest.send();
-
-	const responseText = HttpRequest.responseText
-
-	return parseInt(responseText);
+	jumpToButton.disabled = false;
 }
 
 // previous button function that takes a multiplier indicating the amount of pages to page at a time
 function previousButton(multiplier: number) {
-	// wrap the logic within a debounce funtion to prevent unnecesary calls.
-	let request = myUtility.debounce(function () {
+	myTable.from = myTable.from - ((myTable.getNumberOfRows() + 1) * multiplier);
 
-		myTable.from = myTable.from - ((myTable.getNumberOfRows() + 1) * multiplier);
-
-		myTable.buildTable();
-
-	}, 250);
-
-	request();
-
+	myTable.buildTable();
 }
 
-//next button function that takes a multiplier indicating the amount of pages to page at a time
+// next button function that takes a multiplier indicating the amount of pages to page at a time
 function nextButton(multiplier: number) {
-	// wrap the logic within a debounce funtion to prevent unnecesary calls.
-	let request = myUtility.debounce(function () {
+	myTable.from = myTable.from + ((myTable.getNumberOfRows() + 1) * multiplier);
 
-		myTable.from = myTable.from + ((myTable.getNumberOfRows() + 1) * multiplier);
-
-		myTable.buildTable();
-
-	}, 250);
-
-	request();
-
+	myTable.buildTable();
 }
 
 function jumpToButton() {
 	let inputElement = <HTMLInputElement>document.getElementById("jumpToValue");
 	let from: number;
 
-	// wrap the logic within a debounce funtion to prevent unnecesary calls.
-	let request = myUtility.debounce(function () {
+	if (inputElement.value === "")
+		from = 0;
+	else
+		from = parseInt(inputElement.value);
 
-		if (inputElement.value === "")
-			from = 0;
-		else
-			from = parseInt(inputElement.value);
+	myTable.from = from;
 
-		myTable.from = from;
-
-		myTable.buildTable();
-
-	}, 250);
-
-	request();
+	myTable.buildTable();
 
 }
 
-function test() {
+function addButtons() {
+
+	let button: HTMLButtonElement;
+	let buttonDiv = <HTMLElement>document.getElementById("buttondiv");
+
+	button = document.createElement("button");
+	button.innerHTML = "&lt&lt&lt 10";
+	button.id = "previous10";
+	button.setAttribute("disabled", "true");
+	button.onclick = () => { previousButton(10) };
+	buttonDiv.appendChild(button);
+
+	button = document.createElement("button");
+	button.innerHTML = "&lt&lt 5";
+	button.id = "previous5";
+	button.setAttribute("disabled", "true");
+	button.onclick = () => { previousButton(5) };
+	buttonDiv.appendChild(button);
+
+	button = document.createElement("button");
+	button.innerHTML = "&lt";
+	button.id = "previous";
+	button.setAttribute("disabled", "true");
+	button.onclick = () => { previousButton(1) };
+	buttonDiv.appendChild(button);
+
+	button = document.createElement("button");
+	button.innerHTML = "&gt";
+	button.id = "next";
+	button.setAttribute("disabled", "true");
+	button.onclick = () => { nextButton(1) };
+	buttonDiv.appendChild(button);
+
+	button = document.createElement("button");
+	button.innerHTML = "5 &gt&gt ";
+	button.id = "next5";
+	button.setAttribute("disabled", "true");
+	button.onclick = () => { nextButton(5) };
+	buttonDiv.appendChild(button);
+
+	button = document.createElement("button");
+	button.innerHTML = "10 &gt&gt&gt";
+	button.id = "next10";
+	button.setAttribute("disabled", "true");
+	button.onclick = () => { nextButton(10) };
+	buttonDiv.appendChild(button);
+
+	button = document.createElement("button");
+	button.innerHTML = "Jump To:";
+	button.id = "jumpToButton";
+	button.setAttribute("disabled", "true");
+	button.onclick = () => { jumpToButton() };
+	buttonDiv.appendChild(button);
+
+	let input = document.createElement("INPUT");
+	input.id = "jumpToValue";
+	input.setAttribute("type", "number");
+	buttonDiv.appendChild(input);
 
 }
-

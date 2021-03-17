@@ -32,7 +32,6 @@
 	bottom: 0;
 	left: 0;
 	height: calc(100% - 50px);
-	/*height: 100%;*/
 	width: 100%;
 }
 
@@ -94,18 +93,6 @@ button {
 	text-align: center;
 }
 
-/*@media screen and (max-height:400px) {
-	#captiondiv
-	{
-			display: none !important;
-	}
-	#tablediv
-	{
-		top:0;
-		height: calc(100% - 25px);
-	}
-}*/
-
 @media screen and (max-width: 800px) {
 	#next10 {
 		display: none !important;
@@ -136,7 +123,7 @@ button {
 #jumpToButton {
 	width: 13%;
 	min-width: 50px;
-	font-size: small;
+	font-size: x-small;
 	white-space: nowrap;
 }
 

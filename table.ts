@@ -1,15 +1,13 @@
 class Table {
 
 	private _from: number = 0;
-	//private _to: number;
-	private _totalRecords: number;
-	private _columns: string[];
+	private _totalRecords: number = 0;
+	private _columns: string[] = [];
+	private timeout = 0;
+	private rows = 0;
 
 	constructor() {
 		this.from = 0;
-		//this._to = this.to;
-		this._totalRecords = getTotalRecords();
-		this._columns = this.getColumnData();
 	}
 
 	get totalRecords(): number {
@@ -25,16 +23,17 @@ class Table {
 	}
 
 	set from(from: number) {
-		let totalRecordsIndex: number = this._totalRecords - 1;
+		let totalRecordsIndex = this._totalRecords - 1;
 
-		if ((from + this.getNumberOfRows()) > totalRecordsIndex)
-			this._from = (totalRecordsIndex - this.getNumberOfRows());
+		if (totalRecordsIndex < 0)
+			totalRecordsIndex = 0;
+
+		if ((from + this.rows) > totalRecordsIndex)
+			this._from = (totalRecordsIndex - this.rows);
 		else if (from < 0)
 			this._from = 0;
 		else
 			this._from = from;
-
-		//this._to = this.to;
 
 	}
 
@@ -47,7 +46,7 @@ class Table {
 			return to;
 	}
 
-	getColumnData(): string[] {
+	getColumnData(): void {
 		let headerArray: string[];
 
 		headerArray = [];
@@ -55,31 +54,29 @@ class Table {
 		$.ajax({
 			url: 'http://localhost:2050/columns',
 			dataType: 'json',
-			async: false,
 			success: (data: string[]) => {
 
-				for (let index = 0; index < data.length; index++) {
-					headerArray[index] = data[index];
+				let tableBody = <HTMLTableSectionElement>document.getElementById("dataTableBody");
+
+				const dataRow = tableBody.insertRow(0);
+
+				for (let i = 0; i < data.length; i++) {
+					const newCell = dataRow.insertCell(-1);
+					newCell.outerHTML = `<th>${data[i]}</th>`;
 				}
+
+				this.buildTable();
+
 			}
 		});
-
-		return headerArray;
 	}
 
 
 	/** determine the amount of rows to add to the table based on the size on the window */
 	getNumberOfRows(): number {
-		let rows: number;
 
 		// subtract - 1 to cater for header row.
-		let height = (parseInt(((window.innerHeight - 75) / 30).toFixed(0)) - 1);
-		let width = (parseInt(((window.innerWidth - 75) / 30).toFixed(0)) - 1);
-
-		if (height < width)
-			rows = height;
-		else
-			rows = width;
+		let rows = (parseInt(((window.innerHeight - 75) / 30).toFixed(0)) - 1);
 
 		if (rows < 0)
 			return 0;
@@ -88,51 +85,54 @@ class Table {
 
 	}
 
-	getTotalRecords(): number {
-		const HttpRequest = new XMLHttpRequest();
-		const url = 'http://localhost:2050/recordCount';
-		HttpRequest.open("GET", url, false);
-		HttpRequest.send();
+	getTotalRecords(): void {
 
-		const responseText = HttpRequest.responseText
-
-		return parseInt(responseText);
-	}
-
-	buildTable = (): void => {
-		$("#dataTableBody").find("tr").remove();
-
-		let tableBody = <HTMLTableSectionElement>document.getElementById("dataTableBody");
-
-		// make the ajax call to retrieve the records and build the table
 		$.ajax({
-			url: `http://localhost:2050/records?from=${this.from}&to=${this.to}`,
+			url: 'http://localhost:2050/recordCount',
 			dataType: 'json',
-			async: true,
-			success: (data: string[]): void => {
-
-				for (let row of data) {
-					const dataRow = tableBody.insertRow(-1);
-					for (let cell of row) {
-						const newCell = dataRow.insertCell(-1);
-						newCell.innerHTML = cell
-					}
-				}
+			success: (data: string): void => {
+				this._totalRecords = parseInt(data);
+				this.getColumnData();
 			}
 		});
+	}
 
-		tableBody = <HTMLTableSectionElement>document.getElementById("dataTableBody");
+	initialTableBuild() {
+		this.getTotalRecords();
+	}
 
-		const dataRow = tableBody.insertRow(0);
+	buildTable(): void {
 
-		for (let i = 0; i < myTable.columns.length; i++) {
-			const newCell = dataRow.insertCell(-1);
-			newCell.outerHTML = `<th>${myTable.columns[i]}</th>`;
-		}
+		clearTimeout(this.timeout);
+		this.timeout = setTimeout(() => {
 
-		// call the button property set fucntion to set disable/enable buttons appropriately
-		buttonPropertySet();
+			let html: string;
 
+			// make the ajax call to retrieve the records and build the table
+			$.ajax({
+				url: `http://localhost:2050/records?from=${this.from}&to=${this.to}`,
+				dataType: 'json',
+				success: (data: string[]): void => {
+
+					for (let row of data) {
+
+						html = html + "<tr>"
+
+						for (let cell of row) {
+							html = html + "<td>" + cell + "</td>";
+						}
+
+						html = html + "</tr>"
+					}
+
+					$("#dataTableBody").find("tr:gt(0)").remove();
+					$("#dataTableBody > tr").eq(0).after(html);
+
+				}
+			});
+
+			buttonPropertySet();
+		}, 250);
 	}
 
 }
