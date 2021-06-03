@@ -1,0 +1,24 @@
+{
+  "name": "onboard-javascript",
+  "version": "1.0.0",
+  "description": "onboarding",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geraldtivatyi/onboard-javascript.git"
+  },
+  "author": "Gerald",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/geraldtivatyi/onboard-javascript/issues"
+  },
+  "homepage": "https://github.com/geraldtivatyi/onboard-javascript#readme",
+  "dependencies": {
+    "@types/jquery": "^3.5.5",
+    "typescript": "^4.3.2"
+  }
+}
