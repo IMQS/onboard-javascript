@@ -8,8 +8,18 @@
 	</head>
 	<body>
 		<h1>Onboarding Table</h1>
-		<div id="app"></div>
-		<script type="text/javascript" charset="utf-8" src="app.js"></script>
+		<div id="app">
+			<h2>Table Navigation</h2>
+			<form class="navigation">
+				<label for="fname">From ID:</label><br>
+				<input type="number" id="fromID" name="fromID" value="1"><br>
+				<label for="lname">To ID:</label><br>
+				<input type="number" id="toID" name="toID" value="5"><br><br>
+				<input id="submit" type="submit" value="Submit">
+			  </form> 
+			  <div class="table"></div>
+		</div>
+		<script type="module" charset="utf-8" src="app.js"></script>
 	</body>
 </html>
 
