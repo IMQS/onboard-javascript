@@ -1,8 +1,32 @@
-#app {
+body {
   font-family: Arial, Helvetica, sans-serif;
+  overflow-y: scroll;
 }
 
-#app .navigation {
+/* Hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+#app {
+  margin-top: 150px;
+}
+
+.navigation {
+  background-color: #ffffff;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.navigation .form {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,22 +34,22 @@
   font-size: 25px;
 }
 
-#app .navigation .input {
+.navigation .form .input {
   text-align: center;
   font-size: 25px;
   width: 150px;
   height: 30px;
 }
 
-#app .navigation .padding {
+.navigation .form .padding {
   margin-left: 20px;
 }
 
-#app .navigation label {
+.navigation .form label {
   margin-right: 10px;
 }
 
-#app .navigation #submit {
+.navigation .form #submit {
   font-size: 25px;
   font-weight: bold;
   color: white;
