@@ -4,12 +4,10 @@ export class createTable {
     constructor(private container: HTMLTableElement) {}
 
     renderHeading(headings: HasFormatMethod){
-        const th = document.createElement('th');
-        th.innerHTML = headings.format();
+        const tr = document.createElement('tr');
 
-        array.forEach(element => {
-            this.container.append(th);
-        });
+        tr.innerHTML = headings.format();
+        this.container.append(tr);
     }
 
     renderRecords(records: HasFormatMethod){
@@ -18,4 +16,4 @@ export class createTable {
 
         this.container.append(tr);
     }
-} 
+}

@@ -3,9 +3,9 @@ var createTable = /** @class */ (function () {
         this.container = container;
     }
     createTable.prototype.renderHeading = function (headings) {
-        var th = document.createElement('th');
-        th.innerHTML = headings.format();
-        this.container.append(th);
+        var tr = document.createElement('tr');
+        tr.innerHTML = headings.format();
+        this.container.append(tr);
     };
     createTable.prototype.renderRecords = function (records) {
         var tr = document.createElement('tr');

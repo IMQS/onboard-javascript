@@ -2,7 +2,14 @@ import { tableHeadings } from "./classes/table_headings.js";
 import { recordStruct } from "./classes/record_struct.js";
 import { createTable } from "./classes/create_table.js";
 import { HasFormatMethod } from "./interfaces/hasformatmethod.js";
+import { httpReq } from './classes/http';
 
+const request = new httpReq('www.google.com','/','get');
+// request.addArg('num', '1');
+
+// request.get((res: string): void => {
+//     console.log('Response received: ' + res);
+// });
 
 //Accessing Form Data
 const form = document.querySelector('.navigation') as HTMLFormElement;
