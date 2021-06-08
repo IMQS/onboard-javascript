@@ -1,33 +1,18 @@
 import { HasFormatMethod } from "../interfaces/hasformatmethod.js";
 
+// generate html string for table headings data and render
 export class tableHeadings implements HasFormatMethod {
-    private id: string;
-	private A: string;
-	private B: string;
-	private C: string;
-	private D: string;
-	private E: string;
-	private F: string;
-	private G: string;
-	private H: string;
-	private I: string;
-	private J: string;
+	private returnStr: string = "";
 
-	constructor( id: string, a: string, b: string, c: string, d: string, e: string, f: string, g: string, h: string, i: string, j: string ){
-		this.id = id;
-		this.A = a;
-		this.B = b;
-		this.C = c;
-		this.D = d;
-		this.E = e;
-		this.F = f;
-		this.G = g;
-		this.H = h;
-		this.I = i;
-		this.J = j;	
+	constructor( headingsStr: string){
+
+		const myArr = JSON.parse(headingsStr);
+		for(let i=0;i<myArr.length;i++){
+			this.returnStr = this.returnStr + "<th>"+myArr[i]+"</th>";
+		}
 	}
 
 	format() {
-		return `<th>${this.id}</th> <th>${this.A}</th> <th>${this.B}</th> <th>${this.C}</th> <th>${this.D}</th> <th>${this.E}</th> <th>${this.F}</th> <th>${this.G}</th> <th>${this.H}</th> <th>${this.I}</th> <th>${this.J}</th>`
+		return this.returnStr;
 	}
 }

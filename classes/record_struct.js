@@ -1,19 +1,20 @@
 var recordStruct = /** @class */ (function () {
-    function recordStruct(id, a, b, c, d, e, f, g, h, i, j) {
-        this.id = id;
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
-        this.E = e;
-        this.F = f;
-        this.G = g;
-        this.H = h;
-        this.I = i;
-        this.J = j;
+    function recordStruct(recordsStr) {
+        this.returnStr = "";
+        var table = document.querySelector('table');
+        var myArr = JSON.parse(recordsStr);
+        for (var i = 0; i < myArr.length; i++) {
+            for (var j = 0; j < myArr[i].length; j++) {
+                this.returnStr = this.returnStr + "<td>" + myArr[i][j] + "</td>";
+            }
+            var tr = document.createElement('tr');
+            tr.innerHTML = this.returnStr;
+            table.append(tr);
+            this.returnStr = "";
+        }
     }
     recordStruct.prototype.format = function () {
-        return "<td>" + this.id + "</td> <td>" + this.A + "</td> <td>" + this.B + "</td> <td>" + this.C + "</td> <td>" + this.D + "</td> <td>" + this.E + "</td> <td>" + this.F + "</td> <td>" + this.G + "</td> <td>" + this.H + "</td> <td>" + this.I + "</td> <td>" + this.J + "</td>";
+        return this.returnStr;
     };
     return recordStruct;
 }());
