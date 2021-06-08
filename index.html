@@ -6,17 +6,19 @@
 		<link rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<h1>JS Onboard Project</h1>
-		<div id="app">
-			<form class="navigation">
+		<div class="navigation">
+			<h1>JS Onboard Project</h1>
+			<form class="form">
 				<label for="fname">From ID: </label><br>
 				<input type="number" class="input" id="fromID" name="fromID" placeholder="0" autofocus><br>
 				<label class="padding" for="lname">To ID: </label><br>
 				<input type="number" class="input" id="toID" name="toID" placeholder="0"><br><br>
 				<input class="padding" id="submit" type="submit" value="Submit">
-			  </form>
-			  <hr>
-			  <table id="table" class="table"></table id="table">
+			</form>
+			<hr>
+		</div>
+		<div id="app">
+			<table id="table" class="table"></table id="table">
 		</div>
 		<script type="module" charset="utf-8" src="app.js"></script>
 	</body>
