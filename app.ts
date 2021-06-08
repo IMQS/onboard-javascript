@@ -1,17 +1,17 @@
-import { tableHeadings } from "./classes/table_headings.js";
-import { recordStruct } from "./classes/record_struct.js";
-import { createTable } from "./classes/create_table.js";
+import { TableHeadingString } from "./classes/table_headings.js";
+import { RenderTableRows } from "./classes/render_rows.js";
+import { RenderTableHeading } from "./classes/render_headings.js";
 import { HasFormatMethod } from "./interfaces/hasformatmethod.js";
-import { request } from './classes/httpreq.js';
+import { request } from './httprequests/httpreq.js';
 
 
 //Accessing form data
-const form = document.querySelector('#form') as HTMLFormElement;
-const fromID = document.querySelector('#fromID') as HTMLInputElement;
-const toID = document.querySelector('#toID') as HTMLInputElement;
+let form = document.querySelector('#form') as HTMLFormElement;
+let fromID = document.querySelector('#fromID') as HTMLInputElement;
+let toID = document.querySelector('#toID') as HTMLInputElement;
 
 // Instantiate grid table to append innerHTML
-let tble = new createTable(document.querySelector('#table') as HTMLTableElement);
+let tble = new RenderTableHeading(document.querySelector('#table') as HTMLTableElement);
 
 // Strings holding heading and records data requested from server
 let headingsStr: string;
@@ -19,13 +19,14 @@ let recordsStr: string;
 
 // Listen for submission in form and use inputs to request data from backend
 form.addEventListener('submit', (e: Event) => {
-	document.getElementById("table")!.innerHTML = "";
+	let t = el("table") as HTMLTableElement;
+	t.innerHTML = ""; // empty table every time a new submission is made
 	e.preventDefault();
 	
 	// Fetch table headings from server
 	request(
 		"/columns", "GET",
-		function(r: any) {
+		function(r: string) {
 			try {
 				headingsStr = r; // set response from server
 			} catch(err) {
@@ -36,10 +37,10 @@ form.addEventListener('submit', (e: Event) => {
 	);
 
 	// Fetch records from server
-	let url: string = "/records?from="+fromID.valueAsNumber+"&to="+toID.valueAsNumber;
+	let url = "/records?from="+fromID.valueAsNumber+"&to="+toID.valueAsNumber;
 	request(
 		url, "GET",
-		function(r: any) {
+		function(r: string) {
 			try {
 				recordsStr = r; 	// set response from server
 				generateTable(); 	// call function to render table in browser
@@ -56,8 +57,12 @@ form.addEventListener('submit', (e: Event) => {
 function generateTable(){
 	let interfaceHeading: HasFormatMethod;					// variable of type interface used in creating table headings
 	let interfaceRecords: HasFormatMethod;					// variable of type interface used in creating table rows
-	interfaceHeading = new tableHeadings(headingsStr);		// call method to generate string containing table heading element
+	interfaceHeading = new TableHeadingString(headingsStr);	// call method to generate string containing table heading element
 	tble.constructTableHeadings(interfaceHeading);			// call method to render table headings element in browser
-	interfaceRecords = new recordStruct(recordsStr);		// call method to generate string containing table row elements
+	interfaceRecords = new RenderTableRows(recordsStr);		// call method to generate string containing table row elements
+}
+
+function el(s: string) {
+	return document.getElementById(s);
 }
 

@@ -1,15 +1,17 @@
-var tableHeadings = /** @class */ (function () {
-    function tableHeadings(headingsStr) {
+// generate html string for table headings data
+var TableHeadingString = /** @class */ (function () {
+    function TableHeadingString(headingsStr) {
         this.returnStr = "";
         var myArr = JSON.parse(headingsStr);
         for (var i = 0; i < myArr.length; i++) {
-            this.returnStr = this.returnStr + "<th>" + myArr[i] + "</th>";
+            this.returnStr +=
+                "<th>" + myArr[i] + "</th>";
         }
     }
-    tableHeadings.prototype.format = function () {
+    TableHeadingString.prototype.internalFormat = function () {
         return this.returnStr;
     };
-    return tableHeadings;
+    return TableHeadingString;
 }());
-export { tableHeadings };
+export { TableHeadingString };
 //# sourceMappingURL=table_headings.js.map
