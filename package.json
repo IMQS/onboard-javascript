@@ -19,6 +19,10 @@
   "homepage": "https://github.com/geraldtivatyi/onboard-javascript#readme",
   "dependencies": {
     "@types/jquery": "^3.5.5",
+    "http": "^0.0.1-security",
     "typescript": "^4.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^15.12.1"
   }
 }

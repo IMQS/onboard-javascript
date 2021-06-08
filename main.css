@@ -1,20 +1,91 @@
-#app .navigation {
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-y: scroll;
+  margin: 0px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+#app {
+  margin-top: 150px;
+}
+
+.navigation {
+  background-color: #ffffff;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 5px;
+  z-index: 1;
+}
+
+.navigation .form {
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 30px;
+  font-size: 25px;
 }
+
+.navigation .form .input {
+  text-align: center;
+  font-size: 25px;
+  width: 150px;
+  height: 30px;
+  border-radius: 6px;
+}
+
+.navigation .form .padding {
+  margin-left: 20px;
+}
+
+.navigation .form label {
+  margin-right: 10px;
+}
+
+.navigation .form #submit {
+  font-size: 25px;
+  font-weight: bold;
+  color: white;
+  background-color: #00b77a;
+  border-style: none;
+  border-radius: 6px;
+  width: fit-content;
+  height: 40px;
+  margin-left: 50px;
+}
+
 table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-  }
-  
-  td, th {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
-  }
-  
-  tr:nth-child(even) {
-    background-color: #dddddd;
-  }
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  position: relative;
+}
+
+th {
+  position: sticky;
+  top: 130px;
+  background-color: #ffffff;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd60;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  text-align: center;
+}
