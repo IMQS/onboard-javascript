@@ -1,18 +1,18 @@
 import { HasFormatMethod } from "../interfaces/hasformatmethod.js";
 
-// generate html string for table headings data and render
-export class tableHeadings implements HasFormatMethod {
-	private returnStr: string = "";
+// generate html string for table headings data
+export class TableHeadingString implements HasFormatMethod {
+	private returnStr = "";
 
 	constructor( headingsStr: string){
-
-		const myArr = JSON.parse(headingsStr);
+		let myArr = JSON.parse(headingsStr);
 		for(let i=0;i<myArr.length;i++){
-			this.returnStr = this.returnStr + "<th>"+myArr[i]+"</th>";
+			this.returnStr += 
+			"<th>"+myArr[i]+"</th>";
 		}
 	}
 
-	format() {
+	internalFormat() {
 		return this.returnStr;
 	}
 }

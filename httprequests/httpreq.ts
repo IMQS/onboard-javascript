@@ -1,7 +1,7 @@
 // http request and response handling
-declare var ActiveXObject: (type: string) => void;
+declare let ActiveXObject: (type: string) => void;
 export function request(action: string, method: string, callback: any) {
-  var x: any = {};
+  let x: any;
   if (window.XMLHttpRequest) x = new XMLHttpRequest();
   else x = ActiveXObject('Microsoft.XMLHTTP');
   x.onreadystatechange = function () {

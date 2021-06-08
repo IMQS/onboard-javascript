@@ -1,5 +1,5 @@
 export function request(action, method, callback) {
-    var x = {};
+    var x;
     if (window.XMLHttpRequest)
         x = new XMLHttpRequest();
     else

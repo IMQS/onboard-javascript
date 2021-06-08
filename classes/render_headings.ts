@@ -1,12 +1,12 @@
 import { HasFormatMethod } from "../interfaces/hasformatmethod.js";
 
 // create table elements and render in browser
-export class createTable {
+export class RenderTableHeading {
     constructor(private container: HTMLTableElement) {}
 
     constructTableHeadings(element: HasFormatMethod){
-        const tr = document.createElement('tr');
-        tr.innerHTML = element.format();
+        let tr = document.createElement('tr');
+        tr.innerHTML = element.internalFormat();
 
         this.container.append(tr);
     }
