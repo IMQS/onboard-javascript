@@ -7,11 +7,12 @@ var RenderTableRows = /** @class */ (function () {
         for (var i = 0; i < myArr.length; i++) {
             for (var j = 0; j < myArr[i].length; j++) {
                 this.returnStr +=
-                    "<td>" + myArr[i][j] + "</td>";
+                    "<div><p>" + myArr[i][j] + "</p></div>";
             }
-            var tr = document.createElement('tr');
-            tr.innerHTML = this.returnStr;
-            table.append(tr);
+            var div = document.createElement('div');
+            div.innerHTML = this.returnStr;
+            div.className = "tablecell";
+            table.append(div);
             this.returnStr = "";
         }
     }

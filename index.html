@@ -7,18 +7,18 @@
 	</head>
 	<body>
 		<div class="navigation">
-			<h1>JS Onboard Project</h1>
+			<svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.67 0l2.83 2.829-9.339 9.175 9.339 9.167-2.83 2.829-12.17-11.996z"/></svg>
 			<form id="form" class="form">
 				<label for="fname">From ID: </label><br>
-				<input type="number" class="input" id="fromID" name="fromID" placeholder="0" autofocus><br>
+				<input type="number" class="input" id="fromID" name="fromID" value="1" autofocus><br>
 				<label class="padding" for="lname">To ID: </label><br>
-				<input type="number" class="input" id="toID" name="toID" placeholder="0"><br><br>
+				<input type="number" class="input" id="toID" name="toID" value="24"><br><br>
 				<input class="padding" id="submit" type="submit" value="Submit">
 			</form>
-			<hr>
+			<svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7.33 24l-2.83-2.829 9.339-9.175-9.339-9.167 2.83-2.829 12.17 11.996z"/></svg>
 		</div>
 		<div id="app">
-			<table id="table" class="table"></table>
+			<div id="table" class="table"></div>
 		</div>
 		<script type="module" charset="utf-8" src="app.js"></script>
 	</body>

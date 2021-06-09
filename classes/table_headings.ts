@@ -8,7 +8,7 @@ export class TableHeadingString implements HasFormatMethod {
 		let myArr = JSON.parse(headingsStr);
 		for(let i=0;i<myArr.length;i++){
 			this.returnStr += 
-			"<th>"+myArr[i]+"</th>";
+			"<div><p><b>"+myArr[i]+"</b></p></div>";
 		}
 	}
 

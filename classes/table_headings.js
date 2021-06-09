@@ -5,7 +5,7 @@ var TableHeadingString = /** @class */ (function () {
         var myArr = JSON.parse(headingsStr);
         for (var i = 0; i < myArr.length; i++) {
             this.returnStr +=
-                "<th>" + myArr[i] + "</th>";
+                "<div><p><b>" + myArr[i] + "</b></p></div>";
         }
     }
     TableHeadingString.prototype.internalFormat = function () {

@@ -11,7 +11,7 @@ let fromID = document.querySelector('#fromID') as HTMLInputElement;
 let toID = document.querySelector('#toID') as HTMLInputElement;
 
 // Instantiate grid table to append innerHTML
-let tble = new RenderTableHeading(document.querySelector('#table') as HTMLTableElement);
+let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivElement);
 
 // Strings holding heading and records data requested from server
 let headingsStr: string;
@@ -19,7 +19,7 @@ let recordsStr: string;
 
 // Listen for submission in form and use inputs to request data from backend
 form.addEventListener('submit', (e: Event) => {
-	let t = el("table") as HTMLTableElement;
+	let t = document.querySelector('#table') as HTMLDivElement;
 	t.innerHTML = ""; // empty table every time a new submission is made
 	e.preventDefault();
 	

@@ -5,17 +5,18 @@ export class RenderTableRows implements HasFormatMethod {
 	private returnStr = "";
 	
 	constructor( recordsStr: string ){
-		let table = document.querySelector('#table') as HTMLTableElement;
+		let table = document.querySelector('#table') as HTMLDivElement;
 		let myArr = JSON.parse(recordsStr);
 		
 		for(let i=0;i<myArr.length;i++) {
 			for(let j=0;j<myArr[i].length;j++) {
 				this.returnStr += 
-				"<td>"+myArr[i][j]+"</td>";
+				"<div><p>"+myArr[i][j]+"</p></div>";
 			}
-			let tr = document.createElement('tr');
-			tr.innerHTML = this.returnStr;
-			table.append(tr);
+			let div = document.createElement('div');
+			div.innerHTML = this.returnStr;
+			div.className = "tablecell";
+			table.append(div);
 			this.returnStr = "";
 		}
 	}
