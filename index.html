@@ -7,15 +7,15 @@
 	</head>
 	<body>
 		<div class="navigation">
-			<svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.67 0l2.83 2.829-9.339 9.175 9.339 9.167-2.83 2.829-12.17-11.996z"/></svg>
-			<form id="form" class="form">
-				<label for="fname">From ID: </label><br>
-				<input type="number" class="input" id="fromID" name="fromID" value="1" autofocus><br>
-				<label class="padding" for="lname">To ID: </label><br>
-				<input type="number" class="input" id="toID" name="toID" value="24"><br><br>
-				<input class="padding" id="submit" type="submit" value="Submit">
-			</form>
-			<svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7.33 24l-2.83-2.829 9.339-9.175-9.339-9.167 2.83-2.829 12.17 11.996z"/></svg>
+			<svg id="leftarrow" class="arrow" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.67 0l2.83 2.829-9.339 9.175 9.339 9.167-2.83 2.829-12.17-11.996z"/></svg>
+			<div id="values" class="values">
+				<p id="fromID" name="fromID"></p>
+				<p>-</p>
+				<p id="toID" name="toID"></p>
+				<p>of</p>
+				<p id="numofrecords" name="numofrecords"></p>
+			</div>
+			<svg id="rightarrow" class="arrow" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7.33 24l-2.83-2.829 9.339-9.175-9.339-9.167 2.83-2.829 12.17 11.996z"/></svg>
 		</div>
 		<div id="app">
 			<div id="table" class="table"></div>
