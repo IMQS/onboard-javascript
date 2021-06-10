@@ -38,6 +38,22 @@ request(
 	function(r: string) {
 		try {
 			headingsStr = r; // set response from server
+
+			// Fetch records from server
+			let url = "/records?from=1&to=23";
+			request(
+				url, "GET",
+				function(r: string) {
+					try {
+						recordsStr = r; 	// set response from server
+						generateTable(); 	// call function to render table in browser
+						
+					} catch(err) {
+						console.log(err);
+						return;
+					}
+				}
+			);
 		} catch(err) {
 			console.log(err);
 			return;
@@ -45,21 +61,6 @@ request(
 	}
 );
 
-// Fetch records from server
-let url = "/records?from=1&to=23";
-request(
-	url, "GET",
-	function(r: string) {
-		try {
-			recordsStr = r; 	// set response from server
-			generateTable(); 	// call function to render table in browser
-			
-		} catch(err) {
-			console.log(err);
-			return;
-		}
-	}
-);
 
 
 // Instantiate grid table to append innerHTML
@@ -84,11 +85,26 @@ leftarrow.addEventListener("click", (e:Event) => {
 		e.preventDefault();
 		
 		// Fetch table headings from server
-		request(
+		request (
 			"/columns", "GET",
 			function(r: string) {
 				try {
 					headingsStr = r; // set response from server
+					// Fetch records from server
+					let url = "/records?from="+fromID+"&to="+toID;
+					request(
+						url, "GET",
+						function(r: string) {
+							try {
+								recordsStr = r; 	// set response from server
+								generateTable(); 	// call function to render table in browser
+								
+							} catch(err) {
+								console.log(err);
+								return;
+							}
+						}
+					);
 				} catch(err) {
 					console.log(err);
 					return;
@@ -96,21 +112,6 @@ leftarrow.addEventListener("click", (e:Event) => {
 			}
 		);
 	
-		// Fetch records from server
-		let url = "/records?from="+fromID+"&to="+toID;
-		request(
-			url, "GET",
-			function(r: string) {
-				try {
-					recordsStr = r; 	// set response from server
-					generateTable(); 	// call function to render table in browser
-					
-				} catch(err) {
-					console.log(err);
-					return;
-				}
-			}
-		);
 	}
 });
 
@@ -137,22 +138,21 @@ rightarrow.addEventListener("click", (e:Event) => {
 			function(r: string) {
 				try {
 					headingsStr = r; // set response from server
-				} catch(err) {
-					console.log(err);
-					return;
-				}
-			}
-		);
-	
-		// Fetch records from server
-		let url = "/records?from="+fromID+"&to="+toID;
-		request(
-			url, "GET",
-			function(r: string) {
-				try {
-					recordsStr = r; 	// set response from server
-					generateTable(); 	// call function to render table in browser
-					
+					// Fetch records from server
+					let url = "/records?from="+fromID+"&to="+toID;
+					request(
+						url, "GET",
+						function(r: string) {
+							try {
+								recordsStr = r; 	// set response from server
+								generateTable(); 	// call function to render table in browser
+								
+							} catch(err) {
+								console.log(err);
+								return;
+							}
+						}
+					);
 				} catch(err) {
 					console.log(err);
 					return;
