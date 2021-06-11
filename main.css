@@ -39,8 +39,9 @@ body {
   background-color: #00b77a;
   border-radius: 6px;
   border-color: #00b77a;
-  padding: 5px;
   margin-left: 5px;
+  height: 90%;
+  cursor: pointer;
 }
 
 .form {
@@ -55,7 +56,7 @@ body {
   font-size: 14px;
 }
 
-.form .input {
+.form .startfrom {
   text-align: center;
   width: 70px;
   padding: 5px;
@@ -70,8 +71,9 @@ body {
   background-color: #00b77a;
   border-radius: 6px;
   border-color: #00b77a;
-  padding: 5px;
   margin-left: 5px;
+  height: 90%;
+  cursor: pointer;
 }
 
 .pagination {
