@@ -38,7 +38,6 @@ request(
 	function(r: string) {
 		try {
 			headingsStr = r; // set response from server
-			
 			// Fetch records from server
 			let url = "/records?from=1&to=23";
 			request(
@@ -70,97 +69,99 @@ let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivEle
 // Listen for click on left and use inputs to request data from backend
 let leftarrow = document.querySelector("#leftarrow") as SVGElement;
 leftarrow.addEventListener("click", (e:Event) => {
+	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
+	startfrom.value = "";
 	if (fromID < 22) {
-		fromID = fromID;
+		fromID = 1;
 		fromIDElement.innerHTML = fromID.toString();
-		toID = 22;
+		toID = 23;
 		toIDElement.innerHTML = toID.toString();
 	} else {
 		fromID = fromID - 22;
 		toID = toID - 22;
 		fromIDElement.innerHTML = fromID.toString();
 		toIDElement.innerHTML = toID.toString();
-		let t = document.querySelector('#table') as HTMLDivElement;
-		t.innerHTML = ""; // empty table every time a new submission is made
-		e.preventDefault();
-		
-		// Fetch table headings from server
-		request (
-			"/columns", "GET",
-			function(r: string) {
-				try {
-					headingsStr = r; // set response from server
-					// Fetch records from server
-					let url = "/records?from="+fromID+"&to="+toID;
-					request(
-						url, "GET",
-						function(r: string) {
-							try {
-								recordsStr = r; 	// set response from server
-								generateTable(); 	// call function to render table in browser
-								
-							} catch(err) {
-								console.log(err);
-								return;
-							}
-						}
-					);
-				} catch(err) {
-					console.log(err);
-					return;
-				}
-			}
-		);
 	}
+	let t = document.querySelector('#table') as HTMLDivElement;
+	t.innerHTML = ""; // empty table every time a new submission is made
+	e.preventDefault();
+	
+	// Fetch table headings from server
+	request (
+		"/columns", "GET",
+		function(r: string) {
+			try {
+				headingsStr = r; // set response from server
+				// Fetch records from server
+				let url = "/records?from="+fromID+"&to="+toID;
+				request(
+					url, "GET",
+					function(r: string) {
+						try {
+							recordsStr = r; 	// set response from server
+							generateTable(); 	// call function to render table in browser
+							
+						} catch(err) {
+							console.log(err);
+							return;
+						}
+					}
+				);
+			} catch(err) {
+				console.log(err);
+				return;
+			}
+		}
+	);
 });
 					
 // Listen for submission in form and use inputs to request data from backend
 let rightarrow = document.querySelector("#rightarrow") as SVGElement;
 rightarrow.addEventListener("click", (e:Event) => {
-	if (fromID >= (999999-22))
-	if (fromID > (999999-22)) {
+	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
+	startfrom.value = "";
+	if (fromID > (999999-44)) {
 		fromID = (999999-22);
 		fromIDElement.innerHTML = fromID.toString();
 		toID = 999999;
 		toIDElement.innerHTML = toID.toString();
-	} else if () {
 	} else {
 		fromID = fromID + 22;
 		fromIDElement.innerHTML = fromID.toString();
 		toID = toID + 22;
 		toIDElement.innerHTML = toID.toString();
-		let t = document.querySelector('#table') as HTMLDivElement;
-		t.innerHTML = ""; // empty table every time a new submission is made
-		e.preventDefault();
-
-		// Fetch table headings from server
-		request(
-			"/columns", "GET",
-			function(r: string) {
-				try {
-					headingsStr = r; // set response from server
-					// Fetch records from server
-					let url = "/records?from="+fromID+"&to="+toID;
-					request(
-						url, "GET",
-						function(r: string) {
-							try {
-								recordsStr = r; 	// set response from server
-								generateTable(); 	// call function to render table in browser
-								
-							} catch(err) {
-								console.log(err);
-								return;
-							}
-						}
-					);
-				} catch(err) {
-					console.log(err);
-					return;
-				}
-			}
-		);
 	}
+	let t = document.querySelector('#table') as HTMLDivElement;
+	t.innerHTML = ""; // empty table every time a new submission is made
+	e.preventDefault();
+
+	// Fetch table headings from server
+	request(
+		"/columns", "GET",
+		function(r: string) {
+			try {
+				headingsStr = r; // set response from server
+				// Fetch records from server
+				let url = "/records?from="+fromID+"&to="+toID;
+				request(
+					url, "GET",
+					function(r: string) {
+						try {
+							recordsStr = r; 	// set response from server
+							generateTable(); 	// call function to render table in browser
+							
+						} catch(err) {
+							console.log(err);
+							return;
+						}
+					}
+				);
+			} catch(err) {
+				console.log(err);
+				return;
+			}
+		}
+	);
 });
 							
 // Listen for submission in form and use inputs to request data from backend
@@ -181,7 +182,7 @@ submit.addEventListener("click", (e:Event) => {
 	} else if (startFrom < 22) {
 		fromID = fromID;
 		fromIDElement.innerHTML = fromID.toString();
-		toID = 22;
+		toID = 23;
 		toIDElement.innerHTML = toID.toString();
 	} else {
 		fromID = startFrom;
@@ -225,6 +226,8 @@ submit.addEventListener("click", (e:Event) => {
 // Listen for submission in form and use inputs to request data from backend
 let gotostart = document.querySelector("#gotostart") as HTMLInputElement;
 gotostart.addEventListener("click", (e:Event) => {
+	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
+	startfrom.value = "";
 	fromID = 1;
 	fromIDElement.innerHTML = fromID.toString();
 	toID = 23;
@@ -266,6 +269,8 @@ gotostart.addEventListener("click", (e:Event) => {
 // Listen for submission in form and use inputs to request data from backend
 let gotoend = document.querySelector("#gotoend") as HTMLInputElement;
 gotoend.addEventListener("click", (e:Event) => {
+	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
+	startfrom.value = "";
 	fromID = 999977;
 	fromIDElement.innerHTML = fromID.toString();
 	toID = 999999;

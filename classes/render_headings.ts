@@ -8,6 +8,7 @@ export class RenderTableHeading {
         let div = document.createElement('div');
         div.innerHTML = element.internalFormat();
         div.className = "tablecell";
+        div.style.gridTemplateColumns = "repeat("+element.arrayLength()+", 1fr)";
 
         this.container.append(div);
     }
