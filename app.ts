@@ -174,17 +174,7 @@ submit.addEventListener("click", (e:Event) => {
 		alert("The acceptable range is between 1 and 999977");
 		return;
 	}
-	if (startFrom > (999999-22)) {
-		fromID = (999999-22);
-		fromIDElement.innerHTML = fromID.toString();
-		toID = 999999;
-		toIDElement.innerHTML = toID.toString();
-	} else if (startFrom < 22) {
-		fromID = fromID;
-		fromIDElement.innerHTML = fromID.toString();
-		toID = 23;
-		toIDElement.innerHTML = toID.toString();
-	} else {
+	else {
 		fromID = startFrom;
 		fromIDElement.innerHTML = fromID.toString();
 		toID = fromID + 22;
