@@ -1,4 +1,4 @@
-import { HasFormatMethod } from "../interfaces/hasformatmethod.js";
+import { HasFormatMethod } from "../interfaces/has-format-method.js";
 
 // generate html string for table rows data and render in browser
 export class RenderTableRows implements HasFormatMethod {

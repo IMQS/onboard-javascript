@@ -111,6 +111,7 @@ $( "#gotostart" ).on( "click", function() {
 	createTable(fromID, toID);
 });
 
+
 $( "#gotoend" ).on( "click", function() {
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";

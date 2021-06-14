@@ -13,4 +13,4 @@ var RenderTableHeading = /** @class */ (function () {
     return RenderTableHeading;
 }());
 export { RenderTableHeading };
-//# sourceMappingURL=render_headings.js.map
+//# sourceMappingURL=render-headings.js.map

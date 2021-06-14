@@ -28,4 +28,4 @@ var RenderTableRows = /** @class */ (function () {
     return RenderTableRows;
 }());
 export { RenderTableRows };
-//# sourceMappingURL=render_rows.js.map
+//# sourceMappingURL=render-rows.js.map
