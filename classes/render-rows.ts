@@ -13,7 +13,7 @@ export class RenderTableRows implements HasFormatMethod {
 			for(let j=0;j<myArr[i].length;j++) {
 				this.arrLength = myArr[i].length;
 				this.returnStr += 
-				"<div><p>"+myArr[i][j]+"</p></div>";
+					"<div><p>"+myArr[i][j]+"</p></div>";
 			}
 			let div = document.createElement('div');
 			div.innerHTML = this.returnStr;

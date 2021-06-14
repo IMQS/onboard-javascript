@@ -7,6 +7,31 @@ import { request } from './httprequests/httpreq.js';
 // Variable for tracking click events
 let clicked = false;
 
+// Screen Size
+let screenWidth = screen.width;
+let screenHeight = screen.height;
+
+console.log("screen width: ", screenWidth);
+console.log("screen height: ", screenHeight);
+
+window.addEventListener('resize', function(event){
+    screenWidth = window.innerWidth;
+    screenHeight = window.innerHeight; 
+	console.log("screen width: ", screenWidth);
+	console.log("screen height: ", screenHeight);
+});
+
+// Number of rows on page
+// @media (min-width: 1281px) {
+// @media (min-width: 1025px) and (max-width: 1280px) {
+// @media (min-width: 768px) and (max-width: 1024px) {
+// @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+// @media (min-width: 481px) and (max-width: 767px) {
+// @media (min-width: 320px) and (max-width: 480px) {   
+
+let numOfRows = 23;
+let totalNumofRecords: number;
+
 //Accessing form data from front end
 let fromIDElement = document.querySelector('#fromID') as HTMLParagraphElement;
 let toIDElement = document.querySelector('#toID') as HTMLParagraphElement;
@@ -14,7 +39,7 @@ let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphEleme
 
 // Initializing variables for first page of data
 let fromID = 1;
-let toID = 23;
+let toID = numOfRows;
 fromIDElement.innerHTML = fromID.toString();
 toIDElement.innerHTML = toID.toString();
 
@@ -25,6 +50,7 @@ let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivEle
 request( "/recordCount", "GET", function(r: string) {
 		try {
 			numofrecords.innerHTML = r;
+			totalNumofRecords = Number(r)-1;
 		} catch(err) {
 			console.log(err);
 			return;
@@ -42,14 +68,14 @@ $( "#leftarrow" ).on( "click", function() {
 		clicked = true;
 		let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 		startfrom.value = "";
-		if (fromID < 22) {
+		if (fromID < (numOfRows-1)) {
 			fromID = 1;
-			toID = 23;
+			toID = numOfRows;
 			fromIDElement.innerHTML = fromID.toString();
 			toIDElement.innerHTML = toID.toString();
 		} else {
-			fromID = fromID - 22;
-			toID = toID - 22;
+			fromID = fromID - (numOfRows-1);
+			toID = toID - (numOfRows-1);
 			fromIDElement.innerHTML = fromID.toString();
 			toIDElement.innerHTML = toID.toString();
 		}
@@ -64,15 +90,15 @@ $( "#rightarrow" ).on( "click", function() {
 		clicked = true;
 		let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 		startfrom.value = "";
-		if (fromID > (999999-44)) {
-			fromID = (999999-22);
-			toID = 999999;
+		if (fromID > (totalNumofRecords-((numOfRows-1)*2 ))) {
+			fromID = (totalNumofRecords-(numOfRows-1));
+			toID = totalNumofRecords;
 			fromIDElement.innerHTML = fromID.toString();
 			toIDElement.innerHTML = toID.toString();
 		} else {
-			fromID = fromID + 22;
+			fromID = fromID + (numOfRows-1);
 			fromIDElement.innerHTML = fromID.toString();
-			toID = toID + 22;
+			toID = toID + (numOfRows-1);
 			toIDElement.innerHTML = toID.toString();
 		}
 	
@@ -91,7 +117,7 @@ $( "#submit" ).on( "click", function() {
 	}
 	else {
 		fromID = startFrom;
-		toID = fromID + 22;
+		toID = fromID + (numOfRows-1);
 		fromIDElement.innerHTML = fromID.toString();
 		toIDElement.innerHTML = toID.toString();
 	}
@@ -104,7 +130,7 @@ $( "#gotostart" ).on( "click", function() {
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";
 	fromID = 1;
-	toID = 23;
+	toID = numOfRows;
 	fromIDElement.innerHTML = fromID.toString();
 	toIDElement.innerHTML = toID.toString();
 	
@@ -116,7 +142,7 @@ $( "#gotoend" ).on( "click", function() {
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";
 	fromID = 999977;
-	toID = 999999;
+	toID = totalNumofRecords;
 	fromIDElement.innerHTML = fromID.toString();
 	toIDElement.innerHTML = toID.toString();
 	
@@ -158,8 +184,8 @@ function generateTable(headingsStr: string, recordsStr: string) {
 	let interfaceHeading: HasFormatMethod;							// variable of type interface used in creating table headings
 	let interfaceRecords: HasFormatMethod;							// variable of type interface used in creating table rows
 	interfaceHeading = new TableHeadingString(headingsStr);			// call method to generate string containing table heading element
-	interfaceRecords = new RenderTableRows(recordsStr);				// call method to generate string containing table row elements
 	tble.constructTableHeadings(interfaceHeading);					// call method to render table headings element in browser
+	interfaceRecords = new RenderTableRows(recordsStr);				// call method to generate string containing table row elements
 }
 
 function el(s: string) {
