@@ -1,6 +1,10 @@
+html,body {
+  height: 100%;
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
-  overflow-y: scroll;
+  overflow: hidden;
   margin: 0px;
 }
 
@@ -15,77 +19,158 @@ body {
   scrollbar-width: none;  /* Firefox */
 }
 
-#app {
-  margin-top: 150px;
-}
-
 .navigation {
-  background-color: #ffffff;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  padding: 5px;
-  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4%;
 }
 
-.navigation .form {
+.filters {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.filters .button {
+  font-size: 14px;
+  color: white;
+  background-color: #00b77a;
+  border-radius: 6px;
+  border-color: #00b77a;
+  margin-left: 5px;
+  height: 90%;
+  cursor: pointer;
+}
+
+.form {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 30px;
-  font-size: 25px;
+  width: 100%;
+  height: 100%;
 }
 
-.navigation .form .input {
+.form label {
+  font-size: 14px;
+}
+
+.form .startfrom {
   text-align: center;
-  font-size: 25px;
-  width: 150px;
-  height: 30px;
-  border-radius: 6px;
+  width: 70px;
+  padding: 5px;
+  margin-left: 5px;
+  border-width: 0 0 thin 0;
+  outline: none;
 }
 
-.navigation .form .padding {
-  margin-left: 20px;
-}
-
-.navigation .form label {
-  margin-right: 10px;
-}
-
-.navigation .form #submit {
-  font-size: 25px;
-  font-weight: bold;
+.form .submit {
+  font-size: 14px;
   color: white;
   background-color: #00b77a;
-  border-style: none;
   border-radius: 6px;
-  width: fit-content;
-  height: 40px;
-  margin-left: 50px;
+  border-color: #00b77a;
+  margin-left: 5px;
+  height: 90%;
+  cursor: pointer;
 }
 
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background-color: #ffffff;
+  overflow: hidden;
   width: 100%;
-  table-layout: fixed;
-  position: relative;
+  height: 100%;
 }
 
-th {
-  position: sticky;
-  top: 130px;
+.pagination svg {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.pagination .values {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.pagination .values p {
+  font-size: 14px;
+  padding-left: 5px;
+}
+
+.pagination .arrow {
+  cursor: pointer;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+#app .table {
+  border-style: solid;
+  border-width: thin;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: repeat(auto-fill, 4%);
+}
+
+#app .table .tablecell {
+  display: grid;
+  /* grid-template-columns: repeat(11, 1fr); */
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  border-style: solid;
+  border-width: thin 0px 0px 0px;
+}
+
+#app .table .tablecell > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-style: solid;
+  border-width: 0 thin 0 thin;
+}
+
+#app .table .tablecell > div p{
+  font-size: 10px;
+  margin: 0px;
+  padding: 0px;
+}
+
+#app .table tr {
+  min-height:4%;
+}
+
+#app .table th {
   background-color: #ffffff;
 }
 
-tr:nth-child(even) {
-  background-color: #dddddd60;
+#app .table tr:nth-child(even) {
+  background-color: #00000000;
 }
 
-td, th {
+#app .table td, th {
   border: 1px solid #dddddd;
-  text-align: left;
   padding: 8px;
   text-align: center;
+}
+
+::-webkit-input-placeholder { /* Edge */
+  color: #d5d5d5;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #d5d5d5;
+}
+
+::placeholder {
+  color: #d5d5d5;
 }

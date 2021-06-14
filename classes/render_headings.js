@@ -4,9 +4,11 @@ var RenderTableHeading = /** @class */ (function () {
         this.container = container;
     }
     RenderTableHeading.prototype.constructTableHeadings = function (element) {
-        var tr = document.createElement('tr');
-        tr.innerHTML = element.internalFormat();
-        this.container.append(tr);
+        var div = document.createElement('div');
+        div.innerHTML = element.internalFormat();
+        div.className = "tablecell";
+        div.style.gridTemplateColumns = "repeat(" + element.arrayLength() + ", 1fr)";
+        this.container.append(div);
     };
     return RenderTableHeading;
 }());

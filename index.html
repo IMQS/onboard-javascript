@@ -7,18 +7,29 @@
 	</head>
 	<body>
 		<div class="navigation">
-			<h1>JS Onboard Project</h1>
-			<form id="form" class="form">
-				<label for="fname">From ID: </label><br>
-				<input type="number" class="input" id="fromID" name="fromID" placeholder="0" autofocus><br>
-				<label class="padding" for="lname">To ID: </label><br>
-				<input type="number" class="input" id="toID" name="toID" placeholder="0"><br><br>
-				<input class="padding" id="submit" type="submit" value="Submit">
-			</form>
-			<hr>
+			<div class="filters">
+				<button class="button" id="gotostart">Go to Start</button>
+				<button class="button" id="gotoend">Go to End</button>
+			</div>
+			<div id="form" class="form">
+				<label>Start from ID: </label>
+				<input type="number" pattern="^[0-9]$" class="startfrom" id="startfrom" name="startfrom" placeholder="0" autofocus />
+				<input type="submit" class="submit" id="submit" value="Submit" />
+			</div>
+			<div class="pagination">
+				<svg id="leftarrow" class="arrow" width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm3 5.753l-6.44 5.247 6.44 5.263-.678.737-7.322-6 7.335-6 .665.753z"/></svg>
+				<div id="values" class="values">
+					<p id="fromID" name="fromID"></p>
+					<p>-</p>
+					<p id="toID" name="toID"></p>
+					<p>of</p>
+					<p id="numofrecords" name="numofrecords"></p>
+				</div>
+				<svg id="rightarrow" class="arrow" width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm-3 5.753l6.44 5.247-6.44 5.263.678.737 7.322-6-7.335-6-.665.753z"/></svg>
+			</div>
 		</div>
 		<div id="app">
-			<table id="table" class="table"></table>
+			<div id="table" class="table"></div>
 		</div>
 		<script type="module" charset="utf-8" src="app.js"></script>
 	</body>

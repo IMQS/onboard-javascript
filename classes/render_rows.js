@@ -2,19 +2,26 @@
 var RenderTableRows = /** @class */ (function () {
     function RenderTableRows(recordsStr) {
         this.returnStr = "";
+        this.arrLength = 0;
         var table = document.querySelector('#table');
         var myArr = JSON.parse(recordsStr);
         for (var i = 0; i < myArr.length; i++) {
             for (var j = 0; j < myArr[i].length; j++) {
+                this.arrLength = myArr[i].length;
                 this.returnStr +=
-                    "<td>" + myArr[i][j] + "</td>";
+                    "<div><p>" + myArr[i][j] + "</p></div>";
             }
-            var tr = document.createElement('tr');
-            tr.innerHTML = this.returnStr;
-            table.append(tr);
+            var div = document.createElement('div');
+            div.innerHTML = this.returnStr;
+            div.className = "tablecell";
+            div.style.gridTemplateColumns = "repeat(" + this.arrLength + ", 1fr)";
+            table.append(div);
             this.returnStr = "";
         }
     }
+    RenderTableRows.prototype.arrayLength = function () {
+        return this.arrLength;
+    };
     RenderTableRows.prototype.internalFormat = function () {
         return this.returnStr;
     };
