@@ -1,4 +1,4 @@
-import { HasFormatMethod } from "../interfaces/hasformatmethod.js";
+import { HasFormatMethod } from "../interfaces/has-format-method.js";
 
 // generate html string for table headings data
 export class TableHeadingString implements HasFormatMethod {

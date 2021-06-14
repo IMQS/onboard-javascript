@@ -1,28 +1,28 @@
-import { TableHeadingString } from "./classes/table_headings.js";
-import { RenderTableRows } from "./classes/render_rows.js";
-import { RenderTableHeading } from "./classes/render_headings.js";
-import { HasFormatMethod } from "./interfaces/hasformatmethod.js";
+import { TableHeadingString } from "./classes/table-headings.js";
+import { RenderTableRows } from "./classes/render-rows.js";
+import { RenderTableHeading } from "./classes/render-headings.js";
+import { HasFormatMethod } from "./interfaces/has-format-method.js";
 import { request } from './httprequests/httpreq.js';
 
-// Strings holding heading and records data requested from server
-let headingsStr: string;
-let recordsStr: string;
-let numberOfRecordsStr: string;
+// Variable for tracking click events
+let clicked = false;
 
-//Accessing form data
+//Accessing form data from front end
 let fromIDElement = document.querySelector('#fromID') as HTMLParagraphElement;
 let toIDElement = document.querySelector('#toID') as HTMLParagraphElement;
 let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
 
+// Initializing variables for first page of data
 let fromID = 1;
-fromIDElement.innerHTML = fromID.toString();
 let toID = 23;
+fromIDElement.innerHTML = fromID.toString();
 toIDElement.innerHTML = toID.toString();
 
-// Fetch number of records
-request(
-	"/recordCount", "GET",
-	function(r: string) {
+// Instantiate grid table to append innerHTML
+let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivElement);
+
+//Request for total number of records
+request( "/recordCount", "GET", function(r: string) {
 		try {
 			numofrecords.innerHTML = r;
 		} catch(err) {
@@ -31,142 +31,57 @@ request(
 		}
 	}
 );
-	
-// Fetch table headings from server
-request(
-	"/columns", "GET",
-	function(r: string) {
-		try {
-			headingsStr = r; // set response from server
-			// Fetch records from server
-			let url = "/records?from=1&to=23";
-			request(
-				url, "GET",
-				function(r: string) {
-					try {
-						recordsStr = r; 	// set response from server
-						generateTable(); 	// call function to render table in browser
-						
-					} catch(err) {
-						console.log(err);
-						return;
-					}
-				}
-			);
-		} catch(err) {
-			console.log(err);
-			return;
+
+// Render Initial Page of Data
+createTable(fromID, toID); // create table and render to browser
+			
+// Listen for click on left arrow
+// let leftarrow = document.querySelector("#leftarrow") as SVGElement;
+$( "#leftarrow" ).on( "click", function() {
+	if (!clicked) {
+		clicked = true;
+		let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
+		startfrom.value = "";
+		if (fromID < 22) {
+			fromID = 1;
+			toID = 23;
+			fromIDElement.innerHTML = fromID.toString();
+			toIDElement.innerHTML = toID.toString();
+		} else {
+			fromID = fromID - 22;
+			toID = toID - 22;
+			fromIDElement.innerHTML = fromID.toString();
+			toIDElement.innerHTML = toID.toString();
 		}
+		
+		createTable(fromID, toID);
 	}
-);
-			
-			
-			
-// Instantiate grid table to append innerHTML
-let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivElement);
-			
-			
-// Listen for click on left and use inputs to request data from backend
-let leftarrow = document.querySelector("#leftarrow") as SVGElement;
-leftarrow.addEventListener("click", (e:Event) => {
-	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
-	startfrom.value = "";
-	if (fromID < 22) {
-		fromID = 1;
-		fromIDElement.innerHTML = fromID.toString();
-		toID = 23;
-		toIDElement.innerHTML = toID.toString();
-	} else {
-		fromID = fromID - 22;
-		toID = toID - 22;
-		fromIDElement.innerHTML = fromID.toString();
-		toIDElement.innerHTML = toID.toString();
-	}
-	let t = document.querySelector('#table') as HTMLDivElement;
-	t.innerHTML = ""; // empty table every time a new submission is made
-	e.preventDefault();
-	
-	// Fetch table headings from server
-	request (
-		"/columns", "GET",
-		function(r: string) {
-			try {
-				headingsStr = r; // set response from server
-				// Fetch records from server
-				let url = "/records?from="+fromID+"&to="+toID;
-				request(
-					url, "GET",
-					function(r: string) {
-						try {
-							recordsStr = r; 	// set response from server
-							generateTable(); 	// call function to render table in browser
-							
-						} catch(err) {
-							console.log(err);
-							return;
-						}
-					}
-				);
-			} catch(err) {
-				console.log(err);
-				return;
-			}
-		}
-	);
 });
 					
-// Listen for submission in form and use inputs to request data from backend
-let rightarrow = document.querySelector("#rightarrow") as SVGElement;
-rightarrow.addEventListener("click", (e:Event) => {
-	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
-	startfrom.value = "";
-	if (fromID > (999999-44)) {
-		fromID = (999999-22);
-		fromIDElement.innerHTML = fromID.toString();
-		toID = 999999;
-		toIDElement.innerHTML = toID.toString();
-	} else {
-		fromID = fromID + 22;
-		fromIDElement.innerHTML = fromID.toString();
-		toID = toID + 22;
-		toIDElement.innerHTML = toID.toString();
-	}
-	let t = document.querySelector('#table') as HTMLDivElement;
-	t.innerHTML = ""; // empty table every time a new submission is made
-	e.preventDefault();
-
-	// Fetch table headings from server
-	request(
-		"/columns", "GET",
-		function(r: string) {
-			try {
-				headingsStr = r; // set response from server
-				// Fetch records from server
-				let url = "/records?from="+fromID+"&to="+toID;
-				request(
-					url, "GET",
-					function(r: string) {
-						try {
-							recordsStr = r; 	// set response from server
-							generateTable(); 	// call function to render table in browser
-							
-						} catch(err) {
-							console.log(err);
-							return;
-						}
-					}
-				);
-			} catch(err) {
-				console.log(err);
-				return;
-			}
+// Listen for click on right arrow
+$( "#rightarrow" ).on( "click", function() {
+	if (!clicked) {
+		clicked = true;
+		let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
+		startfrom.value = "";
+		if (fromID > (999999-44)) {
+			fromID = (999999-22);
+			toID = 999999;
+			fromIDElement.innerHTML = fromID.toString();
+			toIDElement.innerHTML = toID.toString();
+		} else {
+			fromID = fromID + 22;
+			fromIDElement.innerHTML = fromID.toString();
+			toID = toID + 22;
+			toIDElement.innerHTML = toID.toString();
 		}
-	);
+	
+		createTable(fromID, toID);
+	}
 });
 							
 // Listen for submission in form and use inputs to request data from backend
-let submit = document.querySelector("#submit") as HTMLInputElement;
-submit.addEventListener("click", (e:Event) => {
+$( "#submit" ).on( "click", function() {
 	let startFromIDElement = document.querySelector('#startfrom') as HTMLInputElement;
 	let startFrom = startFromIDElement.valueAsNumber;
 
@@ -176,115 +91,54 @@ submit.addEventListener("click", (e:Event) => {
 	}
 	else {
 		fromID = startFrom;
-		fromIDElement.innerHTML = fromID.toString();
 		toID = fromID + 22;
+		fromIDElement.innerHTML = fromID.toString();
 		toIDElement.innerHTML = toID.toString();
 	}
-	let t = document.querySelector('#table') as HTMLDivElement;
-	t.innerHTML = ""; // empty table every time a new submission is made
-	e.preventDefault();
-	
-	// Fetch table headings from server
-	request(
-		"/columns", "GET",
-		function(r: string) {
-			try {
-				headingsStr = r; // set response from server
-				// Fetch records from server
-				let url = "/records?from="+fromID+"&to="+toID;
-				request(
-					url, "GET",
-					function(r: string) {
-						try {
-							recordsStr = r; 	// set response from server
-							generateTable(); 	// call function to render table in browser
-							
-						} catch(err) {
-							console.log(err);
-							return;
-						}
-					}
-				);
-			} catch(err) {
-				console.log(err);
-				return;
-			}
-		}
-	);
+
+	createTable(fromID, toID);
 });
 
 // Listen for submission in form and use inputs to request data from backend
-let gotostart = document.querySelector("#gotostart") as HTMLInputElement;
-gotostart.addEventListener("click", (e:Event) => {
+$( "#gotostart" ).on( "click", function() {
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";
 	fromID = 1;
-	fromIDElement.innerHTML = fromID.toString();
 	toID = 23;
+	fromIDElement.innerHTML = fromID.toString();
 	toIDElement.innerHTML = toID.toString();
 	
-	let t = document.querySelector('#table') as HTMLDivElement;
-	t.innerHTML = ""; // empty table every time a new submission is made
-	e.preventDefault();
-	
-	// Fetch table headings from server
-	request(
-		"/columns", "GET",
-		function(r: string) {
-			try {
-				headingsStr = r; // set response from server
-				// Fetch records from server
-				let url = "/records?from="+fromID+"&to="+toID;
-				request(
-					url, "GET",
-					function(r: string) {
-						try {
-							recordsStr = r; 	// set response from server
-							generateTable(); 	// call function to render table in browser
-							
-						} catch(err) {
-							console.log(err);
-							return;
-						}
-					}
-				);
-			} catch(err) {
-				console.log(err);
-				return;
-			}
-		}
-	);
+	createTable(fromID, toID);
 });
 
-// Listen for submission in form and use inputs to request data from backend
-let gotoend = document.querySelector("#gotoend") as HTMLInputElement;
-gotoend.addEventListener("click", (e:Event) => {
+
+$( "#gotoend" ).on( "click", function() {
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";
 	fromID = 999977;
-	fromIDElement.innerHTML = fromID.toString();
 	toID = 999999;
+	fromIDElement.innerHTML = fromID.toString();
 	toIDElement.innerHTML = toID.toString();
 	
+	createTable(fromID, toID);
+});
+
+function createTable(fromID: number, toID: number) {
 	let t = document.querySelector('#table') as HTMLDivElement;
-	t.innerHTML = ""; // empty table every time a new submission is made
-	e.preventDefault();
+	t.innerHTML = ""; 												// empty table every time a new submission is made
 	
 	// Fetch table headings from server
-	request(
-		"/columns", "GET",
-		function(r: string) {
+	request ("/columns", "GET", function(r: string) {
+			let headingsStr: string;
+			let recordsStr: string;
 			try {
-				headingsStr = r; // set response from server
+				headingsStr = r; 
 				// Fetch records from server
-				let url = "/records?from="+fromID+"&to="+toID;
-				request(
-					url, "GET",
-					function(r: string) {
+				request( "/records?from="+fromID+"&to="+toID, "GET", function(r: string) {
 						try {
-							recordsStr = r; 	// set response from server
-							generateTable(); 	// call function to render table in browser
-							
+							recordsStr = r; 
+							generateTable(headingsStr, recordsStr); // call function to render table in browser
+							clicked = false;
 						} catch(err) {
 							console.log(err);
 							return;
@@ -297,15 +151,15 @@ gotoend.addEventListener("click", (e:Event) => {
 			}
 		}
 	);
-});
+}
 
 // Create table and render in browser
-function generateTable(){
-	let interfaceHeading: HasFormatMethod;					// variable of type interface used in creating table headings
-	let interfaceRecords: HasFormatMethod;					// variable of type interface used in creating table rows
-	interfaceHeading = new TableHeadingString(headingsStr);	// call method to generate string containing table heading element
-	tble.constructTableHeadings(interfaceHeading);			// call method to render table headings element in browser
-	interfaceRecords = new RenderTableRows(recordsStr);		// call method to generate string containing table row elements
+function generateTable(headingsStr: string, recordsStr: string) {
+	let interfaceHeading: HasFormatMethod;							// variable of type interface used in creating table headings
+	let interfaceRecords: HasFormatMethod;							// variable of type interface used in creating table rows
+	interfaceHeading = new TableHeadingString(headingsStr);			// call method to generate string containing table heading element
+	interfaceRecords = new RenderTableRows(recordsStr);				// call method to generate string containing table row elements
+	tble.constructTableHeadings(interfaceHeading);					// call method to render table headings element in browser
 }
 
 function el(s: string) {

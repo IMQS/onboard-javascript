@@ -19,4 +19,4 @@ var TableHeadingString = /** @class */ (function () {
     return TableHeadingString;
 }());
 export { TableHeadingString };
-//# sourceMappingURL=table_headings.js.map
+//# sourceMappingURL=table-headings.js.map
