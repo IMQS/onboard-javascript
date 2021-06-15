@@ -7,29 +7,15 @@ import { request } from './httprequests/httpreq.js';
 // Variable for tracking click events
 let clicked = false;
 
+// Instantiate grid table to append innerHTML
+let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivElement);
+
 // Screen Size
 let screenWidth = screen.width;
 let screenHeight = screen.height;
 
-console.log("screen width: ", screenWidth);
-console.log("screen height: ", screenHeight);
-
-window.addEventListener('resize', function(event){
-    screenWidth = window.innerWidth;
-    screenHeight = window.innerHeight; 
-	console.log("screen width: ", screenWidth);
-	console.log("screen height: ", screenHeight);
-});
-
-// Number of rows on page
-// @media (min-width: 1281px) {
-// @media (min-width: 1025px) and (max-width: 1280px) {
-// @media (min-width: 768px) and (max-width: 1024px) {
-// @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-// @media (min-width: 481px) and (max-width: 767px) {
-// @media (min-width: 320px) and (max-width: 480px) {   
-
-let numOfRows = 23;
+// let numOfRows = 23;
+let numOfRows = getNumOfRows();
 let totalNumofRecords: number;
 
 //Accessing form data from front end
@@ -43,65 +29,63 @@ let toID = numOfRows;
 fromIDElement.innerHTML = fromID.toString();
 toIDElement.innerHTML = toID.toString();
 
-// Instantiate grid table to append innerHTML
-let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivElement);
+createInitialPage(numOfRows);
 
-//Request for total number of records
-request( "/recordCount", "GET", function(r: string) {
-		try {
-			numofrecords.innerHTML = r;
-			totalNumofRecords = Number(r)-1;
-		} catch(err) {
-			console.log(err);
-			return;
-		}
+window.addEventListener('resize', function(event) {
+	screenWidth = window.innerWidth;
+	screenHeight = window.innerHeight;
+							
+	if (screenHeight >= 750) {
+		numOfRows = 23;
+	} else if ((screenHeight < 750) && (screenHeight >= 550)) {
+		numOfRows = 18;
+	} else if ((screenHeight < 550) && (screenHeight >= 265)) {
+		numOfRows = 8;
+	} else if (screenHeight < 265) {
+		numOfRows = 3;
 	}
-);
 
-// Render Initial Page of Data
-createTable(fromID, toID); // create table and render to browser
-			
-// Listen for click on left arrow
-// let leftarrow = document.querySelector("#leftarrow") as SVGElement;
+	createInitialPage(numOfRows);
+});
+
+// When clicking on left arrow
 $( "#leftarrow" ).on( "click", function() {
-	if (!clicked) {
-		clicked = true;
-		let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
-		startfrom.value = "";
-		if (fromID < (numOfRows-1)) {
-			fromID = 1;
-			toID = numOfRows;
-			fromIDElement.innerHTML = fromID.toString();
-			toIDElement.innerHTML = toID.toString();
-		} else {
-			fromID = fromID - (numOfRows-1);
-			toID = toID - (numOfRows-1);
-			fromIDElement.innerHTML = fromID.toString();
-			toIDElement.innerHTML = toID.toString();
-		}
-		
+	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
+	startfrom.value = "";
+	if ((fromID < (numOfRows-1)) && (fromID > 1)) {
+		fromID = 1;
+		toID = numOfRows;
+		fromIDElement.innerHTML = fromID.toString();
+		toIDElement.innerHTML = toID.toString();
+		createTable(fromID, toID);
+	} else if (fromID === 1) {
+		// do nothing
+	} else {
+		fromID = fromID - (numOfRows-1);
+		toID = toID - (numOfRows-1);
+		fromIDElement.innerHTML = fromID.toString();
+		toIDElement.innerHTML = toID.toString();
 		createTable(fromID, toID);
 	}
 });
 					
 // Listen for click on right arrow
 $( "#rightarrow" ).on( "click", function() {
-	if (!clicked) {
-		clicked = true;
-		let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
-		startfrom.value = "";
-		if (fromID > (totalNumofRecords-((numOfRows-1)*2 ))) {
-			fromID = (totalNumofRecords-(numOfRows-1));
-			toID = totalNumofRecords;
-			fromIDElement.innerHTML = fromID.toString();
-			toIDElement.innerHTML = toID.toString();
-		} else {
-			fromID = fromID + (numOfRows-1);
-			fromIDElement.innerHTML = fromID.toString();
-			toID = toID + (numOfRows-1);
-			toIDElement.innerHTML = toID.toString();
-		}
-	
+	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
+	startfrom.value = "";
+	if ((fromID > (totalNumofRecords-((numOfRows-1)*2)) ) && (fromID < totalNumofRecords) ) {
+		fromID = (totalNumofRecords-(numOfRows-1));
+		toID = totalNumofRecords;
+		fromIDElement.innerHTML = fromID.toString();
+		toIDElement.innerHTML = toID.toString();
+		createTable(fromID, toID);
+	}  else if (toID === totalNumofRecords) {
+		// do nothing
+	} else {
+		fromID = fromID + (numOfRows-1);
+		fromIDElement.innerHTML = fromID.toString();
+		toID = toID + (numOfRows-1);
+		toIDElement.innerHTML = toID.toString();
 		createTable(fromID, toID);
 	}
 });
@@ -111,8 +95,8 @@ $( "#submit" ).on( "click", function() {
 	let startFromIDElement = document.querySelector('#startfrom') as HTMLInputElement;
 	let startFrom = startFromIDElement.valueAsNumber;
 
-	if (startFrom < 1 || startFrom > 999977) {
-		alert("The acceptable range is between 1 and 999977");
+	if (startFrom < 1 || startFrom > (totalNumofRecords-((numOfRows-1)*2))) {
+		alert("The acceptable range is between 1 and "+(totalNumofRecords-((numOfRows-1))));
 		return;
 	}
 	else {
@@ -150,9 +134,6 @@ $( "#gotoend" ).on( "click", function() {
 });
 
 function createTable(fromID: number, toID: number) {
-	let t = document.querySelector('#table') as HTMLDivElement;
-	t.innerHTML = ""; 												// empty table every time a new submission is made
-	
 	// Fetch table headings from server
 	request ("/columns", "GET", function(r: string) {
 			let headingsStr: string;
@@ -181,6 +162,8 @@ function createTable(fromID: number, toID: number) {
 
 // Create table and render in browser
 function generateTable(headingsStr: string, recordsStr: string) {
+	let t = document.querySelector('#table') as HTMLDivElement;
+	t.innerHTML = ""; 
 	let interfaceHeading: HasFormatMethod;							// variable of type interface used in creating table headings
 	let interfaceRecords: HasFormatMethod;							// variable of type interface used in creating table rows
 	interfaceHeading = new TableHeadingString(headingsStr);			// call method to generate string containing table heading element
@@ -192,3 +175,40 @@ function el(s: string) {
 	return document.getElementById(s);
 }
 
+function createInitialPage(numOfRows: number) {
+	fromID = 1;
+	toID = numOfRows;
+	fromIDElement.innerHTML = fromID.toString();
+	toIDElement.innerHTML = toID.toString();
+
+	//Request for total number of records
+	request( "/recordCount", "GET", function(r: string) {
+		try {
+			numofrecords.innerHTML = r;
+			totalNumofRecords = Number(r)-1;
+		} catch(err) {
+			console.log(err);
+			return;
+		}
+	});
+
+	// Render Initial Page of Data
+	createTable(fromID, toID); // create table and render to browser.
+}
+
+function getNumOfRows() {
+	screenWidth = window.innerWidth;
+	screenHeight = window.innerHeight; 
+							
+	if (screenHeight >= 750) {
+		return 23;
+	} else if ((screenHeight < 750) && (screenHeight >= 550)) {
+		return 18;
+	} else if ((screenHeight < 550) && (screenHeight >= 265)) {
+		return 8;
+	} else if (screenHeight < 265) {
+		return 3;
+	} else {
+		return 23;
+	}
+}

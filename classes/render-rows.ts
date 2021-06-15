@@ -7,7 +7,11 @@ export class RenderTableRows implements HasFormatMethod {
 	
 	constructor( recordsStr: string ){
 		let table = document.querySelector('#table') as HTMLDivElement;
+		let navigation = document.querySelector('#navigation') as HTMLDivElement;
 		let myArr = JSON.parse(recordsStr);
+		table.style.display = "grid";
+		table.style.gridTemplateRows = "repeat(auto-fill, "+(100/(myArr.length+2))+"%)";
+		navigation.style.height = (100/(myArr.length+2))+"%";
 		
 		for(let i=0;i<myArr.length;i++) {
 			for(let j=0;j<myArr[i].length;j++) {
