@@ -7,6 +7,9 @@ import { request } from './httprequests/httpreq.js';
 // Instantiate grid table to append innerHTML
 let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivElement);
 
+let headingsStr: string;
+let recordsStr: string;
+
 // Screen Size
 let screenWidth = screen.width;
 let screenHeight = screen.height;
@@ -63,7 +66,10 @@ $( "#leftarrow" ).on( "click", function() {
 		toID = toID - (numOfRows-1);
 		fromIDElement.innerHTML = fromID.toString();
 		toIDElement.innerHTML = toID.toString();
-		createTable(fromID, toID);
+		// createTable(fromID, toID);
+		// createTable(fromID, toID).then( () => {
+		// 	getRecords(fromID, toID);
+		// } ).catch(( err => console.log(err)));
 	}
 });
 					
@@ -84,7 +90,10 @@ $( "#rightarrow" ).on( "click", function() {
 		fromIDElement.innerHTML = fromID.toString();
 		toID = toID + (numOfRows-1);
 		toIDElement.innerHTML = toID.toString();
-		createTable(fromID, toID);
+		// createTable(fromID, toID);
+		// createTable(fromID, toID).then( () => {
+		// 	getRecords(fromID, toID);
+		// } ).catch(( err => console.log(err)));
 	}
 });
 							
@@ -104,7 +113,10 @@ $( "#submit" ).on( "click", function() {
 		toIDElement.innerHTML = toID.toString();
 	}
 
-	createTable(fromID, toID);
+	// createTable(fromID, toID);
+	// createTable(fromID, toID).then( () => {
+	// 	getRecords(fromID, toID);
+	// } ).catch(( err => console.log(err)));
 });
 
 // Listen for submission in form and use inputs to request data from backend
@@ -116,7 +128,10 @@ $( "#gotostart" ).on( "click", function() {
 	fromIDElement.innerHTML = fromID.toString();
 	toIDElement.innerHTML = toID.toString();
 	
-	createTable(fromID, toID);
+	// createTable(fromID, toID);
+	// createTable(fromID, toID).then( () => {
+	// 	getRecords(fromID, toID);
+	// } ).catch(( err => console.log(err)));
 });
 
 
@@ -128,21 +143,23 @@ $( "#gotoend" ).on( "click", function() {
 	fromIDElement.innerHTML = fromID.toString();
 	toIDElement.innerHTML = toID.toString();
 	
-	createTable(fromID, toID);
+	// createTable(fromID, toID);
+	// createTable(fromID, toID).then( () => {
+	// 	getRecords(fromID, toID);
+	// } ).catch(( err => console.log(err)));
 });
 
-function createTable(fromID: number, toID: number) {
+function getRecords (fromID: number, toID: number) {
 	// Fetch table headings from server
 	request ("/columns", "GET", function(r: string) {
-			let headingsStr: string;
-			let recordsStr: string;
 			try {
-				headingsStr = r; 
+				headingsStr = r;
 				// Fetch records from server
 				request( "/records?from="+fromID+"&to="+toID, "GET", function(r: string) {
 						try {
 							recordsStr = r; 
-							generateTable(headingsStr, recordsStr); // call function to render table in browser
+							generateTable(headingsStr, recordsStr);// call function to render table in browser
+							// returnStr = r;
 						} catch(err) {
 							console.log(err);
 							return;
@@ -156,6 +173,47 @@ function createTable(fromID: number, toID: number) {
 		}
 	);
 }
+
+let createTable = (fromID: number, toID: number): Promise<void> => {
+	return new Promise<void>( (resolve, reject) => {
+		let v = false;
+		if ( !v ) {
+			resolve();
+		} else {
+			reject("Error: Something went wrong!");
+		}
+	})
+};
+
+let allPromises = Promise.all<void>( [
+	createTable(17, 24),
+	createTable(1, 8),
+	createTable(9, 16)
+]);
+
+allPromises.then(() => {
+	console.log("Resolved")
+	getRecords(17, 24);
+}).catch(err => console.log(err));
+
+// function createTable(fromID: number, toID: number) {
+// 	let backendCall = new Promise<void> ((resolve, reject) => {
+// 		let v = false;
+// 		// if ( typeof r === "string") {
+// 		if ( !v ) {
+// 			resolve();
+// 		} else {
+// 			reject("Error: Something went wrong!");
+// 		}
+		
+// 	});	
+
+// 	return backendCall.then(() => {
+// 		getRecords(fromID, toID);
+// 	}).catch(err => console.log(err));
+// }
+
+
 
 // Create table and render in browser
 function generateTable(headingsStr: string, recordsStr: string) {
@@ -173,9 +231,7 @@ function el(s: string) {
 }
 
 function createInitialPage(numOfRows: number) {
-	// fromID = 1;
 	fromID = fromID;
-	// toID = numOfRows;
 	toID = fromID + (numOfRows-1);
 	fromIDElement.innerHTML = fromID.toString();
 	toIDElement.innerHTML = toID.toString();
@@ -192,7 +248,11 @@ function createInitialPage(numOfRows: number) {
 	});
 
 	// Render Initial Page of Data
-	createTable(fromID, toID); // create table and render to browser.
+	// createTable(fromID, toID); // create table and render to browser.
+
+	// createTable(fromID, toID).then( () => {
+	// 	getRecords(fromID, toID);
+	// } ).catch(( err => console.log(err)));
 }
 
 function getNumOfRows() {
