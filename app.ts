@@ -173,50 +173,10 @@ $( "#gotoend" ).on( "click", function() {
 	}).catch(err => console.log(err));
 });
 
-function getRecords (fromID: number, toID: number) {
-	// Fetch table headings from server
-	request ("/columns", "GET", function(r: string) {
-			try {
-				headingsStr = r;
-				// Fetch records from server
-				request( "/records?from="+fromID+"&to="+toID, "GET", function(r: string) {
-						try {
-							recordsStr = r; 
-							// generateTable(headingsStr, recordsStr);// call function to render table in browser
-							// returnStr = r;
-						} catch(err) {
-							console.log(err);
-							return;
-						}
-					}
-				);
-			} catch(err) {
-				console.log(err);
-				return;
-			}
-		}
-	);
-}
-
-function createTable(fromID: number, toID: number) {
-	return new Promise<void> ((resolve, reject) => {
-		getRecords(fromID, toID);
-		let v = false;
-		// if ( typeof r === "string") {
-		if ( !v ) {
-			resolve();
-		} else {
-			reject("Error: Something went wrong!");
-		}
-		
-	});
-}
-
-
 // Create table and render in browser
 function generateTable(headingsStr: string, recordsStr: string) {
 	let t = document.querySelector('#table') as HTMLDivElement;
-	t.innerHTML = ""; 
+	t.innerHTML = "";
 	let interfaceHeading: HasFormatMethod;							// variable of type interface used in creating table headings
 	let interfaceRecords: HasFormatMethod;							// variable of type interface used in creating table rows
 	interfaceHeading = new TableHeadingString(headingsStr);			// call method to generate string containing table heading element
@@ -247,9 +207,16 @@ function createInitialPage(numOfRows: number) {
 
 	let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 	let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
+	let headings1 = Promise.resolve(fetch("/columns").then(res => res.text())); 
+	let records1 = Promise.resolve(fetch("/records?from="+23+"&to="+45).then(res => res.text()));
+	let headings2 = Promise.resolve(fetch("/columns").then(res => res.text())); 
+	let records2 = Promise.resolve(fetch("/records?from="+45+"&to="+67).then(res => res.text()));
+	let headings3 = Promise.resolve(fetch("/columns").then(res => res.text())); 
+	let records3 = Promise.resolve(fetch("/records?from="+67+"&to="+89).then(res => res.text()));
 
-	Promise.all([headings, records]).then((values) => {
-		generateTable(values[0], values[1]);
+	Promise.all([headings, records, headings1, records1, headings2, records2, headings3, records3]).then((values) => {
+		let vLngth = values.length;
+		generateTable(values[vLngth-2], values[vLngth-1]);
 	}).catch(err => console.log(err));
 }
 
