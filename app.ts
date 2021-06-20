@@ -10,6 +10,8 @@ let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivEle
 let headingsStr: string;
 let recordsStr: string;
 
+let arr = new Array();
+
 // Screen Size
 let screenWidth = screen.width;
 let screenHeight = screen.height;
@@ -49,8 +51,12 @@ window.addEventListener('resize', function(event) {
 	createInitialPage(numOfRows);
 });
 
+let clickTimeout: ReturnType<typeof setTimeout>;
+
 // When clicking on left arrow
 $( "#leftarrow" ).on( "click", function() {
+	clearTimeout(clickTimeout);
+
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";
 	if ((fromID < (numOfRows-1)) && (fromID > 1)) {
@@ -62,9 +68,11 @@ $( "#leftarrow" ).on( "click", function() {
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 
-		Promise.all([headings, records]).then((values) => {
-			generateTable(values[0], values[1]);
-		}).catch(err => console.log(err));
+		clickTimeout = setTimeout(function(){
+			Promise.all([headings, records]).then((values) => {
+				generateTable(values[0], values[1]);
+			}).catch(err => console.log(err));
+		}, 500);
 	} else if (fromID === 1) {
 		// do nothing
 	} else {
@@ -76,14 +84,18 @@ $( "#leftarrow" ).on( "click", function() {
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 
-		Promise.all([headings, records]).then((values) => {
-			generateTable(values[0], values[1]);
-		}).catch(err => console.log(err));
+		clickTimeout = setTimeout(function(){
+			Promise.all([headings, records]).then((values) => {
+				generateTable(values[0], values[1]);
+			}).catch(err => console.log(err));
+		}, 500);
 	}
 });
 					
 // Listen for click on right arrow
 $( "#rightarrow" ).on( "click", function() {
+	clearTimeout(clickTimeout);
+
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";
 	if ((fromID > (totalNumofRecords-((numOfRows-1)*2)) ) && (fromID < totalNumofRecords) ) {
@@ -95,9 +107,11 @@ $( "#rightarrow" ).on( "click", function() {
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 
-		Promise.all([headings, records]).then((values) => {
-			generateTable(values[0], values[1]);
-		}).catch(err => console.log(err));
+		clickTimeout = setTimeout(function(){
+			Promise.all([headings, records]).then((values) => {
+				generateTable(values[0], values[1]);
+			}).catch(err => console.log(err));
+		}, 500);
 	}  else if (toID === totalNumofRecords) {
 		// do nothing
 	} else {
@@ -109,14 +123,17 @@ $( "#rightarrow" ).on( "click", function() {
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 
-		Promise.all([headings, records]).then((values) => {
-			generateTable(values[0], values[1]);
-		}).catch(err => console.log(err));
+		clickTimeout = setTimeout(function(){
+			Promise.all([headings, records]).then((values) => {
+				generateTable(values[0], values[1]);
+			}).catch(err => console.log(err));
+		}, 500);
 	}
 });
 							
 // Listen for submission in form and use inputs to request data from backend
 $( "#submit" ).on( "click", function() {
+	clearTimeout(clickTimeout);
 	let startFromIDElement = document.querySelector('#startfrom') as HTMLInputElement;
 	let startFrom = startFromIDElement.valueAsNumber;
 
@@ -134,13 +151,16 @@ $( "#submit" ).on( "click", function() {
 	let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 	let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 
-	Promise.all([headings, records]).then((values) => {
-		generateTable(values[0], values[1]);
-	}).catch(err => console.log(err));
+	clickTimeout = setTimeout(function(){
+		Promise.all([headings, records]).then((values) => {
+			generateTable(values[0], values[1]);
+		}).catch(err => console.log(err));
+	}, 500);
 });
 
 // Listen for submission in form and use inputs to request data from backend
 $( "#gotostart" ).on( "click", function() {
+	clearTimeout(clickTimeout);
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";
 	fromID = 1;
@@ -151,13 +171,16 @@ $( "#gotostart" ).on( "click", function() {
 	let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 	let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 
-	Promise.all([headings, records]).then((values) => {
-		generateTable(values[0], values[1]);
-	}).catch(err => console.log(err));
+	clickTimeout = setTimeout(function(){
+		Promise.all([headings, records]).then((values) => {
+			generateTable(values[0], values[1]);
+		}).catch(err => console.log(err));
+	}, 500);
 });
 
 
 $( "#gotoend" ).on( "click", function() {
+	clearTimeout(clickTimeout);
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";
 	fromID = totalNumofRecords-(numOfRows-1);
@@ -168,9 +191,11 @@ $( "#gotoend" ).on( "click", function() {
 	let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 	let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 
-	Promise.all([headings, records]).then((values) => {
-		generateTable(values[0], values[1]);
-	}).catch(err => console.log(err));
+	clickTimeout = setTimeout(function(){
+		Promise.all([headings, records]).then((values) => {
+			generateTable(values[0], values[1]);
+		}).catch(err => console.log(err));
+	}, 500);
 });
 
 // Create table and render in browser
@@ -205,18 +230,13 @@ function createInitialPage(numOfRows: number) {
 		}
 	});
 
-	let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
+	let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
 	let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-	let headings1 = Promise.resolve(fetch("/columns").then(res => res.text())); 
-	let records1 = Promise.resolve(fetch("/records?from="+23+"&to="+45).then(res => res.text()));
-	let headings2 = Promise.resolve(fetch("/columns").then(res => res.text())); 
-	let records2 = Promise.resolve(fetch("/records?from="+45+"&to="+67).then(res => res.text()));
-	let headings3 = Promise.resolve(fetch("/columns").then(res => res.text())); 
-	let records3 = Promise.resolve(fetch("/records?from="+67+"&to="+89).then(res => res.text()));
-
-	Promise.all([headings, records, headings1, records1, headings2, records2, headings3, records3]).then((values) => {
-		let vLngth = values.length;
-		generateTable(values[vLngth-2], values[vLngth-1]);
+	
+	arr.push(headings, records)
+	Promise.all(arr).then((values) => {
+		let valuesLngth = values.length;
+		generateTable(values[valuesLngth-2], values[valuesLngth-1]);
 	}).catch(err => console.log(err));
 }
 
