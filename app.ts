@@ -204,6 +204,20 @@ function el(s: string) {
 
 function createInitialPage(numOfRows: number) {
 	clearTimeout(clickTimeout);
+
+	if (fromID > (totalNumofRecords-(numOfRows-1))) {
+		fromID = totalNumofRecords-(numOfRows-1);
+		toID = fromID + (numOfRows-1);
+		fromIDElement.innerHTML = fromID.toString();
+		toIDElement.innerHTML = toID.toString();
+	} else {
+		numOfRows = 2;
+		fromID = fromID;
+		toID = fromID + (numOfRows-1);
+		fromIDElement.innerHTML = fromID.toString();
+		toIDElement.innerHTML = toID.toString();
+	}
+	
 	fromID = fromID;
 	toID = fromID + (numOfRows-1);
 	fromIDElement.innerHTML = fromID.toString();
