@@ -4,14 +4,6 @@ import { RenderTableHeading } from "./classes/render-headings.js";
 import { HasFormatMethod } from "./interfaces/has-format-method.js";
 import { request } from './httprequests/httpreq.js';
 
-// Instantiate grid table to append innerHTML
-let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivElement);
-let arr = new Array();
-
-// Screen size variables declaration
-let screenWidth = screen.width;
-let screenHeight = screen.height;
-
 let numOfRows = getNumOfRows();
 let totalNumofRecords: number;
 
@@ -19,17 +11,18 @@ let totalNumofRecords: number;
 let fromIDElement = document.querySelector('#fromID') as HTMLParagraphElement;
 let toIDElement = document.querySelector('#toID') as HTMLParagraphElement;
 let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
-
 // Initializing variables for first page of data
 let fromID = 1;
 let toID = numOfRows;
 fromIDElement.innerHTML = fromID.toString();
 toIDElement.innerHTML = toID.toString();
 
+// Create initial page
 createInitialPage(numOfRows);
 
+// Listening for change in screen size
+let screenHeight = screen.height;
 window.addEventListener('resize', function(event) {
-	screenWidth = window.innerWidth;
 	screenHeight = window.innerHeight;
 							
 	if (screenHeight >= 750) {
@@ -187,10 +180,14 @@ $( "#gotoend" ).on( "click", function() {
 	}, 500);
 });
 
+
 // Create table and render in browser
 function generateTable(headingsStr: string, recordsStr: string) {
-	let t = document.querySelector('#table') as HTMLDivElement;
-	t.innerHTML = "";
+	// Instantiate grid table to append innerHTML
+	let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivElement);
+
+	let emptyTable = document.querySelector('#table') as HTMLDivElement;
+	emptyTable.innerHTML = "";												// clear table to empty html
 	let interfaceHeading: HasFormatMethod;							// variable of type interface used in creating table headings
 	let interfaceRecords: HasFormatMethod;							// variable of type interface used in creating table rows
 	interfaceHeading = new TableHeadingString(headingsStr);			// call method to generate string containing table heading element
@@ -211,7 +208,6 @@ function createInitialPage(numOfRows: number) {
 		fromIDElement.innerHTML = fromID.toString();
 		toIDElement.innerHTML = toID.toString();
 	} else {
-		numOfRows = 2;
 		fromID = fromID;
 		toID = fromID + (numOfRows-1);
 		fromIDElement.innerHTML = fromID.toString();
@@ -244,7 +240,6 @@ function createInitialPage(numOfRows: number) {
 }
 
 function getNumOfRows() {
-	screenWidth = window.innerWidth;
 	screenHeight = window.innerHeight; 
 							
 	if (screenHeight >= 750) {
