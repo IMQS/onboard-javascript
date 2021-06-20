@@ -6,13 +6,9 @@ import { request } from './httprequests/httpreq.js';
 
 // Instantiate grid table to append innerHTML
 let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivElement);
-
-let headingsStr: string;
-let recordsStr: string;
-
 let arr = new Array();
 
-// Screen Size
+// Screen size variables declaration
 let screenWidth = screen.width;
 let screenHeight = screen.height;
 
@@ -65,10 +61,9 @@ $( "#leftarrow" ).on( "click", function() {
 		fromIDElement.innerHTML = fromID.toString();
 		toIDElement.innerHTML = toID.toString();
 
-		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
-		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-
 		clickTimeout = setTimeout(function(){
+			let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
+			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 			Promise.all([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
@@ -81,10 +76,9 @@ $( "#leftarrow" ).on( "click", function() {
 		fromIDElement.innerHTML = fromID.toString();
 		toIDElement.innerHTML = toID.toString();
 
-		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
-		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-
 		clickTimeout = setTimeout(function(){
+			let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
+			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 			Promise.all([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
@@ -104,10 +98,9 @@ $( "#rightarrow" ).on( "click", function() {
 		fromIDElement.innerHTML = fromID.toString();
 		toIDElement.innerHTML = toID.toString();
 
-		let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
-		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-
 		clickTimeout = setTimeout(function(){
+			let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
+			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 			Promise.all([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
@@ -120,10 +113,9 @@ $( "#rightarrow" ).on( "click", function() {
 		toID = toID + (numOfRows-1);
 		toIDElement.innerHTML = toID.toString();
 
-		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
-		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-
 		clickTimeout = setTimeout(function(){
+			let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
+			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 			Promise.all([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
@@ -148,10 +140,9 @@ $( "#submit" ).on( "click", function() {
 		toIDElement.innerHTML = toID.toString();
 	}
 
-	let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
-	let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-
 	clickTimeout = setTimeout(function(){
+		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
+		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 		Promise.all([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
@@ -167,11 +158,10 @@ $( "#gotostart" ).on( "click", function() {
 	toID = numOfRows;
 	fromIDElement.innerHTML = fromID.toString();
 	toIDElement.innerHTML = toID.toString();
-	
-	let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
-	let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 
 	clickTimeout = setTimeout(function(){
+		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
+		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 		Promise.all([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
@@ -188,10 +178,9 @@ $( "#gotoend" ).on( "click", function() {
 	fromIDElement.innerHTML = fromID.toString();
 	toIDElement.innerHTML = toID.toString();
 	
-	let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
-	let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-
 	clickTimeout = setTimeout(function(){
+		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
+		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 		Promise.all([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
@@ -214,6 +203,7 @@ function el(s: string) {
 }
 
 function createInitialPage(numOfRows: number) {
+	clearTimeout(clickTimeout);
 	fromID = fromID;
 	toID = fromID + (numOfRows-1);
 	fromIDElement.innerHTML = fromID.toString();
@@ -230,14 +220,13 @@ function createInitialPage(numOfRows: number) {
 		}
 	});
 
-	let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
-	let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-	
-	arr.push(headings, records)
-	Promise.all(arr).then((values) => {
-		let valuesLngth = values.length;
-		generateTable(values[valuesLngth-2], values[valuesLngth-1]);
-	}).catch(err => console.log(err));
+	clickTimeout = setTimeout(function(){
+		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
+		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
+		Promise.all([headings, records]).then((values) => {
+			generateTable(values[0], values[1]);
+		}).catch(err => console.log(err));
+	}, 500);
 }
 
 function getNumOfRows() {
