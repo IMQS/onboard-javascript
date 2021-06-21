@@ -1,4 +1,4 @@
-// create table elements and render in browser
+// Create table headings and render in browser
 var RenderTableHeading = /** @class */ (function () {
     function RenderTableHeading(container) {
         this.container = container;
