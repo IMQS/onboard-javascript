@@ -1,6 +1,6 @@
 import { HasFormatMethod } from "../interfaces/has-format-method.js";
 
-// create table elements and render in browser
+// Create table headings and render in browser
 export class RenderTableHeading {
     constructor(private container: HTMLDivElement) {}
 

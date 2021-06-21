@@ -2,7 +2,6 @@ import { TableHeadingString } from "./classes/table-headings.js";
 import { RenderTableRows } from "./classes/render-rows.js";
 import { RenderTableHeading } from "./classes/render-headings.js";
 import { HasFormatMethod } from "./interfaces/has-format-method.js";
-import { request } from './httprequests/httpreq.js';
 
 let numOfRows = getNumOfRows();		// Call function to get number of rows to render based on current screen size
 let totalNumofRecords: number;		// Declare public variable to store total number of records from the server
@@ -68,7 +67,8 @@ $( "#leftarrow" ).on( "click", function() {
 			// Use resolved promises to fetch data from backend
 			let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-			Promise.all([headings, records]).then((values) => {
+			// Promise.all<string>([headings, records]).then((values) => {
+			Promise.all<string>([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
 		}, 500);
@@ -88,7 +88,7 @@ $( "#leftarrow" ).on( "click", function() {
 			// Use resolved promises to fetch data from backend
 			let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-			Promise.all([headings, records]).then((values) => {
+			Promise.all<string>([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
 		}, 500);
@@ -117,7 +117,7 @@ $( "#rightarrow" ).on( "click", function() {
 			// Use resolved promises to fetch data from backend
 			let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-			Promise.all([headings, records]).then((values) => {
+			Promise.all<string>([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
 		}, 500);
@@ -137,7 +137,7 @@ $( "#rightarrow" ).on( "click", function() {
 			// Use resolved promises to fetch data from backend
 			let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-			Promise.all([headings, records]).then((values) => {
+			Promise.all<string>([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
 		}, 500);
@@ -171,7 +171,7 @@ $( "#submit" ).on( "click", function() {
 		// Use resolved promises to fetch data from backend
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-		Promise.all([headings, records]).then((values) => {
+		Promise.all<string>([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
 	}, 500);
@@ -197,7 +197,7 @@ $( "#gotostart" ).on( "click", function() {
 		// Use resolved promises to fetch data from backend
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-		Promise.all([headings, records]).then((values) => {
+		Promise.all<string>([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
 	}, 500);
@@ -223,7 +223,7 @@ $( "#gotoend" ).on( "click", function() {
 		// Use resolved promises to fetch data from backend
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-		Promise.all([headings, records]).then((values) => {
+		Promise.all<string>([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
 	}, 500);
@@ -271,22 +271,17 @@ function createInitialPage(numOfRows: number) {
 	}
 
 	//Request for and set the total number of records
-	request( "/recordCount", "GET", function(r: string) {
-		try {
-			numofrecords.innerHTML = r;
-			totalNumofRecords = Number(r)-1;
-		} catch(err) {
-			console.log(err);
-			return;
-		}
-	});
+	fetch("/recordCount").then(res => res.text()).then((value) => {
+		numofrecords.innerHTML = value;
+		totalNumofRecords = Number(value) - 1;
+	}).catch(err => console.log(err))
 
 	// Create table using the new set IDs inside a set timeout
 	clickTimeout = setTimeout(function(){
 		// Use resolved promises to fetch data from backend
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-		Promise.all([headings, records]).then((values) => {
+		Promise.all<string>([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
 	}, 500);
