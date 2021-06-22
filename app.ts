@@ -22,21 +22,9 @@ createInitialPage(numOfRows);
 
 // Listen for change in window size
 let screenHeight = screen.height;
-window.addEventListener('resize', function(event) {
+window.addEventListener('resize', () => {
 	screenHeight = window.innerHeight;	
-	
-	// Change number of rows based on window size
-	if (screenHeight >= 750) {
-		numOfRows = 23;
-	} else if ((screenHeight < 750) && (screenHeight >= 550)) {
-		numOfRows = 18;
-	} else if ((screenHeight < 550) && (screenHeight >= 265)) {
-		numOfRows = 8;
-	} else if ((screenHeight < 265) && (screenHeight >= 95)) {
-		numOfRows = 3;
-	} else if (screenHeight < 95) {
-		numOfRows = 2;
-	}
+	numOfRows = Math.round(screenHeight / 33);
 
 	// Recreate grid with new set number of rows
 	createInitialPage(numOfRows);
@@ -46,7 +34,7 @@ window.addEventListener('resize', function(event) {
 let clickTimeout: ReturnType<typeof setTimeout>;
 
 // When clicking on left arrow
-$( "#leftarrow" ).on( "click", function() {
+$( "#leftarrow" ).on( "click", () => {
 	// Clear the timeout every time if you navigate and you're not at the start ID of all the data
 	if (fromID != 1) {
 		clearTimeout(clickTimeout);
@@ -56,22 +44,22 @@ $( "#leftarrow" ).on( "click", function() {
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";
 	
-	if ((fromID < (numOfRows-1)) && (fromID > 1)) {		// If the "from" ID is within the IDs at the beginning of the dataset
+	if (fromID < (numOfRows-1) && fromID > 1) {		// If the "from" ID is within the IDs at the beginning of the dataset
 		fromID = 1;
 		toID = numOfRows;
 		fromIDElement.innerHTML = fromID.toString();
 		toIDElement.innerHTML = toID.toString();
 
 		// Create table using the new set IDs inside a set timeout
-		clickTimeout = setTimeout(function(){
+		clickTimeout = setTimeout( () => {
 			// Use resolved promises to fetch data from backend
-			let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
-			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
+			let headings = Promise.resolve(fetch("/columns").then(res => res.json())); 
+			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.json()));
 			// Promise.all<string>([headings, records]).then((values) => {
 			Promise.all<string>([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
-		}, 500);
+		}, 200);
 	} else if (fromID === 1) {							// If the "from" ID is 1 then set the values and do not make any backend calls
 		fromID = 1;
 		toID = numOfRows;
@@ -84,19 +72,19 @@ $( "#leftarrow" ).on( "click", function() {
 		toIDElement.innerHTML = toID.toString();
 
 		// Create table using the new set IDs inside a set timeout
-		clickTimeout = setTimeout(function(){
+		clickTimeout = setTimeout( () => {
 			// Use resolved promises to fetch data from backend
 			let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 			Promise.all<string>([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
-		}, 500);
+		}, 200);
 	}
 });
 					
 // Listen for click on right arrow
-$( "#rightarrow" ).on( "click", function() {
+$( "#rightarrow" ).on( "click", () => {
 	// Clear the timeout every time if you navigate and you're not at the end ID of all the data
 	if (toID != totalNumofRecords) {
 			clearTimeout(clickTimeout);
@@ -106,21 +94,21 @@ $( "#rightarrow" ).on( "click", function() {
 	let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 	startfrom.value = "";
 
-	if ((fromID > (totalNumofRecords-((numOfRows-1)*2)) ) && (fromID < totalNumofRecords) ) { 		// If the "from" ID is within the IDs at the ending of the dataset
+	if (fromID > (totalNumofRecords-((numOfRows-1)*2)) && fromID < totalNumofRecords ) { 		// If the "from" ID is within the IDs at the ending of the dataset
 		fromID = (totalNumofRecords-(numOfRows-1));
 		toID = totalNumofRecords;
 		fromIDElement.innerHTML = fromID.toString();
 		toIDElement.innerHTML = toID.toString();
 
 		// Create table using the new set IDs inside a set timeout
-		clickTimeout = setTimeout(function(){
+		clickTimeout = setTimeout( () => {
 			// Use resolved promises to fetch data from backend
 			let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 			Promise.all<string>([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
-		}, 500);
+		}, 200);
 	} else if (toID === totalNumofRecords) {													// If the "to" ID is the ending ID, then set the values and do not make any backend calls
 		fromID = (totalNumofRecords-(numOfRows-1));
 		toID = totalNumofRecords;
@@ -133,19 +121,19 @@ $( "#rightarrow" ).on( "click", function() {
 		toIDElement.innerHTML = toID.toString();
 
 		// Create table using the new set IDs inside a set timeout
-		clickTimeout = setTimeout(function(){
+		clickTimeout = setTimeout( () => {
 			// Use resolved promises to fetch data from backend
 			let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 			Promise.all<string>([headings, records]).then((values) => {
 				generateTable(values[0], values[1]);
 			}).catch(err => console.log(err));
-		}, 500);
+		}, 200);
 	}
 });
 							
 // Listen for submission in form and use inputs to request data from backend
-$( "#submit" ).on( "click", function() {
+$( "#submit" ).on( "click", () => {
 	// Clear the timeout every time if you submit on the form
 	clearTimeout(clickTimeout);
 
@@ -167,18 +155,18 @@ $( "#submit" ).on( "click", function() {
 	}
 
 	// Create table using the new set IDs inside a set timeout
-	clickTimeout = setTimeout(function(){
+	clickTimeout = setTimeout( () => {
 		// Use resolved promises to fetch data from backend
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 		Promise.all<string>([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
-	}, 500);
+	}, 200);
 });
 
 // Listen for submission in form and use inputs to request data from backend
-$( "#gotostart" ).on( "click", function() {
+$( "#gotostart" ).on( "click", () => {
 	// Clear the timeout every time if you click to go to start of dataset
 	clearTimeout(clickTimeout);
 
@@ -193,18 +181,18 @@ $( "#gotostart" ).on( "click", function() {
 	toIDElement.innerHTML = toID.toString();
 
 	// Create table using the new set IDs inside a set timeout
-	clickTimeout = setTimeout(function(){
+	clickTimeout = setTimeout( () => {
 		// Use resolved promises to fetch data from backend
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 		Promise.all<string>([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
-	}, 500);
+	}, 200);
 });
 
 
-$( "#gotoend" ).on( "click", function() {
+$( "#gotoend" ).on( "click", () => {
 	// Clear the timeout every time if you click to go to end of dataset
 	clearTimeout(clickTimeout);
 
@@ -219,14 +207,14 @@ $( "#gotoend" ).on( "click", function() {
 	toIDElement.innerHTML = toID.toString();
 	
 	// Create table using the new set IDs inside a set timeout
-	clickTimeout = setTimeout(function() {
+	clickTimeout = setTimeout(() =>  {
 		// Use resolved promises to fetch data from backend
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 		Promise.all<string>([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
-	}, 500);
+	}, 200);
 });
 
 
@@ -277,33 +265,19 @@ function createInitialPage(numOfRows: number) {
 	}).catch(err => console.log(err))
 
 	// Create table using the new set IDs inside a set timeout
-	clickTimeout = setTimeout(function(){
+	clickTimeout = setTimeout(() => {
 		// Use resolved promises to fetch data from backend
 		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
 		Promise.all<string>([headings, records]).then((values) => {
 			generateTable(values[0], values[1]);
 		}).catch(err => console.log(err));
-	}, 500);
+	}, 200);
 }
 
 // Function returning number of rows based on window size
 function getNumOfRows() {
 	// Get height of screen
 	screenHeight = window.innerHeight; 
-				
-	// Checks to return correct value for number of rows
-	if (screenHeight >= 750) {
-		return 23;
-	} else if ((screenHeight < 750) && (screenHeight >= 550)) {
-		return 18;
-	} else if ((screenHeight < 550) && (screenHeight >= 265)) {
-		return 8;
-	} else if ((screenHeight < 265) && (screenHeight >= 95)) {
-		return 3;
-	} else if (screenHeight < 95) {
-		return 2;
-	} else {
-		return 23;
-	}
+	return Math.round(screenHeight/33);
 }
