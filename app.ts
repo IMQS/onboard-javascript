@@ -54,11 +54,10 @@ $( "#leftarrow" ).on( "click", () => {
 		// Create table using the new set IDs inside a set timeout
 		clickTimeout = setTimeout( () => {
 			// Use resolved promises to fetch data from backend
-			let headings = Promise.resolve(fetch("/columns").then(res => res.json()));
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.json()));
-			// Promise.all<string>([headings, records]).then((values) => {
-			Promise.all<string>([headings, records]).then((values) => {
-				generateTable(values[0], values[1]);
+			// Promise.all<string>([records]).then((values) => {
+			Promise.all<string>([records]).then((values) => {
+				generateTable(values[0]);
 			}).catch(err => console.log(err));
 		}, 200);
 	} else if (fromID === 1) {							// If the "from" ID is 1 then set the values and do not make any backend calls
@@ -75,10 +74,9 @@ $( "#leftarrow" ).on( "click", () => {
 		// Create table using the new set IDs inside a set timeout
 		clickTimeout = setTimeout( () => {
 			// Use resolved promises to fetch data from backend
-			let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-			Promise.all<string>([headings, records]).then((values) => {
-				generateTable(values[0], values[1]);
+			Promise.all<string>([records]).then((values) => {
+				generateTable(values[0]);
 			}).catch(err => console.log(err));
 		}, 200);
 	}
@@ -104,10 +102,9 @@ $( "#rightarrow" ).on( "click", () => {
 		// Create table using the new set IDs inside a set timeout
 		clickTimeout = setTimeout( () => {
 			// Use resolved promises to fetch data from backend
-			let headings = Promise.resolve(fetch("/columns").then(res => res.text()));
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-			Promise.all<string>([headings, records]).then((values) => {
-				generateTable(values[0], values[1]);
+			Promise.all<string>([records]).then((values) => {
+				generateTable(values[0]);
 			}).catch(err => console.log(err));
 		}, 200);
 	} else if (toID === totalNumofRecords) {													// If the "to" ID is the ending ID, then set the values and do not make any backend calls
@@ -124,10 +121,9 @@ $( "#rightarrow" ).on( "click", () => {
 		// Create table using the new set IDs inside a set timeout
 		clickTimeout = setTimeout( () => {
 			// Use resolved promises to fetch data from backend
-			let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-			Promise.all<string>([headings, records]).then((values) => {
-				generateTable(values[0], values[1]);
+			Promise.all<string>([records]).then((values) => {
+				generateTable(values[0]);
 			}).catch(err => console.log(err));
 		}, 200);
 	}
@@ -148,6 +144,7 @@ $( "#submit" ).on( "click", () => {
 		return;
 	} else if (isNaN(startFrom)) {
 		alert("You have not set a value to submit.");
+		return;
 	} else {
 		fromID = startFrom;
 		toID = fromID + (numOfRows-1);
@@ -158,10 +155,9 @@ $( "#submit" ).on( "click", () => {
 	// Create table using the new set IDs inside a set timeout
 	clickTimeout = setTimeout( () => {
 		// Use resolved promises to fetch data from backend
-		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-		Promise.all<string>([headings, records]).then((values) => {
-			generateTable(values[0], values[1]);
+		Promise.all<string>([records]).then((values) => {
+			generateTable(values[0]);
 		}).catch(err => console.log(err));
 	}, 200);
 });
@@ -184,10 +180,9 @@ $( "#gotostart" ).on( "click", () => {
 	// Create table using the new set IDs inside a set timeout
 	clickTimeout = setTimeout( () => {
 		// Use resolved promises to fetch data from backend
-		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-		Promise.all<string>([headings, records]).then((values) => {
-			generateTable(values[0], values[1]);
+		Promise.all<string>([records]).then((values) => {
+			generateTable(values[0]);
 		}).catch(err => console.log(err));
 	}, 200);
 });
@@ -210,14 +205,12 @@ $( "#gotoend" ).on( "click", () => {
 	// Create table using the new set IDs inside a set timeout
 	clickTimeout = setTimeout(() =>  {
 		// Use resolved promises to fetch data from backend
-		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-		Promise.all<string>([headings, records]).then((values) => {
-			generateTable(values[0], values[1]);
+		Promise.all<string>([records]).then((values) => {
+			generateTable(values[0]);
 		}).catch(err => console.log(err));
 	}, 200);
 });
-
 
 // Function to create table and render in browser
 function generateHeadings(headingsStr: string) {
@@ -229,7 +222,7 @@ function generateHeadings(headingsStr: string) {
 	hd.constructTableHeadings(interfaceHeading);					// call method to render table headings element in browser
 }
 
-function generateTable(headingsStr: string, recordsStr: string) {
+function generateTable(recordsStr: string) {
 	// Instantiate grid table to append innerHTML
 	let tble = new RenderTableHeading(document.querySelector('#records') as HTMLDivElement);
 
@@ -250,7 +243,7 @@ function el(s: string) {
 // Function to create the initial table when loading the page for the first time or when the window size changes
 function createHeadings(numOfRows: number) {
 	//Request for and set the total number of records
-	fetch("/columns").then(res => res.text()).then((value) => {
+	fetch("/columns").then(res => res.json()).then((value) => {
 		generateHeadings(value);
 		numofrecords.innerHTML = value;
 		totalNumofRecords = Number(value) - 1;
@@ -283,11 +276,10 @@ function createInitialPage(numOfRows: number) {
 
 	// Create table using the new set IDs inside a set timeout
 	clickTimeout = setTimeout(() => {
-		// Use resolved promises to fetch data from backend
-		let headings = Promise.resolve(fetch("/columns").then(res => res.text())); 
+		// Use resolved promises to fetch data from backend 
 		let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.text()));
-		Promise.all<string>([headings, records]).then((values) => {
-			generateTable(values[0], values[1]);
+		Promise.all<string>([records]).then((values) => {
+			generateTable(values[0]);
 		}).catch(err => console.log(err));
 	}, 200);
 }
