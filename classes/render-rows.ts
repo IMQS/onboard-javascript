@@ -6,14 +6,15 @@ export class RenderTableRows implements HasFormatMethod {
 	private arrLength = 0;
 	
 	constructor( recordsStr: string ){
-		let table = document.querySelector('#table') as HTMLDivElement;				// Target div element with ID table
+		// let table = document.querySelector('#table') as HTMLDivElement;				// Target div element with ID table
+		let records = document.querySelector('#records') as HTMLDivElement;				// Target div element with ID table
 		let navigation = document.querySelector('#navigation') as HTMLDivElement;	// Target div element with ID navigation
 		let myArr = JSON.parse(recordsStr);											// Parse the string to create array of the data
 
 		// Edit styling of the table and navigation bar
-		table.style.display = "grid";
-		table.style.gridTemplateRows = "repeat(auto-fill, "+(100/(myArr.length+2))+"%)";
-		navigation.style.height = (100/(myArr.length+2))+"%";
+		records.style.display = "grid";
+		records.style.gridTemplateRows = "repeat(auto-fill, "+(100/(myArr.length+3))+"%)";
+		navigation.style.height = (100/(myArr.length+3))+"%";
 		
 		// Create innerHTML text to be rendered to front-end in the table div
 		for(let i=0;i<myArr.length;i++) {
@@ -28,7 +29,7 @@ export class RenderTableRows implements HasFormatMethod {
 			div.innerHTML = this.returnStr;
 			div.className = "tablecell";
 			div.style.gridTemplateColumns = "repeat("+this.arrLength+", 1fr)";
-			table.append(div);
+			records.append(div);
 			this.returnStr = "";
 		}
 	}

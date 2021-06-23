@@ -18,6 +18,7 @@ fromIDElement.innerHTML = fromID.toString();
 toIDElement.innerHTML = toID.toString();
 
 // Create initial page with initial data
+createHeadings(numOfRows);
 createInitialPage(numOfRows);
 
 // Listen for change in window size
@@ -53,7 +54,7 @@ $( "#leftarrow" ).on( "click", () => {
 		// Create table using the new set IDs inside a set timeout
 		clickTimeout = setTimeout( () => {
 			// Use resolved promises to fetch data from backend
-			let headings = Promise.resolve(fetch("/columns").then(res => res.json())); 
+			let headings = Promise.resolve(fetch("/columns").then(res => res.json()));
 			let records = Promise.resolve(fetch("/records?from="+fromID+"&to="+toID).then(res => res.json()));
 			// Promise.all<string>([headings, records]).then((values) => {
 			Promise.all<string>([headings, records]).then((values) => {
@@ -219,25 +220,41 @@ $( "#gotoend" ).on( "click", () => {
 
 
 // Function to create table and render in browser
+function generateHeadings(headingsStr: string) {
+	// Instantiate grid table to append innerHTML
+	let hd = new RenderTableHeading(document.querySelector('#headings') as HTMLDivElement);
+
+	let interfaceHeading: HasFormatMethod;							// variable of type interface used in creating table headings
+	interfaceHeading = new TableHeadingString(headingsStr);			// call method to generate string containing table heading element
+	hd.constructTableHeadings(interfaceHeading);					// call method to render table headings element in browser
+}
+
 function generateTable(headingsStr: string, recordsStr: string) {
 	// Instantiate grid table to append innerHTML
-	let tble = new RenderTableHeading(document.querySelector('#table') as HTMLDivElement);
+	let tble = new RenderTableHeading(document.querySelector('#records') as HTMLDivElement);
 
 	// Empty the table in the html
-	let emptyTable = document.querySelector('#table') as HTMLDivElement;
+	let emptyTable = document.querySelector('#records') as HTMLDivElement;
 	emptyTable.innerHTML = "";										// clear table to empty html
 
 	// Recreate table with new headings and records data
-	let interfaceHeading: HasFormatMethod;							// variable of type interface used in creating table headings
 	let interfaceRecords: HasFormatMethod;							// variable of type interface used in creating table rows
-	interfaceHeading = new TableHeadingString(headingsStr);			// call method to generate string containing table heading element
-	tble.constructTableHeadings(interfaceHeading);					// call method to render table headings element in browser
 	interfaceRecords = new RenderTableRows(recordsStr);				// call method to generate string containing table row elements
 }
 
 // Function to target an element in html by its id
 function el(s: string) {
 	return document.getElementById(s);
+}
+
+// Function to create the initial table when loading the page for the first time or when the window size changes
+function createHeadings(numOfRows: number) {
+	//Request for and set the total number of records
+	fetch("/columns").then(res => res.text()).then((value) => {
+		generateHeadings(value);
+		numofrecords.innerHTML = value;
+		totalNumofRecords = Number(value) - 1;
+	}).catch(err => console.log(err))
 }
 
 // Function to create the initial table when loading the page for the first time or when the window size changes
