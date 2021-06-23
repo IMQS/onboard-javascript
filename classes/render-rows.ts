@@ -13,9 +13,11 @@ export class RenderTableRows implements HasFormatMethod {
 
 		// Edit styling of the table and navigation bar
 		records.style.display = "grid";
-		records.style.gridTemplateRows = "repeat(auto-fill, "+(100/(myArr.length+1))+"%)";
-		records.style.height = "96.5%";
-		navigation.style.height = (100/(myArr.length+1))+"%";
+		records.style.gridTemplateRows = "repeat(auto-fill, "+(100/(myArr.length+2))+"%)";
+		records.style.height = "100%";
+		navigation.style.height = (100/(myArr.length+2))+"%";
+		let headings = document.querySelector('#headings') as HTMLDivElement;
+		headings.style.height = 100/(myArr.length+2)+"%";
 		
 		// Create innerHTML text to be rendered to front-end in the table div
 		for(let i=0;i<myArr.length;i++) {

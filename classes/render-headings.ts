@@ -4,14 +4,11 @@ import { HasFormatMethod } from "../interfaces/has-format-method.js";
 export class RenderTableHeading {
     constructor(private container: HTMLDivElement) {}
 
-    constructTableHeadings(element: HasFormatMethod) {
-		let headings = document.querySelector('#headings') as HTMLDivElement;				// Target div element with ID table
-		headings.style.height = "3.5%";
-
-        let div = document.createElement('div');
-        div.innerHTML = element.internalFormat();
+    constructTableHeadings(hd: HasFormatMethod) {
+		let div = document.createElement('div');
+        div.innerHTML = hd.internalFormat();
         div.className = "tablecell";
-        div.style.gridTemplateColumns = "repeat("+element.arrayLength()+", 1fr)";
+        div.style.gridTemplateColumns = "repeat("+hd.arrayLength()+", 1fr)";
 
         this.container.append(div);
     }
