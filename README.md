@@ -79,7 +79,6 @@ These steps include just enough detail to guide you. Each step will require some
 1. Fork this GIT repository under your own GIT account  
 1. Start up the backend server:
     - Open console and change directory to `server` directory  
-    - Run `env.bat`  
     - Run `go run main.go`  
     - Open up your browser and point it to [http://localhost:2050](http://localhost:2050). You should see "Hello"  
 1. Create the frontend project:  
