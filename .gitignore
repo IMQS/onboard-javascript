@@ -1,7 +1,3 @@
 /node_modules
-/classes/*.js
-/classes/*.js.map
-/interfaces/*.js
-/interfaces/*.js.map
 app.js
 app.js.map
