@@ -1,6 +1,4 @@
-// let totalNumofRecords: number;							
-let fromID = 1;										
-let toID = getNumOfRows();								
+let timeOut: ReturnType<typeof setTimeout>;					
 
 // Get list of headings
 fetch("/columns").then(res => res.text()).then((headingsStr) => {
@@ -14,30 +12,44 @@ fetch("/columns").then(res => res.text()).then((headingsStr) => {
 
 fetch("/recordCount").then(res => res.text()).then(
 	(value) => {
+		let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
+		numofrecords.innerHTML = value; 
 		let t = Number(value) - 1;
 		// Create initial page
 		createInitialPage(getNumOfRows(), t);
-		let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
-		numofrecords.innerHTML = value; 
 	}
 ).catch(err => console.log(err));
 
 // Listen for change in window size
 window.addEventListener('resize', () => {
+	// Clear the timeout every time if you submit on the form
+	clearTimeout(timeOut);
+
 	let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
-	let totalNumofRecords = Number(numofrecords.innerHTML);
-	console.log(totalNumofRecords);
-	getRecords(fromID, toID, totalNumofRecords);
+	let totalNumofRecords = Number(numofrecords.innerHTML)-1;
+	
+	let fID = document.querySelector('#fromID') as HTMLParagraphElement;
+	let tID = document.querySelector('#toID') as HTMLParagraphElement;
+	getRecords(Number(fID.innerHTML), Number(tID.innerHTML), totalNumofRecords);
 });
 
 // Listen for clicks on left arrow
 $( "#leftarrow" ).on( "click", () => {
+	// // Clear the timeout every time if you submit on the form
+	clearTimeout(timeOut);
+	
 	let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
-	let totalNumofRecords = Number(numofrecords.nodeValue);
+	let totalNumofRecords = Number(numofrecords.innerHTML)-1;
 	let numOfRows = getNumOfRows();
-	if (fromID < (numOfRows-1) && fromID > 1 || fromID === 1) {
-		fromID = 1;
-		toID = numOfRows;
+	
+	let fID = document.querySelector('#fromID') as HTMLParagraphElement;
+	let tID = document.querySelector('#toID') as HTMLParagraphElement;
+	let fromID = Number(fID.innerHTML);
+	let toID = Number(tID.innerHTML);
+	
+	if ((fromID < numOfRows && fromID > 0) || fromID === 0) {
+		fromID = 0;
+		toID = numOfRows-1;
 	} else {
 		fromID = fromID - (numOfRows-1);
 		toID = toID - (numOfRows-1);
@@ -49,9 +61,18 @@ $( "#leftarrow" ).on( "click", () => {
 					
 // Listen for clicks on right arrow
 $( "#rightarrow" ).on( "click", () => {
+	// Clear the timeout every time if you submit on the form
+	clearTimeout(timeOut);
+
 	let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
-	let totalNumofRecords = Number(numofrecords.nodeValue);
+	let totalNumofRecords = Number(numofrecords.innerHTML)-1;
 	let numOfRows = getNumOfRows();
+
+	let fID = document.querySelector('#fromID') as HTMLParagraphElement;
+	let tID = document.querySelector('#toID') as HTMLParagraphElement;
+	let fromID = Number(fID.innerHTML);
+	let toID = Number(tID.innerHTML);
+
 	if (fromID > (totalNumofRecords-((numOfRows-1)*2)) && fromID < totalNumofRecords || toID === totalNumofRecords) { 	
 		fromID = (totalNumofRecords-(numOfRows-1));
 		toID = totalNumofRecords;
@@ -66,19 +87,25 @@ $( "#rightarrow" ).on( "click", () => {
 							
 // Listen for submission in form and use inputs to request data from backend
 $( "#submit" ).on( "click", () => {
-	let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
-	let totalNumofRecords = Number(numofrecords.nodeValue);
-	let numOfRows = getNumOfRows();
 	// Clear the timeout every time if you submit on the form
-	clearTimeout(clickTimeout(fromID, toID));
+	clearTimeout(timeOut);
+
+	let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
+	let totalNumofRecords = Number(numofrecords.innerHTML)-1;
+	let numOfRows = getNumOfRows();
+
+	let fID = document.querySelector('#fromID') as HTMLParagraphElement;
+	let tID = document.querySelector('#toID') as HTMLParagraphElement;
+	let fromID = Number(fID.innerHTML);
+	let toID = Number(tID.innerHTML);
 
 	// Clear form value in from end when navigating data using the arrows
 	let startFromIDElement = document.querySelector('#startfrom') as HTMLInputElement;
 	let startFrom = startFromIDElement.valueAsNumber;
 
 	// Checks to see if you request invalid values in the form
-	if (startFrom < 1 || startFrom > (totalNumofRecords-(numOfRows-1))) {
-		alert("The acceptable range is between 1 and "+(totalNumofRecords-(numOfRows-1)));
+	if (startFrom < 0 || startFrom > (totalNumofRecords-(numOfRows-1))) {
+		alert("The acceptable range is between 0 and "+(totalNumofRecords-(numOfRows-1)));
 		return;
 	} else if (isNaN(startFrom)) {
 		alert("You have not set a value to submit.");
@@ -94,15 +121,16 @@ $( "#submit" ).on( "click", () => {
 
 // Listen for click to go to start of data
 $( "#gotostart" ).on( "click", () => {
-	let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
-	let totalNumofRecords = Number(numofrecords.nodeValue);
-	let numOfRows = getNumOfRows();
 	// Clear the timeout every time if you click to go to start of dataset
-	clearTimeout(clickTimeout(fromID, toID));
+	clearTimeout(timeOut);
+
+	let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
+	let totalNumofRecords = Number(numofrecords.innerHTML)-1;
+	let numOfRows = getNumOfRows();
 
 	// Set ID values to the start of the dataset
-	fromID = 1;
-	toID = numOfRows;
+	let fromID = 0;
+	let toID = numOfRows;
 
 	// Get records from backend
 	getRecords(fromID, toID, totalNumofRecords);
@@ -111,14 +139,14 @@ $( "#gotostart" ).on( "click", () => {
 // Listen for sclick to go to end of data
 $( "#gotoend" ).on( "click", () => {
 	let numofrecords = document.querySelector('#numofrecords') as HTMLParagraphElement;
-	let totalNumofRecords = Number(numofrecords.nodeValue);
+	let totalNumofRecords = Number(numofrecords.innerHTML)-1;
 	let numOfRows = getNumOfRows();
 	// Clear the timeout every time if you click to go to end of dataset
-	clearTimeout(clickTimeout(fromID, toID));
+	clearTimeout(timeOut);
 
 	// Set ID values to the end of the dataset
-	fromID = totalNumofRecords-(numOfRows-1);
-	toID = totalNumofRecords;
+	let fromID = totalNumofRecords-(numOfRows-1);
+	let toID = totalNumofRecords;
 	
 	// Get records from backend
 	getRecords(fromID, toID, totalNumofRecords);
@@ -126,12 +154,17 @@ $( "#gotoend" ).on( "click", () => {
 
 // Function to create the initial table when loading the page for the first time or when the window size changes
 function createInitialPage(numOfRows: number, totalNumofRecords: number) {
+	// Clear the timeout every time this function is called
+	clearTimeout(timeOut);
+
 	let fromIDElement = document.querySelector('#fromID') as HTMLParagraphElement;			
 	let toIDElement = document.querySelector('#toID') as HTMLParagraphElement;				
 
-	// Clear the timeout every time this function is called
-	clearTimeout(clickTimeout(fromID, toID));
-
+	let fID = document.querySelector('#fromID') as HTMLParagraphElement;
+	let tID = document.querySelector('#toID') as HTMLParagraphElement;
+	let fromID = Number(fID.innerHTML);
+	let toID = Number(tID.innerHTML);
+	
 	// Check if you're at the start or end of the data set, and reset IDs for change in window size
 	if (fromID > (totalNumofRecords-(numOfRows-1))) {
 		fromID = totalNumofRecords-(numOfRows-1);
@@ -172,7 +205,7 @@ function getRecords(fromID: number, toID: number, totalNumofRecords: number) {
 
 	// Clear the timeout every time if you navigate and you're not at the start ID of all the data
 	if (fromID != 1 || toID != totalNumofRecords) {
-		clearTimeout(clickTimeout(fromID, toID));
+		clearTimeout(timeOut);
 	}
 
 	// Create table using the new set IDs inside a set timeout
@@ -196,7 +229,7 @@ function getRecords(fromID: number, toID: number, totalNumofRecords: number) {
 }
 
 function clickTimeout(fromID: number, toID: number) {
-	let timeOut = setTimeout( () => {
+	timeOut = setTimeout( () => {
 		let startfrom = document.querySelector("#startfrom") as HTMLInputElement;
 		startfrom.value = "";
 
