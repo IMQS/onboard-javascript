@@ -1,21 +1,8 @@
 "use strict";
+/// <reference path="../app.ts" />
 /// <reference path="../has-format-method.ts" />
 var HasFormatMethod;
 (function (HasFormatMethod) {
-    var RenderTableHeading = /** @class */ (function () {
-        function RenderTableHeading(container) {
-            this.container = container;
-        }
-        RenderTableHeading.prototype.constructTableHeadings = function (hd) {
-            var div = document.createElement('div');
-            div.innerHTML = hd.internalFormat();
-            div.className = "tablecell";
-            div.style.gridTemplateColumns = "repeat(" + hd.arrayLength() + ", 1fr)";
-            this.container.append(div);
-        };
-        return RenderTableHeading;
-    }());
-    HasFormatMethod.RenderTableHeading = RenderTableHeading;
     var TableHeadingString = /** @class */ (function () {
         function TableHeadingString(headingsStr) {
             this.returnStr = "";

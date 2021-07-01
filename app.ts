@@ -51,7 +51,6 @@ namespace HasFormatMethod {
 						
 	// Listen for clicks on right arrow
 	$( "#rightarrow" ).on( "click", () => {
-		console.log("I made it here");
 		// Clear the timeout every time if you submit on the form
 		clearTimeout(timeOut);
 
@@ -227,7 +226,7 @@ namespace HasFormatMethod {
 		fetch("/columns").then(res => res.text()).then((headingsStr) => {
 			// Instantiate grid table to append innerHTML
 			let hd = new RenderTableHeading(document.querySelector('#headings') as HTMLDivElement);
-			let interfaceHeading: HasFormatMethod;							// Variable of type interface used in creating table headings
+			let interfaceHeading: HasFormatMethod;						// Variable of type interface used in creating table headings
 			interfaceHeading = new TableHeadingString(headingsStr);			// Call method to generate string containing table heading element
 			hd.constructTableHeadings(interfaceHeading);					// Call method to render table headings element in browser
 		}).catch(err => console.log(err));
@@ -291,4 +290,17 @@ namespace HasFormatMethod {
 			return this.returnStr;
 		}
 	}
+
+	class RenderTableHeading {
+        constructor(  private container: HTMLDivElement) {}
+        
+        constructTableHeadings(hd: HasFormatMethod) {
+            let div = document.createElement('div');
+            div.innerHTML = hd.internalFormat();
+            div.className = "tablecell";
+            div.style.gridTemplateColumns = "repeat("+hd.arrayLength()+", 1fr)";
+
+            this.container.append(div);
+        }
+    }
 }
