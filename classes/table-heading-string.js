@@ -1,8 +1,7 @@
 "use strict";
-/// <reference path="../app.ts" />
 /// <reference path="../has-format-method.ts" />
-var HasFormatMethod;
-(function (HasFormatMethod) {
+var HFM;
+(function (HFM) {
     var TableHeadingString = /** @class */ (function () {
         function TableHeadingString(headingsStr) {
             this.returnStr = "";
@@ -25,6 +24,6 @@ var HasFormatMethod;
         };
         return TableHeadingString;
     }());
-    HasFormatMethod.TableHeadingString = TableHeadingString;
-})(HasFormatMethod || (HasFormatMethod = {}));
-//# sourceMappingURL=table-headings.js.map
+    HFM.TableHeadingString = TableHeadingString;
+})(HFM || (HFM = {}));
+//# sourceMappingURL=table-heading-string.js.map

@@ -1,7 +1,6 @@
-/// <reference path="../app.ts" />
 /// <reference path="../has-format-method.ts" />
 
-namespace HasFormatMethod {
+namespace HFM {
     export class TableHeadingString implements HasFormatMethod {
         private returnStr = "";
         private arrLength = 0;
