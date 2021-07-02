@@ -98,12 +98,17 @@ $( "#submit" ).on( "click", () => {
 	let startFrom = startFromIDElement.valueAsNumber;
 
 	// Checks to see if you request invalid values in the form
-	if (startFrom < 0 || startFrom > (totalNumofRecords-(numOfRows-1))) {
-		alert("The acceptable range is between 0 and "+(totalNumofRecords-(numOfRows-1)));
-		return;
-	} else if (isNaN(startFrom)) {
-		alert("You have not set a value to submit.");
-		return;
+	if (totalNumofRecords <= numOfRows) {
+		alert("This page shows all the records available");
+			return;
+	} else {
+		if (startFrom < 0 || startFrom > (totalNumofRecords-(numOfRows-1))) {
+			alert("The acceptable range is between 0 and "+(totalNumofRecords-(numOfRows-1)));
+			return;
+		} else if (isNaN(startFrom)) {
+			alert("You have not set a value to submit.");
+			return;
+		}
 	}
 	
 	fromID = startFrom;
@@ -160,13 +165,17 @@ function createInitialPage(numOfRows: number, totalNumofRecords: number) {
 	let toID = Number(tID.innerHTML);
 	
 	// Check if you're at the start or end of the data set, and reset IDs for change in window size
-	if (fromID > (totalNumofRecords-(numOfRows-1))) {
+	if (totalNumofRecords <= numOfRows) {
+		fromID = 0;
+		toID = totalNumofRecords;
+	} else if (fromID > (totalNumofRecords-(numOfRows-1))) {
 		fromID = totalNumofRecords-(numOfRows-1);
+		toID = fromID + (numOfRows-1);
 	} else {
 		fromID = fromID;
+		toID = fromID + (numOfRows-1);
 	}
-	
-	toID = fromID + (numOfRows-1);
+
 	fromIDElement.innerHTML = fromID.toString();
 	toIDElement.innerHTML = toID.toString();
 
@@ -186,12 +195,18 @@ function getRecords(fromID: number, toID: number, totalNumofRecords: number) {
 	let toIDElement = document.querySelector('#toID') as HTMLParagraphElement;				
 
 	// Change fromID and toID according to changes in numOfRows
-	if (fromID > (totalNumofRecords-(numOfRows-1))) {
-		fromID = totalNumofRecords-(numOfRows-1);
+	if (totalNumofRecords <= numOfRows) {
+		fromID = 0;
+		toID = totalNumofRecords
 	} else {
-		fromID = fromID;
+		if (fromID > (totalNumofRecords-(numOfRows-1))) {
+			fromID = totalNumofRecords-(numOfRows-1);
+			toID = fromID + (numOfRows-1);
+		} else {
+			fromID = fromID;
+			toID = fromID + (numOfRows-1);
+		}
 	}
-	toID = fromID + (numOfRows-1);
 
 	// Change innerHTML for fromID and toID
 	fromIDElement.innerHTML = fromID.toString();
@@ -203,7 +218,9 @@ function getRecords(fromID: number, toID: number, totalNumofRecords: number) {
 	}
 
 	// Create table using the new set IDs inside a set timeout
-	clickTimeout(fromID, toID);	
+	// if (totalNumofRecords > numOfRows) {
+		clickTimeout(fromID, toID);	
+	// }
 }
 
 function getRecordCount() {
