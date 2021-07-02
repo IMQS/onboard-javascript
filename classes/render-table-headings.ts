@@ -1,4 +1,4 @@
-/// <reference path="../has-format-method.ts" />
+/// <reference path="../interfaces/has-format-method.ts" />
 
 namespace HFM {
     export class RenderTableHeading {

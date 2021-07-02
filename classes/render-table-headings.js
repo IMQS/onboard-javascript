@@ -1,5 +1,5 @@
 "use strict";
-/// <reference path="../has-format-method.ts" />
+/// <reference path="../interfaces/has-format-method.ts" />
 var HFM;
 (function (HFM) {
     var RenderTableHeading = /** @class */ (function () {
