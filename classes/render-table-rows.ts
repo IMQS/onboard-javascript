@@ -1,6 +1,18 @@
 /// <reference path="../interfaces/has-format-method.ts" />
 
 namespace HFM {
+    /**
+       * This class is used to create and render the html string containing the rows of records into the DOM
+       * @param returnStr This parameter holds formatted html string containing the rows of records to be injected into the DOM
+       * @param arrLength This parameter holds length of the array containing the rows of the records
+       * @param records This parameter holds the HTML DIV element with the ID #records
+       * @param navigation This parameter holds the HTML DIV element with the ID #navigation
+       * @param myArr This parameter is the array of the parsed string of records fetched from the back-end
+       * @param headings This parameter holds the HTML DIV element with the ID #headings and is used to edit the style of the headings
+       * @param div This parameter is the created div holding the html rows to be injected into the HTML DOM
+       * @function arrayLength This function returns the length of the array of rows to be rendered. This length is used in styling the grid
+       * @function internalFormat This function returns the formatted html string containing all the rows of records
+    */
     export class RenderTableRows implements HasFormatMethod {
         private returnStr = "";
         private arrLength = 0;
