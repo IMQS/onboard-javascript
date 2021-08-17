@@ -15,7 +15,7 @@ body{
 #go-button,#previous,#next {
     border: none;
     border-radius: 5px;
- 
+    text-transform: uppercase;
     font-family: 'Ubuntu';
     padding: 10px 30px;
     transition: filter 500ms ease-in-out;
@@ -33,6 +33,12 @@ body{
 
   }
   
+
+  #form-content{
+    color: white;
+    font-size: 19px;
+    font-weight: 900;
+  }
 
 
 h4{
