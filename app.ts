@@ -115,26 +115,40 @@ async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> 
 
 
  function RecordsFromCursor(cursor: number[]): Promise<number[]> {
+
     cursor = cursor.sort((a,b) => {return a-b});
     return  LoadRecordsData(cursor[0], cursor[1]);
+
+    throw new Error("Error");
+    
 }
 
 
 
 window.onresize = () => {
-    const nextToId = calculateToId(previous[0]);
-    clearTimeout(Timmer);
-    Timmer = setTimeout(async () => {
-        const recordCount = await getRecordCountCall();
-        if (nextToId >= recordCount - 1) {
-            const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
-            const toId = recordCount - 1;
-            previous = await LoadRecordsData(fromId, toId);
-            alert('Note that since you were on the last page, the final record is still at the bottom of your page');
-        } else {
-            previous = await LoadRecordsData(previous[0], nextToId)
-        }
-    }, 250);
+
+    try {
+        const nextToId = calculateToId(previous[0]);
+        clearTimeout(Timmer);
+        Timmer = setTimeout(async () => {
+            const recordCount = await getRecordCountCall();
+            if (nextToId >= recordCount - 1) {
+                const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
+                const toId = recordCount - 1;
+                previous = await LoadRecordsData(fromId, toId);
+                alert('Note that since you were on the last page, the final record is still at the bottom of your page');
+            } else {
+                previous = await LoadRecordsData(previous[0], nextToId)
+            }
+        }, 250);
+        
+
+    } catch (error) {
+        
+            throw new Error("Error" + error);
+
+    }
+ 
 }
 
 
@@ -161,6 +175,7 @@ async function LoadPageContent(fromID: number, toID: number): Promise<number[]> 
 }
 
 function ConvertNumber(input: string | number, parseAsInt: boolean = true) : number {
+
     switch (typeof input) {
         case ('string'):
             if (parseAsInt == true) {
@@ -172,9 +187,13 @@ function ConvertNumber(input: string | number, parseAsInt: boolean = true) : num
         default:
             return 0;
     }
+
+    throw new Error("Error");
+    
 }
 
 function calculateToId(fromId: number): number {
+
     const possibleRecordsData = Math.floor((window.innerHeight - ($("#form-content").innerHeight() as number)) / 37);
     const possibleId = fromId + possibleRecordsData;
 
@@ -213,8 +232,6 @@ function previousPageResize(previous: number[]):  number[] {
     throw new Error("Error");
 
 }
-
-
 
 
 window.onload = async () => {     
