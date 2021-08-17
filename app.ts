@@ -20,7 +20,6 @@ async function getRecordCountCall() : Promise<number> {
 // log response or catch error of fetch promise
 getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
 
-
 async function getColumnNamesCall() : Promise<string[]>{
 
     const response = await fetch('http://localhost:2050/columns');
