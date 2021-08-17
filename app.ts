@@ -105,9 +105,9 @@ async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> 
             $("#wrapper-table-content-body").append(DisplayContent);
     }
     
-    } catch (e) {
+    } catch (error) {
     
-        console.log("Error <No data>")
+        console.log("Error <No data>" + error)
 }
 
     return [fromID, toID];
@@ -140,14 +140,23 @@ window.onresize = () => {
 
 // Handlers
 async function LoadPageContent(fromID: number, toID: number): Promise<number[]> {
-    let DisplayContent = "";
-    const columns = await getColumnNamesCall();
-    for (const column of columns) {
-        DisplayContent += `<th align="center">${column}</th>`;
+
+    try {
+            let DisplayContent = "";
+            const columns = await getColumnNamesCall();
+        for (const column of columns) {
+            DisplayContent += `<th align="center">${column}</th>`;
         
+            $("#wrapper-table-header-row").empty();
+            $("#wrapper-table-header-row").append(DisplayContent);
     }
-    $("#wrapper-table-header-row").empty();
-    $("#wrapper-table-header-row").append(DisplayContent);
+        
+    } catch (error) {
+        
+        console.log("Error <No Data>" + error) ;
+
+    }
+    
     return await LoadRecordsData(fromID, toID);
 }
 
@@ -183,7 +192,7 @@ function calculateToId(fromId: number): number {
     return recordDisplayOffset + possibleId;
 }
 
-function nextPageResize(previous: number[]): number {
+ function nextPageResize(previous: number[]): number {
     const fromID = ConvertNumber(previous.sort((a, b) => {return a - b})[0]);
     const toID = ConvertNumber(previous.sort((a, b) => {return a - b})[1]);
     const documentHeight = $(window).innerHeight() as number - ($(`#table-row-${fromID}`).height() as number);
@@ -192,33 +201,53 @@ function nextPageResize(previous: number[]): number {
         const elementHeightOffset = ($(`#table-row-${i}`).offset() as JQueryCoordinates).top;
 
         if (elementHeightOffset < documentHeight) continue; 
-        return i;
+        return  i;
     }
-    return toID;
+    return  toID;
 }
 
-function previousPageResize(previous: number[]): number[] {
+function previousPageResize(previous: number[]):  number[] {
     const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
     return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
+
+    throw new Error("Error");
+
 }
+
+
+
+
 window.onload = async () => {     
-    previous = await LoadPageContent(0, calculateToId(0));
-    
-    $("#previous").click(async () => { 
-        const CountData = await getRecordCountCall();
-        previous = previousPageResize(previous);
-        let fromId = previous[0] >= 0 ? previous[0] : 0;
-        const possibleStep = calculateToId(fromId) - fromId;
-        let toId = (previous[0] >= 0 ? previous[1] : possibleStep);
-        fromId = fromId == CountData - 1 ? fromId - possibleStep : fromId;
-        toId = toId <= CountData - 1 ? toId : CountData - 1;
-        previous = await LoadRecordsData(fromId, toId);
+
+    try {
+        previous = await LoadPageContent(0, calculateToId(0));
+
+        $("#previous").click(async () => { 
+            const CountData = await getRecordCountCall();
+            previous = previousPageResize(previous);
+            let fromId = previous[0] >= 0 ? previous[0] : 0;
+            const possibleStep = calculateToId(fromId) - fromId;
+            let toId = (previous[0] >= 0 ? previous[1] : possibleStep);
+            fromId = fromId == CountData - 1 ? fromId - possibleStep : fromId;
+            toId = toId <= CountData - 1 ? toId : CountData - 1;
+            previous = await LoadRecordsData(fromId, toId);
+            
+        });
         
-    });
+    } catch (error) {
+       
+        throw new Error("Error....." + error);
+        
+        
+    }
+    
 
 $("#next").click(async () => {
 
+
+    try {
         const recordCount = await getRecordCountCall();
+
         const fromId = nextPageResize(previous);
         const possibleStep = calculateToId(fromId) - fromId;
         if (fromId <= recordCount - possibleStep - 1) {
@@ -233,9 +262,20 @@ $("#next").click(async () => {
 
             console.log("Test is working ");
         }
+
+    } catch (error) {
+        
+        throw new Error("Error........." + error);     
+    }
+  
+
+
     });
 
 $("#go-button").click(async () => {
+
+    try {
+        
         const recordCount = await getRecordCountCall();
         const fromId = ConvertNumber($("#index").val() as string, false);
         const possibleStep = calculateToId(fromId) - fromId;
@@ -254,8 +294,15 @@ $("#go-button").click(async () => {
                 alert('not inserting an integer - please ensure that you are.');
 
                 console.log("Test is working ");
+                }
             }
+
+
+            } catch (error) {
+        
+        throw new Error("Error........." + error); 
         }
+       
     });
 }
 
