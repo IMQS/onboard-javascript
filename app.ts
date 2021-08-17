@@ -9,17 +9,35 @@ let previousprocess: number;
 // region API Call 
 async function getRecordCountCall() : Promise<number> {
     const response = await fetch('http://localhost:2050/recordCount');
-    return await response.json();
+    if(!response.ok){
+        const message = `An error has occured: ${response.status}`;
+        throw new Error(message);
+    }else{
+        return await response.json();
+        console.log(response);
+    }
 }
 
 async function getColumnNamesCall() : Promise<string[]>{
     const response = await fetch('http://localhost:2050/columns');
-    return await response.json();
+    if(!response.ok){
+        const message = `An error has occured: ${response.status}`;
+        throw new Error(message);
+    }else{
+        return await response.json();
+        console.log(response);       
+    }
 }
 
 async function getRecordsCall(fromID: number, toID: number): Promise<string[][]> {
     const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
-    return await response.json();
+    if(!response.ok){
+        const message = `An error has occured: ${response.status}`;
+        throw new Error(message);
+    }else{
+        return await response.json();
+        console.log(response);
+    }
 }
 
 
