@@ -21,8 +21,8 @@ async function getRecordCountCall() : Promise<number> {
 getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
 
 
-
 async function getColumnNamesCall() : Promise<string[]>{
+
     const response = await fetch('http://localhost:2050/columns');
 
     if(!response.ok){
@@ -57,7 +57,6 @@ async function getRecordsCall(fromID: number, toID: number): Promise<string[][]>
 //     content?: Request,
 //     callback?: (response: Response) => void,
 //     errorCallback?: (err: any) => void) {
-
 // const request = new XMLHttpRequest();
 // request.open(method, url, true);
 // request.onload = function () {
