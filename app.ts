@@ -1,3 +1,43 @@
+// Declaring my variable
+let Timmer = 10;
+
+let previous: number[];
+
+let previousprocess: number;
+
+
+// region API Call 
+async function getRecordCountCall() : Promise<number> {
+    const response = await fetch('http://localhost:2050/recordCount');
+    return await response.json();
+}
+
+async function getColumnNamesCall() : Promise<string[]>{
+    const response = await fetch('http://localhost:2050/columns');
+    return await response.json();
+}
+
+async function getrecordsCall(fromID: number, toID: number): Promise<string[][]> {
+    const response = await fetch(`http://localhost:2050/recordsData?from=${(fromID)}&to=${(toID)}`);
+    return await response.json();
+}
+
+
+//region Data Loading methods
+async function recordsDataData(fromID: number, toID: number): Promise<number[]> {
+    const recordsData = await getrecordsCall(fromID, toID)
+    let appendable = '';
+    for (const record of recordsData) {
+        appendable += `<tr id="table-row-${record[0]}">`;
+        for (const column of record) {
+            appendable += `<td align="center">${column}</td>`;     
+        }
+        appendable += '</tr>';
+    }
+    $("#wrapper-table-content-body").empty();
+    $("#wrapper-table-content-body").append(appendable);
+    return [fromID, toID];
+}
 
 // // Using callbacks for columns:
 // function requestcolumns<Request>(
@@ -23,56 +63,10 @@
 // };
 // }
 
-// Declaring my variable
-let Timmer = 10;
 
-let previous: number[];
-
-let previousprocess: number;
-
-
-// region API Call 
-async function getRecordCountCall() : Promise<number> {
-    const response = await fetch('http://localhost:2050/recordCount');
-    return await response.json();
-}
-
-async function getColumnNamesCall() : Promise<string[]>{
-    const response = await fetch('http://localhost:2050/columns');
-    return await response.json();
-}
-
-async function getRecordsCall(fromID: number, toID: number): Promise<string[][]> {
-    const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
-    return await response.json();
-}
-
-
-
-
-//region Data Loading methods
-async function Records(fromID: number, toID: number): Promise<number[]> {
-    const records = await getRecordsCall(fromID, toID)
-    let appendable = '';
-    for (const record of records) {
-        appendable += `<tr id="table-row-${record[0]}">`;
-        for (const column of record) {
-            appendable += `<td align="center">${column}</td>`;     
-        }
-        appendable += '</tr>';
-    }
-    $("#wrapper-table-content-body").empty();
-    $("#wrapper-table-content-body").append(appendable);
-    return [fromID, toID];
-}
-
-
-
-
-
- function RecordsFromCursor(cursor: number[]): Promise<number[]> {
+ function recordsDataFromCursor(cursor: number[]): Promise<number[]> {
     cursor = cursor.sort((a,b) => {return a-b});
-    return  Records(cursor[0], cursor[1]);
+    return  recordsDataData(cursor[0], cursor[1]);
 }
 
 
@@ -96,10 +90,10 @@ window.onresize = () => {
         if (nextToId >= recordCount - 1) {
             const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
             const toId = recordCount - 1;
-            previous = await Records(fromId, toId);
+            previous = await recordsDataData(fromId, toId);
             alert('Note that since you were on the last page, the final record is still at the bottom of your page');
         } else {
-            previous = await Records(previous[0], nextToId)
+            previous = await recordsDataData(previous[0], nextToId)
         }
     }, 250);
 }
@@ -115,7 +109,7 @@ async function getPageContent(fromID: number, toID: number): Promise<number[]> {
     }
     $("#wrapper-table-header-row").empty();
     $("#wrapper-table-header-row").append(appendable);
-    return await Records(fromID, toID);
+    return await recordsDataData(fromID, toID);
 }
 
 function ConvertNumber(input: string | number, parseAsInt: boolean = true) : number {
@@ -133,8 +127,8 @@ function ConvertNumber(input: string | number, parseAsInt: boolean = true) : num
 }
 
 function calculateToId(fromId: number): number {
-    const possibleRecords = Math.floor((window.innerHeight - ($("#form-content").innerHeight() as number)) / 37);
-    const possibleId = fromId + possibleRecords;
+    const possiblerecordsDataData = Math.floor((window.innerHeight - ($("#form-content").innerHeight() as number)) / 37);
+    const possibleId = fromId + possiblerecordsDataData;
 
     let recordDisplayOffset = 0;
     if (window.innerHeight <= 646) {
@@ -147,7 +141,7 @@ function calculateToId(fromId: number): number {
         recordDisplayOffset = 15
     }
 
-    return recordDisplayOffset + possibleId;
+    return  recordDisplayOffset + possibleId;
 }
 
 function nextPageResize(previous: number[]): number {
@@ -182,7 +176,7 @@ window.onload = async () => {
         let toId = (previous[0] >= 0 ? previous[1] : possibleStep);
         fromId = fromId == recordCount - 1 ? fromId - possibleStep : fromId;
         toId = toId <= recordCount - 1 ? toId : recordCount - 1;
-        previous = await Records(fromId, toId);
+        previous = await recordsDataData(fromId, toId);
         
     });
 
@@ -192,12 +186,13 @@ window.onload = async () => {
         const possibleStep = calculateToId(fromId) - fromId;
         if (fromId <= recordCount - possibleStep - 1) {
             const toId = fromId + possibleStep <= recordCount - 1 ? fromId + possibleStep : recordCount - 1;
-            previous = await Records(fromId, toId);
+            previous = await recordsDataData(fromId, toId);
         } else if (fromId <= recordCount - 1)  {
-            previous = await Records(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
+            previous = await recordsDataData(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
             alert('You reached the last record - which is shown at the bottom of the screen');
         } else {
             alert('You Reach Last Record');
+            console.log("Error");
         }
     });
 
@@ -213,10 +208,11 @@ $("#go-button").click(async () => {
                     alert(`You may not insert a desired Id greater than ${recordCount - possibleStep}`);
                 } else {
                     let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
-                    previous = await Records(fromId, toId);
+                    previous = await recordsDataData(fromId, toId);
                 }
             } else {
                 alert('not inserting an integer - please ensure that you are.');
+                console.log("Error");
             }
         }
     });
