@@ -5,7 +5,6 @@ let previous: number[];
 
 let previousprocess: number;
 
-
 // region API Call 
 async function getRecordCountCall() : Promise<number> {
     const response = await fetch('http://localhost:2050/recordCount');
@@ -17,9 +16,15 @@ async function getRecordCountCall() : Promise<number> {
         console.log(response);
     }
 }
+// trigger async function
+// log response or catch error of fetch promise
+getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
+
+
 
 async function getColumnNamesCall() : Promise<string[]>{
     const response = await fetch('http://localhost:2050/columns');
+
     if(!response.ok){
         const message = `An error has occured: ${response.status}`;
         throw new Error(message);
@@ -28,6 +33,10 @@ async function getColumnNamesCall() : Promise<string[]>{
         console.log(response);       
     }
 }
+// trigger async function
+// log response or catch error of fetch promise
+getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
+
 
 async function getRecordsCall(fromID: number, toID: number): Promise<string[][]> {
     const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
