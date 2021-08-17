@@ -76,15 +76,6 @@ async function getRecordsCall(fromID: number, toID: number): Promise<string[][]>
 // };
 // }
 
-// const Http = new XMLHttpRequest();
-// const url='http://localhost:2050/';
-// Http.open("GET", url);
-// Http.send();
-
-// Http.onreadystatechange = (e) => {
-//   console.log(Http.responseText)
-// }
-
 
 //region Data Loading methods
 async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
