@@ -1,9 +1,12 @@
-// Declaring my  Timmer,previous, previousprocess variable
-let Timmer = 10;
 
-let previous: number[];
+namespace onboardproject {
+    
+module onboardproject {
 
-let previousprocess: number;
+    //Variable declarations
+    let Timmer = 10 ,previous: number[],previousprocess: number;
+
+
 
 // region API Call 
 async function getRecordCountCall() : Promise<number> {
@@ -53,7 +56,7 @@ async function getRecordsCall(fromID: number, toID: number): Promise<string[][]>
 }
 
 
-// // Using callbacks for columns:
+// // Using callbacks for columns: text-transform: uppercase;
 // function requestcolumns<Request>(
 //     method: 'GET',
 //     url: 'http://localhost:2050/columns',
@@ -146,7 +149,6 @@ window.onresize = () => {
 
 // Handlers
 async function LoadPageContent(fromID: number, toID: number): Promise<number[]> {
-
 
     try {
             let DisplayContent = "";
@@ -314,6 +316,6 @@ $("#go-button").click(async () => {
         }
        
     });
+   }
+ }
 }
-
-
