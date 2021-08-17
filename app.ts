@@ -1,4 +1,4 @@
-// Declaring my variable
+// Declaring my  Timmer,previous, previousprocess variable
 let Timmer = 10;
 
 let previous: number[];
