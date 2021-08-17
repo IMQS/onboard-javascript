@@ -147,6 +147,7 @@ window.onresize = () => {
 // Handlers
 async function LoadPageContent(fromID: number, toID: number): Promise<number[]> {
 
+
     try {
             let DisplayContent = "";
             const columns = await getColumnNamesCall();
@@ -163,8 +164,7 @@ async function LoadPageContent(fromID: number, toID: number): Promise<number[]> 
 
     }
     
-    return await LoadRecordsData(fromID, toID);
-    
+    return await LoadRecordsData(fromID, toID); 
 }
 
 function ConvertNumber(input: string | number, parseAsInt: boolean = true) : number {
