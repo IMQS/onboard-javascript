@@ -1,7 +1,8 @@
+let Timmer = 10;
 
-let resizeTimer = 1000;
-let previousCursor: number[];
-let previousScale: number;
+let previous: number[];
+
+let previousprocess: number;
 
 
 // region API Call 
@@ -24,7 +25,6 @@ async function getRecordsCall(fromID: number, toID: number): Promise<string[][]>
 
 
 //region Data Loading methods
-
 async function placeRecords(fromID: number, toID: number): Promise<number[]> {
     const records = await getRecordsCall(fromID, toID)
     let appendable = '';
@@ -43,6 +43,24 @@ async function placeRecords(fromID: number, toID: number): Promise<number[]> {
 async function placeRecordsFromCursor(cursor: number[]): Promise<number[]> {
     cursor = cursor.sort((a,b) => {return a-b});
     return await placeRecords(cursor[0], cursor[1]);
+}
+
+
+
+window.onresize = () => {
+    const nextToId = calculateToId(previous[0]);
+    clearTimeout(Timmer);
+    Timmer = setTimeout(async () => {
+        const recordCount = await getRecordCountCall();
+        if (nextToId >= recordCount - 1) {
+            const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
+            const toId = recordCount - 1;
+            previous = await placeRecords(fromId, toId);
+            alert('Note that since you were on the last page, the final record is still at the bottom of your page');
+        } else {
+            previous = await placeRecords(previous[0], nextToId)
+        }
+    }, 250);
 }
 
 
@@ -91,9 +109,9 @@ function calculateToId(fromId: number): number {
     return recordDisplayOffset + possibleId;
 }
 
-function nextPageResize(previousCursor: number[]): number {
-    const fromID = toNumber(previousCursor.sort((a, b) => {return a - b})[0]);
-    const toID = toNumber(previousCursor.sort((a, b) => {return a - b})[1]);
+function nextPageResize(previous: number[]): number {
+    const fromID = toNumber(previous.sort((a, b) => {return a - b})[0]);
+    const toID = toNumber(previous.sort((a, b) => {return a - b})[1]);
     const documentHeight = $(window).innerHeight() as number - ($(`#table-row-${fromID}`).height() as number);
 
     for (let i = fromID; i <= toID; i++) {
@@ -105,40 +123,40 @@ function nextPageResize(previousCursor: number[]): number {
     return toID;
 }
 
-function previousPageResize(previousCursor: number[]): number[] {
-    const toId = calculateToId(previousCursor[0] - (nextPageResize(previousCursor) - previousCursor[0]));
-    return [previousCursor[0] - (nextPageResize(previousCursor) - previousCursor[0]), toId];
+function previousPageResize(previous: number[]): number[] {
+    const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
+    return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
 }
 
 
 
 window.onload = async () => {     
-    previousCursor = await getPageContent(0, calculateToId(0));
+    previous = await getPageContent(0, calculateToId(0));
     
     $("#previous").click(async () => { 
         const recordCount = await getRecordCountCall();
-        previousCursor = previousPageResize(previousCursor);
-        let fromId = previousCursor[0] >= 0 ? previousCursor[0] : 0;
+        previous = previousPageResize(previous);
+        let fromId = previous[0] >= 0 ? previous[0] : 0;
         const possibleStep = calculateToId(fromId) - fromId;
-        let toId = (previousCursor[0] >= 0 ? previousCursor[1] : possibleStep);
+        let toId = (previous[0] >= 0 ? previous[1] : possibleStep);
         fromId = fromId == recordCount - 1 ? fromId - possibleStep : fromId;
         toId = toId <= recordCount - 1 ? toId : recordCount - 1;
-        previousCursor = await placeRecords(fromId, toId);
+        previous = await placeRecords(fromId, toId);
         
     });
 
     $("#next").click(async () => {
         const recordCount = await getRecordCountCall();
-        const fromId = nextPageResize(previousCursor);
+        const fromId = nextPageResize(previous);
         const possibleStep = calculateToId(fromId) - fromId;
         if (fromId <= recordCount - possibleStep - 1) {
             const toId = fromId + possibleStep <= recordCount - 1 ? fromId + possibleStep : recordCount - 1;
-            previousCursor = await placeRecords(fromId, toId);
+            previous = await placeRecords(fromId, toId);
         } else if (fromId <= recordCount - 1)  {
-            previousCursor = await placeRecords(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
+            previous = await placeRecords(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
             alert('You reached the last record - which is shown at the bottom of the screen');
         } else {
-            alert('You have reached the end of the list');
+            alert('You Reach Last Record');
         }
     });
 
@@ -154,29 +172,13 @@ window.onload = async () => {
                     alert(`You may not insert a desired Id greater than ${recordCount - possibleStep}`);
                 } else {
                     let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
-                    previousCursor = await placeRecords(fromId, toId);
+                    previous = await placeRecords(fromId, toId);
                 }
             } else {
-                alert('It seems you are not inserting an integer - please ensure that you are.');
+                alert('not inserting an integer - please ensure that you are.');
             }
         }
     });
 }
 
 
-
-window.onresize = () => {
-    const nextToId = calculateToId(previousCursor[0]);
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(async () => {
-        const recordCount = await getRecordCountCall();
-        if (nextToId >= recordCount - 1) {
-            const fromId = recordCount - 1 - (calculateToId(previousCursor[0]) - previousCursor[0]);
-            const toId = recordCount - 1;
-            previousCursor = await placeRecords(fromId, toId);
-            alert('Note that since you were on the last page, the final record is still at the bottom of your page');
-        } else {
-            previousCursor = await placeRecords(previousCursor[0], nextToId)
-        }
-    }, 250);
-}
