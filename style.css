@@ -12,6 +12,29 @@ body{
     table-layout: fixed;
 }
 
+#go-button,#previous,#next {
+    border: none;
+    border-radius: 5px;
+ 
+    font-family: 'Ubuntu';
+    padding: 10px 30px;
+    transition: filter 500ms ease-in-out;
+  }
+  
+  #go-button:hover {
+    cursor: pointer;
+    filter: brightness(1.5);
+  }
+
+  #index{
+
+    width: 162px;
+    height: 30px;
+
+  }
+  
+
+
 h4{
     font-size: 30px;
     color: #fff;
