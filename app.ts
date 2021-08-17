@@ -13,6 +13,7 @@ async function getRecordCountCall() : Promise<number> {
         throw new Error(message);
     }else{
         return await response.json();
+
         console.log(response);
     }
 }
@@ -29,6 +30,8 @@ async function getColumnNamesCall() : Promise<string[]>{
         throw new Error(message);
     }else{
         return await response.json();
+
+
         console.log(response);       
     }
 }
@@ -44,6 +47,7 @@ async function getRecordsCall(fromID: number, toID: number): Promise<string[][]>
         throw new Error(message);
     }else{
         return await response.json();
+       
         console.log(response);
     }
 }
@@ -84,17 +88,28 @@ async function getRecordsCall(fromID: number, toID: number): Promise<string[][]>
 
 //region Data Loading methods
 async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
-    const recordsvalue = await getRecordsCall(fromID, toID)
-    let DisplayContent = '';
+
+    try {
+            const recordsvalue = await getRecordsCall(fromID, toID)
+            let DisplayContent = '';
     for (const record of recordsvalue) {
-        DisplayContent += `<tr id="table-row-${record[0]}">`;
-        for (const column of record) {
-            DisplayContent += `<td align="center">${column}</td>`;     
+          DisplayContent += `<tr id="table-row-${record[0]}">`;
+                for (const column of record) {
+                    DisplayContent += `<td align="center">${column}</td>`;     
         }
+        
+        
         DisplayContent += '</tr>';
+        
+            $("#wrapper-table-content-body").empty();
+            $("#wrapper-table-content-body").append(DisplayContent);
     }
-    $("#wrapper-table-content-body").empty();
-    $("#wrapper-table-content-body").append(DisplayContent);
+    
+    } catch (e) {
+    
+        console.log("Error <No data>")
+}
+
     return [fromID, toID];
 }
 
@@ -202,6 +217,7 @@ window.onload = async () => {
     });
 
 $("#next").click(async () => {
+
         const recordCount = await getRecordCountCall();
         const fromId = nextPageResize(previous);
         const possibleStep = calculateToId(fromId) - fromId;
