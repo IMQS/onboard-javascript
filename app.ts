@@ -82,11 +82,11 @@ async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> 
 
     try {
             const recordsvalue = await getRecordsCall(fromID, toID)
-            let DisplayContent = '';
-    for (const record of recordsvalue) {
-          DisplayContent += `<tr id="table-row-${record[0]}">`;
-                for (const column of record) {
-                    DisplayContent += `<td align="center">${column}</td>`;     
+                let DisplayContent = '';
+        for (const record of recordsvalue) {
+                    DisplayContent += `<tr id="table-row-${record[0]}">`;
+            for (const column of record) {
+                   DisplayContent += `<td align="center">${column}</td>`;     
         }
         
         
@@ -118,6 +118,7 @@ async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> 
 
 window.onresize = () => {
 
+ setTimeout(function() {
     try {
         const nextToId = calculateToId(previous[0]);
         clearTimeout(Timmer);
@@ -139,7 +140,7 @@ window.onresize = () => {
             throw new Error("Error" + error);
 
     }
- 
+  },2000);
 }
 
 
@@ -163,6 +164,7 @@ async function LoadPageContent(fromID: number, toID: number): Promise<number[]> 
     }
     
     return await LoadRecordsData(fromID, toID);
+    
 }
 
 function ConvertNumber(input: string | number, parseAsInt: boolean = true) : number {
