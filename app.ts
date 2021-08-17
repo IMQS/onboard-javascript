@@ -81,10 +81,6 @@ async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> 
 
 
 
-
-
-
-
 window.onresize = () => {
     const nextToId = calculateToId(previous[0]);
     clearTimeout(Timmer);
@@ -164,18 +160,18 @@ function nextPageResize(previous: number[]): number {
 function previousPageResize(previous: number[]): number[] {
     const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
     return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
-}previous
+}
 window.onload = async () => {     
     previous = await LoadPageContent(0, calculateToId(0));
     
     $("#previous").click(async () => { 
-        const recordCount = await getRecordCountCall();
+        const CountData = await getRecordCountCall();
         previous = previousPageResize(previous);
         let fromId = previous[0] >= 0 ? previous[0] : 0;
         const possibleStep = calculateToId(fromId) - fromId;
         let toId = (previous[0] >= 0 ? previous[1] : possibleStep);
-        fromId = fromId == recordCount - 1 ? fromId - possibleStep : fromId;
-        toId = toId <= recordCount - 1 ? toId : recordCount - 1;
+        fromId = fromId == CountData - 1 ? fromId - possibleStep : fromId;
+        toId = toId <= CountData - 1 ? toId : CountData - 1;
         previous = await LoadRecordsData(fromId, toId);
         
     });
