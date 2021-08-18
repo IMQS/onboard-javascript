@@ -14,7 +14,7 @@ namespace onboardproject {
         let promise = new Promise((res, rej) => {
             setTimeout(() => res("Now it's done!"), 1000)
         });
-        
+
         if(!response.ok){
 
             const message = `An error has occured: ${response.status}`;
@@ -159,7 +159,7 @@ namespace onboardproject {
                     const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
                     const toId = recordCount - 1;
                     previous = await LoadRecordsData(fromId, toId);
-                    alert('Note that since you were on the last page, the final record is still at the bottom of your page');
+                    //alert('Note that since you were on the last page, the final record is still at the bottom of your page');
                 } else {
                     previous = await LoadRecordsData(previous[0], nextToId)
                 }
@@ -295,10 +295,10 @@ namespace onboardproject {
                 previous = await LoadRecordsData(fromId, toId);
             } else if (fromId <= recordCount - 1)  {
                 previous = await LoadRecordsData(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
-                alert('You reached the last record - which is shown at the bottom of the screen');
+                //alert('You reached the last record - which is shown at the bottom of the screen');
             } else {
                 
-                alert('You Reach Last Record');
+                //alert('You Reach Last Record');
 
                 console.log("Test is working ");
             }
