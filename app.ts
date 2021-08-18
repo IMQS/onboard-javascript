@@ -1,4 +1,3 @@
-
 namespace onboardproject {
      
  module onboardprojects {
@@ -63,6 +62,11 @@ namespace onboardproject {
 
         const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
 
+
+        let promise = new Promise((res, rej) => {
+            setTimeout(() => res("Now it's done!"), 1000)
+        });
+        
         if(!response.ok){
 
             const message = `An error has occured: ${response.status}`;
