@@ -1,35 +1,51 @@
 
 namespace onboardproject {
-    
-module onboardprojectSystem {
+     
+ module onboardprojects {
 
     //Variable declarations
-    let Timmer = 10 ,previous: number[],previousprocess: number;
-
+    let Timmer = 50,previous: number[],previousprocess: number;
 
     // region API Call 
-    async function getRecordCountCall() : Promise<number> {
+    async function getRecordCountCall() :  Promise<number> {
+      
         const response = await fetch('http://localhost:2050/recordCount');
+        
         if(!response.ok){
+
             const message = `An error has occured: ${response.status}`;
+            
             throw new Error(message);
+
+            console.log(message)
         }else{
+
             return await response.json();
 
             console.log(response);
         }
     }
+
     // trigger async function
     // log response or catch error of fetch promise
     getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
+
+
 
     async function getColumnNamesCall() : Promise<string[]>{
 
         const response = await fetch('http://localhost:2050/columns');
 
+
+        let promise = new Promise((res, rej) => {
+            setTimeout(() => res("Now it's done!"), 1000)
+        });
+
         if(!response.ok){
+
             const message = `An error has occured: ${response.status}`;
             throw new Error(message);
+
         }else{
             return await response.json();
 
@@ -37,23 +53,28 @@ module onboardprojectSystem {
             console.log(response);       
         }
     }
+    
     // trigger async function
     // log response or catch error of fetch promise
     getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
 
 
     async function getRecordsCall(fromID: number, toID: number): Promise<string[][]> {
+
         const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
+
         if(!response.ok){
+
             const message = `An error has occured: ${response.status}`;
             throw new Error(message);
+
         }else{
+
             return await response.json();
         
             console.log(response);
         }
     }
-
 
 // // Using callbacks for columns: text-transform: uppercase;
 // function requestcolumns<Request>(
@@ -77,7 +98,6 @@ module onboardprojectSystem {
 //     }
 // };
 // }
-
 
     //region Data Loading methods
     async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
@@ -310,10 +330,10 @@ module onboardprojectSystem {
 
                 } catch (error) {
             
-            throw new Error("Error........." + error); 
+     
             }
-        
-            });
-        }
+
+        });
+      }
     }
-  } 
+} 
