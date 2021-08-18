@@ -4,7 +4,7 @@ namespace onboardproject {
  module onboardprojects {
 
     //Variable declarations
-    let Timmer = 50,previous: number[],previousprocess: number;
+    let Load = 50,previous: number[],previousprocess: number;
 
     // region API Call 
     async function getRecordCountCall() :  Promise<number> {
@@ -143,8 +143,8 @@ namespace onboardproject {
     setTimeout(function() {
         try {
             const nextToId = calculateToId(previous[0]);
-            clearTimeout(Timmer);
-            Timmer = setTimeout(async () => {
+            clearTimeout(Load);
+            Load = setTimeout(async () => {
                 const recordCount = await getRecordCountCall();
                 if (nextToId >= recordCount - 1) {
                     const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
