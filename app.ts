@@ -10,6 +10,11 @@ namespace onboardproject {
       
         const response = await fetch('http://localhost:2050/recordCount');
         
+
+        let promise = new Promise((res, rej) => {
+            setTimeout(() => res("Now it's done!"), 1000)
+        });
+        
         if(!response.ok){
 
             const message = `An error has occured: ${response.status}`;
@@ -66,7 +71,7 @@ namespace onboardproject {
         let promise = new Promise((res, rej) => {
             setTimeout(() => res("Now it's done!"), 1000)
         });
-        
+
         if(!response.ok){
 
             const message = `An error has occured: ${response.status}`;
@@ -143,8 +148,8 @@ namespace onboardproject {
 
 
     window.onresize = () => {
-
-    setTimeout(function() {
+   
+        setTimeout(function() {
         try {
             const nextToId = calculateToId(previous[0]);
             clearTimeout(Load);
@@ -247,7 +252,7 @@ namespace onboardproject {
         const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
         return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
 
-        throw new Error("Error");
+
 
     }
 
@@ -271,7 +276,7 @@ namespace onboardproject {
             
         } catch (error) {
         
-            throw new Error("Error....." + error);
+        
             
             
         }
@@ -300,7 +305,7 @@ namespace onboardproject {
 
         } catch (error) {
             
-            throw new Error("Error........." + error);     
+               
         }
     
         });
