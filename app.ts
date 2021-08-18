@@ -3,7 +3,7 @@ namespace onboardproject {
  module onboardprojects {
 
     //Variable declarations
-    let Load = 50,previous: number[],previousprocess: number;
+    let Load = 10,previous: number[],previousprocess: number;
 
     // region API Call 
     async function getRecordCountCall() :  Promise<number> {
@@ -148,8 +148,7 @@ namespace onboardproject {
 
 
     window.onresize = () => {
-   
-        setTimeout(function() {
+
         try {
             const nextToId = calculateToId(previous[0]);
             clearTimeout(Load);
@@ -159,19 +158,18 @@ namespace onboardproject {
                     const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
                     const toId = recordCount - 1;
                     previous = await LoadRecordsData(fromId, toId);
-                    //alert('Note that since you were on the last page, the final record is still at the bottom of your page');
+                  
                 } else {
                     previous = await LoadRecordsData(previous[0], nextToId)
                 }
-            }, 250);
+            }, 10);
             
 
         } catch (error) {
             
-                throw new Error("Error" + error);
+               // throw new Error("Error" + error);
 
         }
-    },2000);
     }
 
 
@@ -222,16 +220,16 @@ namespace onboardproject {
 
         let recordDisplayOffset = 0;
         if (window.innerHeight <= 646) {
-            recordDisplayOffset = 0
+             recordDisplayOffset = 0
         } else if (window.innerHeight <= 969) {
-            recordDisplayOffset = 1;
+            recordDisplayOffset = 0; 
         } else if (window.innerHeight <= 1938) {
             recordDisplayOffset = 3
         } else {
             recordDisplayOffset = 15
         }
 
-        return recordDisplayOffset + possibleId;
+      return recordDisplayOffset + possibleId;
     }
 
     function nextPageResize(previous: number[]): number {
@@ -294,13 +292,14 @@ namespace onboardproject {
                 const toId = fromId + possibleStep <= recordCount - 1 ? fromId + possibleStep : recordCount - 1;
                 previous = await LoadRecordsData(fromId, toId);
             } else if (fromId <= recordCount - 1)  {
+                
                 previous = await LoadRecordsData(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
-                //alert('You reached the last record - which is shown at the bottom of the screen');
+              
             } else {
                 
                 //alert('You Reach Last Record');
 
-                console.log("Test is working ");
+                //console.log("Test is working ");
             }
 
         } catch (error) {
@@ -330,7 +329,7 @@ namespace onboardproject {
                     }
                 } else {
                     
-                    alert('not inserting an integer - please ensure that you are.');
+                   // alert('not inserting an integer - please ensure that you are.');
 
                     console.log("Test is working ");
                     }
