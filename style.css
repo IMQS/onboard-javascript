@@ -1,77 +1,91 @@
-*{
-  overflow: hidden;
+	
+	table tr td,table tr td{
+		text-align: center;
+    COLOR: white;
+    border: 1px solid;
+	}
 
-  font-family: 'Roboto', sans-serif;
- }
+tr td {
+		height: 26px;
+ 
+  } 
 
- #wrapper-table{
-  width:100%; 
-  table-layout: fixed;
+	@media only screen and (max-width: 500px) {
+		table,thead,tbody,th,td,tr {
+			display: block;
+      COLOR: white;
+		}
+
+		thead tr {
+			display: none;
+      COLOR: white;
+		}
+
+		tr {
+			border: 1px solid #ccc; 
+		}
+
+		td {
+			border: none;
+			border-bottom: 1px solid #eee;
+			position: relative;
+			 padding-left: 50%; 
+			white-space: normal;
+			text-align:left;
+			min-height: 10px; 
+			overflow: hidden;
+			word-break:break-all;
+		}
+
+		td:before {
+			position: absolute;
+			top: 6px;
+			left: 6px;
+			width: 45%;
+			padding-right: 10px;
+			text-align:left;
+			font-weight: bold;
+			content: attr(data-title);
+		}
+	}
+
+  body{
+
+    overflow: hidden;
+    background: -webkit-linear-gradient(left, #25c481, #25b7c4);
+    background: linear-gradient(to right, #25c481, #25b7c4);
+    font-family: 'Roboto', sans-serif;
+    color: white;
+   }
+
+   #wrapper-table{
+    width:100%; 
+    height:1000%;
+    table-layout: fixed;
 }
-table tr td,table tr td{
-  text-align: center;
-  
-}
 
-
-#index {
-  width: 162px;
-  height: 11px;
-}
-
+ 
 #form-content{
 
   text-align: center;
 
 }
 
-tr td {
-  height: 25px;;
-  border: solid 1px rgba(192, 75, 75, 0.1);
+table{
+  width:100%;
+  table-layout: fixed;
 }
 
-
-#go-button,#previous,#next {
-  border: none;
-  border-radius: 5px;
+h4{
+  font-size: 20px;
+  color: #fff;
   text-transform: uppercase;
-  font-family: 'Ubuntu';
-
-  transition: filter 500ms ease-in-out;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 15px;
 }
 
-@media only screen and (max-width: 500px) {
-  table,thead,tbody,th,td,tr {
-    display: block;
-  }
+#wrapper-table-content-body{
 
-  thead tr {
-    display: none;
-  }
-
-
-
-  td {
-    border: none;
-
-    position: relative;
-    padding-left: 50%;
-    white-space: normal;
-    text-align:left;
-    min-height: 10px;
-    overflow: hidden;
-    word-break:break-all;
-  }
-
-  td:before {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    width: 45%;
-    padding-right: 10px;
-    text-align:left;
-    font-weight: bold;
-    content: attr(data-title);
-  }
+  font-size: 12px;
 }
-

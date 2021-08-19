@@ -3,7 +3,7 @@ namespace onboardproject {
  module onboardprojects {
 
     //Variable declarations
-    let Load = 10,previous: number[],previousprocess: number;
+    let Load = 50,previous: number[],previousprocess: number;
 
     // region API Call 
     async function getRecordCountCall() :  Promise<number> {
@@ -12,7 +12,7 @@ namespace onboardproject {
         
 
         let promise = new Promise((res, rej) => {
-            setTimeout(() => res("Now it's done!"), 1000)
+            setTimeout(() => res("Now it's done!"), 50)
         });
 
         if(!response.ok){
@@ -42,7 +42,7 @@ namespace onboardproject {
 
 
         let promise = new Promise((res, rej) => {
-            setTimeout(() => res("Now it's done!"), 1000)
+            setTimeout(() => res("Now it's done!"),50)
         });
 
         if(!response.ok){
@@ -69,7 +69,7 @@ namespace onboardproject {
 
 
         let promise = new Promise((res, rej) => {
-            setTimeout(() => res("Now it's done!"), 1000)
+            setTimeout(() => res("Now it's done!"), 50)
         });
 
         if(!response.ok){
@@ -108,6 +108,7 @@ namespace onboardproject {
 // };
 // }
 
+
     //region Data Loading methods
     async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
 
@@ -134,6 +135,8 @@ namespace onboardproject {
 
         return [fromID, toID];
     }
+
+
 
 
     function RecordsFromCursor(cursor: number[]): Promise<number[]> {
@@ -222,7 +225,7 @@ namespace onboardproject {
         if (window.innerHeight <= 646) {
              recordDisplayOffset = 0
         } else if (window.innerHeight <= 969) {
-            recordDisplayOffset = 0; 
+            recordDisplayOffset = 1; 
         } else if (window.innerHeight <= 1938) {
             recordDisplayOffset = 3
         } else {
@@ -246,14 +249,10 @@ namespace onboardproject {
         return  toID;
     }
 
+    
     function previousPageResize(previous: number[]):  number[] {
         const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
-        return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
-
-
-
-    }
-
+        return [previous[0] - (nextPageResize(previous) - previous[0]), toId];    }
 
     window.onload = async () => {     
 
@@ -334,7 +333,6 @@ namespace onboardproject {
                     console.log("Test is working ");
                     }
                 }
-
 
                 } catch (error) {
             
