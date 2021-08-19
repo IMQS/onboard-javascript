@@ -1,16 +1,16 @@
 namespace onboardproject {
      
- module onboardprojects {
-
+     module onboardprojects {
+      
     //Variable declarations
     let Load = 50,previous: number[],previousprocess: number;
 
     // region API Call 
+   // Trigger async function
     async function getRecordCountCall() :  Promise<number> {
       
         const response = await fetch('http://localhost:2050/recordCount');
         
-
         let promise = new Promise((res, rej) => {
             setTimeout(() => res("Now it's done!"), 50)
         });
@@ -30,34 +30,34 @@ namespace onboardproject {
         }
     }
 
-    // trigger async function
+
     // log response or catch error of fetch promise
     getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
 
-
-
+    // Trigger async function
     async function getColumnNamesCall() : Promise<string[]>{
 
         const response = await fetch('http://localhost:2050/columns');
 
-
         let promise = new Promise((res, rej) => {
+
             setTimeout(() => res("Now it's done!"),50)
         });
 
         if(!response.ok){
 
             const message = `An error has occured: ${response.status}`;
+            
             throw new Error(message);
 
         }else{
+
             return await response.json();
-
-
+           
             console.log(response);       
         }
     }
-    
+
     // trigger async function
     // log response or catch error of fetch promise
     getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
@@ -85,7 +85,6 @@ namespace onboardproject {
         }
     }
 
-// // Using callbacks for columns: text-transform: uppercase;
 // function requestcolumns<Request>(
 //     method: 'GET',
 //     url: 'http://localhost:2050/columns',
@@ -99,7 +98,6 @@ namespace onboardproject {
 //         // Success!
 //         const data = JSON.parse(this.response) as Response;
 //         callback && callback(data);
-
 //     } else {
 //         // We reached our target server, but it returned an error
 
@@ -108,23 +106,28 @@ namespace onboardproject {
 // };
 // }
 
-
     //region Data Loading methods
     async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
 
         try {
+
                 const recordsvalue = await getRecordsCall(fromID, toID)
+
                     let DisplayContent = '';
+
             for (const record of recordsvalue) {
-                        DisplayContent += `<tr id="table-row-${record[0]}">`;
+
+                    DisplayContent += `<tr id="table-row-${record[1]}">`;
+
                 for (const column of record) {
+
                     DisplayContent += `<td align="center">${column}</td>`;     
             }
             
-            
-            DisplayContent += '</tr>';
+                    DisplayContent += '</tr>';
             
                 $("#wrapper-table-content-body").empty();
+
                 $("#wrapper-table-content-body").append(DisplayContent);
         }
         
@@ -142,12 +145,13 @@ namespace onboardproject {
     function RecordsFromCursor(cursor: number[]): Promise<number[]> {
 
         cursor = cursor.sort((a,b) => {return a-b});
-        return  LoadRecordsData(cursor[0], cursor[1]);
-
-        throw new Error("Error");
+        
+       
+            return  LoadRecordsData(cursor[0], cursor[1]);
+        
+        // throw new Error("Error");
         
     }
-
 
 
     window.onresize = () => {
@@ -174,6 +178,7 @@ namespace onboardproject {
 
         }
     }
+
 
 
     // Handlers
@@ -216,26 +221,33 @@ namespace onboardproject {
         
     }
 
-    function calculateToId(fromId: number): number {
+function calculateToId(fromId: number): number {
 
-        const possibleRecordsData = Math.floor((window.innerHeight - ($("#form-content").innerHeight() as number)) / 37);
-        const possibleId = fromId + possibleRecordsData;
+        const possibleRecords = Math.floor((window.innerHeight - ($("#form-content").innerHeight() as number)) / 20);
+        const DisplayId = fromId + possibleRecords;
+        
+        let recordDisplayset = 0;
 
-        let recordDisplayOffset = 0;
-        if (window.innerHeight <= 646) {
-             recordDisplayOffset = 0
-        } else if (window.innerHeight <= 969) {
-            recordDisplayOffset = 1; 
-        } else if (window.innerHeight <= 1938) {
-            recordDisplayOffset = 3
-        } else {
-            recordDisplayOffset = 15
+        switch(recordDisplayset){
+            case 0 :
+                window.innerHeight <= 646;
+            break;
+            case 1 :
+                window.innerHeight <= 969;
+            break;
+            case 2: 
+            window.innerHeight <= 1938;
+            break;
+            default :
+            recordDisplayset = 15;
+            break;
         }
-
-      return recordDisplayOffset + possibleId;
+      return recordDisplayset + DisplayId;
     }
 
-    function nextPageResize(previous: number[]): number {
+
+function nextPageResize(previous: number[]): number {
+       
         const fromID = ConvertNumber(previous.sort((a, b) => {return a - b})[0]);
         const toID = ConvertNumber(previous.sort((a, b) => {return a - b})[1]);
         const documentHeight = $(window).innerHeight() as number - ($(`#table-row-${fromID}`).height() as number);
@@ -247,19 +259,21 @@ namespace onboardproject {
             return  i;
         }
         return  toID;
-    }
+}
 
     
-    function previousPageResize(previous: number[]):  number[] {
+function previousPageResize(previous: number[]):  number[] {
+    
         const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
         return [previous[0] - (nextPageResize(previous) - previous[0]), toId];    }
 
-    window.onload = async () => {     
+             window.onload = async () => {     
 
         try {
             previous = await LoadPageContent(0, calculateToId(0));
 
             $("#previous").click(async () => { 
+
                 const CountData = await getRecordCountCall();
                 previous = previousPageResize(previous);
                 let fromId = previous[0] >= 0 ? previous[0] : 0;
@@ -271,15 +285,11 @@ namespace onboardproject {
                 
             });
             
-        } catch (error) {
-        
-        
-            
-            
-        }
+        } catch (error) {            
+}
         
 
-    $("#next").click(async () => {
+$("#next").click(async () => {
 
 
         try {
@@ -287,6 +297,7 @@ namespace onboardproject {
 
             const fromId = nextPageResize(previous);
             const possibleStep = calculateToId(fromId) - fromId;
+
             if (fromId <= recordCount - possibleStep - 1) {
                 const toId = fromId + possibleStep <= recordCount - 1 ? fromId + possibleStep : recordCount - 1;
                 previous = await LoadRecordsData(fromId, toId);
@@ -296,50 +307,58 @@ namespace onboardproject {
               
             } else {
                 
-                //alert('You Reach Last Record');
-
-                //console.log("Test is working ");
+          
+              console.log("Test is working ");
             }
 
         } catch (error) {
             
                
-        }
+     }
     
-        });
+});
 
 
-    $("#go-button").click(async () => {
+ $("#go-button").click(async () => {
 
         try {
-            
+  
             const recordCount = await getRecordCountCall();
+
             const fromId = ConvertNumber($("#index").val() as string, false);
+
             const possibleStep = calculateToId(fromId) - fromId;
+
             if (fromId < 0){
-                alert('You may only insert Id greater than or equal to 0');
+
+                alert('only insert Id greater than or equal to 0');
+
             } else {
+
                 if (Math.floor(fromId).toString() == fromId.toString() === true) {
+
                     if ( fromId > recordCount - possibleStep ) {
+
                         alert(`You may not insert a desired Id greater than ${recordCount - possibleStep}`);
+
+
                     } else {
+
                         let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
                         previous = await LoadRecordsData(fromId, toId);
-                    }
-                } else {
+                        
+                      }
                     
-                   // alert('not inserting an integer - please ensure that you are.');
+                     } else {
+                    
+                      console.log("Test is working ");
 
-                    console.log("Test is working ");
                     }
-                }
+                 }
 
-                } catch (error) {
-            
-     
-            }
-
-        });
-      }
-    }
+              } catch (error) {   
+          }
+       });
+     }
+   }
 } 
