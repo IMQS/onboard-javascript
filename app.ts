@@ -120,15 +120,11 @@ namespace onboardproject {
 				const columns = await getColumnNamesCall();
 				for (const column of columns) {
 					DisplayContent += `<th align="center">${column}</th>`;
-
 					$("#wrapper-table-header-row").empty();
 					$("#wrapper-table-header-row").append(DisplayContent);
 				}
-
 			} catch (error) {
-
 				console.log("Error <No Data>" + error);
-
 			}
 			return await LoadRecordsData(fromID, toID);
 		}
