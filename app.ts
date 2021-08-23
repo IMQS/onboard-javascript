@@ -1,14 +1,13 @@
 import { data } from "jquery";
 
 namespace onboardproject {
-
 	module onboardprojects {
 
-		//Variable declarations
+		//Load Variable declarations
 		let Load = 50;
-
+		// Previous Variable declarations
 		let previous: number[];
-
+		//Previous Process Variable declarations
 		let previousprocess: number;
 
 		// region API Call
