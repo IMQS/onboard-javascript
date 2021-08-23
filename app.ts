@@ -55,7 +55,6 @@ namespace onboardproject {
 				console.log(response);
 			}
 		}
-
 		// function requestcolumns<Request>(
 		//     method: 'GET',
 		//     url: 'http://localhost:2050/columns',
@@ -78,7 +77,6 @@ namespace onboardproject {
 		// }
 		//region Data Loading methods
 		async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
-
 			const recordsvalue = await getRecordsCall(fromID, toID)
 			let DisplayContent = '';
 			for (const record of recordsvalue) {
@@ -138,12 +136,11 @@ namespace onboardproject {
 				default:
 					return 0;
 			}
-			throw new Error("Error");
+			// throw new Error("Error");
 		}
 		function calculateToId(fromId: number): number {
 			const possibleRecordsData = Math.max((window.innerHeight - ($("#form-content").innerHeight() as number)));
 			const possibleId = fromId + possibleRecordsData;
-
 			let recordDisplayset = 0;
 			switch (recordDisplayset) {
 				case 0:
@@ -177,6 +174,7 @@ namespace onboardproject {
 			return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
 		}
 		window.onload = async () => {
+
 			// trigger async function
 			// log response or catch error of fetch promise
 			getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
@@ -195,7 +193,6 @@ namespace onboardproject {
 				toId = toId <= CountData - 1 ? toId : CountData - 1;
 				previous = await LoadRecordsData(fromId, toId);
 			});
-
 			$("#next").click(async () => {
 				try {
 					const recordCount = await getRecordCountCall();
