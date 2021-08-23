@@ -144,7 +144,8 @@ namespace onboardproject {
 			throw new Error("Error");
 		}
 		function calculateToId(fromId: number): number {
-			const possibleRecordsData = Math.floor((window.innerHeight - ($("#form-content").innerHeight() as number)) / 37);
+
+			const possibleRecordsData = Math.max((window.innerHeight - ($("#form-content").innerHeight() as number)));
 			const possibleId = fromId + possibleRecordsData;
 
 			let recordDisplayset = 0;
@@ -164,6 +165,8 @@ namespace onboardproject {
 			}
 			return recordDisplayset + possibleId;
 		}
+
+
 		function nextPageResize(previous: number[]): number {
 			const fromID = ConvertNumber(previous.sort((a, b) => { return a - b })[0]);
 			const toID = ConvertNumber(previous.sort((a, b) => { return a - b })[1]);
