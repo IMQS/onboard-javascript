@@ -1,6 +1,7 @@
 import { data } from "jquery";
 
 namespace onboardproject {
+
 	module onboardprojects {
 
 		//Variable declarations
@@ -116,17 +117,12 @@ namespace onboardproject {
 		}
 		// Handlers
 		async function LoadPageContent(fromID: number, toID: number): Promise<number[]> {
-
-			try {
-				let DisplayContent = "";
-				const columns = await getColumnNamesCall();
-				for (const column of columns) {
-					DisplayContent += `<th align="center">${column}</th>`;
-					$("#wrapper-table-header-row").empty();
-					$("#wrapper-table-header-row").append(DisplayContent);
-				}
-			} catch (error) {
-				console.log("Error <No Data>" + error);
+			let DisplayContent = "";
+			const columns = await getColumnNamesCall();
+			for (const column of columns) {
+				DisplayContent += `<th align="center">${column}</th>`;
+				$("#wrapper-table-header-row").empty();
+				$("#wrapper-table-header-row").append(DisplayContent);
 			}
 			return await LoadRecordsData(fromID, toID);
 		}
@@ -182,11 +178,10 @@ namespace onboardproject {
 			return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
 		}
 		window.onload = async () => {
-
 			// trigger async function
 			// log response or catch error of fetch promise
 			getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
-
+			// trigger async function
 			// log response or catch error of fetch promise
 			getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
 
