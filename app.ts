@@ -173,7 +173,6 @@ namespace onboardproject {
 			return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
 		}
 		window.onload = async () => {
-
 			// trigger async function
 			// log response or catch error of fetch promise
 			getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
@@ -181,7 +180,9 @@ namespace onboardproject {
 			// log response or catch error of fetch promise
 			getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
 
+			//Loading Content Function
 			previous = await LoadPageContent(0, calculateToId(0));
+			//click function for previewing page
 			$("#previous").click(async () => {
 				const CountData = await getRecordCountCall();
 				previous = previousPageResize(previous);
@@ -192,6 +193,7 @@ namespace onboardproject {
 				toId = toId <= CountData - 1 ? toId : CountData - 1;
 				previous = await LoadRecordsData(fromId, toId);
 			});
+			//click function for Skipping to next page
 			$("#next").click(async () => {
 				try {
 					const recordCount = await getRecordCountCall();
@@ -209,6 +211,7 @@ namespace onboardproject {
 				} catch (error) {
 				}
 			});
+			//Searching function for index
 			$("#go-button").click(async () => {
 				const recordCount = await getRecordCountCall();
 				const fromId = ConvertNumber($("#index").val() as string, false);
