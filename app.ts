@@ -6,9 +6,9 @@ namespace onboardproject {
 		// Trigger async function
 		async function getRecordCountCall(): Promise<number> {
 			const response = await fetch('http://localhost:2050/recordCount');
-			let promise = new Promise((res, rej) => {
-				setTimeout(() => res("Now it's done!"), 50)
-			});
+			// let promise = new Promise((res, rej) => {
+			// 	setTimeout(() => res("Now it's done!"), 50)
+			// });
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
@@ -23,9 +23,10 @@ namespace onboardproject {
 		// Trigger async function
 		async function getColumnNamesCall(): Promise<string[]> {
 			const response = await fetch('http://localhost:2050/columns');
-			let promise = new Promise((res, rej) => {
-				setTimeout(() => res("Now it's done!"), 50)
-			});
+
+			// let promise = new Promise((res, rej) => {
+			// 	setTimeout(() => res("Now it's done!"), 50)
+			// });
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
@@ -39,9 +40,9 @@ namespace onboardproject {
 		getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
 		async function getRecordsCall(fromID: number, toID: number): Promise<string[][]> {
 			const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
-			let promise = new Promise((res, rej) => {
-				setTimeout(() => res("Now it's done!"), 50)
-			});
+			// let promise = new Promise((res, rej) => {
+			// 	setTimeout(() => res("Now it's done!"), 50)
+			// });
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
