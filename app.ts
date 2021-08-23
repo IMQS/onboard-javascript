@@ -1,7 +1,15 @@
+import { data } from "jquery";
+
 namespace onboardproject {
 	module onboardprojects {
+
 		//Variable declarations
-		let Load = 50, previous: number[], previousprocess: number;
+		let Load = 50;
+
+		let previous: number[];
+
+		let previousprocess: number;
+
 		// region API Call
 		// Trigger async function
 		async function getRecordCountCall(): Promise<number> {
@@ -11,19 +19,16 @@ namespace onboardproject {
 			// });
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
-				throw new Error(message);
+				//throw new Error(message);
 				console.log(message)
 			} else {
-				return await response.json();
 				console.log(response);
 			}
+			return await response.json();
 		}
-		// log response or catch error of fetch promise
-		getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
 		// Trigger async function
 		async function getColumnNamesCall(): Promise<string[]> {
 			const response = await fetch('http://localhost:2050/columns');
-
 			// let promise = new Promise((res, rej) => {
 			// 	setTimeout(() => res("Now it's done!"), 50)
 			// });
@@ -35,9 +40,7 @@ namespace onboardproject {
 				console.log(response);
 			}
 		}
-		// trigger async function
-		// log response or catch error of fetch promise
-		getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message))
+
 		async function getRecordsCall(fromID: number, toID: number): Promise<string[][]> {
 			const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
 			// let promise = new Promise((res, rej) => {
@@ -51,6 +54,7 @@ namespace onboardproject {
 				console.log(response);
 			}
 		}
+
 		// function requestcolumns<Request>(
 		//     method: 'GET',
 		//     url: 'http://localhost:2050/columns',
@@ -73,20 +77,17 @@ namespace onboardproject {
 		// }
 		//region Data Loading methods
 		async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
-			try {
-				const recordsvalue = await getRecordsCall(fromID, toID)
-				let DisplayContent = '';
-				for (const record of recordsvalue) {
-					DisplayContent += `<tr id="table-row-${record[0]}">`;
-					for (const column of record) {
-						DisplayContent += `<td align="center">${column}</td>`;
-					}
-					DisplayContent += '</tr>';
-					$("#wrapper-table-content-body").empty();
-					$("#wrapper-table-content-body").append(DisplayContent);
+
+			const recordsvalue = await getRecordsCall(fromID, toID)
+			let DisplayContent = '';
+			for (const record of recordsvalue) {
+				DisplayContent += `<tr id="table-row-${record[0]}">`;
+				for (const column of record) {
+					DisplayContent += `<td align="center">${column}</td>`;
 				}
-			} catch (error) {
-				console.log("Error <No data>" + error)
+				DisplayContent += '</tr>';
+				$("#wrapper-table-content-body").empty();
+				$("#wrapper-table-content-body").append(DisplayContent);
 			}
 			return [fromID, toID];
 		}
@@ -165,8 +166,6 @@ namespace onboardproject {
 			}
 			return recordDisplayset + possibleId;
 		}
-
-
 		function nextPageResize(previous: number[]): number {
 			const fromID = ConvertNumber(previous.sort((a, b) => { return a - b })[0]);
 			const toID = ConvertNumber(previous.sort((a, b) => { return a - b })[1]);
@@ -183,20 +182,26 @@ namespace onboardproject {
 			return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
 		}
 		window.onload = async () => {
-			try {
-				previous = await LoadPageContent(0, calculateToId(0));
-				$("#previous").click(async () => {
-					const CountData = await getRecordCountCall();
-					previous = previousPageResize(previous);
-					let fromId = previous[0] >= 0 ? previous[0] : 0;
-					const possibleStep = calculateToId(fromId) - fromId;
-					let toId = (previous[0] >= 0 ? previous[1] : possibleStep);
-					fromId = fromId == CountData - 1 ? fromId - possibleStep : fromId;
-					toId = toId <= CountData - 1 ? toId : CountData - 1;
-					previous = await LoadRecordsData(fromId, toId);
-				});
-			} catch (error) {
-			}
+
+			// trigger async function
+			// log response or catch error of fetch promise
+			getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
+
+			// log response or catch error of fetch promise
+			getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
+
+			previous = await LoadPageContent(0, calculateToId(0));
+			$("#previous").click(async () => {
+				const CountData = await getRecordCountCall();
+				previous = previousPageResize(previous);
+				let fromId = previous[0] >= 0 ? previous[0] : 0;
+				const possibleStep = calculateToId(fromId) - fromId;
+				let toId = (previous[0] >= 0 ? previous[1] : possibleStep);
+				fromId = fromId == CountData - 1 ? fromId - possibleStep : fromId;
+				toId = toId <= CountData - 1 ? toId : CountData - 1;
+				previous = await LoadRecordsData(fromId, toId);
+			});
+
 			$("#next").click(async () => {
 				try {
 					const recordCount = await getRecordCountCall();
@@ -215,25 +220,22 @@ namespace onboardproject {
 				}
 			});
 			$("#go-button").click(async () => {
-				try {
-					const recordCount = await getRecordCountCall();
-					const fromId = ConvertNumber($("#index").val() as string, false);
-					const possibleStep = calculateToId(fromId) - fromId;
-					if (fromId < 0) {
-						alert('only insert Id greater than or equal to 0');
-					} else {
-						if (Math.floor(fromId).toString() == fromId.toString() === true) {
-							if (fromId > recordCount - possibleStep) {
-								alert(`You may not insert a desired Id greater than ${recordCount - possibleStep}`);
-							} else {
-								let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
-								previous = await LoadRecordsData(fromId, toId);
-							}
+				const recordCount = await getRecordCountCall();
+				const fromId = ConvertNumber($("#index").val() as string, false);
+				const possibleStep = calculateToId(fromId) - fromId;
+				if (fromId < 0) {
+					alert('only insert Id greater than or equal to 0');
+				} else {
+					if (Math.floor(fromId).toString() == fromId.toString() === true) {
+						if (fromId > recordCount - possibleStep) {
+							alert(`You may not insert a desired Id greater than ${recordCount - possibleStep}`);
 						} else {
-							console.log("Test is working ");
+							let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
+							previous = await LoadRecordsData(fromId, toId);
 						}
+					} else {
+						console.log("Test is working ");
 					}
-				} catch (error) {
 				}
 			});
 		}
