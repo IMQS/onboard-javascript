@@ -127,6 +127,7 @@ namespace onboardproject {
 			}
 			// throw new Error("Error");
 		}
+
 		//
 		function calculateToId(fromId: number): number {
 			const possibleRecordsData = Math.max((window.innerHeight - ($("#form-content").innerHeight() as number)));
@@ -223,6 +224,7 @@ namespace onboardproject {
 				} catch (error) {
 				}
 			});
+
 			//Searching function for index
 			$("#go-button").click(async () => {
 				const recordCount = await getRecordCountCall();
