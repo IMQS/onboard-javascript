@@ -5,8 +5,10 @@ namespace onboardproject {
 
 		//Load Variable declarations
 		let Load = 50;
+
 		// Previous Variable declarations
 		let previous: number[];
+
 		//Previous Process Variable declarations
 		let previousprocess: number;
 
@@ -19,13 +21,14 @@ namespace onboardproject {
 			// });
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
-				//throw new Error(message);
+				throw new Error(message);
 				console.log(message)
 			} else {
 				console.log(response);
 			}
-			return await response.json();
+			return response.json();
 		}
+
 		// Trigger async function
 		async function getColumnNamesCall(): Promise<string[]> {
 			const response = await fetch('http://localhost:2050/columns');
@@ -36,10 +39,11 @@ namespace onboardproject {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
 			} else {
-				return await response.json();
+				return response.json();
 				console.log(response);
 			}
 		}
+
 		async function getRecordsCall(fromID: number, toID: number): Promise<string[][]> {
 			const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
 			// let promise = new Promise((res, rej) => {
@@ -49,10 +53,11 @@ namespace onboardproject {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
 			} else {
-				return await response.json();
+				return response.json();
 				console.log(response);
 			}
 		}
+
 		// function requestcolumns<Request>(
 		//     method: 'GET',
 		//     url: 'http://localhost:2050/columns',
@@ -73,6 +78,7 @@ namespace onboardproject {
 		//     }
 		// };
 		// }
+
 		//region Data Loading methods
 		async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
 			const recordsvalue = await getRecordsCall(fromID, toID)
@@ -88,29 +94,13 @@ namespace onboardproject {
 			}
 			return [fromID, toID];
 		}
+
 		function RecordsFromCursor(cursor: number[]): Promise<number[]> {
 			cursor = cursor.sort((a, b) => { return a - b });
 			return LoadRecordsData(cursor[0], cursor[1]);
 			// throw new Error("Error");
 		}
-		window.onresize = () => {
-			try {
-				const nextToId = calculateToId(previous[0]);
-				clearTimeout(Load);
-				Load = setTimeout(async () => {
-					const recordCount = await getRecordCountCall();
-					if (nextToId >= recordCount - 1) {
-						const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
-						const toId = recordCount - 1;
-						previous = await LoadRecordsData(fromId, toId);
-					} else {
-						previous = await LoadRecordsData(previous[0], nextToId)
-					}
-				}, 10);
-			} catch (error) {
-				// throw new Error("Error" + error);
-			}
-		}
+
 		// Handlers
 		async function LoadPageContent(fromID: number, toID: number): Promise<number[]> {
 			let DisplayContent = "";
@@ -120,8 +110,9 @@ namespace onboardproject {
 				$("#wrapper-table-header-row").empty();
 				$("#wrapper-table-header-row").append(DisplayContent);
 			}
-			return await LoadRecordsData(fromID, toID);
+			return LoadRecordsData(fromID, toID);
 		}
+
 		function ConvertNumber(input: string | number, parseAsInt: boolean = true): number {
 			switch (typeof input) {
 				case ('string'):
@@ -176,12 +167,31 @@ namespace onboardproject {
 		}
 
 		window.onload = async () => {
+
+			window.onresize = () => {
+				try {
+					const nextToId = calculateToId(previous[0]);
+					clearTimeout(Load);
+					Load = setTimeout(async () => {
+						const recordCount = await getRecordCountCall();
+						if (nextToId >= recordCount - 1) {
+							const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
+							const toId = recordCount - 1;
+							previous = await LoadRecordsData(fromId, toId);
+						} else {
+							previous = await LoadRecordsData(previous[0], nextToId)
+						}
+					}, 10);
+				} catch (error) {
+					// throw new Error("Error" + error);
+				}
+			}
 			// trigger async function
 			// log response or catch error of fetch promise
-			getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
+			// getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
 			// trigger async function
 			// log response or catch error of fetch promise
-			getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
+			// getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
 
 			//Loading Content Function
 			previous = await LoadPageContent(0, calculateToId(0));
