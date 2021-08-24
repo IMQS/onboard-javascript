@@ -124,9 +124,8 @@ namespace onboardproject {
 					return parseFloat(input as string);
 				case ("number"):
 					return input as number;
-				default:
-					return 0;
 			}
+			return 0;
 			// throw new Error("Error");
 		}
 
