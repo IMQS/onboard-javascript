@@ -22,7 +22,6 @@ namespace onboardproject {
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
-				// console.log(message)
 			} else {
 				console.log(response);
 			}
