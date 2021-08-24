@@ -39,7 +39,7 @@ namespace onboardproject {
 				throw new Error(message);
 			} else {
 				return response.json();
-				// console.log(response);
+
 			}
 		}
 
@@ -54,7 +54,6 @@ namespace onboardproject {
 				throw new Error(message);
 			} else {
 				return response.json();
-				// console.log(response);
 			}
 		}
 
