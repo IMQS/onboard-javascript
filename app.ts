@@ -124,10 +124,7 @@ namespace onboardproject {
 					return parseFloat(input as string);
 				case ("number"):
 					return input as number;
-				default:
-					return 0;
-			}
-			// throw new Error("Error");
+				default:Next_Page_Resize
 		}
 
 		//
@@ -152,7 +149,7 @@ namespace onboardproject {
 			return recordDisplayset + possibleId;
 		}
 
-		//
+		//Next_Page_Resize Function
 		function nextPageResize(previous: number[]): number {
 			const fromID = ConvertNumber(previous.sort((a, b) => { return a - b })[0]);
 			const toID = ConvertNumber(previous.sort((a, b) => { return a - b })[1]);
@@ -165,6 +162,7 @@ namespace onboardproject {
 			return toID;
 		}
 
+		//Previous_Page_Resize Function
 		function previousPageResize(previous: number[]): number[] {
 			const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
 			return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
@@ -191,7 +189,6 @@ namespace onboardproject {
 					// throw new Error("Error" + error);
 				}
 			}
-
 			// trigger async function
 			// log response or catch error of fetch promise
 			// getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
@@ -201,6 +198,7 @@ namespace onboardproject {
 
 			//Loading Content Function
 			previous = await LoadPageContent(0, calculateToId(0));
+
 			//click function for previewing page
 			$("#previous").click(async () => {
 				const CountData = await getRecordCountCall();
@@ -212,6 +210,7 @@ namespace onboardproject {
 				toId = toId <= CountData - 1 ? toId : CountData - 1;
 				previous = await LoadRecordsData(fromId, toId);
 			});
+
 			//click function for Skipping to next page
 			$("#next").click(async () => {
 				try {
