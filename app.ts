@@ -43,6 +43,7 @@ namespace onboardproject {
 			}
 		}
 
+		// Trigger async function
 		async function getRecordsCall(fromID: number, toID: number): Promise<string[][]> {
 			const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
 			// let promise = new Promise((res, rej) => {
@@ -94,7 +95,7 @@ namespace onboardproject {
 			return [fromID, toID];
 		}
 
-		//
+		// Load Records Function
 		function RecordsFromCursor(cursor: number[]): Promise<number[]> {
 			cursor = cursor.sort((a, b) => { return a - b });
 			return LoadRecordsData(cursor[0], cursor[1]);
@@ -113,6 +114,7 @@ namespace onboardproject {
 			return LoadRecordsData(fromID, toID);
 		}
 
+		// Conversion Method
 		function ConvertNumber(input: string | number, parseAsInt: boolean = true): number {
 			switch (typeof input) {
 				case ('string'):
@@ -150,6 +152,7 @@ namespace onboardproject {
 			return recordDisplayset + possibleId;
 		}
 
+		//
 		function nextPageResize(previous: number[]): number {
 			const fromID = ConvertNumber(previous.sort((a, b) => { return a - b })[0]);
 			const toID = ConvertNumber(previous.sort((a, b) => { return a - b })[1]);
@@ -220,6 +223,9 @@ namespace onboardproject {
 
 						previous = await LoadRecordsData(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
 					} else {
+
+						throw new Error("Error 404");
+
 					}
 				} catch (error) {
 				}
