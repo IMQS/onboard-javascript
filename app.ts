@@ -170,6 +170,7 @@ namespace onboardproject {
 			return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
 		}
 
+		//Onload Function
 		window.onload = async () => {
 
 			window.onresize = () => {
