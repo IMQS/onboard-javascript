@@ -12,7 +12,6 @@ namespace onboardproject {
 		//Previous Process Variable declarations
 		let previousprocess: number;
 
-
 		// Trigger async function
 		async function getRecordCountCall(): Promise<number> {
 			const response = await fetch('http://localhost:2050/recordCount');
