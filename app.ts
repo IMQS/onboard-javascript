@@ -58,27 +58,6 @@ namespace onboardproject {
 			}
 		}
 
-		// function requestcolumns<Request>(
-		//     method: 'GET',
-		//     url: 'http://localhost:2050/columns',
-		//     content?: Request,
-		//     callback?: (response: Response) => void,
-		//     errorCallback?: (err: any) => void) {
-		// const request = new XMLHttpRequest();
-		// request.open(method, url, true);
-		// request.onload = function () {
-		//     if (this.status >= 200 && this.status < 400) {
-		//         // Success!
-		//         const data = JSON.parse(this.response) as Response;
-		//         callback && callback(data);
-		//     } else {
-		//         // We reached our target server, but it returned an error
-
-		//         console.log("Error 404");
-		//     }
-		// };
-		// }
-
 		//region Data Loading methods
 		async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
 			const recordsvalue = await getRecordsCall(fromID, toID);
