@@ -40,7 +40,6 @@ namespace onboardproject {
 				console.log(response);
 			}
 		}
-
 		async function getRecordsCall(fromID: number, toID: number): Promise<string[][]> {
 			const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
 			// let promise = new Promise((res, rej) => {
@@ -137,6 +136,7 @@ namespace onboardproject {
 			}
 			// throw new Error("Error");
 		}
+
 		function calculateToId(fromId: number): number {
 			const possibleRecordsData = Math.max((window.innerHeight - ($("#form-content").innerHeight() as number)));
 			const possibleId = fromId + possibleRecordsData;
@@ -157,6 +157,7 @@ namespace onboardproject {
 			}
 			return recordDisplayset + possibleId;
 		}
+
 		function nextPageResize(previous: number[]): number {
 			const fromID = ConvertNumber(previous.sort((a, b) => { return a - b })[0]);
 			const toID = ConvertNumber(previous.sort((a, b) => { return a - b })[1]);
@@ -168,10 +169,12 @@ namespace onboardproject {
 			}
 			return toID;
 		}
+
 		function previousPageResize(previous: number[]): number[] {
 			const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
 			return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
 		}
+
 		window.onload = async () => {
 			// trigger async function
 			// log response or catch error of fetch promise
