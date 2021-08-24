@@ -91,6 +91,9 @@ namespace onboardproject {
 				DisplayContent += '</tr>';
 				$("#wrapper-table-content-body").empty();
 				$("#wrapper-table-content-body").append(DisplayContent);
+
+				throw new Error("Error No data");
+
 			}
 			return [fromID, toID];
 		}
