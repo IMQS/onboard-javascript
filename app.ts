@@ -114,7 +114,7 @@ namespace onboardproject {
 			return LoadRecordsData(fromID, toID);
 		}
 
-		// Conversion Method
+		// Conversion Function
 		function ConvertNumber(input: string | number, parseAsInt: boolean = true): number {
 			switch (typeof input) {
 				case ('string'):
@@ -124,7 +124,10 @@ namespace onboardproject {
 					return parseFloat(input as string);
 				case ("number"):
 					return input as number;
-				default:Next_Page_Resize
+				default:
+					return 0;
+			}
+			// throw new Error("Error");
 		}
 
 		//
@@ -171,6 +174,7 @@ namespace onboardproject {
 		//Onload Function
 		window.onload = async () => {
 
+			//On Resize_Function
 			window.onresize = () => {
 				try {
 					const nextToId = calculateToId(previous[0]);
@@ -189,10 +193,8 @@ namespace onboardproject {
 					// throw new Error("Error" + error);
 				}
 			}
-			// trigger async function
 			// log response or catch error of fetch promise
 			// getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
-			// trigger async function
 			// log response or catch error of fetch promise
 			// getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
 
