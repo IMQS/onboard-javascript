@@ -22,9 +22,10 @@ namespace onboardproject {
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
-			} else {
-				console.log(response);
 			}
+			//else {
+			// 	console.log(response);
+			// }
 			return response.json();
 		}
 
@@ -39,7 +40,7 @@ namespace onboardproject {
 				throw new Error(message);
 			} else {
 				return response.json();
-				console.log(response);
+				// console.log(response);
 			}
 		}
 
@@ -54,7 +55,7 @@ namespace onboardproject {
 				throw new Error(message);
 			} else {
 				return response.json();
-				console.log(response);
+				// console.log(response);
 			}
 		}
 
@@ -172,8 +173,6 @@ namespace onboardproject {
 				} catch (error) {
 					// throw new Error("Error" + error);
 				}
-
-
 			}
 			// log response or catch error of fetch promise
 			// getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
