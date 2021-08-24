@@ -157,6 +157,7 @@ namespace onboardproject {
 
 			//On Resize_Function
 			window.onresize = () => {
+
 				try {
 					const nextToId = calculateToId(previous[0]);
 					clearTimeout(Load);
@@ -173,6 +174,8 @@ namespace onboardproject {
 				} catch (error) {
 					// throw new Error("Error" + error);
 				}
+
+
 			}
 			// log response or catch error of fetch promise
 			// getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
