@@ -12,7 +12,7 @@ namespace onboardproject {
 		//Previous Process Variable declarations
 		let previousprocess: number;
 
-		// region API Call
+
 		// Trigger async function
 		async function getRecordCountCall(): Promise<number> {
 			const response = await fetch('http://localhost:2050/recordCount');
@@ -70,9 +70,7 @@ namespace onboardproject {
 				DisplayContent += '</tr>';
 				$("#wrapper-table-content-body").empty();
 				$("#wrapper-table-content-body").append(DisplayContent);
-
 				throw new Error("Error No data");
-
 			}
 			return [fromID, toID];
 		}
@@ -207,12 +205,9 @@ namespace onboardproject {
 						const toId = fromId + possibleStep <= recordCount - 1 ? fromId + possibleStep : recordCount - 1;
 						previous = await LoadRecordsData(fromId, toId);
 					} else if (fromId <= recordCount - 1) {
-
 						previous = await LoadRecordsData(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
 					} else {
-
 						throw new Error("Error 404");
-
 					}
 				} catch (error) {
 				}
