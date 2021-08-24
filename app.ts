@@ -186,9 +186,9 @@ namespace onboardproject {
 							const toId = recordCount - 1;
 							previous = await LoadRecordsData(fromId, toId);
 						} else {
-							previous = await LoadRecordsData(previous[0], nextToId)
+							previous = await LoadRecordsData(previous[0], nextToId);
 						}
-					}, 10);
+					}, 250);
 				} catch (error) {
 					// throw new Error("Error" + error);
 				}
