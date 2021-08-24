@@ -165,14 +165,14 @@ namespace onboardproject {
 			return toID;
 		}
 
-		//Previous_Page_Resize Function
-		function previousPageResize(previous: number[]): number[] {
-			const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
-			return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
-		}
-
 		//Onload Function
 		window.onload = async () => {
+
+			//Previous_Page_Resize Function
+			function previousPageResize(previous: number[]): number[] {
+				const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
+				return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
+			}
 
 			//On Resize_Function
 			window.onresize = () => {
