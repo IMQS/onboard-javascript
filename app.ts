@@ -22,7 +22,7 @@ namespace onboardproject {
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
-				console.log(message)
+				// console.log(message)
 			} else {
 				console.log(response);
 			}
@@ -81,7 +81,7 @@ namespace onboardproject {
 
 		//region Data Loading methods
 		async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
-			const recordsvalue = await getRecordsCall(fromID, toID)
+			const recordsvalue = await getRecordsCall(fromID, toID);
 			let DisplayContent = '';
 			for (const record of recordsvalue) {
 				DisplayContent += `<tr id="table-row-${record[0]}">`;
@@ -95,6 +95,7 @@ namespace onboardproject {
 			return [fromID, toID];
 		}
 
+		//
 		function RecordsFromCursor(cursor: number[]): Promise<number[]> {
 			cursor = cursor.sort((a, b) => { return a - b });
 			return LoadRecordsData(cursor[0], cursor[1]);
@@ -128,6 +129,7 @@ namespace onboardproject {
 			// throw new Error("Error");
 		}
 
+		//
 		function calculateToId(fromId: number): number {
 			const possibleRecordsData = Math.max((window.innerHeight - ($("#form-content").innerHeight() as number)));
 			const possibleId = fromId + possibleRecordsData;
@@ -219,7 +221,6 @@ namespace onboardproject {
 
 						previous = await LoadRecordsData(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
 					} else {
-						console.log("Test is working ");
 					}
 				} catch (error) {
 				}
@@ -240,7 +241,7 @@ namespace onboardproject {
 							previous = await LoadRecordsData(fromId, toId);
 						}
 					} else {
-						console.log("Test is working ");
+
 					}
 				}
 			});
