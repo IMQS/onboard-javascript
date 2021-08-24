@@ -190,6 +190,7 @@ namespace onboardproject {
 					// throw new Error("Error" + error);
 				}
 			}
+
 			// trigger async function
 			// log response or catch error of fetch promise
 			// getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
@@ -246,8 +247,6 @@ namespace onboardproject {
 							let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
 							previous = await LoadRecordsData(fromId, toId);
 						}
-					} else {
-
 					}
 				}
 			});
