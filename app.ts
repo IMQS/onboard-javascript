@@ -13,23 +13,23 @@ namespace onboardproject {
 		let previousprocess: number;
 
 		// Trigger async function
-		async function getRecordCountCall(): Promise<number> {
+		async function getRecordCountCall(): Promise<void> {
 			const response = await fetch('http://localhost:2050/recordCount');
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
 			}
-			return response.json();
+			//return response.json();
 		}
 
 		// Trigger async function
-		async function getColumnNamesCall(): Promise<string[]> {
+		async function getColumnNamesCall(): Promise<void> {
 			const response = await fetch('http://localhost:2050/columns');
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
 			}
-			return response.json();
+			//return response.json();
 		}
 
 		// Trigger async function
