@@ -33,7 +33,7 @@ namespace onboardproject {
 		}
 
 		// Trigger async function
-		async function getRecordsCall(fromID: number, toID: number): Promise<string[][]> {
+		async function getRecordsCall(fromID: number, toID: number): Promise<void> {
 			const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
@@ -43,7 +43,7 @@ namespace onboardproject {
 		}
 
 		// Region Data Loading methods
-		async function LoadRecordsData(fromID: number, toID: number): Promise<number[]> {
+		async function LoadRecordsData(fromID: number, toID: number): Promise<void> {
 			const recordsvalue = await getRecordsCall(fromID, toID);
 			let DisplayContent = '';
 			for (const record of recordsvalue) {
@@ -55,18 +55,18 @@ namespace onboardproject {
 				$("#wrapper-table-content-body").empty();
 				$("#wrapper-table-content-body").append(DisplayContent);
 			}
-			return [fromID, toID];
+			// return [fromID, toID];
 		}
 
 		// Load Records Function
-		function RecordsFromCursor(cursor: number[]): Promise<number[]> {
+		function RecordsFromCursor(cursor: number[]): Promise<void> {
 			cursor = cursor.sort((a, b) => { return a - b });
-			return LoadRecordsData(cursor[0], cursor[1]);
+			//return LoadRecordsData(cursor[0], cursor[1]);
 			// throw new Error("Error");
 		}
 
 		// Handlers
-		async function LoadPageContent(fromID: number, toID: number): Promise<number[]> {
+		async function LoadPageContent(fromID: number, toID: number): Promise<void> {
 			let DisplayContent = "";
 			const columns = await getColumnNamesCall();
 			for (const column of columns) {
@@ -74,7 +74,7 @@ namespace onboardproject {
 				$("#wrapper-table-header-row").empty();
 				$("#wrapper-table-header-row").append(DisplayContent);
 			}
-			return LoadRecordsData(fromID, toID);
+			// return LoadRecordsData(fromID, toID);
 		}
 
 		// Conversion Function
@@ -146,9 +146,9 @@ namespace onboardproject {
 						if (nextToId >= recordCount - 1) {
 							const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
 							const toId = recordCount - 1;
-							previous = await LoadRecordsData(fromId, toId);
+							//previous = await LoadRecordsData(fromId, toId);
 						} else {
-							previous = await LoadRecordsData(previous[0], nextToId);
+							//previous = await LoadRecordsData(previous[0], nextToId);
 						}
 					}, 250);
 				} catch (error) {
@@ -161,7 +161,7 @@ namespace onboardproject {
 			// getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
 
 			//Loading Content Function
-			previous = await LoadPageContent(0, calculateToId(0));
+			//previous = await LoadPageContent(0, calculateToId(0));
 
 			// Click function for previewing page
 			$("#previous").click(async () => {
@@ -172,7 +172,7 @@ namespace onboardproject {
 				let toId = (previous[0] >= 0 ? previous[1] : possibleStep);
 				fromId = fromId == CountData - 1 ? fromId - possibleStep : fromId;
 				toId = toId <= CountData - 1 ? toId : CountData - 1;
-				previous = await LoadRecordsData(fromId, toId);
+				//previous = await LoadRecordsData(fromId, toId);
 			});
 
 			// Click function for Skipping to next page
@@ -183,9 +183,9 @@ namespace onboardproject {
 					const possibleStep = calculateToId(fromId) - fromId;
 					if (fromId <= recordCount - possibleStep - 1) {
 						const toId = fromId + possibleStep <= recordCount - 1 ? fromId + possibleStep : recordCount - 1;
-						previous = await LoadRecordsData(fromId, toId);
+						//	previous = await LoadRecordsData(fromId, toId);
 					} else if (fromId <= recordCount - 1) {
-						previous = await LoadRecordsData(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
+						//previous = await LoadRecordsData(recordCount - 1 - (calculateToId(fromId) - fromId), recordCount - 1);
 					} else {
 						throw new Error("Error 404");
 					}
@@ -193,7 +193,7 @@ namespace onboardproject {
 				}
 			});
 
-			// Searching function for index
+			//Searching function for index
 			$("#go-button").click(async () => {
 				const recordCount = await getRecordCountCall();
 				const fromId = ConvertNumber($("#index").val() as string, false);
@@ -206,7 +206,7 @@ namespace onboardproject {
 							alert(`You may not insert a desired Id greater than ${recordCount - possibleStep}`);
 						} else {
 							let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
-							previous = await LoadRecordsData(fromId, toId);
+							//	previous = await LoadRecordsData(fromId, toId);
 						}
 					}
 				}
