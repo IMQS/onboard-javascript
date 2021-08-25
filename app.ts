@@ -3,7 +3,7 @@ import { data } from "jquery";
 namespace onboardproject {
 	module onboardprojects {
 
-		//Load Variable declarations
+		// Load Variable declarations
 		let Load = 50;
 
 		// Previous Variable declarations
@@ -54,7 +54,6 @@ namespace onboardproject {
 				DisplayContent += '</tr>';
 				$("#wrapper-table-content-body").empty();
 				$("#wrapper-table-content-body").append(DisplayContent);
-				throw new Error("Error No data");
 			}
 			return [fromID, toID];
 		}
