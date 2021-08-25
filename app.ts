@@ -90,20 +90,6 @@ namespace onboardproject {
 		function calculateToId(fromId: number): number {
 			const possibleRecordsData = Math.max((window.innerHeight - ($("#form-content").innerHeight() as number)) / 37);
 			let recordDisplayset = 0;
-			switch (recordDisplayset) {
-				case 0:
-					window.innerHeight <= 646;
-					break;
-				case 1:
-					window.innerHeight <= 969;
-					break;
-				case 2:
-					window.innerHeight <= 1938;
-					break;
-				default:
-					recordDisplayset = 15;
-					break;
-			}
 			return recordDisplayset;
 		}
 
