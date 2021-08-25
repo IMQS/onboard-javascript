@@ -111,7 +111,7 @@ namespace onboardproject {
 		function nextPageResize(previous: number[]): number {
 			const fromID = ConvertNumber(previous.sort((a, b) => { return a - b })[0]);
 			const toID = ConvertNumber(previous.sort((a, b) => { return a - b })[1]);
-			const documentHeight = $(window).innerHeight() as number - ($(`#table-row-${fromID}`).height() as number);
+			const documentHeight = Math.max((window.innerHeight - ($(`#table-row-${fromID}`).height() as number)));
 			for (let i = fromID; i <= toID; i++) {
 				const elementHeightOffset = ($(`#table-row-${i}`).offset() as JQueryCoordinates).top;
 				if (elementHeightOffset < documentHeight) continue;
@@ -183,16 +183,6 @@ namespace onboardproject {
 				} catch (error) {
 				}
 			});
-
-
-
-
-
-
-
-
-
-
 
 			$("#go-button").click(async () => {
 				const recordCount = await getRecordCountCall();
