@@ -9,7 +9,7 @@ namespace onboardproject {
 		// Previous Variable declarations
 		let previous: number[];
 
-		//Previous Process Variable declarations
+		// Previous Process Variable declarations
 		let previousprocess: number;
 
 		// Trigger async function
