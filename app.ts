@@ -22,9 +22,6 @@ namespace onboardproject {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
 			}
-			//else {
-			// 	console.log(response);
-			// }
 			return response.json();
 		}
 
@@ -37,10 +34,8 @@ namespace onboardproject {
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
-			} else {
-				return response.json();
-
 			}
+			return response.json();
 		}
 
 		// Trigger async function
@@ -52,9 +47,8 @@ namespace onboardproject {
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
-			} else {
-				return response.json();
 			}
+			return response.json();
 		}
 
 		//region Data Loading methods
@@ -105,7 +99,6 @@ namespace onboardproject {
 					return input as number;
 			}
 			return 0;
-			// throw new Error("Error");
 		}
 
 		//
