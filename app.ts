@@ -89,7 +89,6 @@ namespace onboardproject {
 		// Height Diplay Function
 		function calculateToId(fromId: number): number {
 			const possibleRecordsData = Math.max((window.innerHeight - ($("#form-content").innerHeight() as number)) / 37);
-			const possibleId = fromId + possibleRecordsData;
 			let recordDisplayset = 0;
 			switch (recordDisplayset) {
 				case 0:
@@ -105,7 +104,7 @@ namespace onboardproject {
 					recordDisplayset = 15;
 					break;
 			}
-			return recordDisplayset + possibleId;
+			return recordDisplayset;
 		}
 
 		// Next_Page_Resize Function
