@@ -1,6 +1,7 @@
 import { data } from "jquery";
 
 namespace onboardproject {
+
 	module onboardprojects {
 
 		// Load Variable declarations
@@ -9,7 +10,7 @@ namespace onboardproject {
 		// Previous Variable declarations
 		let previous: number;
 
-		// Previous Variable declarations
+		// Previous data Variable declarations
 		let previousdata: number;
 
 		// Previous Process Variable declarations
@@ -49,15 +50,17 @@ namespace onboardproject {
 		async function LoadRecordsData(fromID: number, toID: number): Promise<void> {
 			const recordsvalue = await getRecordsCall(fromID, toID);
 			let DisplayContent = '';
-			for (const record of recordsvalue) {
-				DisplayContent += `<tr id="table-row-${record[0]}">`;
-				for (const column of record) {
-					DisplayContent += `<td align="center">${column}</td>`;
+			for ()
+
+				for (const record of recordsvalue) {
+					DisplayContent += `<tr id="table-row-${record[0]}">`;
+					for (const column of record) {
+						DisplayContent += `<td align="center">${column}</td>`;
+					}
+					DisplayContent += '</tr>';
+					$("#wrapper-table-content-body").empty();
+					$("#wrapper-table-content-body").append(DisplayContent);
 				}
-				DisplayContent += '</tr>';
-				$("#wrapper-table-content-body").empty();
-				$("#wrapper-table-content-body").append(DisplayContent);
-			}
 			// return [fromID, toID];
 		}
 
