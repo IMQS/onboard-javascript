@@ -7,7 +7,10 @@ namespace onboardproject {
 		let Load = 50;
 
 		// Previous Variable declarations
-		let previous: number[];
+		let previous: number;
+
+		// Previous Variable declarations
+		let previousdata: number;
 
 		// Previous Process Variable declarations
 		let previousprocess: number;
