@@ -26,6 +26,7 @@ namespace onboardproject {
 			//return response.json();
 		}
 
+
 		// Trigger async function
 		async function getColumnNamesCall(): Promise<void> {
 			const response = await fetch('http://localhost:2050/columns');
