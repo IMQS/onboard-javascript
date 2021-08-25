@@ -10,9 +10,6 @@ namespace onboardproject {
 		// Previous Variable declarations
 		let previous: number;
 
-		// Previous data Variable declarations
-		let previousdata: number;
-
 		// Previous Process Variable declarations
 		let previousprocess: number;
 
@@ -26,7 +23,6 @@ namespace onboardproject {
 			//return response.json();
 		}
 
-
 		// Trigger async function
 		async function getColumnNamesCall(): Promise<void> {
 			const response = await fetch('http://localhost:2050/columns');
@@ -38,7 +34,7 @@ namespace onboardproject {
 		}
 
 		// Trigger async function
-		async function getRecordsCall(fromID: number, toID: number): Promise<void> {
+		async function getRecordsCall(fromID: number, toID: number): Promise<number[]> {
 			const response = await fetch(`http://localhost:2050/records?from=${(fromID)}&to=${(toID)}`);
 			if (!response.ok) {
 				const message = `An error has occured: ${response.status}`;
@@ -51,17 +47,15 @@ namespace onboardproject {
 		async function LoadRecordsData(fromID: number, toID: number): Promise<void> {
 			const recordsvalue = await getRecordsCall(fromID, toID);
 			let DisplayContent = '';
-			for ()
-
-				for (const record of recordsvalue) {
-					DisplayContent += `<tr id="table-row-${record[0]}">`;
-					for (const column of record) {
-						DisplayContent += `<td align="center">${column}</td>`;
-					}
-					DisplayContent += '</tr>';
-					$("#wrapper-table-content-body").empty();
-					$("#wrapper-table-content-body").append(DisplayContent);
+			for (const records of recordsvalue) {
+				DisplayContent += `<tr id="table-row-${records}">`;
+				for (const column of record) {
+					DisplayContent += `<td align="center">${column}</td>`;
 				}
+				DisplayContent += '</tr>';
+				$("#wrapper-table-content-body").empty();
+				$("#wrapper-table-content-body").append(DisplayContent);
+			}
 			// return [fromID, toID];
 		}
 
@@ -100,7 +94,7 @@ namespace onboardproject {
 
 		// Height Diplay Function
 		function calculateToId(fromId: number): number {
-			const possibleRecordsData = Math.max((window.innerHeight - ($("#form-content").innerHeight() as number)));
+			const possibleRecordsData = Math.max((window.innerHeight - ($("#form-content").innerHeight() as number)) / 37);
 			const possibleId = fromId + possibleRecordsData;
 			let recordDisplayset = 0;
 			switch (recordDisplayset) {
@@ -146,12 +140,12 @@ namespace onboardproject {
 			window.onresize = () => {
 
 				try {
-					const nextToId = calculateToId(previous[0]);
+					const nextToId = calculateToId(previous);
 					clearTimeout(Load);
 					Load = setTimeout(async () => {
 						const recordCount = await getRecordCountCall();
 						if (nextToId >= recordCount - 1) {
-							const fromId = recordCount - 1 - (calculateToId(previous[0]) - previous[0]);
+							const fromId = recordCount - 1 - (calculateToId(previous) - previous);
 							const toId = recordCount - 1;
 							//previous = await LoadRecordsData(fromId, toId);
 						} else {
@@ -174,9 +168,9 @@ namespace onboardproject {
 			$("#previous").click(async () => {
 				const CountData = await getRecordCountCall();
 				previous = previousPageResize(previous);
-				let fromId = previous[0] >= 0 ? previous[0] : 0;
+				let fromId = previous >= 0 ? previous : 0;
 				const possibleStep = calculateToId(fromId) - fromId;
-				let toId = (previous[0] >= 0 ? previous[1] : possibleStep);
+				let toId = (previous >= 0 ? previous : possibleStep);
 				fromId = fromId == CountData - 1 ? fromId - possibleStep : fromId;
 				toId = toId <= CountData - 1 ? toId : CountData - 1;
 				//previous = await LoadRecordsData(fromId, toId);
