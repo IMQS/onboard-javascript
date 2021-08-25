@@ -20,7 +20,6 @@ namespace onboardproject {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
 			}
-			//return response.json();
 		}
 
 		// Trigger async function
@@ -30,7 +29,6 @@ namespace onboardproject {
 				const message = `An error has occured: ${response.status}`;
 				throw new Error(message);
 			}
-			//return response.json();
 		}
 
 		// Trigger async function
@@ -56,14 +54,11 @@ namespace onboardproject {
 				$("#wrapper-table-content-body").empty();
 				$("#wrapper-table-content-body").append(DisplayContent);
 			}
-			// return [fromID, toID];
 		}
 
 		// Load Records Function
 		function RecordsFromCursor(cursor: number[]): Promise<void> {
 			cursor = cursor.sort((a, b) => { return a - b });
-			//return LoadRecordsData(cursor[0], cursor[1]);
-			// throw new Error("Error");
 		}
 
 		// Handlers
@@ -75,7 +70,6 @@ namespace onboardproject {
 				$("#wrapper-table-header-row").empty();
 				$("#wrapper-table-header-row").append(DisplayContent);
 			}
-			// return LoadRecordsData(fromID, toID);
 		}
 
 		// Conversion Function
@@ -156,10 +150,6 @@ namespace onboardproject {
 					// throw new Error("Error" + error);
 				}
 			}
-			// log response or catch error of fetch promise
-			// getColumnNamesCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
-			// log response or catch error of fetch promise
-			// getRecordCountCall().then(data => console.log(data)).catch(reason => console.log(reason.message));
 
 			//Loading Content Function
 			//previous = await LoadPageContent(0, calculateToId(0));
@@ -194,19 +184,30 @@ namespace onboardproject {
 				}
 			});
 
-			//Searching function for index
+
+
+
+
+
+
+
+
+
+
 			$("#go-button").click(async () => {
 				const recordCount = await getRecordCountCall();
 				const fromId = ConvertNumber($("#index").val() as string, false);
 				const possibleStep = calculateToId(fromId) - fromId;
 				if (fromId < 0) {
 					alert('only insert Id greater than or equal to 0');
-				} else {
+				}
+				else {
 					if (Math.floor(fromId).toString() == fromId.toString() === true) {
 						if (fromId > recordCount - possibleStep) {
 							alert(`You may not insert a desired Id greater than ${recordCount - possibleStep}`);
 						} else {
 							let toId = (fromId) + possibleStep < recordCount ? (fromId) + possibleStep : recordCount - 1;
+
 							//	previous = await LoadRecordsData(fromId, toId);
 						}
 					}
