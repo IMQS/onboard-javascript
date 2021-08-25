@@ -125,8 +125,9 @@ namespace onboardproject {
 
 			// Previous_Page_Resize Function
 			function previousPageResize(previous: number[]): number[] {
-				const toId = calculateToId(previous[0] - (nextPageResize(previous) - previous[0]));
-				return [previous[0] - (nextPageResize(previous) - previous[0]), toId];
+				let nextPage = nextPageResize([]);
+				const toId = calculateToId(previous[0] - nextPage);
+				return [previous[0] - (nextPage - previous[0]), toId];
 			}
 
 			// On Resize_Function
