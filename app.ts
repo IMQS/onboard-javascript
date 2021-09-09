@@ -1,10 +1,10 @@
 class ApiService{
 
-    url: string = 'http://localhost:2050';
-    columnNames: Array<string> = [];
-    numberOfRecords: number = 0;
-    dataRecords: Array<Array<string>> = [];
-    topRecordIndex: number = 0;
+    private url: string = 'http://localhost:2050';
+    private columnNames: Array<string> = [];
+    private numberOfRecords: number = 0;
+    private dataRecords: Array<Array<string>> = [];
+    private topRecordIndex: number = 0;
 
     constructor(){
 
@@ -39,27 +39,16 @@ class ApiService{
         }
     }
 
-    private getRecords(){
-        $.get(this.url + '/records', {
-            from : this.topRecordIndex.toString(),
-            to : (this.topRecordIndex + 41).toString()
-         },
-         data => {
-            this.dataRecords = JSON.parse(data);
-            this.populateRecords();
-         });
-    }
-
     public next(): void{
-        if(this.topRecordIndex + 42 < this.numberOfRecords - 42){
-            this.topRecordIndex = this.topRecordIndex + 42;
+        if(this.topRecordIndex + 41 < this.numberOfRecords - 41){
+            this.topRecordIndex = this.topRecordIndex + 41;
             this.getRecords();
         }
     }
 
     public previous(): void{
-        if(this.topRecordIndex - 42 >= 0){
-            this.topRecordIndex = this.topRecordIndex - 42;
+        if(this.topRecordIndex - 41 >= 0){
+            this.topRecordIndex = this.topRecordIndex - 41;
             this.getRecords();
         }
     }    
@@ -84,7 +73,6 @@ class ApiService{
         if($("tbody").length == 0){
             $("table").append(document.createElement('TBODY'));
         } else{
-            console.log("tbody");
             $("tbody").empty();            
         }
         
@@ -102,6 +90,16 @@ class ApiService{
         $("tr:nth-child(even)").css({"background-color":"#04AA6D"});
     }
 
+    private getRecords(){
+        $.get(this.url + '/records', {
+            from : this.topRecordIndex.toString(),
+            to : (this.topRecordIndex + 40).toString()
+         },
+         data => {
+            this.dataRecords = JSON.parse(data);
+            this.populateRecords();
+         });
+    }
 
 
 }
@@ -112,14 +110,26 @@ window.onload = () => {
     $("#next").on("click", function() {
         apiService.next();
     })
-    $("#next").css({"bottom":"1%", "right":"6%", "position": "absolute"});
+    $("#next").css({"bottom":"1%", "right":"6%", "position": "absolute",
+        "background-color": "#4CAF50", /* Green */
+        "border-radius": "2px",
+        "color": "white",
+        "text-align": "center",
+        "text-decoration": "none",
+        "display": "inline-block",
+        "font-size": "16px",
+      });
 
     $("#prev").on("click", function() {
         apiService.previous();
     })
-    $("#prev").css({"bottom":"1%", "right":"11%", "position": "absolute"}); 
+    $("#prev").css({"bottom":"1%", "right":"11%", "position": "absolute",
+        "background-color": "#4CAF50", /* Green */
+        "border-radius": "2px",
+        "color": "white",
+        "text-align": "center",
+        "text-decoration": "none",
+        "display": "inline-block",
+        "font-size": "16px",
+    });
 }
-
-
-
-
