@@ -1,93 +1,79 @@
 class ApiService{
 
-    private url: string = 'http://localhost:2050';
-    private columnNames: Array<string> = [];
-    private numberOfRecords: number = 0;
-    private dataRecords: Array<Array<string>> = [];
-    private topRecordIndex: number = 0;
+    private url = 'http://localhost:2050';
+    private columnNames = [];
+    private numberOfRecords = 0;
+    private dataRecords= [[]];
+    private topRecordIndex = 0;
 
     constructor(){
+        $(".myGrid").css({"display": "grid",
+        "width": "100%",
+        "height": "100%",
+        "text-align": "center"});
+        $.get(this.url + '/columns', (data, success) => {
+            //Need to handle different responses
+            // if(success){
 
-        if($("#myTable")){
-            $("#myTable").append(document.createElement("table"));
-            $("#myTable").css({"position": "relative", "overflow": "hidden"});
-            $("table").css({'table-layout' : ' fixed ',
-             'width' : '100%',
-             'font-family': 'Arial, Helvetica, sans-serif',
-             'border-collapse': 'collapse',
-             'top' : '0',
-             'bottom' : '0',
-             'right' : '0',
-             'left' : '0'});
+            // }
+            this.columnNames = JSON.parse(data);
+            this.populateHeaders();
+        });
 
-            $.get(this.url + '/columns', data => {
-               this.columnNames = JSON.parse(data);
-               this.populateHeaders();
-            });
-    
-            $.get(this.url + '/recordCount', data => {
-                this.numberOfRecords = data;
-             });
+        $.get(this.url + '/recordCount', data => {
+            this.numberOfRecords = data;
+        });
 
-             this.getRecords();
+        this.getRecords();
 
-            var nextButton = $('<button id="next">Next</button><br/>');
-            $("body").append(nextButton);
+        var previousButton = $('<button id="prev">Previous</button>');
+        $(".buttons").append(previousButton);
 
-            var previousButton = $('<button id="prev">Previous</button><br/>');
-            $("body").append(previousButton);
-        }
+        var nextButton = $('<button id="next">Next</button>');
+        $(".buttons").append(nextButton);
     }
 
     public next(): void{
-        if(this.topRecordIndex + 41 < this.numberOfRecords - 41){
-            this.topRecordIndex = this.topRecordIndex + 41;
+        if(this.topRecordIndex + 40 <=  this.numberOfRecords - 40){
+            this.topRecordIndex = this.topRecordIndex + 40;
             this.getRecords();
         }
     }
 
     public previous(): void{
-        if(this.topRecordIndex - 41 >= 0){
-            this.topRecordIndex = this.topRecordIndex - 41;
+        if(this.topRecordIndex - 40 >= 0){
+            this.topRecordIndex = this.topRecordIndex - 40;
             this.getRecords();
         }
     }    
 
     public populateHeaders(): void{
         var m = this.columnNames.length;
-        var tHead = document.createElement('THEAD');
-        var tr = document.createElement('TR');
-
+        var lengthOfColumns = new String("auto ");
+        lengthOfColumns = lengthOfColumns.repeat(m);
+        $(".myGrid").css({ "grid-template-columns": lengthOfColumns.toString()});
         for (var j = 0; j < m; j++) {
-            var th = document.createElement('TH');
-            th.innerText = this.columnNames[j];
-            tr.appendChild(th);
+            var item = document.createElement("div");
+            item.setAttribute("class", "grid-header");
+            item.innerText = this.columnNames[j];
+            $(".myGrid").append(item);
         }
-        tHead.appendChild(tr);
-        $("th").css({"background-color":"#04AA6D"});
-        $("table").append(tHead);
+        $(".grid-header").css({ "border": "1px solid #ddd"});
     }
 
     public populateRecords(): void{
         var n = this.dataRecords.length;
-        if($("tbody").length == 0){
-            $("table").append(document.createElement('TBODY'));
-        } else{
-            $("tbody").empty();            
-        }
-        
+        $(".grid-item").remove();
         for (var i = 0; i < n; i++) {
             let rowArr = this.dataRecords[i]; 
-            var tr = document.createElement('TR');  
             for (var j = 0; j < rowArr.length; j++) {
-                var td = document.createElement('TD');
-                td.innerText = rowArr[j];
-                tr.appendChild(td);
+                var item = document.createElement("div");
+                item.setAttribute("class", "grid-item");
+                item.innerText = rowArr[j];
+                $(".myGrid").append(item);
             }
-            $("tbody").append(tr);
         }
-        $("td").css({"border": "2px groove grey", "text-align": "center"});
-        $("tr:nth-child(even)").css({"background-color":"#04AA6D"});
+        $(".grid-item").css({ "border": "1px solid #ddd"});
     }
 
     private getRecords(){
@@ -104,14 +90,24 @@ class ApiService{
 
 }
 window.onload = () => { 
-    $("*").css("box-sizing: border-box");
-    $("body").css({"margin": "0","padding": "0"});
+    $("*").css({"box-sizing": "border-box","margin": "0","padding": "0"});
+    $("body").css({"width": "100vw",
+                "height": "100vh",
+                "overflow": "hidden"});
+    $(".parentContainer").css({"display": "grid",
+    "width": "100%",
+    "height": "100%"});
+    $(".parentContainer").append('<div class="myGrid"></div>');
+    $(".parentContainer").append('<div class="buttons"></div>');
+    $(".buttons").css({"width": "100%",
+                "height": "100%"});
     let apiService = new ApiService();
     $("#next").on("click", function() {
         apiService.next();
-    })
-    $("#next").css({"bottom":"1%", "right":"6%", "position": "absolute",
-        "background-color": "#4CAF50", /* Green */
+    });
+    $("#next").css({"width": "50%",
+        "height": "100%",
+        "background-color": "#4CAF50",
         "border-radius": "2px",
         "color": "white",
         "text-align": "center",
@@ -119,12 +115,12 @@ window.onload = () => {
         "display": "inline-block",
         "font-size": "16px",
       });
-
     $("#prev").on("click", function() {
         apiService.previous();
-    })
-    $("#prev").css({"bottom":"1%", "right":"11%", "position": "absolute",
-        "background-color": "#4CAF50", /* Green */
+    });
+    $("#prev").css({"width": "50%",
+        "height": "100%",
+        "background-color": "#4CAF50",
         "border-radius": "2px",
         "color": "white",
         "text-align": "center",
