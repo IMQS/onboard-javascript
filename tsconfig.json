@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"sourceMap": true,
+		"sourceMap": false,
 		"strict": true,
 		"noImplicitThis": true,
 		"noImplicitAny": true,
@@ -15,8 +15,9 @@
 			"dom",
 			"es2016"
 		],
+		"outDir": "dist"
 	},
 	"include": [
-		"./**/*.ts"
+		"./src/ts/*.ts"			
 	]
 }
