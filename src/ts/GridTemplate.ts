@@ -1,70 +1,112 @@
 export class GridTemplate {
 
     constructor(private columnNames: string[], private dataRecords: string[][]){
-        $(".myGrid").css({"display": "grid",
-        "width": "100%",
-        "height": "100%",
-        "text-align": "center"});
+        $(".myGrid").css({"display": "block",
+                          "width": "100%",
+                          "height": `${100*5/6}%`,
+                          "min-width": "800px",
+                          "text-align": "center"
+                         });
 
-        var previousButton = $('<button id="prev">Previous</button>');
-        $(".buttons").append(previousButton);
-        $("#prev").css({"width": "50%",
-            "height": "100%",
-            "background-color": "#4CAF50",
-            "border-radius": "2px",
-            "color": "white",
-            "text-align": "center",
-            "text-decoration": "none",
-            "display": "inline-block",
-            "font-size": "16px",
-        });
+        $(".controls").css({"display": "block",
+                            "width": "100%",
+                            "height": `${100/6}%`,
+                            "min-height": "160px",
+                            "position": "fixed",
+                            "bottom": "0px"
+                           }); 
 
-        var nextButton = $('<button id="next">Next</button>');
-        $(".buttons").append(nextButton);
-        $("#next").css({"width": "50%",
-            "height": "100%",
-            "background-color": "#4CAF50",
-            "border-radius": "2px",
-            "color": "white",
-            "text-align": "center",
-            "text-decoration": "none",
-            "display": "inline-block",
-            "font-size": "16px",
-        });
-        
+        const lable = document.createElement("lable") as HTMLLabelElement;
+        lable.htmlFor = "#search";
+        lable.innerText = "Search:";  
+        const input = document.createElement("input");
+        input.id = "search";
+        input.type = "text";
+        input.placeholder="Type in a ID";
+        const inputSubmit = document.createElement("input");
+        inputSubmit.value = "Submit";
+        inputSubmit.type = "submit";
+        const form = document.createElement("form");
+        form.id = "searchForm";
+        form.append(document.createElement("br"));
+        form.append(lable);
+        form.append(document.createElement("br"));
+        form.append(input);
+        form.append(document.createElement("br"));
+        form.append(document.createElement("br"));
+        form.append(inputSubmit);
+        form.append(document.createElement("br"));
+        $(".controls").append($('<div class="form-grid"></div>'));
+        $(".form-grid").append(form);
+        $("form").css({"display": "inline-block",
+                       "width": "100%",
+                       "height": `${100/2}%`,
+                       "background-color": "#4CAF50",
+                       "border-radius": "2px",            
+                       "color": "white",
+                       "text-align": "center",
+                       "font-size": "16px",
+                      });
+
+        $(".controls").append($('<div class="control-grid"></div>'));
+        $(".control-grid").css({"display": "block",
+                                "width": "100%",
+                                "height": `${100/2}%`
+                                });
+        $(".control-grid").append($('<button id="prev">Previous</button>'));
+        $("#prev").css({
+                        "display": "inline-block",
+                        "width": "50%",
+                        "height": `${100}%`,
+                        "background-color": "#4CAF50",
+                        "border-radius": "2px",
+                        "color": "white",
+                        "text-align": "center",
+                        "text-decoration": "none",
+                        "font-size": "16px",
+                        });
+        $(".control-grid").append($('<button id="next">Next</button>'));
+        $("#next").css({
+                        "display": "inline-block",
+                        "width": "50%",
+                        "height": `${100}%`,
+                        "background-color": "#4CAF50",
+                        "border-radius": "2px",
+                        "color": "white",
+                        "text-align": "center",
+                        "text-decoration": "none",
+                        "font-size": "16px",
+                        });
         this.populateHeaders();
         this.displayRecords();
-    }
-
-    private populateHeaders(): void {
-        var m = this.columnNames.length;
-        var lengthOfColumns = new String("auto ");
-        lengthOfColumns = lengthOfColumns.repeat(m);
-        $(".myGrid").css({ "grid-template-columns": lengthOfColumns.toString()});
-        for (var j = 0; j < m; j++) {
-            var item = document.createElement("div");
-            item.setAttribute("class", "grid-header");
-            item.innerText = this.columnNames[j];
-            $(".myGrid").append(item);
-        }
-        $(".grid-header").css({ "color": "white",
-                            "border": "1px solid black",
-                            "background-color": "#4CAF50"});
     }
 
     public displayRecords(): void {
         var n = this.dataRecords.length;
         $(".grid-item").remove();
         for (var i = 0; i < n; i++) {
-            let rowArr = this.dataRecords[i]; 
+            let rowArr = this.dataRecords[i];
+            let even = true;
+            if(i % 2 == 0 ){
+                even = false;
+            }
             for (var j = 0; j < rowArr.length; j++) {
-                var item = document.createElement("div") as HTMLDivElement;
-                item.setAttribute("class", "grid-item");
+                const item = document.createElement("div");
+                if(even){
+                    item.className = "grid-item even-item";
+                } else {
+                    item.className = "grid-item odd-item";
+                }
                 item.innerText = rowArr[j];
                 $(".myGrid").append(item);
             }
         }
-        $(".grid-item").css({ "border": "1px solid #ddd"});
+        $(".grid-item").css({"border": "1px solid #A9A9A9",
+                             "display": "inline-block",        
+                             "width":  `${100/this.dataRecords[0].length}%`,
+                             "min-width": `${800/this.dataRecords[0].length}px`
+                            });
+        $(".odd-item").css({"background-color": "#D3D3D3"});                            
     }
 
     public getDataRecords(): string[][] {
@@ -74,4 +116,24 @@ export class GridTemplate {
     public setDataRecords(dataRecords: string[][]): void {
         this.dataRecords = dataRecords;
     }
+
+    private populateHeaders(): void {
+        var m = this.columnNames.length;
+        for (var j = 0; j < m; j++) {
+            const item = document.createElement("div");
+            item.className = "grid-header";
+            item.innerText = this.columnNames[j];
+            $(".myGrid").append(item);
+        }
+        $(".grid-header").css({"color": "white",
+                               "display": "inline-block",
+                               "width":  `${100/m}%`,
+                               "border": "1px solid black",
+                               "background-color": "#4CAF50",
+                               "min-height": "20px",
+                               "min-width": `${800/m}px`
+                            });
+                            
+    }
+
 }
