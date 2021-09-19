@@ -1,5 +1,5 @@
-import { ApiService } from './ApiService.js'
-import { GridTemplate } from './GridTemplate.js'
+import { ApiService } from './api-service.js'
+import { GridTemplate } from './grid-template.js'
 
 let timeout: number = 0;
 let numberOfRecords: number = 0;
@@ -14,17 +14,15 @@ function debounce <F extends (...args: any) => any>(func: F, waitFor: number) {
 
 window.onload = () => {
     numberOfRecords = Math.floor(((window.innerHeight-160) / 20))-1;
-    var x = window.matchMedia("screen and (max-height: 700px)");
-    console.log(x);
-    $(".parentContainer").css({"display":"block",
-                               "width": "100%",
-                               "height": "100%"});
 
     $(".parentContainer").append('<div class="myGrid"></div>');
     $(".parentContainer").append('<div class="controls"></div>');
 
     let apiService = new ApiService(numberOfRecords);
-    let gridTemplate = new GridTemplate(apiService.getColumnNames(), apiService.getDataRecords());
+    let gridTemplate: GridTemplate; 
+    apiService.getCurrentRecords().then(() => {
+        gridTemplate = new GridTemplate(apiService.getColumnNames(), apiService.getDataRecords());
+    
     
     $("#searchForm").on("submit", function(e) {
         let id = $("#search").val() as string;
@@ -35,9 +33,10 @@ window.onload = () => {
             alert(`ID ${id} does not fall between ${apiService.getTotalRecords()} and 0.`);
         } else {
             const fn = debounce( () => {
-                apiService.getRecords(id);
-                gridTemplate.setDataRecords(apiService.getDataRecords());
-                gridTemplate.displayRecords();
+                apiService.searchRecord(id).then(() => {
+                    gridTemplate.setDataRecords(apiService.getDataRecords());
+                    gridTemplate.displayRecords();
+                });
             }, 350);
             fn();
         }
@@ -46,9 +45,10 @@ window.onload = () => {
 
     $("#next").on("click", () => {
         const fn = debounce( () => {
-            apiService.next();
-            gridTemplate.setDataRecords(apiService.getDataRecords());
-            gridTemplate.displayRecords();
+            apiService.next().then(() => {
+                gridTemplate.setDataRecords(apiService.getDataRecords());
+                gridTemplate.displayRecords();                
+            })
         }, 350);
         fn();
     });
@@ -56,26 +56,29 @@ window.onload = () => {
     
     $("#prev").on("click", () => {
         const fn = debounce( () => {
-            apiService.previous();
-            gridTemplate.setDataRecords(apiService.getDataRecords());
-            gridTemplate.displayRecords();
+            apiService.previous().then(() => {
+                gridTemplate.setDataRecords(apiService.getDataRecords());
+                gridTemplate.displayRecords();                
+            })
         }, 350);
         fn();
     });
 
     $( window ).on("resize", (e) => {
-        //const fn = debounce( () => {
-            var oldNumberOfRecords = numberOfRecords;
-            numberOfRecords = Math.floor(((window.innerHeight-160) / 20))-1;
-            apiService.setNumberOfRecords(numberOfRecords);
+        var oldNumberOfRecords = numberOfRecords;
+        numberOfRecords = Math.floor(((window.innerHeight-160) / 20))-1;
+        if(numberOfRecords >= 0 && oldNumberOfRecords >= 0){
+            apiService.setGridSize(numberOfRecords);
             if(oldNumberOfRecords<numberOfRecords){
-                apiService.getCurrentRecords();
+                apiService.getCurrentRecords().then(() => {
+                    gridTemplate.setDataRecords(apiService.getDataRecords().slice(0, numberOfRecords));
+                    gridTemplate.displayRecords();
+                });
             }
-            gridTemplate.setDataRecords(apiService.getDataRecords().slice(0, numberOfRecords));
-            gridTemplate.displayRecords();
-        //}, 70);
-        //fn();
+        }
       });
+
+    })
 }
 
 

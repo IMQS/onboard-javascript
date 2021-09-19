@@ -81,48 +81,48 @@ export class GridTemplate {
         this.displayRecords();
     }
 
-    public displayRecords(): void {
-        var n = this.dataRecords.length;
+    displayRecords(): void {
+        let n = this.dataRecords.length;
         $(".grid-item").remove();
-        for (var i = 0; i < n; i++) {
+        for (let i = 0; i < n; i++) {
             let rowArr = this.dataRecords[i];
             let even = true;
             if(i % 2 == 0 ){
                 even = false;
             }
-            for (var j = 0; j < rowArr.length; j++) {
+            for (let row of rowArr) {
                 const item = document.createElement("div");
                 if(even){
                     item.className = "grid-item even-item";
                 } else {
                     item.className = "grid-item odd-item";
                 }
-                item.innerText = rowArr[j];
+                item.innerText = row;
                 $(".myGrid").append(item);
             }
         }
         $(".grid-item").css({"border": "1px solid #A9A9A9",
                              "display": "inline-block",        
                              "width":  `${100/this.dataRecords[0].length}%`,
-                             "min-width": `${800/this.dataRecords[0].length}px`
+                             "min-width": `${800/this.dataRecords[0].length}px`,
                             });
         $(".odd-item").css({"background-color": "#D3D3D3"});                            
     }
 
-    public getDataRecords(): string[][] {
+    getDataRecords(): string[][] {
         return this.dataRecords;
     }
 
-    public setDataRecords(dataRecords: string[][]): void {
+    setDataRecords(dataRecords: string[][]): void {
         this.dataRecords = dataRecords;
     }
 
     private populateHeaders(): void {
-        var m = this.columnNames.length;
-        for (var j = 0; j < m; j++) {
+        let m = this.columnNames.length;
+        for (let columnName of this.columnNames) {
             const item = document.createElement("div");
             item.className = "grid-header";
-            item.innerText = this.columnNames[j];
+            item.innerText = columnName;
             $(".myGrid").append(item);
         }
         $(".grid-header").css({"color": "white",

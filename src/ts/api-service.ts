@@ -5,19 +5,19 @@ export class ApiService{
     private totalRecords: number;
     private dataRecords: string[][] = [[]];
     private topRecordIndex: number;
-    private numberOfRecords: number;
+    private gridSize: number;
 
     constructor(numberOfRecords: number){
 
         this.url = 'http://localhost:2050';
         this.totalRecords = 0;
         this.topRecordIndex = 0;
-        this.numberOfRecords = numberOfRecords;
+        this.gridSize = numberOfRecords;
         $.ajax({"url": this.url + '/columns',
                 "success" : data => {
                     this.columnNames = JSON.parse(data);
                 },
-                "async" : false
+                //"async" : false
         });
 
 
@@ -31,84 +31,87 @@ export class ApiService{
         this.getCurrentRecords();
     }
 
-    public previous(): void{
-        this.topRecordIndex = this.topRecordIndex - this.numberOfRecords;
-        this.getCurrentRecords();
+    previous() {
+        this.topRecordIndex = this.topRecordIndex - this.gridSize;
+        return this.getCurrentRecords();
     }
     
-    public next(): void{
-        if(this.topRecordIndex + this.numberOfRecords < this.totalRecords){
-            this.topRecordIndex = this.topRecordIndex + this.numberOfRecords;
-            this.getCurrentRecords();
-        }
+    next() {
+        this.topRecordIndex += this.gridSize;
+        return this.getCurrentRecords();
     }
 
-    public getCurrentRecords(){
+    getCurrentRecords(){
         var toId: number;
-        if(this.topRecordIndex + (this.numberOfRecords - 1) > (this.totalRecords-1)){
+        if(this.topRecordIndex + (this.gridSize - 1) > (this.totalRecords-1)){
             toId = this.topRecordIndex + ((this.totalRecords - 1)  - this.topRecordIndex);
         } else if(this.topRecordIndex < 0){
             this.topRecordIndex = 0;
-            toId = this.topRecordIndex + (this.numberOfRecords - 1);
+            toId = this.topRecordIndex + (this.gridSize - 1);
         } else {
-            toId = this.topRecordIndex + (this.numberOfRecords - 1);
+            toId = this.topRecordIndex + (this.gridSize - 1);
         }
-        $.ajax({"url": this.url + '/records',
+        return new Promise((resolve, reject) => {
+            $.ajax({"url": this.url + '/records',
                 "data": {
                     "from" : this.topRecordIndex.toString(),
                     "to" : toId.toString()
                 },
                 "success" : data => {
-                    this.dataRecords = JSON.parse(data);
+                    resolve(this.dataRecords = JSON.parse(data))
                 },
-                "error": function(e) {
-                    console.log(e);
-                    alert('Error occured');
-                },
-                "async" : false
-        });
+                "error": (e) => {
+                    reject(() => {
+                        console.log(e);
+                        alert('Error occured');
+                    })
+                }
+            })
+        })
     }
 
-    public getRecords(id: string) {
+    searchRecord(id: string) {
         this.topRecordIndex = Number(id);
         var toId: number;
-        if(this.topRecordIndex + (this.numberOfRecords - 1) > (this.totalRecords-1)){
+        if(this.topRecordIndex + (this.gridSize - 1) > (this.totalRecords-1)){
             toId = this.topRecordIndex + ((this.totalRecords - 1) - this.topRecordIndex);
         } else if(this.topRecordIndex < 0){
             this.topRecordIndex = 0;
-            toId = this.topRecordIndex + (this.numberOfRecords - 1);
+            toId = this.topRecordIndex + (this.gridSize - 1);
         } else {
-            toId = this.topRecordIndex + (this.numberOfRecords - 1);
+            toId = this.topRecordIndex + (this.gridSize - 1);
         }
-        $.ajax({"url": this.url + '/records',
+        return new Promise((resolve, reject) => {
+            $.ajax({"url": this.url + '/records',
                 "data": {
                     "from" : this.topRecordIndex.toString(),
                     "to" : toId.toString()
                 },
                 "success" : data => {
-                    this.dataRecords = JSON.parse(data);
+                    resolve(this.dataRecords = JSON.parse(data));
                 },
-                "error": function(e) {
-                    console.log(e);
-                    alert('Error occured');
+                "error": (e) => {
+                    reject(() => {  console.log(e);
+                                    alert('Error occured')
+                    })
                 },
-                "async" : false
-        });
+            })
+        })
     }
 
-    public getColumnNames() : string[] {
+    getColumnNames() : string[] {
         return this.columnNames;
     }
 
-    public getTotalRecords(): number {
+    getTotalRecords(): number {
         return this.totalRecords;
     }
 
-    public setNumberOfRecords(numberOfRecords: number) {
-        this.numberOfRecords = numberOfRecords;
+    setGridSize(gridSize: number) {
+        this.gridSize = gridSize;
     }
 
-    public getDataRecords() : string[][] {
+    getDataRecords() : string[][] {
         return this.dataRecords;
     }
 
