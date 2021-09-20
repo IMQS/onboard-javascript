@@ -2,8 +2,9 @@ import { ApiService } from './api-service.js'
 import { GridTemplate } from './grid-template.js'
 
 let timeout: number = 0;
-let numberOfRecords: number = 0;
+let gridSize: number = 0;
 
+//Debounce function to handle multiple request in a short frequency as only a single request
 function debounce <F extends (...args: any) => any>(func: F, waitFor: number) {
     const debounced = (...args: any) => {
       clearTimeout(timeout)
@@ -13,12 +14,17 @@ function debounce <F extends (...args: any) => any>(func: F, waitFor: number) {
 }
 
 window.onload = () => {
-    numberOfRecords = Math.floor(((window.innerHeight-160) / 20))-1;
+    //Retrieve the grid size i.e. The number of records that can fit on the screen.
+    //window.innerHeight is the total height of the display screen
+    //20.4px is the height of a record according to the 16px font-size set. 
+    //A 5/6 is the portion of the window's height that is provided to the grid.
+    let windowHeight = Math.floor($(window).height() as number);
+    gridSize = Math.floor(((windowHeight * 5 / 6)/ 20.4))-1; // Minus one for the Header record
 
     $(".parentContainer").append('<div class="myGrid"></div>');
     $(".parentContainer").append('<div class="controls"></div>');
 
-    let apiService = new ApiService(numberOfRecords);
+    let apiService = new ApiService(gridSize); // Parse in initial grid size
     let gridTemplate: GridTemplate; 
     apiService.getCurrentRecords().then(() => {
         gridTemplate = new GridTemplate(apiService.getColumnNames(), apiService.getDataRecords());
@@ -26,9 +32,9 @@ window.onload = () => {
     
     $("#searchForm").on("submit", function(e) {
         let id = $("#search").val() as string;
-        const regexp = new RegExp('^[1-9][0-9]*$|0');
+        const regexp = new RegExp("^[1-9][0-9]*$|0");
         if(!regexp.test(id)){
-            alert(`Invalid entry.`);
+            alert("Invalid entry.");
         } else if (parseFloat(id) >= apiService.getTotalRecords() || parseFloat(id) as number < 0) {
             alert(`ID ${id} does not fall between ${apiService.getTotalRecords()} and 0.`);
         } else {
@@ -43,20 +49,21 @@ window.onload = () => {
         e.preventDefault();
     });
 
+    //Handle event when Next button is clicked. Debouncing is used for this function.
     $("#next").on("click", () => {
         const fn = debounce( () => {
-            apiService.next().then(() => {
-                gridTemplate.setDataRecords(apiService.getDataRecords());
-                gridTemplate.displayRecords();                
-            })
+            apiService.next()?.then(() => {
+                    gridTemplate.setDataRecords(apiService.getDataRecords());
+                    gridTemplate.displayRecords();                
+                })
         }, 350);
         fn();
     });
    
-    
+    //Handle event when Previous button is clicked. Debouncing is used for this function.
     $("#prev").on("click", () => {
         const fn = debounce( () => {
-            apiService.previous().then(() => {
+        apiService.previous()?.then(() => {
                 gridTemplate.setDataRecords(apiService.getDataRecords());
                 gridTemplate.displayRecords();                
             })
@@ -64,20 +71,27 @@ window.onload = () => {
         fn();
     });
 
-    $( window ).on("resize", (e) => {
-        var oldNumberOfRecords = numberOfRecords;
-        numberOfRecords = Math.floor(((window.innerHeight-160) / 20))-1;
-        if(numberOfRecords >= 0 && oldNumberOfRecords >= 0){
-            apiService.setGridSize(numberOfRecords);
-            if(oldNumberOfRecords<numberOfRecords){
+    //Handle event when resizing the browser window. Recalculate the grid size and display accordingly
+    $(window ).on("resize", () => {
+        let oldNumberOfRecords = gridSize;
+        let windowHeight = Math.floor($(window).height() as number);
+        gridSize = Math.floor(((windowHeight * 5 / 6) / 20.4))-1;
+        //To make sure we are working with a positive sized grid
+        if(gridSize >= 0 && oldNumberOfRecords >= 0){
+            apiService.setGridSize(gridSize);
+            if(oldNumberOfRecords<gridSize){
+                //Only request new records if the grid size was enlarged.
                 apiService.getCurrentRecords().then(() => {
-                    gridTemplate.setDataRecords(apiService.getDataRecords().slice(0, numberOfRecords));
+                    gridTemplate.setDataRecords(apiService.getDataRecords().slice(0, gridSize));
                     gridTemplate.displayRecords();
                 });
+            } else {
+                //Slice the data records to display less records to fit the grid.
+                gridTemplate.setDataRecords(apiService.getDataRecords().slice(0, gridSize));
+                gridTemplate.displayRecords();  
             }
         }
       });
-
     })
 }
 
