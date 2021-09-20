@@ -42,7 +42,7 @@ export class GridTemplate {
                        "width": "100%",
                        "justify-content": "center",
                        "border-radius": "2px",            
-                       "color": "white",
+                       "color": "white"
                       });
 
         $(".controls").append($('<div class="control-grid"></div>'));
@@ -59,7 +59,6 @@ export class GridTemplate {
                         "border-radius": "2px",
                         "color": "white",
                         "text-decoration": "none",
-                        "font-size": "16px"
                         });
         $(".control-grid").append($('<button id="next">Next</button>'));
         $("#next").css({
@@ -69,8 +68,7 @@ export class GridTemplate {
                         "background-color": "#4CAF50",
                         "border-radius": "2px",
                         "color": "white",
-                        "text-decoration": "none",
-                        "font-size": "16px"
+                        "text-decoration": "none"
                         });
         this.populateHeaders();
         this.displayRecords();
@@ -98,8 +96,10 @@ export class GridTemplate {
         }
         $(".grid-item").css({"border": "1px solid #A9A9A9",
                              "display": "inline-block",        
+                             //Equally divide column widths over the screen
                              "width":  `${100/this.dataRecords[0].length}%`,
-                             "min-height": "20px",
+                             //This causes text to overflow over cells but keeps the cell width equal for me. Had to be done.
+                             "white-space": "nowrap" 
                             });
         //Display odd records with a grey background
         $(".odd-item").css({"background-color": "#D3D3D3"});                          
