@@ -20,17 +20,19 @@ export class ApiService{
                 }
         });
 
-        //Send AJAX request to server to retrieve number of available records
-        $.ajax({"url": this.url + "/recordCount",
-                "success" : data => {
-                    this.totalRecords = Number(data);
-                },
-                "async" : false
-        });
+    }
 
-        //Call the function that retrieves the relevant records according to grid size and 
-        //the top record's ID 
-        this.getCurrentRecords();
+    recordCount(){
+        return new Promise((resolve, reject) => {
+            $.ajax({"url": this.url + "/recordCount",
+                "success" : data => {
+                    resolve(this.totalRecords = Number(data));
+                },
+                "error": (e) => {
+                    reject(console.log(e))  //Log the error for debugging purposes
+                }
+            });
+        })
     }
 
     getCurrentRecords(){
