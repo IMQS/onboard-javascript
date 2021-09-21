@@ -16,23 +16,12 @@ export class GridTemplate {
             "bottom": "0px"
         });
 
-        const lable = document.createElement("lable") as HTMLLabelElement;
-        lable.htmlFor = "#search";
-        lable.innerText = "Search: ";
-        const input = document.createElement("input");
-        input.id = "search";
-        input.type = "text";
-        input.placeholder = "Type in a ID";
-        const inputSubmit = document.createElement("input") as HTMLInputElement;
-        inputSubmit.value = "Submit";
-        inputSubmit.type = "submit";
-        const form = document.createElement("form");
-        form.id = "searchForm";
-        form.append(document.createElement("br"));
-        form.append(lable);
-        form.append(input);
-        form.append(inputSubmit);
-        form.append(document.createElement("br"));
+        const form = $('<form id="searchForm"></form>');
+
+        form.append($('<label for="#search">Search: </label>'));
+        form.append($('<input id="search" type="text" placeholder="Type in an ID"></input>'));
+        form.append($('<input value="Submit" type="submit"></input>'));
+
         $(".controls").append($('<div class="form-grid"></div>'));
         $(".form-grid").append(form);
         $(".form-grid").css({

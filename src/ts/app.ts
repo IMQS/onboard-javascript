@@ -3,6 +3,8 @@ import { GridTemplate } from './grid-template.js'
 
 let timeout: number = 0;
 let gridSize: number = 0;
+let gridFraction = 5 / 6;   //A 5/6 is the portion of the window's height that is provided to the grid.
+let rowHeight = 15.6;       //15.6px is the height of a div(row) according to the 12px font-size set. 
 
 //Debounce function to handle multiple request in a short frequency as only a single request
 function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
@@ -16,11 +18,10 @@ function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 window.onload = () => {
     //Retrieve the grid size i.e. The number of records that can fit on the screen.
     //window.innerHeight is the total height of the display screen
-    //15.6px is the height of a div according to the 12px font-size set. 
     //There should be a better way for this.
-    //A 5/6 is the portion of the window's height that is provided to the grid.
+
     let windowHeight = Math.floor($(window).height() as number);
-    gridSize = Math.floor(((windowHeight * 5 / 6) / 15.6)) - 1; // Minus one for the Header record
+    gridSize = Math.floor(((windowHeight * gridFraction) / rowHeight)) - 1; // Minus one for the header record
 
     $(".parentContainer").append('<div class="myGrid"></div>');
     $(".parentContainer").append('<div class="controls"></div>');
@@ -78,7 +79,7 @@ window.onload = () => {
             $(window).on("resize", () => {
                 let oldNumberOfRecords = gridSize;
                 let windowHeight = Math.floor($(window).height() as number);
-                gridSize = Math.floor(((windowHeight * 5 / 6) / 15.6)) - 1;
+                gridSize = Math.floor(((windowHeight * gridFraction) / rowHeight)) - 1;
                 //To make sure we are working with a positive sized grid
                 if (gridSize >= 0 && oldNumberOfRecords >= 0) {
                     apiService.setGridSize(gridSize);

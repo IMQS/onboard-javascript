@@ -66,14 +66,14 @@ export class ApiService {
         if (this.topRecordIndex - (this.gridSize - 1) > -1) {
             this.topRecordIndex -= this.gridSize;
             return this.getCurrentRecords();
-        } else {
-            if (this.topRecordIndex === 0) {
-                return null;
-            } else {
-                this.topRecordIndex = 0;
-                return this.getCurrentRecords();
-            }
         }
+
+        if (this.topRecordIndex === 0) {
+            return null;
+        }
+
+        this.topRecordIndex = 0;
+        return this.getCurrentRecords();
     }
 
     next() {
@@ -81,9 +81,8 @@ export class ApiService {
         if (this.topRecordIndex + (this.gridSize - 1) < (this.totalRecords - 1)) {
             this.topRecordIndex += this.gridSize;
             return this.getCurrentRecords();
-        } else {
-            return null;
         }
+        return null;
     }
 
     searchRecord(id: string) {
