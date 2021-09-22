@@ -1,18 +1,18 @@
 export class ApiService {
 
-    private url = "http://localhost:2050";   //Backend server URL 
-    private columnNames: string[] = [];     //The names of all the columns in order
-    private totalRecords = 0;               //The total number of records
-    private dataRecords: string[][] = [[]]; //A 2-D array of the records retrieved
-    //The 1st dimension is the ID that is the index of the record
-    //The 2nd dimension is the ordered respective column values of the record
-    private topRecordIndex = 0;             //The ID of the first record in the grid displayed
-    private gridSize: number;               //The size of the grid to display
+    private url = "http://localhost:2050";   // Backend server URL 
+    private columnNames: string[] = [];     // The names of all the columns in order
+    private totalRecords = 0;               // The total number of records
+    private dataRecords: string[][] = [[]]; // A 2-D array of the records retrieved
+    // The 1st dimension is the ID that is the index of the record
+    // The 2nd dimension is the ordered respective column values of the record
+    private topRecordIndex = 0;             // The ID of the first record in the grid displayed
+    private gridSize: number;               // The size of the grid to display
 
     constructor(numberOfRecords: number) {
-        this.gridSize = numberOfRecords;    //Initialise the class with the available size of the grid
+        this.gridSize = numberOfRecords;    // Initialise the class with the available size of the grid
 
-        //Send AJAX request to server to retrieve the all the column names to display
+        // Send AJAX request to server to retrieve the all the column names to display
         $.ajax({
             "url": this.url + "/columns",
             "success": data => {
@@ -29,15 +29,15 @@ export class ApiService {
                     resolve(this.totalRecords = Number(data));
                 },
                 "error": (e) => {
-                    reject(console.log(e))  //Log the error for debugging purposes
+                    reject(console.log(e));  // Log the error for debugging purposes
                 }
             });
-        })
+        });
     }
 
     getCurrentRecords() {
         let toId: number;
-        //Calculate the "to" parameter for the records to collect
+        // Calculate the "to" parameter for the records to collect
         if (this.topRecordIndex + (this.gridSize - 1) > (this.totalRecords - 1)) {
             toId = this.totalRecords - 1;
             this.topRecordIndex = this.totalRecords - this.gridSize;
@@ -52,17 +52,17 @@ export class ApiService {
                     "to": toId.toString()
                 },
                 "success": data => {
-                    resolve(this.dataRecords = JSON.parse(data))    //store result privately
+                    resolve(this.dataRecords = JSON.parse(data));    // Store result privately
                 },
                 "error": (e) => {
-                    reject(console.log(e))  //Log the error for debugging purposes
+                    reject(console.log(e));  // Log the error for debugging purposes
                 }
-            })
-        })
+            });
+        });
     }
 
     previous() {
-        //Check if there are records to the left of the top index of the grid before sending a request
+        // Check if there are records to the left of the top index of the grid before sending a request
         if (this.topRecordIndex - (this.gridSize - 1) > -1) {
             this.topRecordIndex -= this.gridSize;
             return this.getCurrentRecords();
@@ -77,7 +77,7 @@ export class ApiService {
     }
 
     next() {
-        //Check if there are records to the right of the top index of the grid before sending a request
+        // Check if there are records to the right of the top index of the grid before sending a request
         if (this.topRecordIndex + (this.gridSize - 1) < (this.totalRecords - 1)) {
             this.topRecordIndex += this.gridSize;
             return this.getCurrentRecords();
@@ -86,7 +86,7 @@ export class ApiService {
     }
 
     searchRecord(id: string) {
-        this.topRecordIndex = Number(id);   //The searched value will always be the top record's ID
+        this.topRecordIndex = Number(id);   // The searched value will always be the top record's ID
         return this.getCurrentRecords().then(() => {
             for (let record of this.dataRecords) {
                 if (record[0] == id) {

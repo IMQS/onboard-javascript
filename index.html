@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>JS Onboard Project</title>
 	<link rel="stylesheet" href="stylesheet.css">
@@ -9,8 +10,21 @@
 
 <body>
 	<div class="parentContainer">
-	</div>	
+		<div class="myGrid"></div>
+		<div class="controls">
+			<div class="form-grid">
+				<form id="searchForm">
+					<label for="#search">Search: </label>
+					<input id="search" type="text" placeholder="Type in an ID"></input>
+					<input value="Submit" type="submit"></input>
+				</form>
+			</div>
+			<div class="control-grid">
+				<button id="prev">Previous</button>
+				<button id="next">Next</button>
+			</div>
+		</div>
+	</div>
 </body>
 
 </html>
-
