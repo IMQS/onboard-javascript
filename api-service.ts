@@ -1,4 +1,4 @@
-export class ApiService {
+class ApiService {
 
     private url = "http://localhost:2050";   // Backend server URL 
     private columnNames: string[] = [];     // The names of all the columns in order

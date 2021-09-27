@@ -1,4 +1,4 @@
-export class GridTemplate {
+class GridTemplate {
 
     constructor(private columnNames: string[], private dataRecords: string[][]) {
         this.populateHeaders();

@@ -1,5 +1,3 @@
-import { ApiService } from './api-service.js'
-import { GridTemplate } from './grid-template.js'
 
 let timeout: number = 0;
 let gridSize: number = 0;
