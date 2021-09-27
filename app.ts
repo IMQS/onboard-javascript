@@ -51,10 +51,12 @@ window.onload = () => {
             // Handle event when Next button is clicked. Debouncing is used for this function.
             $("#next").on("click", () => {
                 const fn = debounce(() => {
-                    apiService.next()?.then(() => {
-                        gridTemplate.setDataRecords(apiService.getDataRecords());
+                    apiService.next()?.then((dataRecords) => {
+                        gridTemplate.setDataRecords(dataRecords);
                         gridTemplate.displayRecords();
-                    })
+                    }).catch((e) => {
+                        console.log(e);
+                    });
                 }, 350);
                 fn();
             });
@@ -62,10 +64,12 @@ window.onload = () => {
             // Handle event when Previous button is clicked. Debouncing is used for this function.
             $("#prev").on("click", () => {
                 const fn = debounce(() => {
-                    apiService.previous()?.then(() => {
-                        gridTemplate.setDataRecords(apiService.getDataRecords());
+                    apiService.previous()?.then((dataRecords) => {
+                        gridTemplate.setDataRecords(dataRecords);
                         gridTemplate.displayRecords();
-                    })
+                    }).catch((e) => {
+                        console.log(e);
+                    });
                 }, 350);
                 fn();
             });
@@ -80,9 +84,11 @@ window.onload = () => {
                     apiService.setGridSize(gridSize);
                     if (oldNumberOfRecords < gridSize) {
                         // Only request new records if the grid size was enlarged.
-                        apiService.getCurrentRecords().then(() => {
-                            gridTemplate.setDataRecords(apiService.getDataRecords());
+                        apiService.getCurrentRecords().then((dataRecords) => {
+                            gridTemplate.setDataRecords(dataRecords);
                             gridTemplate.displayRecords();
+                        }).catch((e) => {
+                            console.log(e);
                         });
                     } else {
                         // Slice the data records to display less records to fit the grid.

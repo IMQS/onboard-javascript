@@ -87,12 +87,14 @@ export class ApiService {
 
     searchRecord(id: string): Promise<void> {
         this.topRecordIndex = Number(id);   // The searched value will always be the top record's ID
-        return this.getCurrentRecords().then(() => {
-            for (let record of this.dataRecords) {
+        return this.getCurrentRecords().then((dataRecords) => {
+            for (let record of dataRecords) {
                 if (record[0] == id) {
                     record.unshift('searched');
                 }
             }
+        }).catch((e) => {
+            console.log(e);
         });
     }
 
