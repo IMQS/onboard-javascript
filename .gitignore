@@ -1,2 +1,7 @@
 /node_modules
-/dist
+app.js
+app.js.map
+api-service.js
+api-service.js.map
+grid-template.js
+grid-template.js.map

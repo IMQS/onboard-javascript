@@ -29,8 +29,7 @@ window.onload = () => {
         apiService.getCurrentRecords().then(() => {
             let gridTemplate = new GridTemplate(apiService.getColumnNames(), apiService.getDataRecords());
 
-
-            $("#searchForm").on("submit", function (e) {
+            $("#searchForm").on("submit", (e) => {
                 let id = $("#search").val() as string;
                 const regexp = new RegExp("^[1-9][0-9]*$|0");
                 if (!regexp.test(id)) {
@@ -95,6 +94,3 @@ window.onload = () => {
         });
     });
 }
-
-
-

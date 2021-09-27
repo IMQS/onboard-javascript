@@ -3,9 +3,11 @@ export class ApiService {
     private url = "http://localhost:2050";   // Backend server URL 
     private columnNames: string[] = [];     // The names of all the columns in order
     private totalRecords = 0;               // The total number of records
-    private dataRecords: string[][] = [[]]; // A 2-D array of the records retrieved
+
+    // A 2-D array of the records retrieved
     // The 1st dimension is the ID that is the index of the record
     // The 2nd dimension is the ordered respective column values of the record
+    private dataRecords: string[][] = [[]];
     private topRecordIndex = 0;             // The ID of the first record in the grid displayed
     private gridSize: number;               // The size of the grid to display
 
@@ -21,7 +23,7 @@ export class ApiService {
         });
     }
 
-    recordCount() {
+    recordCount(): Promise<Number> {
         return new Promise((resolve, reject) => {
             $.ajax({
                 "url": this.url + "/recordCount",
@@ -29,13 +31,13 @@ export class ApiService {
                     resolve(this.totalRecords = Number(data));
                 },
                 "error": (e) => {
-                    reject(console.log(e));  // Log the error for debugging purposes
+                    reject(e);  // Log the error for debugging purposes
                 }
             });
         });
     }
 
-    getCurrentRecords() {
+    getCurrentRecords(): Promise<string[][]> {
         let toId: number;
         // Calculate the "to" parameter for the records to collect
         if (this.topRecordIndex + (this.gridSize - 1) > (this.totalRecords - 1)) {
@@ -55,13 +57,13 @@ export class ApiService {
                     resolve(this.dataRecords = JSON.parse(data));    // Store result privately
                 },
                 "error": (e) => {
-                    reject(console.log(e));  // Log the error for debugging purposes
+                    reject(e);  // Log the error for debugging purposes
                 }
             });
         });
     }
 
-    previous() {
+    previous(): Promise<string[][]> | null {
         // Check if there are records to the left of the top index of the grid before sending a request
         if (this.topRecordIndex - (this.gridSize - 1) > -1) {
             this.topRecordIndex -= this.gridSize;
@@ -76,7 +78,7 @@ export class ApiService {
         return this.getCurrentRecords();
     }
 
-    next() {
+    next(): Promise<string[][]> | null {
         // Check if there are records to the right of the top index of the grid before sending a request
         if (this.topRecordIndex + (this.gridSize - 1) < (this.totalRecords - 1)) {
             this.topRecordIndex += this.gridSize;
@@ -85,12 +87,12 @@ export class ApiService {
         return null;
     }
 
-    searchRecord(id: string) {
+    searchRecord(id: string): Promise<void> {
         this.topRecordIndex = Number(id);   // The searched value will always be the top record's ID
         return this.getCurrentRecords().then(() => {
             for (let record of this.dataRecords) {
                 if (record[0] == id) {
-                    record.unshift('searched')
+                    record.unshift('searched');
                 }
             }
         });

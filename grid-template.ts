@@ -34,16 +34,9 @@ export class GridTemplate {
             }
         }
         $(".grid-item").css({
-            "border": "1px solid #A9A9A9",
-            "display": "inline-block",
             // Equally divide column widths over the screen
             "width": `${100 / this.dataRecords[0].length}%`,
-            // This causes text to overflow over cells but keeps the cell width equal for me. Had to be done.
-            "white-space": "nowrap"
         });
-        // Display odd records with a grey background
-        $(".odd-item").css({ "background-color": "#D3D3D3" });
-        $(".searched-item").css({ "background-color": "#FF4D4D" });
     }
 
     getDataRecords(): string[][] {
@@ -63,11 +56,7 @@ export class GridTemplate {
             $(".myGrid").append(item);
         }
         $(".grid-header").css({
-            "color": "white",
-            "display": "inline-block",
             "width": `${100 / m}%`,
-            "border": "1px solid black",
-            "background-color": "#4CAF50"
         });
 
     }
