@@ -33,10 +33,6 @@ export class GridTemplate {
                 $(".myGrid").append(item);
             }
         }
-        $(".grid-item").css({
-            // Equally divide column widths over the screen
-            "width": `${100 / this.dataRecords[0].length}%`,
-        });
     }
 
     getDataRecords(): string[][] {
@@ -55,10 +51,6 @@ export class GridTemplate {
             item.innerText = columnName;
             $(".myGrid").append(item);
         }
-        $(".grid-header").css({
-            "width": `${100 / m}%`,
-        });
-
     }
 
 }

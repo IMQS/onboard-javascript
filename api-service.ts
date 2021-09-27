@@ -64,17 +64,15 @@ export class ApiService {
     }
 
     previous(): Promise<string[][]> | null {
-        // Check if there are records to the left of the top index of the grid before sending a request
-        if (this.topRecordIndex - (this.gridSize - 1) > -1) {
-            this.topRecordIndex -= this.gridSize;
-            return this.getCurrentRecords();
-        }
-
         if (this.topRecordIndex === 0) {
             return null;
         }
-
-        this.topRecordIndex = 0;
+        // Check if there are records to the left of the top index of the grid before sending a request
+        if (this.topRecordIndex - (this.gridSize - 1) > -1) {
+            this.topRecordIndex -= this.gridSize;
+        } else {
+            this.topRecordIndex = 0;
+        }
         return this.getCurrentRecords();
     }
 
