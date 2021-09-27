@@ -23,12 +23,13 @@ class ApiService {
         });
     }
 
-    recordCount(): Promise<Number> {
+    recordCount(): Promise<void> {
         return new Promise((resolve, reject) => {
             $.ajax({
                 "url": this.url + "/recordCount",
                 "success": data => {
-                    resolve(this.totalRecords = Number(data));
+                    this.totalRecords = Number(data);
+                    resolve();
                 },
                 "error": (e) => {
                     reject(e);  // Log the error for debugging purposes
