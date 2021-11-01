@@ -1,0 +1,24 @@
+{
+  "name": "onboard-javascript",
+  "version": "1.0.0",
+  "description": "This is a JavaScript project for all new developers to complete before venturing into our web frontend codebase.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -w --project ./"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SAMMOLOI/onboard-javascript.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SAMMOLOI/onboard-javascript/issues"
+  },
+  "homepage": "https://github.com/SAMMOLOI/onboard-javascript#readme",
+  "dependencies": {
+    "@types/jquery": "^3.5.6",
+    "query-string": "^7.0.1"
+  }
+}

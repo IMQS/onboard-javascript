@@ -1,13 +1,27 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+	<script src="app.js"> </script>
+	<link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 
-<body>
-	<p>Hello</p>
+<body id="body">
+	<div id="form-content">
+		Go To Start Index:<input type="number" id="index" value="0" min="0">
+		<button id="go-button" type="button">GOT TO INDEX PAGE </button>
+		<button id="previous" type="button">Go to Previous </button>
+		<button id="next" type="button">Go to Next </button>
+	</div>
+	<table id='wrapper-table'>
+		<thead id="wrapper-table-header-row">
+		</thead>
+		<tbody id="wrapper-table-content-body">
+		</tbody>
+	</table>
+	<div id="table-arbitrary-footer"></div>
 </body>
 
 </html>
-
