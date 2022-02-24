@@ -1,18 +1,42 @@
 
-
-const state = {
+let state = {
 	'page': 1,
-	'rows': 15,
+	'records': 15,
 
 	'window': 10
 }
 
-async function pagination(tableData: any, numRecords: number, page: number, rows: number) {
-	let trimStart = (page - 1) * rows
-	let trimEnd = trimStart + rows
+function searchFunction() {
+	// Get entered ID and calculate what page it is on
+	let id = Number($('#id-search').val())
+	let pageNum = Math.ceil((id + 1) / state.records)
+	console.log("Go to page ", pageNum)
+	// Set page to the one that the searched ID is on
+	state.page = pageNum
+	loadIntoTable(document.querySelector("table"))
+}
+
+
+function dropFunction() {
+	let num = Number($('#show-by').val())
+	state.records = num
+	console.log("Show records of ", state.records)
+	loadIntoTable(document.querySelector("table"))
+}
+
+
+async function pagination(tableData: any, numRecords: number, page: number, records: number) {
+	console.log("In pag: ", numRecords, " and ", page, " and ", records)
+	let trimStart = (page - 1) * records
+	let trimEnd = trimStart + records
+	console.log("In pag: trimStart", trimStart, " and trimEnd", trimEnd, " records? ", records)
 
 	let trimmedData = tableData.slice(trimStart, trimEnd)
-	let pages = Math.ceil(numRecords / rows)
+	let pages = Math.ceil(numRecords / records)
+
+	// User info: Display number of records and pages on window
+	let pageDet = document.getElementById('page-details')
+	pageDet!.innerHTML = `<p>There are <strong>${numRecords + 1}</strong> records and <strong>${pages}</strong> pages</p>`
 
 	return {
 		'data': trimmedData,
@@ -21,8 +45,11 @@ async function pagination(tableData: any, numRecords: number, page: number, rows
 }
 
 function pageButtons(pages: number) {
+	// User info: Display current page number
 	let pageNum = document.getElementById('page-number')
 	pageNum!.innerHTML = `<p>Page ${state.page}</p>`
+
+	// Select element to create pagination buttons in
 	let wrapper = document.getElementById('pagination-wrapper')
 	wrapper!.innerHTML = ""
 
@@ -70,7 +97,7 @@ function pageButtons(pages: number) {
 
 
 async function loadIntoTable(table: any) {
-	// Select elements to populate
+	// Select table elements to populate
 	let tableHead = table.querySelector("thead")
 	let tableBody = table.querySelector("tbody")
 
@@ -79,7 +106,9 @@ async function loadIntoTable(table: any) {
 	let recordsLink = "/records?from=0&to=" + cnumRecords
 	let tableData = await (await fetch(recordsLink)).json()
 
-	let rows = pagination(tableData, cnumRecords, state.page, state.rows)
+	console.log('Records:', state.records)
+
+	let rows = pagination(tableData, cnumRecords, state.page, state.records)
 	console.log('Data:', rows)
 
 	// API call for column headers

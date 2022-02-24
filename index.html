@@ -9,14 +9,25 @@
 
 <body>
 	<h1>Onboarding Project</h1>
-  <table class="table">
-	  <thead></thead>
-	  <tbody></tbody>
-  </table>
-  <p id="page-number" class="page-num">Page</p>
-  <div class="container">
-	  <div id="pagination-wrapper"></div>
-  </div>
+	<p id="page-details" class="page-det"></p>
+	<button onclick="searchFunction()">Search ID</button>
+	<input type="text" id="id-search">
+	<label>Show </label>
+	<select id="show-by" onchange="dropFunction()">
+		<option value="5">5</option>
+		<option value="10">10</option>
+		<option value="15" >15</option>
+		<option value="20">20</option>
+	  </select>
+	  <label> records</label>
+	<table class="table">
+		<thead></thead>
+		<tbody></tbody>
+	</table>
+	<p id="page-number" class="page-num">Page</p>
+	<div class="container">
+		<div id="pagination-wrapper"></div>
+	</div>
 </body>
 
 </html>

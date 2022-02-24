@@ -1,5 +1,5 @@
 body {
-	overflow: hidden; /* Hide scrollbars */
+	/* overflow: hidden; Hide scrollbars */
   }
 
 .table {
@@ -34,19 +34,15 @@ body {
 }
 
 .page-num {
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	background: #009578;
 	font-weight: bold;
 	text-align: center;
 }
 
-.center {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
 .container {
 	padding: 1rem;
-	margin: 3rem auto;
+	margin: 1rem auto;
 	display: flex;
 	justify-content: center;
 	align-items: center;
