@@ -132,7 +132,7 @@ h1 {
 	width: 100vw;
 	overflow: hidden;
 	background-color: #16191e;
-	position: absolute;
+	/* position: absolute; */
 	align-items: center;
 }
 

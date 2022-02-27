@@ -1,19 +1,43 @@
 
-let state = {
+const state = {
 	'page': 1,
 	'records': 15,
 	'window': 10
 }
 
-// Search ID function
-function searchFunction() {
-	// Get entered ID and calculate what page it is on
-	let id = Number($('#id-search').val())
-	let pageNum = Math.ceil((id + 1) / state.records)
+async function getData() {
+	// API calls for record count and headers
+	let numRecords = await (await fetch('/recordCount')).json()
+	let headers = await (await fetch('/columns')).json()
 
-	// Set page to the one that the searched ID is on
-	state.page = pageNum
-	loadIntoTable(document.querySelector("table"))
+	return {
+		'recordCount': numRecords,
+		'headers': headers
+	}
+}
+
+// Search ID function
+async function searchFunction() {
+	let id = Number($('#id-search').val())
+
+	// API calls for record amount
+	let dataInfo = getData()
+	let numRecords = (await dataInfo).recordCount - 1
+
+	if (id < 0 || id > numRecords || Number.isNaN(id)) {
+		// User info: Display error message
+		let pageInfo = document.getElementById('page-number')
+		pageInfo!.innerHTML = `<p>No records to display</p>`
+	}
+	else {
+		// Use entered ID to calculate what page it is on
+		let pageNum = Math.ceil((id + 1) / state.records)
+
+		// Set page to the one that the searched ID is on
+		state.page = pageNum
+
+		loadIntoTable(document.querySelector("table"))
+	}
 }
 
 // Select num records to display from drop down function
@@ -25,21 +49,31 @@ function dropFunction() {
 }
 
 // Records to display in table function
-async function pagination(tableData: any, numRecords: number, page: number, records: number) {
+async function pagination(recordCount: number, page: number, records: number) {
+	let pages = Math.ceil(recordCount / records)
+
 	// Calculate where records to display should start and end
 	let trimStart = (page - 1) * records
-	let trimEnd = trimStart + records
+	let trimEnd: number
+	if (page != pages) {
+		trimEnd = trimStart + records - 1
+	}
+	else {
+		trimEnd = recordCount
+	}
 
-	let trimmedData = tableData.slice(trimStart, trimEnd)
-	let pages = Math.ceil(numRecords / records)
+	// Fetch only records that must be displayed on table
+	let recordsLink = "/records?from=" + trimStart + "&to=" + trimEnd
+	let tableData = await (await fetch(recordsLink)).json()
+
 
 	// User info: Display number of records and pages on window
 	// TODO: create a global get element function
 	let pageDet = document.getElementById('page-details')
-	pageDet!.innerHTML = `<p>There are <strong>${numRecords + 1}</strong> records and <strong>${pages}</strong> pages</p>`
+	pageDet!.innerHTML = `<p>There are <strong>${recordCount + 1}</strong> records and <strong>${pages}</strong> pages</p>`
 
 	return {
-		'data': trimmedData,
+		'data': tableData,
 		'pages': pages
 	}
 }
@@ -48,13 +82,7 @@ async function pagination(tableData: any, numRecords: number, page: number, reco
 function pageButtons(pages: number) {
 	// User info: Display current page number
 	let pageNum = document.getElementById('page-number')
-	if (state.page) {
-		pageNum!.innerHTML = `<p>Page ${state.page}</p>`
-	}
-	else {
-		pageNum!.innerHTML = `<p>No records to display</p>`
-	}
-
+	pageNum!.innerHTML = `<p>Page ${state.page}</p>`
 
 	// Select element to create pagination buttons in
 	let wrapper = document.getElementById('pagination-wrapper')
@@ -113,19 +141,12 @@ async function loadIntoTable(table: any) {
 	let tableHead = table.querySelector("thead")
 	let tableBody = table.querySelector("tbody")
 
-	// API calls for record amount and data
-	let numRecords = await (await fetch('/recordCount')).json()
-	let cnumRecords = numRecords - 1
-	let recordsLink = "/records?from=0&to=" + cnumRecords
-	let tableData = await (await fetch(recordsLink)).json()
+	// API calls for record amount
+	let dataInfo = getData()
+	let cnumRecords = (await dataInfo).recordCount - 1
+	let hearders = (await dataInfo).headers
 
-	console.log('Records:', state.records)
-
-	let rows = pagination(tableData, cnumRecords, state.page, state.records)
-	console.log('Data:', rows)
-
-	// API call for column headers
-	let hearders = await (await fetch('/columns')).json()
+	let rows = pagination(cnumRecords, state.page, state.records)
 
 	// Clear the table
 	tableHead.innerHTML = "<tr></tr>"
@@ -155,7 +176,6 @@ async function loadIntoTable(table: any) {
 	pageButtons((await rows).pages)
 
 	// Display content
-	console.log("page is finally fully loaded");
 	$(".loader").fadeOut(500);
 	$(".content").fadeIn(500);
 }
