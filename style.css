@@ -1,9 +1,55 @@
-body {
-	/* overflow: hidden; Hide scrollbars */
-  }
+html {
+	font-size: 62.5%;
+	}
 
+body {
+	font-size: 16px;
+	font-size: 1.6rem;
+	min-height: 100%;
+	overflow: hidden; /* Hide scrollbars */
+	background-color: #16191e;
+	color: #fdfdfd;
+}
+h1 {
+	font-size: 36px;
+	font-size: 3.6rem;
+}
+
+/* Search ID and Show n records */
+.controls {
+	display: flex;
+	justify-content: center;
+}
+
+.search-div {
+	margin: 1rem auto;
+	
+}
+
+.drop-down {
+	margin: 1rem auto;
+	padding: 0.5rem;
+	text-align: center;
+}
+
+.search-btn {
+	color: #fdfdfd;
+	padding: 0.5rem;
+	text-decoration: none;
+	border: solid 1px #45474b;
+	background-color: #45474b;
+}
+
+.search-btn:hover:not(.selected) {
+	color: #1d1f20;
+	background-color: #cae00d;
+	border: solid 1px #cae00d;
+}
+
+
+/* Table */
 .table {
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 0 10px rgba(94, 102, 80, 0.918);
 	border-collapse: collapse;
 	/* overflow: hidden; */
 	font-weight: bold;
@@ -13,8 +59,9 @@ body {
 }
 
 .table thead th {
-	background: #009578;
-	color: #ffff;
+	background: #cae00d;
+	color: #16191e;
+	opacity: 0.9;
 }
 
 .table td,
@@ -26,20 +73,22 @@ body {
 }
 
 .table tbody tr:nth-of-type(even) {
-	background: #eeeeee;
+	background: #45474b;
 }
 
 .table tbody tr:last-of-type {
-	border-bottom: #009578;
+	border-bottom: #cae00d;
 }
 
+/* Page n underneath table */
 .page-num {
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	background: #009578;
+	color: #cae00d;
 	font-weight: bold;
+	font-size: 2.4rem;
 	text-align: center;
 }
 
+/* Pagination buttons */
 .container {
 	padding: 1rem;
 	margin: 1rem auto;
@@ -53,11 +102,12 @@ body {
 }
 
 .btn {
-    color: black;
+    color: #fdfdfd;
 	float: left;
-	padding: 8px 16px;
+	padding: 1rem;
 	text-decoration: none;
-	border-collapse: collapse;
+	border: solid 1px #45474b;
+	background-color: #45474b;
 }
 
 .button:active{
@@ -67,7 +117,42 @@ body {
 }
 
 .btn:hover:not(.selected) {
-	color: #fdfdfd;
-	background-color: #009578;
-	border: solid 1px #009578;
+	color: #1d1f20;
+	background-color: #cae00d;
+	border: solid 1px #cae00d;
+}
+
+/* Loader */
+.content {
+	display: none;
+}
+
+.loader {
+	height: 100vh;
+	width: 100vw;
+	overflow: hidden;
+	background-color: #16191e;
+	position: absolute;
+	align-items: center;
+}
+
+.loader>div{
+	height: 6rem;
+	width: 6rem;
+	border: 15px solid #45474b;
+	border-top-color: #cae00d;
+	position: absolute;
+	margin: auto;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	border-radius: 50%;
+	animation: spin 1.5s infinite linear;
+}
+
+@keyframes spin {
+	100%{
+		transform: rotate(360deg);
+	}
 }

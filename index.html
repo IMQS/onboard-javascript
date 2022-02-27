@@ -8,25 +8,36 @@
 </head>
 
 <body>
-	<h1>Onboarding Project</h1>
-	<p id="page-details" class="page-det"></p>
-	<button onclick="searchFunction()">Search ID</button>
-	<input type="text" id="id-search">
-	<label>Show </label>
-	<select id="show-by" onchange="dropFunction()">
-		<option value="5">5</option>
-		<option value="10">10</option>
-		<option value="15" >15</option>
-		<option value="20">20</option>
-	  </select>
-	  <label> records</label>
-	<table class="table">
-		<thead></thead>
-		<tbody></tbody>
-	</table>
-	<p id="page-number" class="page-num">Page</p>
-	<div class="container">
-		<div id="pagination-wrapper"></div>
+	<div class="loader">
+		<div></div>
+	</div>
+	<div class="content">
+		<h1>IMQS Onboarding Project</h1>
+		<p id="page-details" class="page-det"></p>
+		<div class="controls">
+			<div class="search-div">
+				<button class="search-btn" onclick="searchFunction(); document.getElementById('id-search').value = ''">Search ID</button>
+				<input type="text" id="id-search" onfocus="this.value=''" value="Enter ID number">
+			</div>
+			<div class="drop-down">
+				<label>Show </label>
+				<select id="show-by" onchange="dropFunction()">
+					<option value="5">5</option>
+					<option value="10">10</option>
+					<option value="15" selected>15</option>
+					<option value="20">20</option>
+				</select>
+				<label> records</label>
+			</div>
+		</div>
+		<table class="table">
+			<thead></thead>
+			<tbody></tbody>
+		</table>
+		<p id="page-number" class="page-num">Page</p>
+		<div class="container">
+			<div id="pagination-wrapper"></div>
+		</div>
 	</div>
 </body>
 
