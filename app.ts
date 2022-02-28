@@ -1,32 +1,42 @@
 
 const state = {
 	'page': 1,
-	'records': 15,
+	'records': Math.ceil(window.innerHeight / 60),
 	'window': 10
+}
+
+let RECORDCOUNT = 350
+let HEADERS = ["ID", "City", "Population"]
+
+function el(element: string) {
+	return document.getElementById(element)
 }
 
 async function getData() {
 	// API calls for record count and headers
-	let numRecords = await (await fetch('/recordCount')).json()
-	let headers = await (await fetch('/columns')).json()
-
-	return {
-		'recordCount': numRecords,
-		'headers': headers
-	}
+	RECORDCOUNT = await (await fetch('/recordCount')).json()
+	HEADERS = await (await fetch('/columns')).json()
+	console.log("Changed to ", RECORDCOUNT, " and ", HEADERS)
+	loadIntoTable(document.querySelector("table"))
 }
+
+
+// Bind to the resize event of the window object
+window.addEventListener('resize', function (event) {
+	var newHeight = window.innerHeight;
+	state.records = Math.ceil(1000000 / newHeight)
+	console.log(state.records)
+})
 
 // Search ID function
 async function searchFunction() {
 	let id = Number($('#id-search').val())
 
-	// API calls for record amount
-	let dataInfo = getData()
-	let numRecords = (await dataInfo).recordCount - 1
+	let numRecords = RECORDCOUNT
 
 	if (id < 0 || id > numRecords || Number.isNaN(id)) {
 		// User info: Display error message
-		let pageInfo = document.getElementById('page-number')
+		let pageInfo = el('page-number')
 		pageInfo!.innerHTML = `<p>No records to display</p>`
 	}
 	else {
@@ -36,16 +46,8 @@ async function searchFunction() {
 		// Set page to the one that the searched ID is on
 		state.page = pageNum
 
-		loadIntoTable(document.querySelector("table"))
+		loadIntoTable(el("table"))
 	}
-}
-
-// Select num records to display from drop down function
-function dropFunction() {
-	// Get value selected in drop down and reload table
-	let num = Number($('#show-by').val())
-	state.records = num
-	loadIntoTable(document.querySelector("table"))
 }
 
 // Records to display in table function
@@ -68,8 +70,8 @@ async function pagination(recordCount: number, page: number, records: number) {
 
 
 	// User info: Display number of records and pages on window
-	// TODO: create a global get element function
-	let pageDet = document.getElementById('page-details')
+	// TODO: Create a global get element function
+	let pageDet = el('page-details')
 	pageDet!.innerHTML = `<p>There are <strong>${recordCount + 1}</strong> records and <strong>${pages}</strong> pages</p>`
 
 	return {
@@ -81,11 +83,11 @@ async function pagination(recordCount: number, page: number, records: number) {
 // Create paging buttons functions
 function pageButtons(pages: number) {
 	// User info: Display current page number
-	let pageNum = document.getElementById('page-number')
+	let pageNum = el('page-number')
 	pageNum!.innerHTML = `<p>Page ${state.page}</p>`
 
 	// Select element to create pagination buttons in
-	let wrapper = document.getElementById('pagination-wrapper')
+	let wrapper = el('pagination-wrapper')
 	wrapper!.innerHTML = ""
 
 	let maxLeft = (state.page - Math.floor(state.window / 2))
@@ -126,13 +128,15 @@ function pageButtons(pages: number) {
 
 		state.page = Number($(this).val())
 
-		loadIntoTable(document.querySelector("table"))
+		loadIntoTable(el("table"))
 
 	})
 }
 
 // Load json data into table function
 async function loadIntoTable(table: any) {
+
+	console.log("Records: ", RECORDCOUNT, " Headers: ", HEADERS)
 	// Display loader
 	$(".content").fadeOut(500);
 	$(".loader").fadeIn(500);
@@ -141,10 +145,8 @@ async function loadIntoTable(table: any) {
 	let tableHead = table.querySelector("thead")
 	let tableBody = table.querySelector("tbody")
 
-	// API calls for record amount
-	let dataInfo = getData()
-	let cnumRecords = (await dataInfo).recordCount - 1
-	let hearders = (await dataInfo).headers
+	let cnumRecords = RECORDCOUNT - 1
+	let hearders = HEADERS
 
 	let rows = pagination(cnumRecords, state.page, state.records)
 
@@ -181,5 +183,5 @@ async function loadIntoTable(table: any) {
 }
 
 window.onload = () => {
-	loadIntoTable(document.querySelector("table"))
+	getData()
 }

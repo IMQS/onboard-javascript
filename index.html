@@ -12,25 +12,15 @@
 		<div></div>
 	</div>
 	<div class="content">
-		<h1>IMQS Onboarding Project</h1>
-		<p id="page-details" class="page-det"></p>
 		<div class="controls">
+			<h1>IMQS Onboarding Project</h1>
+			<p id="page-details" class="page-det"></p>
 			<div class="search-div">
 				<button class="search-btn" onclick="searchFunction(); document.getElementById('id-search').value = ''">Search ID</button>
 				<input type="text" id="id-search" onfocus="this.value=''" value="Enter ID number" required>
 			</div>
-			<div class="drop-down">
-				<label>Show </label>
-				<select id="show-by" onchange="dropFunction()">
-					<option value="5">5</option>
-					<option value="10">10</option>
-					<option value="15" selected>15</option>
-					<option value="20">20</option>
-				</select>
-				<label> records</label>
-			</div>
 		</div>
-		<table class="table">
+		<table id="table" class="table">
 			<thead></thead>
 			<tbody></tbody>
 		</table>
