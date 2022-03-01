@@ -1,12 +1,15 @@
 
 const state = {
 	'page': 1,
-	'records': Math.ceil(window.innerHeight / 60),
-	'window': 10
+	'records': Math.floor((window.innerHeight - 200) / 40),
+	'window': 10,
+	'trimStart': 0,
+	'trimEnd': 10
 }
 
 let RECORDCOUNT = 350
 let HEADERS = ["ID", "City", "Population"]
+let timeOutFunctionId: any
 
 function el(element: string) {
 	return document.getElementById(element)
@@ -16,17 +19,93 @@ async function getData() {
 	// API calls for record count and headers
 	RECORDCOUNT = await (await fetch('/recordCount')).json()
 	HEADERS = await (await fetch('/columns')).json()
-	console.log("Changed to ", RECORDCOUNT, " and ", HEADERS)
 	loadIntoTable(document.querySelector("table"))
+	console.log("The height of the window is: ", self.innerHeight)
 }
 
 
 // Bind to the resize event of the window object
-window.addEventListener('resize', function (event) {
-	var newHeight = window.innerHeight;
-	state.records = Math.ceil(1000000 / newHeight)
-	console.log(state.records)
+window.addEventListener('resize', function () {
+	let newHeight = Math.floor((window.innerHeight - 200) / 40);
+	let diff = Math.ceil(newHeight - state.records)
+
+	console.log("Must be: ", newHeight)
+	console.log("Currently is: ", state.records)
+
+	let table = document.querySelector("table")
+	let tableBody = table?.querySelector("tbody")
+
+	// state.records = newHeight
+	let pages = Math.ceil(RECORDCOUNT / state.records)
+	pageButtons(pages)
+
+	if (diff < 0) {
+		// Delete rows
+		console.log("Delete ", diff, " rows")
+
+		console.log("Current record start: ", state.trimStart, " and end: ", state.trimEnd)
+
+		deleteRows(state.records, diff)
+
+		state.trimEnd = state.trimEnd + diff
+		console.log("After delete record start: ", state.trimStart, " and end: ", state.trimEnd)
+		state.records = newHeight
+	}
+	else if (diff > 0) {
+		// Add rows
+		console.log("Add ", diff, " rows")
+
+		state.records = newHeight
+
+		console.log("Current record start: ", state.trimStart, " and end: ", state.trimEnd)
+		let start = state.trimEnd + 1
+		let end = state.trimEnd + diff
+		console.log("After record start: ", state.trimStart, " and end: ", end)
+
+		let recordsLink = "/records?from=" + start + "&to=" + end
+
+		addRows(recordsLink)
+
+		state.trimEnd = state.trimEnd + diff
+
+
+	}
+	else {
+		console.log("Do nothing")
+	}
+
 })
+
+async function addRows(link: string) {
+	let table = document.querySelector("table")
+	let tableBody = table?.querySelector("tbody")
+	let data = await (await fetch(link)).json();
+	for (let row of data) {
+		let rowElement = document.createElement("tr")
+
+		for (let cellText of row) {
+			let cellElement = document.createElement("td")
+
+			cellElement.textContent = cellText
+			rowElement.appendChild(cellElement);
+		}
+		tableBody?.appendChild(rowElement)
+	}
+}
+
+async function deleteRows(newHeight: number, diff: number) {
+	let table = document.querySelector("table")
+	let tableBody = table?.querySelector("tbody")
+	let num = newHeight - 1
+
+	console.log("start at ", newHeight)
+
+	for (let i = num; i > (num + diff); i--) {
+		console.log("deleted a row")
+		tableBody!.deleteRow(i)
+	}
+
+}
 
 // Search ID function
 async function searchFunction() {
@@ -55,27 +134,25 @@ async function pagination(recordCount: number, page: number, records: number) {
 	let pages = Math.ceil(recordCount / records)
 
 	// Calculate where records to display should start and end
-	let trimStart = (page - 1) * records
-	let trimEnd: number
+	state.trimStart = (page - 1) * records
 	if (page != pages) {
-		trimEnd = trimStart + records - 1
+		state.trimEnd = state.trimStart + records - 1
 	}
 	else {
-		trimEnd = recordCount
+		state.trimEnd = recordCount
 	}
 
 	// Fetch only records that must be displayed on table
-	let recordsLink = "/records?from=" + trimStart + "&to=" + trimEnd
-	let tableData = await (await fetch(recordsLink)).json()
+	let recordsLink = "/records?from=" + state.trimStart + "&to=" + state.trimEnd
+
+	addRows(recordsLink)
 
 
 	// User info: Display number of records and pages on window
-	// TODO: Create a global get element function
 	let pageDet = el('page-details')
 	pageDet!.innerHTML = `<p>There are <strong>${recordCount + 1}</strong> records and <strong>${pages}</strong> pages</p>`
 
 	return {
-		'data': tableData,
 		'pages': pages
 	}
 }
@@ -136,7 +213,6 @@ function pageButtons(pages: number) {
 // Load json data into table function
 async function loadIntoTable(table: any) {
 
-	console.log("Records: ", RECORDCOUNT, " Headers: ", HEADERS)
 	// Display loader
 	$(".content").fadeOut(500);
 	$(".loader").fadeIn(500);
@@ -148,7 +224,7 @@ async function loadIntoTable(table: any) {
 	let cnumRecords = RECORDCOUNT - 1
 	let hearders = HEADERS
 
-	let rows = pagination(cnumRecords, state.page, state.records)
+
 
 	// Clear the table
 	tableHead.innerHTML = "<tr></tr>"
@@ -162,19 +238,8 @@ async function loadIntoTable(table: any) {
 		tableHead.querySelector("tr").appendChild(headerElement)
 	}
 
-	// Populate the rows
-	for (let row of (await rows).data) {
-		let rowElement = document.createElement("tr")
+	let rows = pagination(cnumRecords, state.page, state.records)
 
-		for (let cellText of row) {
-			let cellElement = document.createElement("td")
-
-			cellElement.textContent = cellText
-			rowElement.appendChild(cellElement);
-		}
-
-		tableBody.appendChild(rowElement)
-	}
 	pageButtons((await rows).pages)
 
 	// Display content

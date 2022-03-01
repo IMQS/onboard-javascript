@@ -19,6 +19,13 @@ body {
 h1 {
 	font-size: 36px;
 	font-size: 3.6rem;
+	text-overflow: clip; 
+    white-space: nowrap;
+}
+
+.page-det {
+	text-overflow: clip; 
+    white-space: nowrap;
 }
 
 /* Search ID and Show n records */
@@ -70,6 +77,7 @@ h1 {
 .table td,
 .table th {
 	padding: 10px 20px;
+	height: 10px;
 	overflow: hidden; 
     text-overflow: clip; 
     white-space: nowrap;
@@ -88,7 +96,7 @@ h1 {
 	color: #cae00d;
 	font-weight: bold;
 	font-size: 2.4rem;
-	text-align: center;
+	margin-left: 6rem;
 }
 
 /* Pagination buttons */
@@ -98,6 +106,8 @@ h1 {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	position: absolute;
+	bottom: -2em;
 }
 
 .controls-item {
