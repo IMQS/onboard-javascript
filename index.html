@@ -13,9 +13,10 @@
 	</div>
 	<div class="content">
 		<div class="controls">
-			<h1>IMQS Onboarding Project</h1>
-			<p id="page-details" class="page-det"></p>
-			<div class="search-div">
+			<div class="constrols-heading">
+				<h1>IMQS Onboarding Project</h1>
+			</div>
+			<div class="constrols-search">
 				<button class="search-btn" onclick="searchFunction(); document.getElementById('id-search').value = ''">Search ID</button>
 				<input type="text" id="id-search" onfocus="this.value=''" value="Enter ID number" required>
 			</div>
@@ -25,7 +26,7 @@
 			<tbody></tbody>
 		</table>
 		<div class="container">
-			<div id="pagination-wrapper"></div>
+			<div id="pagination-wrapper" class="pagination-wrapper"></div>
 			<p id="page-number" class="page-num">Page</p>
 		</div>
 	</div>
