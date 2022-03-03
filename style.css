@@ -95,9 +95,10 @@ h1 {
 	justify-content: center;
 	align-items: center;
 	position: absolute;
-	bottom: -2em;
+	bottom: -1rem;
 	text-overflow: clip; 
     white-space: nowrap;
+	background-color: #16191e;
 	
 }
 
@@ -115,6 +116,7 @@ h1 {
 .pagination-wrapper {
     width: 70%;
 	overflow-x: auto;
+	margin-left: 1rem;
 }
 
 .btn {
@@ -126,11 +128,18 @@ h1 {
 	background-color: #45474b;
 }
 
-.btn:hover:not(.selected) {
+.btn:hover:not(.btn:disabled) {
 	color: #1d1f20;
 	background-color: #cae00d;
 	border: solid 1px #cae00d;
 	cursor: pointer;
+}
+
+.btn:disabled,
+.btn[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
 }
 
  /* width */

@@ -21,13 +21,18 @@
 				<input type="text" id="id-search" onfocus="this.value=''" value="Enter ID number" required>
 			</div>
 		</div>
-		<table id="table" class="table">
-			<thead></thead>
-			<tbody></tbody>
+		<table id="content-table" class="table">
+			<thead id="content-thead"></thead>
+			<tbody id="content-tbody"></tbody>
 		</table>
 		<div class="container">
-			<div id="pagination-wrapper" class="pagination-wrapper"></div>
-			<p id="page-number" class="page-num">Page</p>
+			<div id="pagination-wrapper" class="pagination-wrapper">
+				<button id="first" class="page btn" onclick="clickFirst()">&#171; First</button>
+				<button id="prev" class="page btn" onclick="clickPrev()" >Prev</button>
+				<button id="next" class="page btn" onclick="clickNext()">Next</button>
+				<button id="last" class="page btn" onclick="clickLast()"> Last &#187;</button>
+			</div>
+			<p id="page-number" class="page-num"></p>
 		</div>
 	</div>
 </body>
