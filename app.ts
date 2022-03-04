@@ -30,13 +30,13 @@ async function getData() {
 
 // Search entered ID
 async function searchFunction() {
+	let idString = $('#id-search').val()
 	let id = Number($('#id-search').val());
 	let pageInfo = el('page-number');
-	let numRecords = RECORDCOUNT;
+	let numRecords = RECORDCOUNT - 1;
 
-	pageInfo!.innerHTML = `<p></p>`;
 
-	if (id < 0 || id > numRecords || Number.isNaN(id)) {
+	if (id < 0 || id > numRecords || Number.isNaN(id) || idString == "") {
 		// User info: Display error message
 		pageInfo!.innerHTML = `<p>No records to display</p>`;
 	}
@@ -111,8 +111,8 @@ async function deleteRows(newHeight: number, diff: number) {
 async function loadIntoTable(table: any) {
 
 	// Display loader
-	$(".content").fadeOut(500);
-	$(".loader").fadeIn(500);
+	$(".content").fadeOut(200);
+	$(".loader").fadeIn(200);
 
 	// UI "Aesthetic": update buttons
 	el('first')?.removeAttribute("disabled");
@@ -129,6 +129,9 @@ async function loadIntoTable(table: any) {
 		el('first')?.setAttribute("disabled", "disabled");
 		el('prev')?.setAttribute("disabled", "disabled");
 	}
+
+	let pageInfo = el('page-number');
+	pageInfo!.innerHTML = `<p></p>`;
 
 	// Select table elements to populate
 	let tableHead = el("content-thead");
@@ -155,19 +158,9 @@ async function loadIntoTable(table: any) {
 	addRows(recordsLink);
 
 	// Display content
-	$(".loader").fadeOut(500);
-	$(".content").fadeIn(500);
+	$(".loader").fadeOut(200);
+	$(".content").fadeIn(200);
 }
-
-
-// Code is only triggered once per user input
-const debounce = (fn: Function, ms = 300) => {
-	let timeoutId: ReturnType<typeof setTimeout>;
-	return function (this: any, ...args: any[]) {
-		clearTimeout(timeoutId);
-		timeoutId = setTimeout(() => fn.apply(this, args), ms);
-	};
-};
 
 
 // Calculate what data should be fetch when page buttons are clicked
@@ -223,7 +216,18 @@ function pageFunction(btnName: string) {
 	else {
 		console.log("Grey out");
 	}
+
 }
+
+
+// Code is only triggered once per user input
+const debounce = (fn: Function, ms: number) => {
+	let timeoutId: ReturnType<typeof setTimeout>;
+	return function (this: any, ...args: any[]) {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(() => fn.apply(this, args), ms);
+	};
+};
 
 
 // Last resort debounce application for buttons
@@ -239,14 +243,14 @@ function inputNext() {
 function inputLast() {
 	pageFunction('last');
 }
-const clickFirst = debounce(() => inputFirst(), 600);
-const clickPrev = debounce(() => inputPrev(), 600);
-const clickNext = debounce(() => inputNext(), 600);
-const clickLast = debounce(() => inputLast(), 600);
+const clickFirst = debounce(() => inputFirst(), 800);
+const clickPrev = debounce(() => inputPrev(), 800);
+const clickNext = debounce(() => inputNext(), 800);
+const clickLast = debounce(() => inputLast(), 800);
 
 
 // Add/remove rows from table based on resize event of the window
-window.addEventListener("resize", debounce(() => {
+window.addEventListener("resize", debounce(async () => {
 
 	// Calculate number rows to be added/deleted
 	let newHeight = Math.floor((window.innerHeight - 160) / 40);
@@ -266,17 +270,18 @@ window.addEventListener("resize", debounce(() => {
 	}
 	else if (diff > 0 && state.trimEnd == RECORDCOUNT - 1) {
 		// Prepend rows as last page gets bigger
+		let timeoutId: ReturnType<typeof setTimeout>;
+
 		end = state.trimStart - 1;
 		start = state.trimStart - diff;
 
-
 		for (let i = end; i >= start; i--) {
 			let recordsLink = "/records?from=" + i + "&to=" + i;
-			prependRows(recordsLink);
+			await prependRows(recordsLink);
 		}
 
 
-		state.trimStart = state.trimStart + diff;
+		state.trimStart = state.trimStart - diff;
 		state.records = newHeight;
 
 	}
@@ -286,7 +291,6 @@ window.addEventListener("resize", debounce(() => {
 		start = end - addEnd + 1;
 		let recordsLink = "/records?from=" + start + "&to=" + end;
 		addRows(recordsLink);
-		console.log("Start ", start, " and end ", end);
 
 		let addTop = diff - addEnd;
 		end = state.trimStart - 1;
@@ -294,12 +298,11 @@ window.addEventListener("resize", debounce(() => {
 
 		for (let i = end; i >= start; i--) {
 			let recordsLink = "/records?from=" + i + "&to=" + i;
-			prependRows(recordsLink);
+			await prependRows(recordsLink);
 		}
-		console.log("Start ", start, " and end ", end);
 
 		state.trimEnd = RECORDCOUNT - 1;
-		state.trimStart = state.trimEnd - (newHeight - 1)
+		state.trimStart = state.trimStart - addTop;
 		state.records = newHeight;
 	}
 	else if (diff > 0 && start <= RECORDCOUNT - 1) {
