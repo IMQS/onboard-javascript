@@ -10,16 +10,15 @@ let RECORDCOUNT: number;
 let HEADERS: string[];
 
 // Global document elements
-let contentTable: HTMLElement | null;
-let tableBody: HTMLTableSectionElement | null;
-let pageInfo: HTMLElement | null;
-let firstBtn: HTMLElement | null;
-let prevBtn: HTMLElement | null;
-let nextBtn: HTMLElement | null;
-let lastBtn: HTMLElement | null;
-let tableHead: HTMLElement | null;
-let inputBox: HTMLElement | null;
-
+let contentTable: HTMLElement | null = document.getElementById('content-table');
+let tableBody: HTMLTableSectionElement | null = contentTable!.querySelector("tbody");
+let tableHead: HTMLElement | null = document.getElementById("content-thead");
+let pageInfo: HTMLElement | null = document.getElementById('page-info');
+let firstBtn: HTMLElement | null = document.getElementById('first');
+let prevBtn: HTMLElement | null = document.getElementById('prev');
+let nextBtn: HTMLElement | null = document.getElementById('next');
+let lastBtn: HTMLElement | null = document.getElementById('last');
+let inputBox: HTMLElement | null = document.getElementById('id-search');
 
 
 // Fetch headers and record count
@@ -32,6 +31,17 @@ async function getData() {
 
 	// Populate table with fetched data
 	loadIntoTable(contentTable);
+}
+
+
+window.onload = () => {
+	trimStart = 0
+	trimEnd = trimStart + records - 1;
+
+	firstBtn?.setAttribute("disabled", "disabled");
+	prevBtn?.setAttribute("disabled", "disabled");
+
+	getData();
 }
 
 
@@ -79,7 +89,7 @@ async function addRows(link: string) {
 			tableBody!.appendChild(rowElement); // Append rows
 		}
 		else {
-			tableBody?.prepend(rowElement); /**Prepend rows*/
+			tableBody!.prepend(rowElement); /**Prepend rows*/
 		}
 
 	}
@@ -145,65 +155,6 @@ async function loadIntoTable(table: any) {
 	$(".content").fadeIn(200);
 }
 
-
-// TODO Divide function into onclick events
-// Calculate what data should be fetch when page buttons are clicked
-function pageFunction(btnName: string) {
-	let isValid = false
-
-	// Set trim to start of data
-	if (btnName == "first" && trimStart != 0) {
-		isValid = true;
-		trimStart = 0;
-		trimEnd = trimStart + records - 1;
-	}
-
-	// Set trim to previous data
-	if (btnName == "prev" && trimStart != 0) {
-		// If previous page is end of data && there are not enough records to fill window
-		if ((trimStart - 1) - (records - 1) < 0) {
-			trimStart = 0;
-			trimEnd = trimStart + records - 1;
-		}
-		else {
-			trimEnd = trimStart - 1;
-			trimStart = trimEnd - records + 1;
-		}
-		isValid = true;
-
-	}
-
-	// Set trim to next data
-	if (btnName == "next" && trimEnd != RECORDCOUNT - 1) {
-		// If next page is end of data && there are not enough records to fill window
-		if ((RECORDCOUNT - 1) - (trimEnd + 1) < records) {
-			trimEnd = RECORDCOUNT - 1;
-			trimStart = trimEnd - records + 1;
-		}
-		else {
-			trimStart = trimEnd + 1;
-			trimEnd = trimStart + records - 1;
-		}
-		isValid = true;
-	}
-
-	// Set trim to end of data
-	if (btnName == "last" && trimEnd != RECORDCOUNT - 1) {
-		isValid = true;
-		trimEnd = RECORDCOUNT - 1;
-		trimStart = trimEnd - records + 1;
-	}
-
-	if (isValid) {
-		loadIntoTable(contentTable);
-	}
-	else {
-		console.log("Grey out");
-	}
-
-}
-
-
 // Code is only triggered once per user input
 const debounce = (fn: Function, ms: number) => {
 	let timeoutId: ReturnType<typeof setTimeout>;
@@ -214,23 +165,54 @@ const debounce = (fn: Function, ms: number) => {
 };
 
 
-// Last resort debounce application for buttons
-function inputFirst() {
-	pageFunction('first');
-}
-function inputPrev() {
-	pageFunction('prev');
-}
-function inputNext() {
-	pageFunction('next');
-}
-function inputLast() {
-	pageFunction('last');
-}
-const clickFirst = debounce(() => inputFirst(), 800);
-const clickPrev = debounce(() => inputPrev(), 800);
-const clickNext = debounce(() => inputNext(), 800);
-const clickLast = debounce(() => inputLast(), 800);
+// Set trim to start of data
+firstBtn!.addEventListener("click", debounce(() => {
+	trimStart = 0;
+	trimEnd = trimStart + records - 1;
+	loadIntoTable(contentTable);
+}, 800)
+);
+
+
+// Set trim to previous data
+prevBtn!.addEventListener("click", debounce(() => {
+	// If previous page is end of data && there are not enough records to fill window
+	if ((trimStart - 1) - (records - 1) < 0) {
+		trimStart = 0;
+		trimEnd = trimStart + records - 1;
+	}
+	else {
+		trimEnd = trimStart - 1;
+		trimStart = trimEnd - records + 1;
+	}
+	loadIntoTable(contentTable);
+}, 800)
+);
+
+
+// Set trim to next data
+nextBtn!.addEventListener("click", debounce(() => {
+	// If next page is end of data && there are not enough records to fill window
+	if ((RECORDCOUNT - 1) - (trimEnd + 1) < records) {
+		trimEnd = RECORDCOUNT - 1;
+		trimStart = trimEnd - records + 1;
+	}
+	else {
+		trimStart = trimEnd + 1;
+		trimEnd = trimStart + records - 1;
+	}
+	loadIntoTable(contentTable);
+}, 800)
+);
+
+
+// Set trim to end of data
+lastBtn!.addEventListener("click", debounce(() => {
+	trimEnd = RECORDCOUNT - 1;
+	trimStart = trimEnd - records + 1;
+	loadIntoTable(contentTable);
+}, 800)
+);
 
 
 // Add/remove rows from table based on resize event of the window
@@ -325,25 +307,6 @@ window.addEventListener("resize", debounce(async () => {
 ); // Log window dimensions at most every 100ms
 
 
-window.onload = () => {
-	trimStart = 0
-	trimEnd = trimStart + records - 1;
-
-	firstBtn?.setAttribute("disabled", "disabled");
-	prevBtn?.setAttribute("disabled", "disabled");
-
-	// Get document elements when page loads
-	contentTable = document.getElementById('content-table');
-	tableBody = contentTable!.querySelector("tbody");
-	tableHead = document.getElementById("content-thead");
-	pageInfo = document.getElementById('page-number');
-	firstBtn = document.getElementById('first');
-	prevBtn = document.getElementById('prev');
-	nextBtn = document.getElementById('next');
-	lastBtn = document.getElementById('last');
-	inputBox = document.getElementById('id-search');
-	getData();
-}
 
 
 
