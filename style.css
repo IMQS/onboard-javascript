@@ -1,7 +1,7 @@
 
 html {
 	font-size: 62.5%;
-	}
+}
 
 body {
 	font-size: 16px;
@@ -136,30 +136,30 @@ h1 {
 
 .btn:disabled,
 .btn[disabled]{
-  border: 1px solid #999999;
-  background-color: #cccccc;
-  color: #666666;
+	border: 1px solid #999999;
+	background-color: #cccccc;
+	color: #666666;
 }
 
- /* width */
- ::-webkit-scrollbar {
+/* width */
+::-webkit-scrollbar {
 	height: 10px;
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
+}
+
+/* Track */
+::-webkit-scrollbar-track {
 	background: #16191e;
-  }
-  
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
 	background: #888;
-  }
-  
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
 	background: #555;
-  } 
+}
 
 /* Loader */
 .content {

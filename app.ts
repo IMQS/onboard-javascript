@@ -1,38 +1,45 @@
 
-let state = {
-	'records': Math.floor((window.innerHeight - 160) / 40), // Estimate of available table space
-	'trimStart': 0,
-	'trimEnd': 10,
-	'countRec': 0
-}
+let records = Math.floor((window.innerHeight - 160) / 40); // Estimate of available table space
+let trimStart: number;
+let trimEnd: number;
+let countRec: number;
+let isAppend: boolean;
 
+// Variables fetched once with load of window
+let RECORDCOUNT: number;
+let HEADERS: string[];
 
-// These are 'technically' constants
-let RECORDCOUNT = 350;
-let HEADERS = ["ID", "City", "Population"];
+// Global document elements
+let contentTable: HTMLElement | null;
+let tableBody: HTMLTableSectionElement | null;
+let pageInfo: HTMLElement | null;
+let firstBtn: HTMLElement | null;
+let prevBtn: HTMLElement | null;
+let nextBtn: HTMLElement | null;
+let lastBtn: HTMLElement | null;
+let tableHead: HTMLElement | null;
+let inputBox: HTMLElement | null;
 
-// 'Global' get element 
-function el(element: string) {
-	return document.getElementById(element);
-}
 
 
 // Fetch headers and record count
 async function getData() {
 	// API calls for record count and headers
-	RECORDCOUNT = await (await fetch('/recordCount')).json();
-	HEADERS = await (await fetch('/columns')).json();
+	RECORDCOUNT = await fetch('/recordCount')
+		.then(resp => resp.json());
+	HEADERS = await fetch('/columns')
+		.then(resp => resp.json());
 
 	// Populate table with fetched data
-	loadIntoTable(el('content-table'));
+	loadIntoTable(contentTable);
 }
 
 
+// TODO Pierre's changes
 // Search entered ID
 async function searchFunction() {
 	let idString = $('#id-search').val()
 	let id = Number($('#id-search').val());
-	let pageInfo = el('page-number');
 	let numRecords = RECORDCOUNT - 1;
 
 
@@ -41,28 +48,29 @@ async function searchFunction() {
 		pageInfo!.innerHTML = `<p>No records to display</p>`;
 	}
 	else {
-		// Use entered ID to calculate what page it is on
-		if ((RECORDCOUNT - 1) - id >= state.records) {
-			state.trimStart = id;
-			state.trimEnd = state.trimStart + (state.records - 1);
+		// Use entered ID to calculate what records should display
+		if ((RECORDCOUNT - 1) - id >= records) {
+			trimStart = id;
+			trimEnd = trimStart + (records - 1);
 		}
 		else {
-			state.trimEnd = RECORDCOUNT - 1;
-			state.trimStart = state.trimEnd - state.records + 1;
+			trimEnd = RECORDCOUNT - 1;
+			trimStart = trimEnd - records + 1;
 		}
-		loadIntoTable(el("table"));
+		loadIntoTable(contentTable);
 	}
+	(<HTMLInputElement>inputBox).value = '';
 }
 
 
 // Add rows to table
 async function addRows(link: string) {
-	let table = el("content-table");
-	let tableBody = table?.querySelector("tbody");
-	let data = await (await fetch(link)).json();
+	let data = await fetch(link)
+		.then(resp => resp.json());
+
 	for (let row of data) {
 		let rowElement = document.createElement("tr");
-		state.countRec += 1;
+		countRec += 1;
 
 		for (let cellText of row) {
 			let cellElement = document.createElement("td");
@@ -70,36 +78,20 @@ async function addRows(link: string) {
 			cellElement.textContent = cellText;
 			rowElement.appendChild(cellElement); // Append cells
 		}
-		tableBody?.appendChild(rowElement); // Append rows
-	}
-}
-
-
-// Prepend rows to table
-async function prependRows(link: string) {
-	let table = el("content-table");
-	let tableBody = table?.querySelector("tbody");
-	let data = await (await fetch(link)).json();
-	for (let row of data) {
-		let rowElement = document.createElement("tr");
-		state.countRec += 1;
-
-		for (let cellText of row) {
-			let cellElement = document.createElement("td");
-
-			cellElement.textContent = cellText;
-			rowElement.appendChild(cellElement);
+		if (isAppend) {
+			tableBody!.appendChild(rowElement); // Append rows
 		}
-		tableBody?.prepend(rowElement); // Prepend rows
+		else {
+			tableBody?.prepend(rowElement); /**Prepend rows*/
+		}
+
 	}
 }
 
 
 // Delete rows from table
 async function deleteRows(newHeight: number, diff: number) {
-	let table = el("content-table");
-	let tableBody = table?.querySelector("tbody");
-	let num = newHeight - 1
+	let num = newHeight - 1;
 
 	for (let i = num; i > (num + diff); i--) {
 		tableBody!.deleteRow(i);
@@ -115,36 +107,29 @@ async function loadIntoTable(table: any) {
 	$(".loader").fadeIn(200);
 
 	// UI "Aesthetic": update buttons
-	el('first')?.removeAttribute("disabled");
-	el('prev')?.removeAttribute("disabled");
-	el('next')?.removeAttribute("disabled");
-	el('last')?.removeAttribute("disabled");
+	firstBtn?.removeAttribute("disabled");
+	prevBtn?.removeAttribute("disabled");
+	nextBtn?.removeAttribute("disabled");
+	lastBtn?.removeAttribute("disabled");
 
-	if (state.trimEnd == RECORDCOUNT - 1) {
-		el('last')?.setAttribute("disabled", "disabled");
-		el('next')?.setAttribute("disabled", "disabled");
+	if (trimEnd == RECORDCOUNT - 1) {
+		lastBtn?.setAttribute("disabled", "disabled");
+		nextBtn?.setAttribute("disabled", "disabled");
 	}
 
-	if (state.trimStart == 0) {
-		el('first')?.setAttribute("disabled", "disabled");
-		el('prev')?.setAttribute("disabled", "disabled");
+	if (trimStart == 0) {
+		firstBtn?.setAttribute("disabled", "disabled");
+		prevBtn?.setAttribute("disabled", "disabled");
 	}
 
-	let pageInfo = el('page-number');
 	pageInfo!.innerHTML = `<p></p>`;
-
-	// Select table elements to populate
-	let tableHead = el("content-thead");
-	let tableBody = el("content-tbody");
-
-	let hearders = HEADERS;
 
 	// Clear the table
 	tableHead!.innerHTML = "<tr></tr>";
 	tableBody!.innerHTML = "";
 
 	// Populate the headers
-	for (let headerText of hearders) {
+	for (let headerText of HEADERS) {
 		let headerElement = document.createElement("th");
 
 		headerElement.textContent = headerText;
@@ -152,9 +137,10 @@ async function loadIntoTable(table: any) {
 	}
 
 	// Fetch only records that must be displayed on table
-	let recordsLink = "/records?from=" + state.trimStart + "&to=" + state.trimEnd;
+	let recordsLink = "/records?from=" + trimStart + "&to=" + trimEnd;
 
-	state.countRec = 0;
+	countRec = 0;
+	isAppend = true;
 	addRows(recordsLink);
 
 	// Display content
@@ -163,55 +149,56 @@ async function loadIntoTable(table: any) {
 }
 
 
+// TODO Divide function into onclick events
 // Calculate what data should be fetch when page buttons are clicked
 function pageFunction(btnName: string) {
 	let isValid = false
 
 	// Set trim to start of data
-	if (btnName == "first" && state.trimStart != 0) {
+	if (btnName == "first" && trimStart != 0) {
 		isValid = true;
-		state.trimStart = 0;
-		state.trimEnd = state.trimStart + state.records - 1;
+		trimStart = 0;
+		trimEnd = trimStart + records - 1;
 	}
 
 	// Set trim to previous data
-	if (btnName == "prev" && state.trimStart != 0) {
+	if (btnName == "prev" && trimStart != 0) {
 		// If previous page is end of data && there are not enough records to fill window
-		if ((state.trimStart - 1) - (state.records - 1) < 0) {
-			state.trimStart = 0;
-			state.trimEnd = state.trimStart + state.records - 1;
+		if ((trimStart - 1) - (records - 1) < 0) {
+			trimStart = 0;
+			trimEnd = trimStart + records - 1;
 		}
 		else {
-			state.trimEnd = state.trimStart - 1;
-			state.trimStart = state.trimEnd - state.records + 1;
+			trimEnd = trimStart - 1;
+			trimStart = trimEnd - records + 1;
 		}
 		isValid = true;
 
 	}
 
 	// Set trim to next data
-	if (btnName == "next" && state.trimEnd != RECORDCOUNT - 1) {
+	if (btnName == "next" && trimEnd != RECORDCOUNT - 1) {
 		// If next page is end of data && there are not enough records to fill window
-		if ((RECORDCOUNT - 1) - (state.trimEnd + 1) < state.records) {
-			state.trimEnd = RECORDCOUNT - 1;
-			state.trimStart = state.trimEnd - state.records + 1;
+		if ((RECORDCOUNT - 1) - (trimEnd + 1) < records) {
+			trimEnd = RECORDCOUNT - 1;
+			trimStart = trimEnd - records + 1;
 		}
 		else {
-			state.trimStart = state.trimEnd + 1;
-			state.trimEnd = state.trimStart + state.records - 1;
+			trimStart = trimEnd + 1;
+			trimEnd = trimStart + records - 1;
 		}
 		isValid = true;
 	}
 
 	// Set trim to end of data
-	if (btnName == "last" && state.trimEnd != RECORDCOUNT - 1) {
+	if (btnName == "last" && trimEnd != RECORDCOUNT - 1) {
 		isValid = true;
-		state.trimEnd = RECORDCOUNT - 1;
-		state.trimStart = state.trimEnd - state.records + 1;
+		trimEnd = RECORDCOUNT - 1;
+		trimStart = trimEnd - records + 1;
 	}
 
 	if (isValid) {
-		loadIntoTable(el("table"));
+		loadIntoTable(contentTable);
 	}
 	else {
 		console.log("Grey out");
@@ -251,96 +238,113 @@ const clickLast = debounce(() => inputLast(), 800);
 
 // Add/remove rows from table based on resize event of the window
 window.addEventListener("resize", debounce(async () => {
+	isAppend = false;
 
 	// Calculate number rows to be added/deleted
 	let newHeight = Math.floor((window.innerHeight - 160) / 40);
-	let diff = newHeight - state.records;
+	let diff = newHeight - records;
 
-	let start = state.trimEnd + 1;
-	let end = state.trimEnd + diff;
+	let start = trimEnd + 1;
+	let end = trimEnd + diff;
 
 
 	if (diff < 0) {
 		// Delete rows from last page
-		deleteRows(state.countRec, diff);
+		deleteRows(countRec, diff);
 
-		state.countRec = state.countRec + diff;
-		state.trimEnd = state.trimEnd + diff;
-		state.records = newHeight;
+		countRec = countRec + diff;
+		trimEnd = trimEnd + diff;
+		records = newHeight;
 	}
-	else if (diff > 0 && state.trimEnd == RECORDCOUNT - 1) {
+	else if (diff > 0 && trimEnd == RECORDCOUNT - 1) {
 		// Prepend rows as last page gets bigger
 		let timeoutId: ReturnType<typeof setTimeout>;
 
-		end = state.trimStart - 1;
-		start = state.trimStart - diff;
+		end = trimStart - 1;
+		start = trimStart - diff;
+		isAppend = false;
 
 		for (let i = end; i >= start; i--) {
 			let recordsLink = "/records?from=" + i + "&to=" + i;
-			await prependRows(recordsLink);
+			await addRows(recordsLink);
 		}
 
 
-		state.trimStart = state.trimStart - diff;
-		state.records = newHeight;
+		trimStart = trimStart - diff;
+		records = newHeight;
 
 	}
 	else if (diff > 0 && end >= RECORDCOUNT) {
-		let addEnd = (RECORDCOUNT - 1) - state.trimEnd;
+		let addEnd = (RECORDCOUNT - 1) - trimEnd;
 		end = RECORDCOUNT - 1;
 		start = end - addEnd + 1;
+		isAppend = true;
 		let recordsLink = "/records?from=" + start + "&to=" + end;
 		addRows(recordsLink);
 
 		let addTop = diff - addEnd;
-		end = state.trimStart - 1;
-		start = state.trimStart - addTop;
+		end = trimStart - 1;
+		start = trimStart - addTop;
+		isAppend = false;
 
 		for (let i = end; i >= start; i--) {
 			let recordsLink = "/records?from=" + i + "&to=" + i;
-			await prependRows(recordsLink);
+			await addRows(recordsLink);
 		}
 
-		state.trimEnd = RECORDCOUNT - 1;
-		state.trimStart = state.trimStart - addTop;
-		state.records = newHeight;
+		trimEnd = RECORDCOUNT - 1;
+		trimStart = trimStart - addTop;
+		records = newHeight;
 	}
 	else if (diff > 0 && start <= RECORDCOUNT - 1) {
 		// Add rows if end of data is not yet reached
+		isAppend = true;
 		let recordsLink = "/records?from=" + start + "&to=" + end;
 		addRows(recordsLink);
 
-		state.trimEnd = state.trimEnd + diff;
-		state.records = newHeight;
+		trimEnd = trimEnd + diff;
+		records = newHeight;
 	}
 	else {
-		state.records = newHeight;
+		records = newHeight;
 	}
 
 	// UI "Aesthetic": update buttons
-	el('first')?.removeAttribute("disabled");
-	el('prev')?.removeAttribute("disabled");
-	el('next')?.removeAttribute("disabled");
-	el('last')?.removeAttribute("disabled");
+	firstBtn?.removeAttribute("disabled");
+	prevBtn?.removeAttribute("disabled");
+	nextBtn?.removeAttribute("disabled");
+	lastBtn?.removeAttribute("disabled");
 
-	if (state.trimEnd == RECORDCOUNT - 1) {
-		el('last')?.setAttribute("disabled", "disabled");
-		el('next')?.setAttribute("disabled", "disabled");
+	if (trimEnd == RECORDCOUNT - 1) {
+		lastBtn?.setAttribute("disabled", "disabled");
+		nextBtn?.setAttribute("disabled", "disabled");
 	}
 
-	if (state.trimStart == 0) {
-		el('first')?.setAttribute("disabled", "disabled");
-		el('prev')?.setAttribute("disabled", "disabled");
+	if (trimStart == 0) {
+		firstBtn?.setAttribute("disabled", "disabled");
+		prevBtn?.setAttribute("disabled", "disabled");
 	}
 }, 100)
 ); // Log window dimensions at most every 100ms
 
 
 window.onload = () => {
-	state.trimStart = 0
-	state.trimEnd = state.trimStart + state.records - 1;
-	el('first')?.setAttribute("disabled", "disabled");
-	el('prev')?.setAttribute("disabled", "disabled");
+	trimStart = 0
+	trimEnd = trimStart + records - 1;
+
+	firstBtn?.setAttribute("disabled", "disabled");
+	prevBtn?.setAttribute("disabled", "disabled");
+
+	// Get document elements when page loads
+	contentTable = document.getElementById('content-table');
+	tableBody = contentTable!.querySelector("tbody");
+	tableHead = document.getElementById("content-thead");
+	pageInfo = document.getElementById('page-number');
+	firstBtn = document.getElementById('first');
+	prevBtn = document.getElementById('prev');
+	nextBtn = document.getElementById('next');
+	lastBtn = document.getElementById('last');
+	inputBox = document.getElementById('id-search');
 	getData();
 }
 
