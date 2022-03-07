@@ -35,15 +35,12 @@ async function getData() {
 }
 
 
-// TODO Pierre's changes
 // Search entered ID
 async function searchFunction() {
-	let idString = $('#id-search').val()
-	let id = Number($('#id-search').val());
+	let id = parseInt((<HTMLInputElement>inputBox).value);
 	let numRecords = RECORDCOUNT - 1;
 
-
-	if (id < 0 || id > numRecords || Number.isNaN(id) || idString == "") {
+	if (id < 0 || id > numRecords || isNaN(id)) {
 		// User info: Display error message
 		pageInfo!.innerHTML = `<p>No records to display</p>`;
 	}
@@ -59,7 +56,7 @@ async function searchFunction() {
 		}
 		loadIntoTable(contentTable);
 	}
-	(<HTMLInputElement>inputBox).value = '';
+	(<HTMLInputElement>inputBox).value = 'Enter ID number';
 }
 
 
