@@ -1,4 +1,3 @@
-
 html {
 	font-size: 62.5%;
 }
@@ -18,7 +17,7 @@ body {
 .controls {
 	display: flex;
 	text-overflow: clip; 
-    white-space: nowrap;
+	white-space: nowrap;
 }
 
 .constrols-heading {
@@ -51,7 +50,6 @@ h1 {
 	border: solid 1px #cae00d;
 }
 
-
 /* Table */
 .table {
 	box-shadow: 0 0 10px rgba(94, 102, 80, 0.918);
@@ -74,8 +72,8 @@ h1 {
 	padding: 10px 20px;
 	height: 10px;
 	overflow: hidden; 
-    text-overflow: clip; 
-    white-space: nowrap;
+	text-overflow: clip; 
+	white-space: nowrap;
 }
 
 .table tbody tr:nth-of-type(even) {
@@ -97,12 +95,11 @@ h1 {
 	position: absolute;
 	bottom: -1rem;
 	text-overflow: clip; 
-    white-space: nowrap;
+	white-space: nowrap;
 	background-color: #16191e;
-	
 }
 
-/* Page n underneath table */
+/* Page info underneath table */
 .page-info {
 	color: #cae00d;
 	font-size: 2.4rem;
@@ -113,13 +110,13 @@ h1 {
 
 /* Pagination buttons */
 .pagination-wrapper {
-    width: 70%;
+	width: 70%;
 	overflow-x: auto;
 	margin-left: 1rem;
 }
 
 .btn {
-    color: #fdfdfd;
+	color: #fdfdfd;
 	/* float: left; */
 	padding: 1rem;
 	text-decoration: none;

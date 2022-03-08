@@ -5,11 +5,13 @@ var State = /** @class */ (function () {
         this.tableBody = document.querySelector('tbody');
         this.tableHead = document.getElementById("content-thead");
         this.pageInfo = document.getElementById('page-info');
+        this.searchBtn = document.getElementById('id-search-btn');
         this.firstBtn = document.getElementById('first');
         this.prevBtn = document.getElementById('prev');
         this.nextBtn = document.getElementById('next');
         this.lastBtn = document.getElementById('last');
         this.inputBox = document.getElementById('id-search');
+        // Default values for variables that stores server data
         this.RECORDCOUNT = 350;
         this.HEADERS = ["ID", "City", "Population"];
         this.data = [[0, "Cape Town", 3500000], [1, "New York", 8500000], [2, "Johannesburg", 4500000]];

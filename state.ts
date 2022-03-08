@@ -1,4 +1,5 @@
 class State {
+	// TODO: change variable to public/private and add/remove getters and setters
 	private records: number;
 	private trimStart: number;
 	private trimEnd: number;
@@ -8,12 +9,14 @@ class State {
 	tableBody: HTMLTableSectionElement | null = document.querySelector('tbody');
 	tableHead: HTMLElement | null = document.getElementById("content-thead");
 	pageInfo: HTMLElement | null = document.getElementById('page-info');
+	searchBtn: HTMLElement | null = document.getElementById('id-search-btn');
 	firstBtn: HTMLElement | null = document.getElementById('first');
 	prevBtn: HTMLElement | null = document.getElementById('prev');
 	nextBtn: HTMLElement | null = document.getElementById('next');
 	lastBtn: HTMLElement | null = document.getElementById('last');
 	inputBox: HTMLElement | null = document.getElementById('id-search');
 
+	// Default values for variables that stores server data
 	RECORDCOUNT: number = 350;
 	HEADERS: string[] = ["ID", "City", "Population"];
 	data: any = [[0, "Cape Town", 3500000], [1, "New York", 8500000], [2, "Johannesburg", 4500000]];
