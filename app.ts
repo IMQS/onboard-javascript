@@ -1,4 +1,5 @@
 let state = new State();
+let el = new docElement();
 
 // Fetch headers and record count
 async function getData(): Promise<void> {
@@ -8,10 +9,10 @@ async function getData(): Promise<void> {
 			if (resp.ok) {
 				return resp.json();
 			}
-			throw new Error('Something went wrong');
+			throw new Error('Could not retrieve data');
 		})
 		.then(count => {
-			state.RECORDCOUNT = count;
+			state.setRecordCount(count);
 		})
 		.catch((error) => {
 			console.log(error);
@@ -22,10 +23,10 @@ async function getData(): Promise<void> {
 			if (resp.ok) {
 				return resp.json();
 			}
-			throw new Error('Something went wrong');
+			throw new Error('Could not retrieve data');
 		})
 		.then(count => {
-			state.HEADERS = count;
+			state.setHeaders(count);
 		})
 		.catch((error) => {
 			console.log(error);
@@ -38,8 +39,8 @@ async function getData(): Promise<void> {
 
 window.onload = () => {
 	// TODO: Check if buttons exits
-	state.firstBtn!.setAttribute("disabled", "disabled");
-	state.prevBtn!.setAttribute("disabled", "disabled");
+	el.firstBtn!.setAttribute("disabled", "disabled");
+	el.prevBtn!.setAttribute("disabled", "disabled");
 	getData();
 };
 
@@ -66,7 +67,7 @@ async function addRows(this: any, start: number, end: number, isAppend: boolean)
 	for (let row of state.data) {
 		let rowElement = document.createElement("tr");
 		// TODO: Set total records after addRows is called
-		state.setCountRec(state.getCountRec() + 1);
+		state.countRec = state.countRec + 1;
 
 		for (let cellText of row) {
 			let cellElement = document.createElement("td");
@@ -75,9 +76,9 @@ async function addRows(this: any, start: number, end: number, isAppend: boolean)
 			rowElement.appendChild(cellElement); // Append cells
 		}
 		if (isAppend) {
-			state.tableBody!.appendChild(rowElement);// Append rows
+			el.tableBody!.appendChild(rowElement);// Append rows
 		} else {
-			state.tableBody!.prepend(rowElement);
+			el.tableBody!.prepend(rowElement);
 		}
 	}
 
@@ -99,7 +100,7 @@ function deleteRows(newHeight: number, diff: number) {
 	let num = newHeight - 1;
 
 	for (let i = num; i > (num + diff); i--) {
-		state.tableBody!.deleteRow(i);
+		el.tableBody!.deleteRow(i);
 	}
 }
 
@@ -111,42 +112,42 @@ function loadIntoTable() {
 	$(".loader").fadeIn(200);
 
 	// UI "Aesthetic": update buttons
-	state.firstBtn?.removeAttribute("disabled");
-	state.prevBtn?.removeAttribute("disabled");
-	state.nextBtn?.removeAttribute("disabled");
-	state.lastBtn?.removeAttribute("disabled");
+	el.firstBtn?.removeAttribute("disabled");
+	el.prevBtn?.removeAttribute("disabled");
+	el.nextBtn?.removeAttribute("disabled");
+	el.lastBtn?.removeAttribute("disabled");
 
-	if (state.getTrimEnd() == state.RECORDCOUNT - 1) {
-		state.lastBtn?.setAttribute("disabled", "disabled");
-		state.nextBtn?.setAttribute("disabled", "disabled");
+	if (state.trimEnd == state.getRecordCount() - 1) {
+		el.lastBtn?.setAttribute("disabled", "disabled");
+		el.nextBtn?.setAttribute("disabled", "disabled");
 	}
 
-	if (state.getTrimStart() == 0) {
-		state.firstBtn?.setAttribute("disabled", "disabled");
-		state.prevBtn?.setAttribute("disabled", "disabled");
+	if (state.trimStart == 0) {
+		el.firstBtn?.setAttribute("disabled", "disabled");
+		el.prevBtn?.setAttribute("disabled", "disabled");
 	}
 
-	state.pageInfo!.innerHTML = `<p></p>`;
+	el.pageInfo!.innerHTML = `<p></p>`;
 
 	// Clear the table
-	state.tableHead!.innerHTML = "";
-	state.tableBody!.innerHTML = "";
+	el.tableHead!.innerHTML = "";
+	el.tableBody!.innerHTML = "";
 
 	let headerRow = document.createElement("tr");
 
 	// Populate the headers
-	for (let headerText of state.HEADERS) {
+	for (let headerText of state.getHeaders()) {
 		let headerElement = document.createElement("th");
 
 		headerElement.textContent = headerText;
 		headerRow.appendChild(headerElement);
 	}
 
-	state.tableHead!.appendChild(headerRow)
+	el.tableHead!.appendChild(headerRow)
 
 	// Add only records that must be displayed on table
-	state.setCountRec(0);
-	addRows(state.getTrimStart(), state.getTrimEnd(), true);
+	state.countRec = 0;
+	addRows(state.trimStart, state.trimEnd, true);
 
 	// Display content
 	$(".loader").fadeOut(200);
@@ -163,64 +164,64 @@ const debounce = (fn: Function, ms: number) => {
 };
 
 // Search entered ID
-state.searchBtn!.addEventListener("click", debounce(() => {
-	let id = parseInt((<HTMLInputElement>state.inputBox).value);
-	let numRecords = state.RECORDCOUNT - 1;
+el.searchBtn!.addEventListener("click", debounce(() => {
+	let id = parseInt((<HTMLInputElement>el.inputBox).value);
+	let numRecords = state.getRecordCount() - 1;
 
 	if (id < 0 || id > numRecords || isNaN(id)) {
 		// User info: Display error message
-		state.pageInfo!.innerHTML = `<p>No records to display</p>`;
+		el.pageInfo!.innerHTML = `<p>No records to display</p>`;
 	} else {
 		// Use entered ID to calculate what records should display
-		if ((state.RECORDCOUNT - 1) - id >= state.getRecords()) {
-			state.setTrimStart(id);
-			state.setTrimEnd(state.getTrimStart() + (state.getRecords() - 1));
+		if ((state.getRecordCount() - 1) - id >= state.records) {
+			state.trimStart = id;
+			state.trimEnd = state.trimStart + (state.records - 1);
 		} else {
-			state.setTrimEnd(state.RECORDCOUNT - 1);
-			state.setTrimStart(state.getTrimEnd() - state.getRecords() + 1);
+			state.trimEnd = state.getRecordCount() - 1;
+			state.trimStart = state.trimEnd - state.records + 1;
 		}
 		loadIntoTable();
 	}
-	(<HTMLInputElement>state.inputBox).value = 'Enter ID number';
+	(<HTMLInputElement>el.inputBox).value = 'Enter ID number';
 }, 300));
 
 // Set trim to start of data
-state.firstBtn!.addEventListener("click", debounce(() => {
-	state.setTrimStart(0);
-	state.setTrimEnd(state.getTrimStart() + state.getRecords() - 1);
+el.firstBtn!.addEventListener("click", debounce(() => {
+	state.trimStart = 0;
+	state.trimEnd = state.trimStart + state.records - 1;
 	loadIntoTable();
 }, 300));
 
 // Set trim to previous data
-state.prevBtn!.addEventListener("click", debounce(() => {
+el.prevBtn!.addEventListener("click", debounce(() => {
 	// If previous page is end of data && there are not enough records to fill window
-	if ((state.getTrimStart() - 1) - (state.getRecords() - 1) < 0) {
-		state.setTrimStart(0);
-		state.setTrimEnd(state.getTrimStart() + state.getRecords() - 1);
+	if ((state.trimStart - 1) - (state.records - 1) < 0) {
+		state.trimStart = 0;
+		state.trimEnd = state.trimStart + state.records - 1;
 	} else {
-		state.setTrimEnd(state.getTrimStart() - 1);
-		state.setTrimStart(state.getTrimEnd() - state.getRecords() + 1);
+		state.trimEnd = state.trimStart - 1;
+		state.trimStart = state.trimEnd - state.records + 1;
 	}
 	loadIntoTable();
 }, 300));
 
 // Set trim to next data
-state.nextBtn!.addEventListener("click", debounce(() => {
+el.nextBtn!.addEventListener("click", debounce(() => {
 	// If next page is end of data && there are not enough records to fill window
-	if ((state.RECORDCOUNT - 1) - (state.getTrimEnd() + 1) < state.getRecords()) {
-		state.setTrimEnd(state.RECORDCOUNT - 1);
-		state.setTrimStart(state.getTrimEnd() - state.getRecords() + 1);
+	if ((state.getRecordCount() - 1) - (state.trimEnd + 1) < state.records) {
+		state.trimEnd = state.getRecordCount() - 1;
+		state.trimStart = state.trimEnd - state.records + 1;
 	} else {
-		state.setTrimStart(state.getTrimEnd() + 1);
-		state.setTrimEnd(state.getTrimStart() + state.getRecords() - 1);
+		state.trimStart = state.trimEnd + 1;
+		state.trimEnd = state.trimStart + state.records - 1;
 	}
 	loadIntoTable();
 }, 300));
 
 // Set trim to end of data
-state.lastBtn!.addEventListener("click", debounce(() => {
-	state.setTrimEnd(state.RECORDCOUNT - 1);
-	state.setTrimStart(state.getTrimEnd() - state.getRecords() + 1);
+el.lastBtn!.addEventListener("click", debounce(() => {
+	state.trimEnd = state.getRecordCount() - 1;
+	state.trimStart = state.trimEnd - state.records + 1;
 	loadIntoTable();
 }, 300));
 
@@ -230,64 +231,64 @@ window.addEventListener("resize", debounce(async () => {
 	// Calculate number rows to be added/deleted
 	// The calculation is an estimate of how many space there is for rows (160 is estimate space for header and footer of website)
 	let newHeight = Math.floor((window.innerHeight - 160) / 40);
-	let diff = newHeight - state.getRecords();
+	let diff = newHeight - state.records;
 
-	let start = state.getTrimEnd() + 1;
-	let end = state.getTrimEnd() + diff;
+	let start = state.trimEnd + 1;
+	let end = state.trimEnd + diff;
 
 	if (diff < 0) {
 		// Delete rows from last page
-		deleteRows(state.getCountRec(), diff);
+		deleteRows(state.countRec, diff);
 
-		state.setCountRec(state.getCountRec() + diff);
-		state.setTrimEnd(state.getTrimEnd() + diff);
-	} else if (diff > 0 && state.getTrimEnd() == state.RECORDCOUNT - 1) {
+		state.countRec = state.countRec + diff;
+		state.trimEnd = state.trimEnd + diff;
+	} else if (diff > 0 && state.trimEnd == state.getRecordCount() - 1) {
 		// Prepend rows as last page gets bigger
 		// 'start' and 'end' only fetches the amount that should be prepended
-		end = state.getTrimStart() - 1;
-		start = state.getTrimStart() - diff;
+		end = state.trimStart - 1;
+		start = state.trimStart - diff;
 
 		await addRows(start, end, false);
 
-		state.setTrimStart(state.getTrimStart() - diff);
-	} else if (diff > 0 && end >= state.RECORDCOUNT) {
+		state.trimStart = state.trimStart - diff;
+	} else if (diff > 0 && end >= state.getRecordCount()) {
 		// Appends remaining records until RECORDCOUNT - 1,
 		// then prepends the rest
-		let addEnd = (state.RECORDCOUNT - 1) - state.getTrimEnd();
-		end = state.RECORDCOUNT - 1;
+		let addEnd = (state.getRecordCount() - 1) - state.trimEnd;
+		end = state.getRecordCount() - 1;
 		start = end - addEnd + 1;
 		addRows(start, end, true);
 
 		let addTop = diff - addEnd;
-		end = state.getTrimStart() - 1;
-		start = state.getTrimStart() - addTop;
+		end = state.trimStart - 1;
+		start = state.trimStart - addTop;
 
 		await addRows(start, end, false);
 
-		state.setTrimEnd(state.RECORDCOUNT - 1);
-		state.setTrimStart(state.getTrimStart() - addTop)
-	} else if (diff > 0 && start <= state.RECORDCOUNT - 1) {
+		state.trimEnd = state.getRecordCount() - 1;
+		state.trimStart = state.trimStart - addTop
+	} else if (diff > 0 && start <= state.getRecordCount() - 1) {
 		// Add rows if end of data is not yet reached
 		addRows(start, end, true);
 
-		state.setTrimEnd(state.getTrimEnd() + diff)
+		state.trimEnd = state.trimEnd + diff
 	}
-	state.setRecords(newHeight);
+	state.records = newHeight;
 
 	// UI "Aesthetic": update buttons
-	state.firstBtn?.removeAttribute("disabled");
-	state.prevBtn?.removeAttribute("disabled");
-	state.nextBtn?.removeAttribute("disabled");
-	state.lastBtn?.removeAttribute("disabled");
+	el.firstBtn?.removeAttribute("disabled");
+	el.prevBtn?.removeAttribute("disabled");
+	el.nextBtn?.removeAttribute("disabled");
+	el.lastBtn?.removeAttribute("disabled");
 
-	if (state.getTrimEnd() == state.RECORDCOUNT - 1) {
-		state.lastBtn?.setAttribute("disabled", "disabled");
-		state.nextBtn?.setAttribute("disabled", "disabled");
+	if (state.trimEnd == state.getRecordCount() - 1) {
+		el.lastBtn?.setAttribute("disabled", "disabled");
+		el.nextBtn?.setAttribute("disabled", "disabled");
 	}
 
-	if (state.getTrimStart() == 0) {
-		state.firstBtn?.setAttribute("disabled", "disabled");
-		state.prevBtn?.setAttribute("disabled", "disabled");
+	if (state.trimStart == 0) {
+		el.firstBtn?.setAttribute("disabled", "disabled");
+		el.prevBtn?.setAttribute("disabled", "disabled");
 	}
 }, 100)); // Log window dimensions at most every 100ms
 
