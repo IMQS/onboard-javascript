@@ -2,7 +2,8 @@
 var docElement = /** @class */ (function () {
     function docElement() {
         this.contentTable = document.getElementById('content-table');
-        this.tableBody = this.contentTable.querySelector('tbody');
+        this.tableBody = document.createElement('tbody');
+        this.reversedTableBody = document.createElement('tbody');
         this.tableHead = document.getElementById('content-thead');
         this.pageInfo = document.getElementById('page-info');
         this.searchBtn = document.getElementById('id-search-btn');

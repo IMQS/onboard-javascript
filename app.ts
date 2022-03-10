@@ -37,25 +37,21 @@ async function getData(): Promise<void> {
 	// TODO: Add return statement
 }
 
-window.onload = () => {
-	// TODO: Check if buttons exits
-	el.firstBtn!.setAttribute("disabled", "disabled");
-	el.prevBtn!.setAttribute("disabled", "disabled");
-	getData();
+window.onload = async () => {
+	await getData();
+	console.log(state.getRecordCount())
 };
 
-// TODO: Fix add rows
 // Add rows to table
 async function addRows(this: any, start: number, end: number, isAppend: boolean) {
-	// let newTableBody = document.createElement("tbody");
-	// let reversedTableBody = document.createElement("tbody");
+
 	let link = "/records?from=" + start + "&to=" + end;
 	await fetch(link)
 		.then(resp => {
 			if (resp.ok) {
 				return resp.json();
 			}
-			throw new Error('Something went wrong');
+			throw new Error('Could not retrieve data');
 		})
 		.then(count => {
 			state.data = count;
@@ -64,35 +60,43 @@ async function addRows(this: any, start: number, end: number, isAppend: boolean)
 			console.log(error);
 		});
 
-	for (let row of state.data) {
-		let rowElement = document.createElement("tr");
-		// TODO: Set total records after addRows is called
-		state.countRec = state.countRec + 1;
+	// Append or prepend rows to table
+	if (isAppend) {
+		for (let row of state.data) {
+			let rowElement = document.createElement("tr");
 
-		for (let cellText of row) {
-			let cellElement = document.createElement("td");
+			for (let cellText of row) {
+				let cellElement = document.createElement("td");
 
-			cellElement.textContent = cellText;
-			rowElement.appendChild(cellElement); // Append cells
-		}
-		if (isAppend) {
+				cellElement.textContent = cellText;
+				rowElement.appendChild(cellElement); // Append cells
+			}
 			el.tableBody!.appendChild(rowElement);// Append rows
-		} else {
-			el.tableBody!.prepend(rowElement);
+		}
+	} else {
+		// Reverse order of data and save in temp variable
+		let rowData: any;
+		rowData = [];
+		let k = 0;
+		for (let i = state.data.length - 1; i >= 0; i--) {
+			rowData[k] = state.data[i];
+			k++;
+		}
+
+		// Use temp variable to append rows to table in correct order
+		for (let row of rowData) {
+			let rowElement = document.createElement("tr");
+
+			for (let cellText of row) {
+				let cellElement = document.createElement("td");
+
+				cellElement.textContent = cellText;
+				rowElement.appendChild(cellElement); // Append cells
+			}
+			el.tableBody!.prepend(rowElement);// Prepend rows
 		}
 	}
-
-	// TODO: Fix prepend feature
-	// let rows = newTableBody!.rows;
-	// if (isAppend) {
-	// 	this.tableBody.parentNode.replaceChild(newTableBody, this.tableBody)// Append rows
-	// }
-	// else {
-	// 	for (let i = rows.length - 1; i >= 0; i--) {
-	// 		reversedTableBody!.appendChild(rows[i]); // Prepend rows
-	// 	}
-	// 	contentTable!.prepend(reversedTableBody);
-	// }
+	el.contentTable!.appendChild(el.tableBody!);
 }
 
 // Delete rows from table
@@ -132,6 +136,7 @@ function loadIntoTable() {
 	// Clear the table
 	el.tableHead!.innerHTML = "";
 	el.tableBody!.innerHTML = "";
+	el.reversedTableBody!.innerHTML = "";
 
 	let headerRow = document.createElement("tr");
 
@@ -146,7 +151,6 @@ function loadIntoTable() {
 	el.tableHead!.appendChild(headerRow)
 
 	// Add only records that must be displayed on table
-	state.countRec = 0;
 	addRows(state.trimStart, state.trimEnd, true);
 
 	// Display content
@@ -238,9 +242,8 @@ window.addEventListener("resize", debounce(async () => {
 
 	if (diff < 0) {
 		// Delete rows from last page
-		deleteRows(state.countRec, diff);
+		deleteRows(state.records, diff);
 
-		state.countRec = state.countRec + diff;
 		state.trimEnd = state.trimEnd + diff;
 	} else if (diff > 0 && state.trimEnd == state.getRecordCount() - 1) {
 		// Prepend rows as last page gets bigger

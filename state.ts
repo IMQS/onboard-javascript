@@ -2,9 +2,8 @@ class State {
 	records: number;
 	trimStart: number;
 	trimEnd: number;
-	countRec: number;
+	isDefaultNode: boolean;
 
-	// Default values for variables that stores server data
 	private RECORDCOUNT: number;
 	private HEADERS: string[];
 	data: any;
@@ -13,8 +12,9 @@ class State {
 		this.records = this.calculateRecords();
 		this.trimStart = 0;
 		this.trimEnd = this.records - 1;
-		this.countRec = 0;
+		this.isDefaultNode = true;
 
+		// Default values for variables that stores server data
 		this.RECORDCOUNT = 350;
 		this.HEADERS = ["ID", "City", "Population"];
 		this.data = [[0, "Cape Town", 3500000], [1, "New York", 8500000], [2, "Johannesburg", 4500000]];

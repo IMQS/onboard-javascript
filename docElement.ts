@@ -1,7 +1,8 @@
 class docElement {
 
-	private contentTable: HTMLElement | null;
+	contentTable: HTMLElement | null;
 	tableBody: HTMLTableSectionElement | null;
+	reversedTableBody: HTMLTableSectionElement | null;
 	tableHead: HTMLElement | null;
 	pageInfo: HTMLElement | null;
 	searchBtn: HTMLElement | null;
@@ -13,7 +14,8 @@ class docElement {
 
 	constructor() {
 		this.contentTable = document.getElementById('content-table');
-		this.tableBody = this.contentTable!.querySelector('tbody');
+		this.tableBody = document.createElement('tbody');
+		this.reversedTableBody = document.createElement('tbody');
 		this.tableHead = document.getElementById('content-thead');
 		this.pageInfo = document.getElementById('page-info');
 		this.searchBtn = document.getElementById('id-search-btn');
