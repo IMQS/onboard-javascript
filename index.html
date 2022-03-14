@@ -2,12 +2,39 @@
 <html>
 <head>
 	<title>JS Onboard Project</title>
+	<link rel="stylesheet" type="text/css" href="style.css" >
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="state.js"></script>
+	<script type="text/javascript" src="app.js"></script>
 </head>
 
 <body>
-	<p>Hello</p>
+	<div class="loader">
+		<div></div>
+	</div>
+	<div class="content">
+		<div class="controls">
+			<div class="constrols-heading">
+				<h1>IMQS Onboarding Project</h1>
+			</div>
+			<div class="constrols-search">
+				<button id="id-search-btn" class="search-btn">Search ID</button>
+				<input type="text" id="id-search" onfocus="this.value=''" value="Enter ID number" required>
+			</div>
+		</div>
+		<table id="content-table" class="table">
+			<thead id="content-thead"></thead>
+			<tbody id="content-tbody"></tbody>
+		</table>
+		<div class="container">
+			<div id="pagination-wrapper" class="pagination-wrapper">
+				<button id="first" class="page btn">&#171; First</button>
+				<button id="prev" class="page btn">Prev</button>
+				<button id="next" class="page btn">Next</button>
+				<button id="last" class="page btn"> Last &#187;</button>
+			</div>
+			<p id="page-info" class="page-info"></p>
+		</div>
+	</div>
 </body>
-
 </html>
-

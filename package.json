@@ -1,0 +1,23 @@
+{
+	"name": "onboard-javascript",
+	"version": "1.0.0",
+	"description": "onboard",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "tsc --build"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CelesteNaude/onboard-javascript.git"
+	},
+	"author": "celeste",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/CelesteNaude/onboard-javascript/issues"
+	},
+	"homepage": "https://github.com/CelesteNaude/onboard-javascript#readme",
+	"dependencies": {
+		"@types/jquery.browser": "^0.1.1"
+	}
+}
