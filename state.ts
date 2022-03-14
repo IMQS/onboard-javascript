@@ -1,12 +1,25 @@
+// Code is only triggered once per user input
+const debounce = (fn: Function, ms: number) => {
+	let timeoutId: ReturnType<typeof setTimeout>;
+	return function (this: any, ...args: any[]) {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(() => fn.apply(this, args), ms);
+	};
+};
+
 class State {
+	// Variables to determine how many records there should be on the screen (records)
+	// and where these records should start and end (trimStart and trimEnd) > (display record 15 to 25)
 	records: number;
 	trimStart: number;
 	trimEnd: number;
 
+	// Variables for server data
 	private RECORDCOUNT: number;
 	private HEADERS: string[];
-	data: any;
+	data: any[];
 
+	// Variables for DOM elements
 	contentTable: HTMLElement | null;
 	tableBody: HTMLTableSectionElement | null;
 	tableHead: HTMLElement | null;
@@ -19,11 +32,12 @@ class State {
 	inputBox: HTMLElement | null;
 
 	constructor() {
+		// Starting values for when page is first loaded
 		this.records = this.calculateRecords();
 		this.trimStart = 0;
 		this.trimEnd = this.records - 1;
 
-		// Default values for variables that stores server data
+		// Default values for server data variables
 		this.RECORDCOUNT = 350;
 		this.HEADERS = ["ID", "City", "Population"];
 		this.data = [[0, "Cape Town", 3500000], [1, "New York", 8500000], [2, "Johannesburg", 4500000]];
@@ -40,6 +54,8 @@ class State {
 		this.inputBox = document.getElementById('id-search');
 	}
 
+	// Record count and headers should not be changed outside the class
+	// hence there are only get methods for them
 	getRecordCount() {
 		return this.RECORDCOUNT;
 	}
@@ -48,31 +64,49 @@ class State {
 		return this.HEADERS;
 	}
 
-	setRecordCount(value: number) {
-		this.RECORDCOUNT = value;
-	}
-
-	setHeaders(value: string[]) {
-		this.HEADERS = value;
-	}
-
 	calculateRecords() {
 		// Estimate of available table space
-		// The calculation is an estimate of how many space there is for rows (160 is estimate space for header and footer of website)
+		// The calculation is an estimate of how many space there is for rows
+		// 160 is estimate space for header and footer of website and 40 is estimated space of a single row
 		return Math.floor((window.innerHeight - 160) / 40);
 	}
 
-	setCurrentState() {
-		let tableBody = document.querySelector('tbody');
-		this.records = tableBody!.rows.length;
+	// The setPageButtons, setSearchButton, and setResizeEvent are seperate functions
+	// so that only the needed functions are used
+	setPageButtons() {
+		// Event listener for button that goes to first page
+		this.firstBtn!.addEventListener("click", debounce(() => {
+			this.goToFirst();
+		}, 250));
 
-		if (this.records != 0) {
-			this.trimStart = parseInt(tableBody!.rows[0].cells[0].innerHTML);
-			this.trimEnd = parseInt(tableBody!.rows[this.records - 1].cells[0].innerHTML);
-		} else {
-			return;
-		}
-		console.log("Num records: ", this.records, " start: ", this.trimStart, " end: ", this.trimEnd);
+		// Event listener for button that goes to previous page
+		this.prevBtn!.addEventListener("click", debounce(() => {
+			this.goToPrev();
+		}, 250));
+
+		// Event listener for button that goes to next page
+		this.nextBtn!.addEventListener("click", debounce(() => {
+			this.goToNext();
+		}, 250));
+
+		// Event listener for button that goes to last page
+		this.lastBtn!.addEventListener("click", debounce(() => {
+			this.goToLast();
+		}, 250));
+	}
+
+	setSearchButton() {
+		// // Event listener for button that searches entered ID
+		this.searchBtn!.addEventListener("click", debounce(() => {
+			this.searchId();
+		}, 250));
+	}
+
+	setResizeEvent() {
+		// Event listener for when user resizes the page
+		window.addEventListener("resize", debounce(() => {
+			this.resize();
+		}, 150)); // Log window dimensions at most every 150ms
 	}
 
 	// Fetch headers and record count
@@ -86,10 +120,10 @@ class State {
 				throw new Error('Could not retrieve data');
 			})
 			.then(count => {
-				this.setRecordCount(count);
+				this.RECORDCOUNT = count;
 			})
 			.catch((error) => {
-				console.log(error);
+				console.error(error);
 			});
 
 		await fetch('/columns')
@@ -100,21 +134,22 @@ class State {
 				throw new Error('Could not retrieve data');
 			})
 			.then(count => {
-				this.setHeaders(count);
+				this.HEADERS = count;
 			})
 			.catch((error) => {
-				console.log(error);
+				console.error(error);
 			});
 
 		return true;
 	}
 
 	// Add rows to table
-	async addRows(start: number, end: number, isAppend: boolean) {
+	async addRows(start: number, end: number) {
 		let table = document.getElementById("content-table");
 		let newTableBody = document.createElement("tbody");
-
+		let oldTableBody = table!.querySelector("tbody");
 		let link = "/records?from=" + start + "&to=" + end;
+
 		await fetch(link)
 			.then(resp => {
 				if (resp.ok) {
@@ -126,66 +161,46 @@ class State {
 				this.data = count;
 			})
 			.catch((error) => {
-				console.log(error);
+				console.error(error);
 			});
 
-		// Append or prepend rows to table
-		if (isAppend) {
-			for (let row of this.data) {
-				let rowElement = document.createElement("tr");
+		for (let row of this.data) {
+			let rowElement = document.createElement("tr");
 
-				for (let cellText of row) {
-					let cellElement = document.createElement("td");
+			for (let cellText of row) {
+				let cellElement = document.createElement("td");
 
-					cellElement.textContent = cellText;
-					rowElement.appendChild(cellElement); // Append cells
-				}
-				newTableBody.appendChild(rowElement);// Append rows
+				cellElement.textContent = cellText;
+				rowElement.appendChild(cellElement); // Append cells to row
 			}
-		} else {
-			// Reverse order of data and save in temp variable
-			let rowData: any;
-			rowData = [];
-			let k = 0;
-			for (let i = this.data.length - 1; i >= 0; i--) {
-				rowData[k] = this.data[i];
-				k++;
-			}
-
-			// Use temp variable to append rows to table in correct order
-			for (let row of rowData) {
-				let rowElement = document.createElement("tr");
-
-				for (let cellText of row) {
-					let cellElement = document.createElement("td");
-
-					cellElement.textContent = cellText;
-					rowElement.appendChild(cellElement); // Append cells
-				}
-				newTableBody.prepend(rowElement);// Prepend rows
-			}
+			newTableBody.appendChild(rowElement);// Append rows to tbody
 		}
-		if (!table)
+
+		// If table exists, replace the new tbody with the old one
+		if (!table) {
+			console.error("Table is undefined");
 			return;
-		table.replaceChild(newTableBody, this.tableBody!);
+		} else {
+			table.replaceChild(newTableBody, oldTableBody!);
+		}
 	}
 
 	// Delete rows from table
 	deleteRows(newHeight: number, diff: number) {
+		let tableBod = this.contentTable!.querySelector('tbody');
 		let num = newHeight - 1;
 
 		for (let i = num; i > (num + diff); i--) {
-			this.tableBody!.deleteRow(i);
+			tableBod!.deleteRow(i);
 		}
 	}
-
 
 	// Load json data into table function
 	loadIntoTable(clearHeader: boolean) {
 
 		// Display loader
-		$(".content").fadeOut(200);
-		$(".loader").fadeIn(200);
+		$(".content").fadeOut(230);
+		$(".loader").fadeIn(230);
 
 		// UI "Aesthetic": update buttons
 		this.firstBtn?.removeAttribute("disabled");
@@ -205,6 +220,7 @@ class State {
 
 		this.pageInfo!.innerHTML = `<p></p>`;
 
+		// Add header only if 'clearHeader' is true
 		if (clearHeader) {
 			this.tableHead!.innerHTML = "";
 			let headerRow = document.createElement("tr");
@@ -216,22 +232,22 @@ class State {
 				headerElement.textContent = headerText;
 				headerRow.appendChild(headerElement);
 			}
-			this.tableHead!.appendChild(headerRow)
+			this.tableHead!.appendChild(headerRow);
 		}
 
 		// Clear the table
 		this.tableBody!.innerHTML = "";
 
 		// Add only records that must be displayed on table
-		this.addRows(this.trimStart, this.trimEnd, true);
+		this.addRows(this.trimStart, this.trimEnd);
 
 		// Display content
-		$(".loader").fadeOut(200);
-		$(".content").fadeIn(200);
+		$(".loader").fadeOut(230);
+		$(".content").fadeIn(230);
 	}
 
+	// Search entered ID
 	searchId() {
-		this.setCurrentState();
 		let id = parseInt((<HTMLInputElement>this.inputBox).value);
 		let numRecords = this.getRecordCount() - 1;
 
@@ -252,14 +268,15 @@ class State {
 		(<HTMLInputElement>document.getElementById('id-search')).value = 'Enter ID number';
 	}
 
+	// Set trim to start of data
 	goToFirst() {
 		this.trimStart = 0;
 		this.trimEnd = this.trimStart + this.records - 1;
 		this.loadIntoTable(false);
 	}
 
+	// Set trim to previous data
 	goToPrev() {
-		this.setCurrentState();
 		// If previous page is end of data && there are not enough records to fill window
 		if ((this.trimStart - 1) - (this.records - 1) < 0) {
 			this.trimStart = 0;
@@ -271,8 +288,8 @@ class State {
 		this.loadIntoTable(false);
 	}
 
+	// Set trim to next data
 	goToNext() {
-		this.setCurrentState();
 		// If next page is end of data && there are not enough records to fill window
 		if ((this.getRecordCount() - 1) - (this.trimEnd + 1) < this.records) {
 			this.trimEnd = this.getRecordCount() - 1;
@@ -284,57 +301,43 @@ class State {
 		this.loadIntoTable(false);
 	}
 
+	// Set trim to end of data
 	goToLast() {
 		this.trimEnd = this.getRecordCount() - 1;
 		this.trimStart = this.trimEnd - this.records + 1;
 		this.loadIntoTable(false);
 	}
 
+	// Add/remove rows from table based on resize event of the window
 	async resize() {
-		this.setCurrentState();
 		// Calculate number rows to be added/deleted
 		let newHeight = this.calculateRecords();
-		console.log("records ", this.records, " vs numRows ", this.records);
 		let diff = newHeight - this.records;
 
 		let start = this.trimStart;
 		let end = this.trimEnd + diff;
 
 		if (diff < 0) {
-			// Delete rows from last page
+			// If screen is made smaller, call delete rows function with this.records (amount of rows that were on the screen)
+			// and diff (how many rows should be deleted)
 			this.deleteRows(this.records, diff);
 
 			this.trimEnd = this.trimEnd + diff;
-		} else if (diff > 0 && this.trimEnd == this.getRecordCount() - 1) {
+		} else if (diff > 0 && end >= this.getRecordCount()) {
 			// Prepend rows as last page gets bigger
-			// 'start' and 'end' only fetches the amount that should be prepended
-			end = this.RECORDCOUNT - 1;
-			start = this.trimStart - diff;
+			end = this.getRecordCount() - 1;
+			start = end - (newHeight - 1);
+			console.log("End reached, displaying record ", start, " to ", end);
 
-			await this.addRows(start, end, false);
+			await this.addRows(start, end);
 
 			this.trimStart = this.trimStart - diff;
-		} else if (diff > 0 && end >= this.getRecordCount()) {
-			// Appends remaining records until RECORDCOUNT - 1,
-			// then prepends the rest
-			let addEnd = (this.getRecordCount() - 1) - this.trimEnd;
-			end = this.getRecordCount() - 1;
-			start = end - addEnd + 1;
-			this.addRows(start, end, true);
-
-			let addTop = diff - addEnd;
-			end = this.trimStart - 1;
-			start = this.trimStart - addTop;
-
-			await this.addRows(start, end, false);
-
 			this.trimEnd = this.getRecordCount() - 1;
-			this.trimStart = this.trimStart - addTop
 		} else if (diff > 0 && start <= this.getRecordCount() - 1) {
 			// Add rows if end of data is not yet reached
-			this.addRows(start, end, true);
+			this.addRows(start, end);
 
-			this.trimEnd = this.trimEnd + diff
+			this.trimEnd = this.trimEnd + diff;
 		}
 		this.records = newHeight;
 

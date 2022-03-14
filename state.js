@@ -35,12 +35,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+// Code is only triggered once per user input
+var debounce = function (fn, ms) {
+    var timeoutId;
+    return function () {
+        var _this = this;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(function () { return fn.apply(_this, args); }, ms);
+    };
+};
 var State = /** @class */ (function () {
     function State() {
+        // Starting values for when page is first loaded
         this.records = this.calculateRecords();
         this.trimStart = 0;
         this.trimEnd = this.records - 1;
-        // Default values for variables that stores server data
+        // Default values for server data variables
         this.RECORDCOUNT = 350;
         this.HEADERS = ["ID", "City", "Population"];
         this.data = [[0, "Cape Town", 3500000], [1, "New York", 8500000], [2, "Johannesburg", 4500000]];
@@ -55,34 +69,54 @@ var State = /** @class */ (function () {
         this.lastBtn = document.getElementById('last');
         this.inputBox = document.getElementById('id-search');
     }
+    // Record count and headers should not be changed outside the class
+    // hence there are only get methods for them
     State.prototype.getRecordCount = function () {
         return this.RECORDCOUNT;
     };
     State.prototype.getHeaders = function () {
         return this.HEADERS;
     };
-    State.prototype.setRecordCount = function (value) {
-        this.RECORDCOUNT = value;
-    };
-    State.prototype.setHeaders = function (value) {
-        this.HEADERS = value;
-    };
     State.prototype.calculateRecords = function () {
         // Estimate of available table space
-        // The calculation is an estimate of how many space there is for rows (160 is estimate space for header and footer of website)
+        // The calculation is an estimate of how many space there is for rows
+        // 160 is estimate space for header and footer of website and 40 is estimated space of a single row
         return Math.floor((window.innerHeight - 160) / 40);
     };
-    State.prototype.setCurrentState = function () {
-        var tableBody = document.querySelector('tbody');
-        this.records = tableBody.rows.length;
-        if (this.records != 0) {
-            this.trimStart = parseInt(tableBody.rows[0].cells[0].innerHTML);
-            this.trimEnd = parseInt(tableBody.rows[this.records - 1].cells[0].innerHTML);
-        }
-        else {
-            return;
-        }
-        console.log("Num records: ", this.records, " start: ", this.trimStart, " end: ", this.trimEnd);
+    // The setPageButtons, setSearchButton, and setResizeEvent are seperate functions
+    // so that only the needed functions are used
+    State.prototype.setPageButtons = function () {
+        var _this = this;
+        // Event listener for button that goes to first page
+        this.firstBtn.addEventListener("click", debounce(function () {
+            _this.goToFirst();
+        }, 250));
+        // Event listener for button that goes to previous page
+        this.prevBtn.addEventListener("click", debounce(function () {
+            _this.goToPrev();
+        }, 250));
+        // Event listener for button that goes to next page
+        this.nextBtn.addEventListener("click", debounce(function () {
+            _this.goToNext();
+        }, 250));
+        // Event listener for button that goes to last page
+        this.lastBtn.addEventListener("click", debounce(function () {
+            _this.goToLast();
+        }, 250));
+    };
+    State.prototype.setSearchButton = function () {
+        var _this = this;
+        // // Event listener for button that searches entered ID
+        this.searchBtn.addEventListener("click", debounce(function () {
+            _this.searchId();
+        }, 250));
+    };
+    State.prototype.setResizeEvent = function () {
+        var _this = this;
+        // Event listener for when user resizes the page
+        window.addEventListener("resize", debounce(function () {
+            _this.resize();
+        }, 150)); // Log window dimensions at most every 150ms
     };
     // Fetch headers and record count
     State.prototype.getData = function () {
@@ -100,10 +134,10 @@ var State = /** @class */ (function () {
                             throw new Error('Could not retrieve data');
                         })
                             .then(function (count) {
-                            _this.setRecordCount(count);
+                            _this.RECORDCOUNT = count;
                         })
                             .catch(function (error) {
-                            console.log(error);
+                            console.error(error);
                         })];
                     case 1:
                         // API calls for record count and headers
@@ -116,10 +150,10 @@ var State = /** @class */ (function () {
                                 throw new Error('Could not retrieve data');
                             })
                                 .then(function (count) {
-                                _this.setHeaders(count);
+                                _this.HEADERS = count;
                             })
                                 .catch(function (error) {
-                                console.log(error);
+                                console.error(error);
                             })];
                     case 2:
                         _a.sent();
@@ -129,15 +163,16 @@ var State = /** @class */ (function () {
         });
     };
     // Add rows to table
-    State.prototype.addRows = function (start, end, isAppend) {
+    State.prototype.addRows = function (start, end) {
         return __awaiter(this, void 0, void 0, function () {
-            var table, newTableBody, link, _i, _a, row, rowElement, _b, row_1, cellText, cellElement, rowData, k, i, _c, rowData_1, row, rowElement, _d, row_2, cellText, cellElement;
+            var table, newTableBody, oldTableBody, link, _i, _a, row, rowElement, _b, row_1, cellText, cellElement;
             var _this = this;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         table = document.getElementById("content-table");
                         newTableBody = document.createElement("tbody");
+                        oldTableBody = table.querySelector("tbody");
                         link = "/records?from=" + start + "&to=" + end;
                         return [4 /*yield*/, fetch(link)
                                 .then(function (resp) {
@@ -150,48 +185,29 @@ var State = /** @class */ (function () {
                                 _this.data = count;
                             })
                                 .catch(function (error) {
-                                console.log(error);
+                                console.error(error);
                             })];
                     case 1:
-                        _e.sent();
-                        // Append or prepend rows to table
-                        if (isAppend) {
-                            for (_i = 0, _a = this.data; _i < _a.length; _i++) {
-                                row = _a[_i];
-                                rowElement = document.createElement("tr");
-                                for (_b = 0, row_1 = row; _b < row_1.length; _b++) {
-                                    cellText = row_1[_b];
-                                    cellElement = document.createElement("td");
-                                    cellElement.textContent = cellText;
-                                    rowElement.appendChild(cellElement); // Append cells
-                                }
-                                newTableBody.appendChild(rowElement); // Append rows
+                        _c.sent();
+                        for (_i = 0, _a = this.data; _i < _a.length; _i++) {
+                            row = _a[_i];
+                            rowElement = document.createElement("tr");
+                            for (_b = 0, row_1 = row; _b < row_1.length; _b++) {
+                                cellText = row_1[_b];
+                                cellElement = document.createElement("td");
+                                cellElement.textContent = cellText;
+                                rowElement.appendChild(cellElement); // Append cells to row
                             }
+                            newTableBody.appendChild(rowElement); // Append rows to tbody
+                        }
+                        // If table exists, replace the new tbody with the old one
+                        if (!table) {
+                            console.error("Table is undefined");
+                            return [2 /*return*/];
                         }
                         else {
-                            rowData = void 0;
-                            rowData = [];
-                            k = 0;
-                            for (i = this.data.length - 1; i >= 0; i--) {
-                                rowData[k] = this.data[i];
-                                k++;
-                            }
-                            // Use temp variable to append rows to table in correct order
-                            for (_c = 0, rowData_1 = rowData; _c < rowData_1.length; _c++) {
-                                row = rowData_1[_c];
-                                rowElement = document.createElement("tr");
-                                for (_d = 0, row_2 = row; _d < row_2.length; _d++) {
-                                    cellText = row_2[_d];
-                                    cellElement = document.createElement("td");
-                                    cellElement.textContent = cellText;
-                                    rowElement.appendChild(cellElement); // Append cells
-                                }
-                                newTableBody.prepend(rowElement); // Prepend rows
-                            }
+                            table.replaceChild(newTableBody, oldTableBody);
                         }
-                        if (!table)
-                            return [2 /*return*/];
-                        table.replaceChild(newTableBody, this.tableBody);
                         return [2 /*return*/];
                 }
             });
@@ -199,17 +215,18 @@ var State = /** @class */ (function () {
     };
     // Delete rows from table
     State.prototype.deleteRows = function (newHeight, diff) {
+        var tableBod = this.contentTable.querySelector('tbody');
         var num = newHeight - 1;
         for (var i = num; i > (num + diff); i--) {
-            this.tableBody.deleteRow(i);
+            tableBod.deleteRow(i);
         }
     };
     // Load json data into table function
     State.prototype.loadIntoTable = function (clearHeader) {
         var _a, _b, _c, _d, _e, _f, _g, _h;
         // Display loader
-        $(".content").fadeOut(200);
-        $(".loader").fadeIn(200);
+        $(".content").fadeOut(230);
+        $(".loader").fadeIn(230);
         // UI "Aesthetic": update buttons
         (_a = this.firstBtn) === null || _a === void 0 ? void 0 : _a.removeAttribute("disabled");
         (_b = this.prevBtn) === null || _b === void 0 ? void 0 : _b.removeAttribute("disabled");
@@ -224,6 +241,7 @@ var State = /** @class */ (function () {
             (_h = this.prevBtn) === null || _h === void 0 ? void 0 : _h.setAttribute("disabled", "disabled");
         }
         this.pageInfo.innerHTML = "<p></p>";
+        // Add header only if 'clearHeader' is true
         if (clearHeader) {
             this.tableHead.innerHTML = "";
             var headerRow = document.createElement("tr");
@@ -239,13 +257,13 @@ var State = /** @class */ (function () {
         // Clear the table
         this.tableBody.innerHTML = "";
         // Add only records that must be displayed on table
-        this.addRows(this.trimStart, this.trimEnd, true);
+        this.addRows(this.trimStart, this.trimEnd);
         // Display content
-        $(".loader").fadeOut(200);
-        $(".content").fadeIn(200);
+        $(".loader").fadeOut(230);
+        $(".content").fadeIn(230);
     };
+    // Search entered ID
     State.prototype.searchId = function () {
-        this.setCurrentState();
         var id = parseInt(this.inputBox.value);
         var numRecords = this.getRecordCount() - 1;
         if (id < 0 || id > numRecords || isNaN(id)) {
@@ -266,13 +284,14 @@ var State = /** @class */ (function () {
         }
         document.getElementById('id-search').value = 'Enter ID number';
     };
+    // Set trim to start of data
     State.prototype.goToFirst = function () {
         this.trimStart = 0;
         this.trimEnd = this.trimStart + this.records - 1;
         this.loadIntoTable(false);
     };
+    // Set trim to previous data
     State.prototype.goToPrev = function () {
-        this.setCurrentState();
         // If previous page is end of data && there are not enough records to fill window
         if ((this.trimStart - 1) - (this.records - 1) < 0) {
             this.trimStart = 0;
@@ -284,8 +303,8 @@ var State = /** @class */ (function () {
         }
         this.loadIntoTable(false);
     };
+    // Set trim to next data
     State.prototype.goToNext = function () {
-        this.setCurrentState();
         // If next page is end of data && there are not enough records to fill window
         if ((this.getRecordCount() - 1) - (this.trimEnd + 1) < this.records) {
             this.trimEnd = this.getRecordCount() - 1;
@@ -297,63 +316,50 @@ var State = /** @class */ (function () {
         }
         this.loadIntoTable(false);
     };
+    // Set trim to end of data
     State.prototype.goToLast = function () {
         this.trimEnd = this.getRecordCount() - 1;
         this.trimStart = this.trimEnd - this.records + 1;
         this.loadIntoTable(false);
     };
+    // Add/remove rows from table based on resize event of the window
     State.prototype.resize = function () {
         var _a, _b, _c, _d, _e, _f, _g, _h;
         return __awaiter(this, void 0, void 0, function () {
-            var newHeight, diff, start, end, addEnd, addTop;
+            var newHeight, diff, start, end;
             return __generator(this, function (_j) {
                 switch (_j.label) {
                     case 0:
-                        this.setCurrentState();
                         newHeight = this.calculateRecords();
-                        console.log("records ", this.records, " vs numRows ", this.records);
                         diff = newHeight - this.records;
                         start = this.trimStart;
                         end = this.trimEnd + diff;
                         if (!(diff < 0)) return [3 /*break*/, 1];
-                        // Delete rows from last page
+                        // If screen is made smaller, call delete rows function with this.records (amount of rows that were on the screen)
+                        // and diff (how many rows should be deleted)
                         this.deleteRows(this.records, diff);
                         this.trimEnd = this.trimEnd + diff;
-                        return [3 /*break*/, 6];
+                        return [3 /*break*/, 4];
                     case 1:
-                        if (!(diff > 0 && this.trimEnd == this.getRecordCount() - 1)) return [3 /*break*/, 3];
+                        if (!(diff > 0 && end >= this.getRecordCount())) return [3 /*break*/, 3];
                         // Prepend rows as last page gets bigger
-                        // 'start' and 'end' only fetches the amount that should be prepended
-                        end = this.RECORDCOUNT - 1;
-                        start = this.trimStart - diff;
-                        return [4 /*yield*/, this.addRows(start, end, false)];
+                        end = this.getRecordCount() - 1;
+                        start = end - (newHeight - 1);
+                        console.log("End reached, displaying record ", start, " to ", end);
+                        return [4 /*yield*/, this.addRows(start, end)];
                     case 2:
                         _j.sent();
                         this.trimStart = this.trimStart - diff;
-                        return [3 /*break*/, 6];
-                    case 3:
-                        if (!(diff > 0 && end >= this.getRecordCount())) return [3 /*break*/, 5];
-                        addEnd = (this.getRecordCount() - 1) - this.trimEnd;
-                        end = this.getRecordCount() - 1;
-                        start = end - addEnd + 1;
-                        this.addRows(start, end, true);
-                        addTop = diff - addEnd;
-                        end = this.trimStart - 1;
-                        start = this.trimStart - addTop;
-                        return [4 /*yield*/, this.addRows(start, end, false)];
-                    case 4:
-                        _j.sent();
                         this.trimEnd = this.getRecordCount() - 1;
-                        this.trimStart = this.trimStart - addTop;
-                        return [3 /*break*/, 6];
-                    case 5:
+                        return [3 /*break*/, 4];
+                    case 3:
                         if (diff > 0 && start <= this.getRecordCount() - 1) {
                             // Add rows if end of data is not yet reached
-                            this.addRows(start, end, true);
+                            this.addRows(start, end);
                             this.trimEnd = this.trimEnd + diff;
                         }
-                        _j.label = 6;
-                    case 6:
+                        _j.label = 4;
+                    case 4:
                         this.records = newHeight;
                         // UI "Aesthetic": update buttons
                         (_a = this.firstBtn) === null || _a === void 0 ? void 0 : _a.removeAttribute("disabled");
