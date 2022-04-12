@@ -233,7 +233,7 @@ window.addEventListener("keydown", (e) => {
     if (key === "Enter") {
         let search: any = document.querySelector('#idInput');
         clearTable()
-        if (search.value != "" && search.value < 1000000) {
+        if (search.value != "" && search.value < 1000000 && search.value >= 0) {
             pageStats.innerHTML = clear
             let searchStats = "Showing result with ID of " + search.value;
             pageStats.innerHTML = searchStats;
@@ -341,7 +341,7 @@ function idJump() {
     paramOne = searchOne
     paramTwo = searchTwo
 
-    if (searchOne != "" && searchOne <= 999990) {
+    if (searchOne !== "" && searchOne <= 999990 && searchOne >= 0 && searchOne !== 'e') {
         clearTable()
         fetch("http://localhost:2050/records?from=" + paramOne + "&to=" + paramTwo, {
             method: "GET",
@@ -357,7 +357,7 @@ function idJump() {
             }
         });
         stats()
-    } else if (searchOne > 999990 && searchOne < 1000000) {
+    } else if (searchOne > 999990 && searchOne < 1000000 && searchOne >= 0 && searchOne !== 'e') {
         clearTable()
         fetch("http://localhost:2050/records?from=" + searchOne + "&to=" + 999999, {
             method: "GET",
@@ -384,8 +384,10 @@ function idJump() {
             pageStats.innerHTML = currentStats;
         })
     } else {
-        alert("There are no records with that ID!")
+        alert("There are no records with that ID! Please check that your input does not exceed 999 999 and is not a negative amount.")
         clearTable()
+        paramOne = 0
+        paramTwo = 9
         stats()
         getTable()
     }
