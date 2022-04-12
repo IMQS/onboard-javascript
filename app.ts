@@ -266,6 +266,7 @@ function recordSelection() {
           name="record-id"
           id="record-id"
           class="navigation-input"
+          value="bad"
         />
       </div>
       <div class="navigation-input-area">
