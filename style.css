@@ -26,7 +26,6 @@ body {
 }
 
 #col_heading input {
-    overflow-x: hidden;
     width: 90%;
     padding: 5px;
     font-size: 0.9rem;
@@ -86,6 +85,7 @@ body {
 #jumpID input {
     text-align: center;
     padding: 3px;
+    /* width: 100px; */
 }
 #jumpID button {
     padding: 5px;
