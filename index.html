@@ -3,10 +3,22 @@
 <head>
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+	<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-	<p>Hello</p>
+	<div class="nav">
+		<label id="pageStats"></label>
+		<div id="jumpID"><input id="idJump"><button onclick="idJump()">Jump To ID</button></div>
+		<div class="btns">
+			<button class="hide prev" id="prev" onclick="prev()" >Prev</button>
+			<button class="next" id="next" onclick="next()">Next</button>
+		</div>
+	</div>
+	<div id="Headings"></div>
+	<div id="Content"></div>
+
+	<script src="app.js"></script>
 </body>
 
 </html>
