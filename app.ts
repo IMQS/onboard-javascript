@@ -21,9 +21,7 @@ function getColumns() {
     .then((data) => {
         data = JSON.parse(data);
         let colList = data;
-        // console.log(colList);
         for (let i = 0; i < colList.length; i++) {
-            // console.log(colList[i]);
             colHeading(colList[i]);
         }
     });
@@ -51,7 +49,6 @@ function getTable() {
 
 function colHeading(heading: string) {
     if (heading == "ID") {
-        // console.log("heading", );
         let headingCol = `<div id="col_heading" class="col_heading">${heading}<input placeholder="Press Enter to search" id="idInput"></div>`;
         headings.innerHTML += headingCol;
     }
@@ -169,9 +166,7 @@ function prev() {
         .then((data) => {
             data = JSON.parse(data);
             let contentList = data;
-            // console.log(contentList);
             for (let i = 0; i < contentList.length; i++) {
-                // console.log(contentList[i]);
                 contentNeeded.push(contentList[i])
                 cols(contentList[i])
             }
@@ -191,9 +186,7 @@ function prev() {
         .then((data) => {
             data = JSON.parse(data);
             let contentList = data;
-            // console.log(contentList);
             for (let i = 0; i < contentList.length; i++) {
-                // console.log(contentList[i]);
                 contentNeeded.push(contentList[i])
                 cols(contentList[i])
             }
@@ -228,11 +221,9 @@ function clearTable() {
 
 window.addEventListener("keydown", (e) => {
     let key = e.key;
-    // console.log(key);
 
     if (key === "Enter") {
         let search: any = document.querySelector('#idInput');
-        // console.log("searched for", search.value);
         clearTable()
         if (search.value != "" && search.value < 1000000) {
             pageStats.innerHTML = clear
@@ -246,7 +237,6 @@ window.addEventListener("keydown", (e) => {
             .then((data) => {
                 data = JSON.parse(data);
                 let contentList = data;
-                // console.log(contentList);
                 for (let i = 0; i < contentList.length; i++) {
                     contentNeeded.push(contentList[i])
                     cols(contentList[i])
@@ -351,7 +341,6 @@ function idJump() {
         .then((data) => {
             data = JSON.parse(data);
             let contentList = data;
-            // console.log(contentList);
             for (let i = 0; i < contentList.length; i++) {
                 contentNeeded.push(contentList[i])
                 cols(contentList[i])
@@ -378,7 +367,6 @@ function idJump() {
         .then((data) => {
             data = JSON.parse(data);
             let contentList = data;
-            // console.log(contentList);
             for (let i = 0; i < contentList.length; i++) {
                 contentNeeded.push(contentList[i])
                 cols(contentList[i])
