@@ -130,7 +130,25 @@ function next() {
         });
         setTimeout(enableNext, 500)
     } else {
-        alert("There are no more records")
+        disableNext()
+        paramOne = 0
+        paramTwo = 9
+        stats()
+        clearTable()
+        fetch("http://localhost:2050/records?from=" + paramOne + "&to=" + paramTwo, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        })
+        .then((res) => res.text())
+        .then((data) => {
+            data = JSON.parse(data);
+            let contentList = data;
+            for (let i = 0; i < contentList.length; i++) {
+                contentNeeded.push(contentList[i])
+                cols(contentList[i])
+            }
+        });
+        setTimeout(enableNext, 500)
     }
 }
 
@@ -160,7 +178,27 @@ function prev() {
         });
         setTimeout(enablePrev, 500)
     } else {
-        alert("No previous records")
+        disablePrev()
+        paramOne = 999990
+        paramTwo = 999999
+        stats()
+        clearTable()
+        fetch("http://localhost:2050/records?from=" + paramOne + "&to=" + paramTwo, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        })
+        .then((res) => res.text())
+        .then((data) => {
+            data = JSON.parse(data);
+            let contentList = data;
+            // console.log(contentList);
+            for (let i = 0; i < contentList.length; i++) {
+                // console.log(contentList[i]);
+                contentNeeded.push(contentList[i])
+                cols(contentList[i])
+            }
+        });
+        setTimeout(enablePrev, 500)
     }
 }
 
