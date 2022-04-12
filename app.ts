@@ -4,6 +4,43 @@ let headingColumns: any = document.querySelector("#column-headings");
 let infoColumns: any = document.querySelector("#info-columns");
 //
 
+// Fetch request that gets the headings as well as the information and then runs
+// the functions that create the rows and columns as well as add the info to them.
+function fetchData() {
+  // Fetches the heading data
+  fetch("http://localhost:2050/columns", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => response.text())
+    .then((data) => {
+      let headingDataList = JSON.parse(data);
+
+      for (let i = 0; i < headingDataList.length; i++) {
+        columnHeading(headingDataList[i]);
+      }
+
+      // Fetching information
+      fetch("http://localhost:2050/records?from=0&to=16", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => response.text())
+        .then((data) => {
+          let columnDataList = JSON.parse(data);
+
+          for (let i = 0; i < columnDataList.length; i++) {
+            columns(columnDataList[i]);
+          }
+        });
+    });
+  createSelect();
+}
+fetchData();
+//
+
+// Functions that shows the info when the page loads at first.
+// Function that creates the select that appears on the page as itloads.
 function createSelect() {
   recordNav.innerHTML = `
   <select name="record-selection" id="record-selection">
@@ -20,15 +57,12 @@ function createSelect() {
 </button>
   `;
 }
-
-// Functions that shows the info when the page loads at first.
 // Function that creates the columns that contain the headings of the information.
 function columnHeading(heading: string) {
   let headingColumn = `<div class="column-heading">${heading}</div>`;
   headingColumns.innerHTML += headingColumn;
 }
-// Function that creates the columns and rows
-// that contain the information.
+// Function that creates the columns and rows that contain the information.
 function columns(info: string) {
   let infoColumns: any = document.querySelector("#info-columns");
   let infoRow = `      
@@ -52,8 +86,6 @@ function columns(info: string) {
 // Functions that shows the info when a user search for a single record.
 // Function that shows only one heading depending on what is being searched.
 function singleColumnHeading(heading: string) {
-  console.log(heading);
-
   let headingColumn = `
   <div class="column-heading">ID</div>
   <div class="column-heading">${heading}</div>
@@ -113,114 +145,114 @@ function singleColumns(info: string, contentColumn: any, heading: any) {
 }
 //
 
-// Fetch request that gets the headings as well as the information and then runs
-// the functions that create the rows and columns as well as add the info to them.
-// Fetching headings
-function fetchData() {
-  fetch("http://localhost:2050/columns", {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((response) => response.text())
-    .then((data) => {
-      let headingDataList = JSON.parse(data);
-
-      for (let i = 0; i < headingDataList.length; i++) {
-        columnHeading(headingDataList[i]);
-      }
-
-      // Fetching information
-      fetch("http://localhost:2050/records?from=0&to=16", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      })
-        .then((response) => response.text())
-        .then((data) => {
-          let columnDataList = JSON.parse(data);
-
-          for (let i = 0; i < columnDataList.length; i++) {
-            columns(columnDataList[i]);
-          }
-        });
-    });
-  createSelect();
-}
-
-fetchData();
-//
-
+// Function that creates the rows and highlights the data you are searching
+// for in the multiple single records.
 function multipleSingularColumns(
   info: string,
   columnPostion: string,
-  idPostion: string
+  idOfData: string
 ) {
   let infoColumns: any = document.querySelector("#info-columns");
   let infoRows = `      
-    <div class="info-row">
+    <div  class="info-row">
       <div class="info-column">${info[0]}</div>
-      <div id="one" class="info-column">${info[1]}</div>
-      <div id="two" class="info-column">${info[2]}</div>
-      <div id="three" class="info-column">${info[3]}</div>
-      <div id="four" class="info-column">${info[4]}</div>
-      <div id="five" class="info-column">${info[5]}</div>
-      <div id="six" class="info-column">${info[6]}</div>
-      <div id="seven" class="info-column">${info[7]}</div>
-      <div id="eight" class="info-column">${info[8]}</div>
-      <div id="nine" class="info-column">${info[9]}</div>
-      <div id="ten" class="info-column">${info[10]}</div>
+      <div id="one" class="info-column certain-column${idOfData}">${info[1]}</div>
+      <div id="two" class="info-column certain-column${idOfData}">${info[2]}</div>
+      <div id="three" class="info-column certain-column${idOfData}">${info[3]}</div>
+      <div id="four" class="info-column certain-column${idOfData}">${info[4]}</div>
+      <div id="five" class="info-column certain-column${idOfData}">${info[5]}</div>
+      <div id="six" class="info-column certain-column${idOfData}">${info[6]}</div>
+      <div id="seven" class="info-column certain-column${idOfData}">${info[7]}</div>
+      <div id="eight" class="info-column certain-column${idOfData}">${info[8]}</div>
+      <div id="nine" class="info-column certain-column${idOfData}">${info[9]}</div>
+      <div id="ten" class="info-column certain-column${idOfData}">${info[10]}</div>
     </div>`;
 
-  infoColumns.innerHTML += infoRows;
-
-  if (columnPostion === "a" && info[0] === idPostion) {
-    let infoColumnTargeted: any = document.querySelector("#one.info-column");
-    console.log(infoColumnTargeted);
+  if (columnPostion === "a") {
+    infoColumns.innerHTML += infoRows;
+    let infoColumnTargeted: any = document.querySelector(
+      "#one.certain-column" + idOfData
+    );
     infoColumnTargeted.style.color = "red";
-  } else if (columnPostion === "b" && info[0] === idPostion) {
-    let infoColumnTargeted: any = document.querySelector("#two.info-column");
+  } else if (columnPostion === "b") {
+    infoColumns.innerHTML += infoRows;
+    let infoColumnTargeted: any = document.querySelector(
+      "#two.certain-column" + idOfData
+    );
     infoColumnTargeted.style.color = "red";
-  } else if (columnPostion === "c" && info[0] === idPostion) {
-    let infoColumnTargeted: any = document.querySelector("#three.info-column");
+  } else if (columnPostion === "c") {
+    infoColumns.innerHTML += infoRows;
+    let infoColumnTargeted: any = document.querySelector(
+      "#three.certain-column" + idOfData
+    );
     infoColumnTargeted.style.color = "red";
-  } else if (columnPostion === "d" && info[0] === idPostion) {
-    let infoColumnTargeted: any = document.querySelector("#four.info-column");
+  } else if (columnPostion === "d") {
+    infoColumns.innerHTML += infoRows;
+    let infoColumnTargeted: any = document.querySelector(
+      "#four.certain-column" + idOfData
+    );
     infoColumnTargeted.style.color = "red";
-  } else if (columnPostion === "e" && info[0] === idPostion) {
-    let infoColumnTargeted: any = document.querySelector("#five.info-column");
+  } else if (columnPostion === "e") {
+    infoColumns.innerHTML += infoRows;
+    let infoColumnTargeted: any = document.querySelector(
+      "#five.certain-column" + idOfData
+    );
     infoColumnTargeted.style.color = "red";
-  } else if (columnPostion === "f" && info[0] === idPostion) {
-    let infoColumnTargeted: any = document.querySelector("#six.info-column");
+  } else if (columnPostion === "f") {
+    infoColumns.innerHTML += infoRows;
+    let infoColumnTargeted: any = document.querySelector(
+      "#six.certain-column" + idOfData
+    );
     infoColumnTargeted.style.color = "red";
-  } else if (columnPostion === "g" && info[0] === idPostion) {
-    let infoColumnTargeted: any = document.querySelector("#seven.info-column");
+  } else if (columnPostion === "g") {
+    infoColumns.innerHTML += infoRows;
+    let infoColumnTargeted: any = document.querySelector(
+      "#seven.certain-column" + idOfData
+    );
     infoColumnTargeted.style.color = "red";
-  } else if (columnPostion === "h" && info[0] === idPostion) {
-    let infoColumnTargeted: any = document.querySelector("#eight.info-column");
+  } else if (columnPostion === "h") {
+    infoColumns.innerHTML += infoRows;
+    let infoColumnTargeted: any = document.querySelector(
+      "#eight.certain-column" + idOfData
+    );
     infoColumnTargeted.style.color = "red";
-  } else if (columnPostion === "i" && info[0] === idPostion) {
-    let infoColumnTargeted: any = document.querySelector("#nine.info-column");
+  } else if (columnPostion === "i") {
+    infoColumns.innerHTML += infoRows;
+    let infoColumnTargeted: any = document.querySelector(
+      "#nine.certain-column" + idOfData
+    );
     infoColumnTargeted.style.color = "red";
-  } else if (columnPostion === "j" && info[0] === idPostion) {
-    let infoColumnTargeted: any = document.querySelector("#ten.info-column");
+  } else if (columnPostion === "j") {
+    infoColumns.innerHTML += infoRows;
+    let infoColumnTargeted: any = document.querySelector(
+      "#ten.certain-column" + idOfData
+    );
     infoColumnTargeted.style.color = "red";
   } else {
     alert("Error");
   }
 }
-// Function that allows the user to filter between looking fo a specific record or multiple records
+//
+
+// Function that allows the user to filter between looking fo a singular record, multiple records or multiple singular records.
 function recordSelection() {
   // let confirmationBtn: any = document.querySelector("#select-confirmation-btn") runs the function in the html (onclick);
-  let selectionArea: any = document.querySelector("#record-navigation");
+  // Accesses the area on the page where the select is shown.
+  let selectionArea: any = recordNav;
+  // Checks how you want filter records.
   let recordSelector: any = document.querySelector("#record-selection");
   let recordSelectionValue: string = recordSelector.value;
+  //
   let records: any = [];
 
+  // Checks if the select gives a proper value.
   if (
     recordSelectionValue === "single" ||
     recordSelectionValue === "multiple" ||
     recordSelectionValue === "multiple-single"
   ) {
     if (recordSelectionValue === "single") {
+      // Creates a div that includes all the inputs, selects and buttons needed to filter.
       let singleRecordSelection = `
       <button id="single-return-btn" class="return-btn">Return</button>
       <div id="user-input-data">
@@ -259,6 +291,7 @@ function recordSelection() {
       `;
       selectionArea.innerHTML = "";
       selectionArea.innerHTML = singleRecordSelection;
+
       let returnBtn: any = document.querySelector(
         "#single-return-btn.return-btn"
       );
@@ -268,10 +301,10 @@ function recordSelection() {
         fetchData();
         createSelect();
       });
+
       let singleSubmitBtn: any = document.querySelector(
         "#single-submit-btn.submit-btn"
       );
-
       singleSubmitBtn.addEventListener("click", () => {
         let recordId: any = document.querySelector("#record-id");
         let recordIdValue = recordId.value;
@@ -358,8 +391,8 @@ function recordSelection() {
                   for (let i = 0; i < columnDataList.length; i++) {
                     let infoColumns: any =
                       document.querySelector("#info-columns");
+
                     infoColumns.innerHTML = "";
-                    console.log(headingsList);
 
                     singleColumns(
                       columnDataList[i],
@@ -583,7 +616,6 @@ function recordSelection() {
         let numberCheck: number = 12 - Number(IdValue);
         const recordAmount: number = 16;
         let amountOfRecords = records.length;
-        console.log(amountOfRecords);
 
         if (amountOfRecords > recordAmount) {
           alert("That is the total amount of records that can be added");
@@ -603,7 +635,6 @@ function recordSelection() {
           };
           let arrayRecord = JSON.stringify(record);
           let isInArray = records.includes(arrayRecord);
-          console.log(isInArray);
 
           if (isInArray === false) {
             // Fetching information
@@ -631,15 +662,12 @@ function recordSelection() {
                 }
               });
             records.push(arrayRecord);
-            console.log(records);
 
             for (let i = 0; i < records.length; i++) {
               JSON.parse(records[i]);
-              console.log(records[i]);
             }
           } else {
             alert("The record was already added");
-            console.log(records);
           }
         } else {
           alert("Enter apropriate inputs please");
