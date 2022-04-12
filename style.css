@@ -1,0 +1,135 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+/*Removing Browser scrollbar*/
+::-webkit-scrollbar {
+  display: none;
+}
+/*  */
+
+select,
+button,
+input {
+  text-align: center;
+  width: 250px;
+  height: 50px;
+  font-size: 18px;
+  border: 2px solid black;
+  border-radius: 5px;
+  background-color: transparent;
+  transition: all 0.5s;
+  transition-timing-function: ease-in-out;
+}
+
+select:hover,
+button:hover,
+input:hover {
+  transform: scale(1.1);
+  color: white;
+  border-color: white;
+  background-color: black;
+}
+
+/* Selection tabs */
+#record-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-direction: row;
+  padding: 10px;
+  height: 10vh;
+}
+
+#user-input-data {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  height: 100%;
+}
+
+.navigation-input-area {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  padding: 10px;
+}
+
+#from-id,
+#to-id,
+.navigation-input-area-id {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  margin-left: 20px;
+  height: 100%;
+}
+
+.record-labels {
+  padding: 5px 10px 0px 0px;
+}
+
+.navigation-input {
+  padding: 5px;
+}
+/*  */
+
+/*Styling for the column headings*/
+#column-headings {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  height: 10vh;
+  width: 100%;
+  border-block: 2px solid black;
+  font-size: 30px;
+}
+
+.column-heading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  width: 100%;
+  height: 100%;
+}
+/*  */
+
+/*Styling for the columns*/
+#info-columns {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  height: calc(100vh -15vh);
+}
+
+.info-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 5vh;
+  width: 100%;
+  border-bottom: 2px solid black;
+  font-size: 20px;
+  transition: all 0.5s;
+  transition-timing-function: ease-in-out;
+}
+
+.info-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  width: 100%;
+  height: 100%;
+}
+/*  */
