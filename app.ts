@@ -266,7 +266,7 @@ function recordSelection() {
           name="record-id"
           id="record-id"
           class="navigation-input"
-          value="bad"
+          value="0"
         />
       </div>
       <div class="navigation-input-area">
@@ -309,108 +309,121 @@ function recordSelection() {
       singleSubmitBtn.addEventListener("click", () => {
         let recordId: any = document.querySelector("#record-id");
         let recordIdValue = recordId.value;
+        console.log(recordIdValue.length);
 
         let recordContent: any = document.querySelector("#record-content");
         let recordContentValue = recordContent.value;
 
-        if (
-          (recordIdValue !== null &&
-            recordContentValue === null &&
-            recordIdValue !== "" &&
-            recordContentValue === "") ||
-          recordContentValue === "none"
-        ) {
-          fetch("http://localhost:2050/columns", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          })
-            .then((response) => response.text())
-            .then((data) => {
-              let headingDataList = JSON.parse(data);
-              headingColumns.innerHTML = "";
-
-              for (let i = 0; i < headingDataList.length; i++) {
-                columnHeading(headingDataList[i]);
-              }
-              // Fetching information
-              fetch(
-                "http://localhost:2050/records?from=" +
-                  recordIdValue +
-                  "&to=" +
-                  recordIdValue,
-                {
-                  method: "GET",
-                  headers: { "Content-Type": "application/json" },
-                }
-              )
-                .then((response) => response.text())
-                .then((data) => {
-                  let columnDataList = JSON.parse(data);
-
-                  for (let i = 0; i < columnDataList.length; i++) {
-                    let infoColumns: any =
-                      document.querySelector("#info-columns");
-                    infoColumns.innerHTML = "";
-                    columns(columnDataList[i]);
-                  }
-                });
-            });
-        } else if (
-          recordIdValue !== null ||
-          (recordContentValue !== null && recordIdValue !== "") ||
-          recordContentValue !== "" ||
-          recordContentValue !== "none"
-        ) {
-          // Fetching headings
-          let headingsList: any = [];
-          fetch("http://localhost:2050/columns", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          })
-            .then((response) => response.text())
-            .then((data) => {
-              let headingDataList = JSON.parse(data);
-
-              for (let i = 0; i < headingDataList.length; i++) {
-                headingsList.push(headingDataList[i]);
-              }
-              // Fetching information
-              fetch(
-                "http://localhost:2050/records?from=" +
-                  recordIdValue +
-                  "&to=" +
-                  recordIdValue,
-                {
-                  method: "GET",
-                  headers: { "Content-Type": "application/json" },
-                }
-              )
-                .then((response) => response.text())
-                .then((data) => {
-                  let columnDataList = JSON.parse(data);
-
-                  for (let i = 0; i < columnDataList.length; i++) {
-                    let infoColumns: any =
-                      document.querySelector("#info-columns");
-
-                    infoColumns.innerHTML = "";
-
-                    singleColumns(
-                      columnDataList[i],
-                      recordContentValue,
-                      headingsList
-                    );
-                  }
-                });
-            });
+        if (recordIdValue.length === 0) {
+          alert(
+            "You left one of the record id inputs empty or you have entered an incorrect character."
+          );
         } else {
-          alert("Sorry there has been a problem. Can you please try again.");
-          let confirmation = confirm("Try again?");
-          if (confirmation === true) {
-            recordIdValue.value = "";
-            recordContentValue.value = "";
+          if (
+            (recordIdValue !== null &&
+              recordContentValue === null &&
+              recordIdValue !== "" &&
+              recordContentValue === "") ||
+            recordContentValue === "none"
+          ) {
+            fetch("http://localhost:2050/columns", {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            })
+              .then((response) => response.text())
+              .then((data) => {
+                let headingDataList = JSON.parse(data);
+                headingColumns.innerHTML = "";
+
+                for (let i = 0; i < headingDataList.length; i++) {
+                  columnHeading(headingDataList[i]);
+                }
+                // Fetching information
+                fetch(
+                  "http://localhost:2050/records?from=" +
+                    recordIdValue +
+                    "&to=" +
+                    recordIdValue,
+                  {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                  }
+                )
+                  .then((response) => response.text())
+                  .then((data) => {
+                    let columnDataList = JSON.parse(data);
+
+                    for (let i = 0; i < columnDataList.length; i++) {
+                      let infoColumns: any =
+                        document.querySelector("#info-columns");
+                      infoColumns.innerHTML = "";
+                      columns(columnDataList[i]);
+                    }
+                  });
+              });
+          } else if (
+            recordIdValue !== null ||
+            (recordContentValue !== null && recordIdValue !== "") ||
+            recordContentValue !== "" ||
+            recordContentValue !== "none"
+          ) {
+            // Fetching headings
+            let headingsList: any = [];
+            fetch("http://localhost:2050/columns", {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            })
+              .then((response) => response.text())
+              .then((data) => {
+                let headingDataList = JSON.parse(data);
+
+                for (let i = 0; i < headingDataList.length; i++) {
+                  headingsList.push(headingDataList[i]);
+                }
+                // Fetching information
+                fetch(
+                  "http://localhost:2050/records?from=" +
+                    recordIdValue +
+                    "&to=" +
+                    recordIdValue,
+                  {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                  }
+                )
+                  .then((response) => response.text())
+                  .then((data) => {
+                    let columnDataList = JSON.parse(data);
+
+                    for (let i = 0; i < columnDataList.length; i++) {
+                      let infoColumns: any =
+                        document.querySelector("#info-columns");
+
+                      infoColumns.innerHTML = "";
+
+                      singleColumns(
+                        columnDataList[i],
+                        recordContentValue,
+                        headingsList
+                      );
+                    }
+                  });
+              });
+          } else if (
+            recordIdValue === "0" ||
+            (recordIdValue === null && recordContentValue === "") ||
+            recordContentValue === "none"
+          ) {
+            alert("hello");
           } else {
-            window.location.reload();
+            alert("Sorry there has been a problem. Can you please try again.");
+            let confirmation = confirm("Try again?");
+            if (confirmation === true) {
+              recordIdValue.value = "0";
+              recordContentValue.value = "";
+            } else {
+              window.location.reload();
+            }
           }
         }
       });
@@ -429,6 +442,7 @@ function recordSelection() {
             name="record-id"
             id="from-record-id"
             class="navigation-input"
+            value="0"
           />
         </div>
         <div class="navigation-input-area-id" id="from-id">
@@ -441,6 +455,7 @@ function recordSelection() {
             name="record-id"
             id="to-record-id"
             class="navigation-input"
+            value="15"
           />
         </div>
       </div>
@@ -475,71 +490,78 @@ function recordSelection() {
         let fromIdValue = fromIdSelection.value;
         let toIdValue = toIdSelection.value;
 
-        if (
-          (fromIdValue !== null && toIdValue !== null) ||
-          (fromIdValue !== "" && toIdValue !== "")
-        ) {
-          const totalRecordsAllowed = 16;
-          let recordCount: number = Number(toIdValue) - Number(fromIdValue) + 1;
-          if (
-            recordCount > totalRecordsAllowed ||
-            typeof recordCount !== "number"
-          ) {
-            let excessRecords = recordCount - totalRecordsAllowed;
-            toIdValue = toIdValue - excessRecords;
-            alert(
-              "The data you entered is incorrect or you trying to access to much records only " +
-                totalRecordsAllowed +
-                " records can be accessed at a time. You have " +
-                excessRecords +
-                " excess records"
-            );
-            // Fetching information
-            fetch(
-              "http://localhost:2050/records?from=" +
-                fromIdValue +
-                "&to=" +
-                toIdValue,
-              {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-              }
-            )
-              .then((response) => response.text())
-              .then((data) => {
-                let columnDataList = JSON.parse(data);
-
-                infoColumns.innerHTML = "";
-                for (let i = 0; i < columnDataList.length; i++) {
-                  columns(columnDataList[i]);
-                }
-              });
-          } else if (recordCount <= 16 || typeof recordCount === "number") {
-            // Fetching information
-            fetch(
-              "http://localhost:2050/records?from=" +
-                fromIdValue +
-                "&to=" +
-                toIdValue,
-              {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-              }
-            )
-              .then((response) => response.text())
-              .then((data) => {
-                let columnDataList = JSON.parse(data);
-
-                infoColumns.innerHTML = "";
-                for (let i = 0; i < columnDataList.length; i++) {
-                  columns(columnDataList[i]);
-                }
-              });
-          }
-        } else {
+        if (fromIdValue.length === 0 || toIdValue === 0) {
           alert(
-            "Sorry there has been a problem. Please check your inputs make sure you have both filled."
+            "You left one of the record id inputs empty or you have entered an incorrect character."
           );
+        } else {
+          if (
+            (fromIdValue !== null && toIdValue !== null) ||
+            (fromIdValue !== "" && toIdValue !== "")
+          ) {
+            const totalRecordsAllowed = 16;
+            let recordCount: number =
+              Number(toIdValue) - Number(fromIdValue) + 1;
+            if (
+              recordCount > totalRecordsAllowed ||
+              typeof recordCount !== "number"
+            ) {
+              let excessRecords = recordCount - totalRecordsAllowed;
+              toIdValue = toIdValue - excessRecords;
+              alert(
+                "The data you entered is incorrect or you trying to access to much records only " +
+                  totalRecordsAllowed +
+                  " records can be accessed at a time. You have " +
+                  excessRecords +
+                  " excess records"
+              );
+              // Fetching information
+              fetch(
+                "http://localhost:2050/records?from=" +
+                  fromIdValue +
+                  "&to=" +
+                  toIdValue,
+                {
+                  method: "GET",
+                  headers: { "Content-Type": "application/json" },
+                }
+              )
+                .then((response) => response.text())
+                .then((data) => {
+                  let columnDataList = JSON.parse(data);
+
+                  infoColumns.innerHTML = "";
+                  for (let i = 0; i < columnDataList.length; i++) {
+                    columns(columnDataList[i]);
+                  }
+                });
+            } else if (recordCount <= 16 || typeof recordCount === "number") {
+              // Fetching information
+              fetch(
+                "http://localhost:2050/records?from=" +
+                  fromIdValue +
+                  "&to=" +
+                  toIdValue,
+                {
+                  method: "GET",
+                  headers: { "Content-Type": "application/json" },
+                }
+              )
+                .then((response) => response.text())
+                .then((data) => {
+                  let columnDataList = JSON.parse(data);
+
+                  infoColumns.innerHTML = "";
+                  for (let i = 0; i < columnDataList.length; i++) {
+                    columns(columnDataList[i]);
+                  }
+                });
+            }
+          } else {
+            alert(
+              "Sorry there has been a problem. Please check your inputs make sure you have both filled."
+            );
+          }
         }
       });
     } else if (recordSelectionValue === "multiple-single") {
@@ -557,6 +579,7 @@ function recordSelection() {
               name="record-id"
               id="record-id"
               class="navigation-input"
+              value="0"
             />
           </div>
           <div id="multiple-single-selection" class="navigation-input-area-id">
@@ -626,52 +649,58 @@ function recordSelection() {
           //pass
         }
 
-        if (
-          typeof numberCheck === "number" &&
-          typeof letterValue === "string"
-        ) {
-          let record = {
-            Id: IdValue,
-            letterId: letterValue,
-          };
-          let arrayRecord = JSON.stringify(record);
-          let isInArray = records.includes(arrayRecord);
+        if (IdValue.length === 0 || letterValue === "none") {
+          alert(
+            "You left one of the record id inputs empty or you have entered an incorrect character."
+          );
+        } else {
+          if (
+            typeof numberCheck === "number" &&
+            typeof letterValue === "string"
+          ) {
+            let record = {
+              Id: IdValue,
+              letterId: letterValue,
+            };
+            let arrayRecord = JSON.stringify(record);
+            let isInArray = records.includes(arrayRecord);
 
-          if (isInArray === false) {
-            // Fetching information
-            fetch(
-              "http://localhost:2050/records?from=" +
-                IdValue +
-                "&to=" +
-                IdValue,
-              {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-              }
-            )
-              .then((response) => response.text())
-              .then((data) => {
-                let columnDataList = JSON.parse(data);
-
-                infoColumns.innerHTML += "";
-                for (let i = 0; i < columnDataList.length; i++) {
-                  multipleSingularColumns(
-                    columnDataList[i],
-                    letterValue,
-                    IdValue
-                  );
+            if (isInArray === false) {
+              // Fetching information
+              fetch(
+                "http://localhost:2050/records?from=" +
+                  IdValue +
+                  "&to=" +
+                  IdValue,
+                {
+                  method: "GET",
+                  headers: { "Content-Type": "application/json" },
                 }
-              });
-            records.push(arrayRecord);
+              )
+                .then((response) => response.text())
+                .then((data) => {
+                  let columnDataList = JSON.parse(data);
 
-            for (let i = 0; i < records.length; i++) {
-              JSON.parse(records[i]);
+                  infoColumns.innerHTML += "";
+                  for (let i = 0; i < columnDataList.length; i++) {
+                    multipleSingularColumns(
+                      columnDataList[i],
+                      letterValue,
+                      IdValue
+                    );
+                  }
+                });
+              records.push(arrayRecord);
+
+              for (let i = 0; i < records.length; i++) {
+                JSON.parse(records[i]);
+              }
+            } else {
+              alert("The record was already added");
             }
           } else {
-            alert("The record was already added");
+            alert("Enter apropriate inputs please");
           }
-        } else {
-          alert("Enter apropriate inputs please");
         }
       });
       records = records;
