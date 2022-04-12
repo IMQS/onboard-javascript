@@ -1,5 +1,5 @@
-let paramOne = 0
-let paramTwo = 9
+let paramOne: any = 0
+let paramTwo: any = 9
 let contentNeeded: any = [];
 let headings: any = document.querySelector("#Headings");
 let content_cols: any = document.querySelector("#Content");
@@ -108,8 +108,12 @@ function cols(content: string) {
 function next() {
     if (paramTwo < 999999) {
         disableNext()
-        paramOne = paramOne + 10
-        paramTwo = paramTwo + 10
+
+        let intOne = parseInt(paramOne) + 10
+        let intTwo = parseInt(paramTwo) + 10
+        paramOne = intOne.toString()
+        paramTwo = intTwo.toString()
+
         stats()
         clearTable()
         fetch("http://localhost:2050/records?from=" + paramOne + "&to=" + paramTwo, {
@@ -154,8 +158,12 @@ function next() {
 function prev() {
     if (paramOne >= 10) {
         disablePrev()
-        paramOne = paramOne - 10
-        paramTwo = paramTwo - 10
+
+        let intOne = parseInt(paramOne) - 10
+        let intTwo = parseInt(paramTwo) - 10
+        paramOne = intOne.toString()
+        paramTwo = intTwo.toString()
+        
         stats()
         clearTable()
         fetch("http://localhost:2050/records?from=" + paramOne + "&to=" + paramTwo, {
@@ -330,10 +338,12 @@ function idJump() {
     let searchOne = search.value
     let convert = parseInt(searchOne) + 9
     let searchTwo = convert.toString()
+    paramOne = searchOne
+    paramTwo = searchTwo
 
     if (searchOne != "" && searchOne <= 999990) {
         clearTable()
-        fetch("http://localhost:2050/records?from=" + searchOne + "&to=" + searchTwo, {
+        fetch("http://localhost:2050/records?from=" + paramOne + "&to=" + paramTwo, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -346,17 +356,7 @@ function idJump() {
                 cols(contentList[i])
             }
         });
-        fetch("http://localhost:2050/recordCount", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        })
-        .then((res) => res.text())
-        .then((data) => {
-            data = JSON.parse(data);
-            let count = data;
-            let currentStats = "Showing results from ID " + searchOne + " to " + searchTwo + " out of " + count + " results.";
-            pageStats.innerHTML = currentStats;
-        })
+        stats()
     } else if (searchOne > 999990 && searchOne < 1000000) {
         clearTable()
         fetch("http://localhost:2050/records?from=" + searchOne + "&to=" + 999999, {
