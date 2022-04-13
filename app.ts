@@ -47,11 +47,12 @@ function getTable() {
         for (let i = 0; i < contentList.length; i++) {
             contentNeeded.push(contentList[i])
             cols(contentList[i])
-            console.log(contentList[i]);
+            // console.log(contentList[i]);
             let contentListContent: any = contentList[i]
             for (let j = 0; j < contentListContent.length; j++) {
+                console.log(contentListContent[j]);
                 contentListNeeded.push(contentListContent[j]);
-                colContent(contentListContent[j])
+                // colContent(contentListContent[j])
             }
         }
     }); 
