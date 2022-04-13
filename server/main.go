@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var columns = [11]string{"ID", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"}
+var columns = [13]string{"ID", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"}
 const recordCount = 1000000
 const columnCount = len(columns); 
 const delayResponse = 500 * time.Millisecond
