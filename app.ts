@@ -1,12 +1,18 @@
 let paramOne: any = 0
 let paramTwo: any = 9
 let contentNeeded: any = [];
-let headings: any = document.querySelector("#Headings");
-let content_cols: any = document.querySelector("#Content");
-let pageStats: any = document.getElementById('pageStats')
-let clear = "";
-let prevButton: any = document.querySelector('#prev')
-let nextButton: any = document.querySelector('#next')
+let contentListNeeded: any = []
+const headings: any = document.querySelector("#Headings");
+const content_cols: any = document.querySelector("#Content");
+const lists: any = document.querySelector('#info-id')
+const pageStats: any = document.getElementById('pageStats')
+const clear = "";
+const prevButton: any = document.querySelector('#prev')
+const nextButton: any = document.querySelector('#next')
+let nextClickCount = 0;
+let prevClickCount = 0;
+let nextClicked: boolean
+let prevClicked: boolean
 
 // Fetch requests
 
@@ -37,10 +43,16 @@ function getTable() {
     .then((res) => res.text())
     .then((data) => {
         data = JSON.parse(data);
-        let contentList = data;
+        let contentList = data; 
         for (let i = 0; i < contentList.length; i++) {
             contentNeeded.push(contentList[i])
             cols(contentList[i])
+            console.log(contentList[i]);
+            let contentListContent: any = contentList[i]
+            for (let j = 0; j < contentListContent.length; j++) {
+                contentListNeeded.push(contentListContent[j]);
+                colContent(contentListContent[j])
+            }
         }
     }); 
 }
@@ -56,6 +68,20 @@ function colHeading(heading: string) {
         let headingCol = `<div id="col_heading" class="col_heading">${heading}</div>`;
         headings.innerHTML += headingCol;
     }
+}
+
+function colContent(list: string) {
+    let contentCol = `<div id="col_heading" class="col_heading">${list}</div>`;
+    lists.innerHTML += contentCol
+}
+
+// Targets content div to create the actual table and fill with data
+
+function cols(content: string) {
+    let content_col = `<div id="content_col" class="content_col">
+                        <div class="info" id="info_id">${content}</div>
+                        </div>`;
+    content_cols.innerHTML += content_col
 }
 
 // Display the current shown results
@@ -82,24 +108,6 @@ window.onload = function() {
     getTable()
 }
 
-// Targets content div to create the actual table and fill with data
-
-function cols(content: string) {
-    let content_col = `<div id="content_col" class="content_col">
-                        <div class="info" id="info_id">${content[0]}</div>
-                        <div class="info">${content[1]}</div>
-                        <div class="info">${content[2]}</div>
-                        <div class="info">${content[3]}</div>
-                        <div class="info">${content[4]}</div>
-                        <div class="info">${content[5]}</div>
-                        <div class="info">${content[6]}</div>
-                        <div class="info">${content[7]}</div>
-                        <div class="info">${content[8]}</div>
-                        <div class="info">${content[9]}</div>
-                        <div class="info">${content[10]}</div>
-                        </div>`;
-    content_cols.innerHTML += content_col
-}
 
 // Nav Buttons
 
@@ -357,7 +365,7 @@ function idJump() {
             }
         });
         stats()
-    } else if (searchOne > 999990 && searchOne < 1000000 && searchOne >= 0 && searchOne !== 'e') {
+    } else if ( searchOne > 999990 && searchOne < 1000000 && searchOne >= 0 && searchOne !== 'e') {
         clearTable()
         fetch("http://localhost:2050/records?from=" + searchOne + "&to=" + 999999, {
             method: "GET",
@@ -393,3 +401,20 @@ function idJump() {
     }
     search.value = clear
 }
+
+// nextButton.addEventListener("click", function() {
+//     let current = new Date()
+//     let firstHour = current.getHours();
+//     let firstMinute = current.getMinutes();
+//     let firstSecond = current.getSeconds();
+//     console.log("test");
+    
+
+//     if (firstSecond > 57) {
+//         let currentSecs = current.getSeconds()
+//         if (currentSecs <= firstSecond + 3 ) {
+//             console.log("Works");
+//         }
+//     } 
+// })
+
