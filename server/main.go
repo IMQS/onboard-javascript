@@ -14,10 +14,10 @@ import (
 )
 
 const recordCount = 1000000
-const columnCount = 12
+const columnCount = 11
 const delayResponse = 500 * time.Millisecond
 
-var columns = [columnCount]string{"ID", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"}
+var columns = [columnCount]string{"ID", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"}
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func main() {
