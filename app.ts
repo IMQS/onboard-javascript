@@ -54,7 +54,7 @@ function getTable() {
             let contentListContent: any = contentList[i]
             for (let j = 0; j < contentListContent.length; j++) {
                 let rowContentList: any = contentListContent[j]
-                console.log(rowContentList);
+                // console.log(rowContentList);
             }
 
         }
