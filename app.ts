@@ -105,7 +105,17 @@ function colHeading(heading: string) {
 
 function cols(content: string) {
     let content_col = `<div id="content_col" class="content_col">
-                        <div class="info" id="info_id">${content}</div>
+                        <div class="info" id="info_id">${content[0]}</div>
+                        <div class="info" id="info_id">${content[1]}</div>
+                        <div class="info" id="info_id">${content[2]}</div>
+                        <div class="info" id="info_id">${content[3]}</div>
+                        <div class="info" id="info_id">${content[4]}</div>
+                        <div class="info" id="info_id">${content[5]}</div>
+                        <div class="info" id="info_id">${content[6]}</div>
+                        <div class="info" id="info_id">${content[7]}</div>
+                        <div class="info" id="info_id">${content[8]}</div>
+                        <div class="info" id="info_id">${content[8]}</div>
+                        <div class="info" id="info_id">${content[10]}</div>
                         </div>`;
     content_cols.innerHTML += content_col
 }
