@@ -3,6 +3,7 @@
   padding: 0;
   box-sizing: border-box;
   font-family: sans-serif;
+  font-size: 12px;
   overflow-y: hidden;
   overflow-x: hidden;
 }
@@ -27,6 +28,7 @@ select,
 input {
   width: 200px;
   padding: 10px;
+  margin: 5px;
 }
 
 /* HTML containers */
@@ -54,6 +56,7 @@ input {
 
 .next-previous-navigation-btns {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   justify-content: space-around;
   width: 100%;
@@ -91,6 +94,7 @@ input {
 }
 
 .column-heading {
+  font-size: 30px;
   padding: 20px;
   text-align: center;
   border-right: 1px solid black;
@@ -102,22 +106,26 @@ input {
 /* Data */
 #info-columns-container {
   display: flex;
-  justify-content: space-between;
   flex-direction: column;
+  justify-content: space-between;
   height: 75vh;
   width: 100%;
 }
 
-.info-row {
+.info-data-row {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  height: 10vh;
   width: 100%;
-  height: 100%;
   border-bottom: 1px solid black;
 }
 
-.info-data {
+.info-column {
+  padding: 15px;
+  text-align: center;
   width: 100%;
-  border-right: 1px solid black;
+  border-right: 1px solid;
 }
+
+/* .info-data-row; */
