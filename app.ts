@@ -87,14 +87,8 @@ window.onload = function() {
 //// Targets heading div to creating the 1st row(Column names)
 
 function colHeading(heading: string) {
-    if (heading == "ID") {
-        let headingCol = `<div id="col_heading" class="col_heading">${heading}<input placeholder="Press Enter to search" id="idInput"></div>`;
-        headings.innerHTML += headingCol;
-    }
-    else {
-        let headingCol = `<div id="col_heading" class="col_heading">${heading}</div>`;
-        headings.innerHTML += headingCol;
-    }
+    let headingCol = `<div id="col_heading" class="col_heading">${heading}</div>`;
+    headings.innerHTML += headingCol;
 }
 
 //// Targets content div to create the actual table and fill with data
@@ -122,39 +116,39 @@ function clearTable() {
     content_cols.innerHTML = clear
 }
 
-// ID Search
+// // ID Search
 
-window.addEventListener("keydown", (e) => {
-    let key = e.key;
+// window.addEventListener("keydown", (e) => {
+//     let key = e.key;
 
-    if (key === "Enter") {
-        let search: any = document.querySelector('#idInput');
-        clearTable()
-        if (search.value != "" && search.value < 1000000 && search.value >= 0) {
-            pageStats.innerHTML = clear
-            let searchStats = "Showing result with ID of " + search.value;
-            pageStats.innerHTML = searchStats;
-            fetch("http://localhost:2050/records?from=" + search.value + "&to=" + search.value, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-            })
-            .then((res) => res.text())
-            .then((data) => {
-                data = JSON.parse(data);
-                let contentList = data;
-                for (let i = 0; i < contentList.length; i++) {
-                    contentNeeded.push(contentList[i])
-                    cols(contentList[i])
-                }
-            });
-        } else {
-            alert("There are no results with that ID!")
-            stats()
-            getTable()
-        }
-        search.value = clear
-    }
-})
+//     if (key === "Enter") {
+//         let search: any = document.querySelector('#idInput');
+//         clearTable()
+//         if (search.value != "" && search.value < 1000000 && search.value >= 0) {
+//             pageStats.innerHTML = clear
+//             let searchStats = "Showing result with ID of " + search.value;
+//             pageStats.innerHTML = searchStats;
+//             fetch("http://localhost:2050/records?from=" + search.value + "&to=" + search.value, {
+//                 method: "GET",
+//                 headers: { "Content-Type": "application/json" },
+//             })
+//             .then((res) => res.text())
+//             .then((data) => {
+//                 data = JSON.parse(data);
+//                 let contentList = data;
+//                 for (let i = 0; i < contentList.length; i++) {
+//                     contentNeeded.push(contentList[i])
+//                     cols(contentList[i])
+//                 }
+//             });
+//         } else {
+//             alert("There are no results with that ID!")
+//             stats()
+//             getTable()
+//         }
+//         search.value = clear
+//     }
+// })
 
 // Jump to ID  
 
@@ -273,8 +267,8 @@ nextButton.addEventListener("click", () => {
     clearTimeout(nextBtnStatus)
     nextCounter += 1
     nextBtnStatus = true
-    nextTurnFalse = setTimeout(nextBtnFalse, 2000)
-    nextActCheck = setTimeout(nextCheck, 2100)
+    nextTurnFalse = setTimeout(nextBtnFalse, 100)
+    nextActCheck = setTimeout(nextCheck, 200)
 })
 
 function nextBtnFalse() {
@@ -341,8 +335,8 @@ prevButton.addEventListener("click", () => {
     clearTimeout(prevBtnStatus)
     prevCounter += 1
     prevBtnStatus = true
-    prevTurnFalse = setTimeout(prevBtnFalse, 2000)
-    prevActCheck = setTimeout(prevCheck, 2100)
+    prevTurnFalse = setTimeout(prevBtnFalse, 100)
+    prevActCheck = setTimeout(prevCheck, 200)
 })
 
 function prevBtnFalse() {
