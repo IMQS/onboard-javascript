@@ -1,10 +1,11 @@
 const headings: any = document.querySelector("#Headings");
 const content_cols: any = document.querySelector("#Content");
-const lists: any = document.querySelector('#info-id')
+const lists: any = document.querySelector('#content_row')
 const pageStats: any = document.getElementById('pageStats')
 const clear = "";
 const nextButton: any = document.querySelector("#next");
 const prevButton: any = document.querySelector("#prev");
+let arrChild: any = []
 let paramOne: any = 0
 let paramTwo: any = 9
 let contentNeeded: any = [];
@@ -47,16 +48,11 @@ function getTable() {
     .then((res) => res.text())
     .then((data) => {
         data = JSON.parse(data);
-        let contentList = data; 
+        let contentList = data;
+        // console.log(contentList);
         for (let i = 0; i < contentList.length; i++) {
-            contentNeeded.push(contentList[i])
-            cols(contentList[i])
             let contentListContent: any = contentList[i]
-            for (let j = 0; j < contentListContent.length; j++) {
-                let rowContentList: any = contentListContent[j]
-                // console.log(rowContentList);
-            }
-
+            cols(contentListContent)
         }
     }); 
 }
@@ -103,22 +99,22 @@ function colHeading(heading: string) {
 
 //// Targets content div to create the actual table and fill with data
 
-function cols(content: string) {
-    let content_col = `<div id="content_col" class="content_col">
-                        <div class="info" id="info_id">${content[0]}</div>
-                        <div class="info" id="info_id">${content[1]}</div>
-                        <div class="info" id="info_id">${content[2]}</div>
-                        <div class="info" id="info_id">${content[3]}</div>
-                        <div class="info" id="info_id">${content[4]}</div>
-                        <div class="info" id="info_id">${content[5]}</div>
-                        <div class="info" id="info_id">${content[6]}</div>
-                        <div class="info" id="info_id">${content[7]}</div>
-                        <div class="info" id="info_id">${content[8]}</div>
-                        <div class="info" id="info_id">${content[8]}</div>
-                        <div class="info" id="info_id">${content[10]}</div>
-                        </div>`;
-    content_cols.innerHTML += content_col
+let columnRowData: any = []
+
+function cols(content: any) {
+    let rows = `<div id=row-${content[0]} class="rows"></div>`;
+
+    content_cols.innerHTML += rows;
+
+    let finalRow: any = document.querySelector("#row-" + content[0] + ".rows");
+
+    for (let x = 0; x < content.length; x++) {
+        let rowCols = `<div class="row-cols">${content[x]}</div>`;
+        finalRow.innerHTML += rowCols;
+    }
 }
+
+
 
 // Clear Table (content div)
 
