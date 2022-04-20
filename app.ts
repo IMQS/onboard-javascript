@@ -3,54 +3,54 @@ let recordNav: any = document.querySelector("#record-navigation-container"); //N
 let headingColumns: any = document.querySelector("#column-headings-container"); //Headings;
 let infoColumns: any = document.querySelector("#info-columns-container"); //Information;
 
+// Creates the navigation.
 function createNavigation() {
   recordNav.innerHTML = `
-  <div class="next-previous-navigation">
   <div class="next-previous-navigation-btns">
     <button class="previous-records-btn">Previous</button>
     <button class="next-records-btn">Next</button>
     <button class="reset-records-btn">First Page</button>
     <button class="last-records-btn">Last Page</button>
   </div>
-</div>
-<div class="current-page-container">
-<p class=current-page></p>
-</div>
-<div class="select-confirm">
+  <div class="select-confirm">
   <select name="record-selection" id="record-selection">
+  <option value="single">Single Records</option>
     <option value="multiple">Multiple Records</option>
-    <option value="single">Single Records</option>
   </select>
   <button onclick="recordSelection()" id="confirmation-btn">
     Confirm Selection
   </button>
-</div>
+  </div>
+  <div class="current-page-container">
+    <p class=current-page></p>
+  </div>
+
   `;
 }
 
+// Heading and info grid being created.
 function createHeadingGrid(headings: any) {
   let headingsData: any = `<h1 class="column-heading">${headings}</h1>`;
   headingColumns.innerHTML += headingsData;
 }
 
-function createGrid(columnData: string) {
-  let infoRowColumns: any = `
-    <div class="info-data-row">
-    <p class="info-column">${columnData[0]}</p>
-    <p class="info-column">${columnData[1]}</p>
-    <p class="info-column">${columnData[2]}</p>
-    <p class="info-column">${columnData[3]}</p>
-    <p class="info-column">${columnData[4]}</p>
-    <p class="info-column">${columnData[5]}</p>
-    <p class="info-column">${columnData[6]}</p>
-    <p class="info-column">${columnData[7]}</p>
-    <p class="info-column">${columnData[8]}</p>
-    <p class="info-column">${columnData[9]}</p>
-    <p class="info-column">${columnData[10]}</p>
-  </div>`;
-  infoColumns.innerHTML += infoRowColumns;
+function dynamicGrid(columnData: any) {
+  // Creates the row that the info will display and adds it to the infoColumnsArea.
+  let infoDataRow = `<div id="info-row-${columnData[0]}" class="info-rows"></div>`;
+  infoColumns.innerHTML += infoDataRow;
+  // Gets the created rows.
+  let finalInfoDataRow: any = document.querySelector(
+    "#info-row-" + columnData[0] + ".info-rows"
+  );
+
+  // Loops through
+  for (let x = 0; x < columnData.length; x++) {
+    let Div = `<p class="info-row-data">${columnData[x]}</p>`;
+    finalInfoDataRow.innerHTML += Div;
+  }
 }
 
+// Adds data in the heading and info grid.
 function fetchData() {
   // Gets headings array
   fetch("http://localhost:2050/columns", {
@@ -84,7 +84,8 @@ function fetchData() {
         .then((data) => {
           let columnDataList = JSON.parse(data);
           for (let i = 0; i < columnDataList.length; i++) {
-            createGrid(columnDataList[i]);
+            // createGrid(columnDataList[i]);
+            dynamicGrid(columnDataList[i]);
           }
         });
     });
@@ -94,8 +95,112 @@ function fetchData() {
 
 fetchData();
 
+// The functionality to move through an amount of records.
+function nextPrevious(firstId: any, finalId: any) {
+  // Btn's used to move from page to page.
+  let nextBtn: any = document.querySelector(".next-records-btn");
+  let previousBtn: any = document.querySelector(".previous-records-btn");
+
+  // Btn's used to move directly to the last and first page.
+  let firstPageBtn: any = document.querySelector(".reset-records-btn");
+  let lastPageBtn: any = document.querySelector(".last-records-btn");
+
+  // The area where the current page is shown.
+  let currentPage: any = document.querySelector(".current-page");
+
+  // The id's of the records that represent the first and last record of the page.
+  let numberOne: number = firstId;
+  let numberTwo: number = finalId;
+  const amountRecords: number = 15;
+
+  // Dsplays the current page.
+  currentPage.innerHTML = numberOne + " / " + numberTwo + " First Page";
+
+  if (numberOne === 0 && numberTwo === 14) {
+    previousBtn.disabled = true;
+  } else {
+    //pass
+  }
+
+  // The button that takes you to the first page.
+  firstPageBtn.addEventListener("click", () => {
+    let nextNumberOne: number = 0;
+    let nextNumberTwo: number = 14;
+    previousBtn.disabled = true;
+    nextBtn.disabled = false;
+
+    currentPage.innerHTML = "";
+    currentPage.innerHTML =
+      nextNumberOne + " / " + nextNumberTwo + " First Page";
+    numberOne = nextNumberOne;
+    numberTwo = nextNumberTwo;
+    nextPageData(numberOne, numberTwo);
+  });
+
+  // The button that takes you to the last page.
+  lastPageBtn.addEventListener("click", () => {
+    let nextNumberOne: number = 999985;
+    let nextNumberTwo: number = 999999;
+    nextBtn.disabled = true;
+    previousBtn.disabled = false;
+
+    currentPage.innerHTML = "";
+    currentPage.innerHTML =
+      nextNumberOne + " / " + nextNumberTwo + " Last Page";
+    numberOne = nextNumberOne;
+    numberTwo = nextNumberTwo;
+    nextPageData(numberOne, numberTwo);
+  });
+
+  // The button that takes you to the next page.
+  nextBtn.addEventListener("click", () => {
+    let nextNumberOne: number = numberOne + amountRecords;
+    let nextNumberTwo: number = numberTwo + amountRecords;
+    previousBtn.disabled = false;
+
+    if (nextNumberOne === 999985 && nextNumberTwo === 999999) {
+      currentPage.innerHTML = "";
+      currentPage.innerHTML =
+        nextNumberOne + " / " + nextNumberTwo + " Final Page";
+      numberOne = nextNumberOne;
+      numberTwo = nextNumberTwo;
+      nextPageData(numberOne, numberTwo);
+      nextBtn.disabled = true;
+    } else {
+      currentPage.innerHTML = "";
+      currentPage.innerHTML = nextNumberOne + " / " + nextNumberTwo;
+      numberOne = nextNumberOne;
+      numberTwo = nextNumberTwo;
+      nextPageData(numberOne, numberTwo);
+    }
+  });
+
+  // The button that takes you to the previous page.
+  previousBtn.addEventListener("click", () => {
+    let nextNumberOne: number = numberOne - amountRecords;
+    let nextNumberTwo: number = numberTwo - amountRecords;
+    nextBtn.disabled = false;
+
+    if (nextNumberOne === 0 && nextNumberTwo === 14) {
+      currentPage.innerHTML = "";
+      currentPage.innerHTML =
+        nextNumberOne + " / " + nextNumberTwo + " First Page";
+      numberOne = nextNumberOne;
+      numberTwo = nextNumberTwo;
+      nextPageData(numberOne, numberTwo);
+      previousBtn.disabled = true;
+    } else {
+      currentPage.innerHTML = "";
+      currentPage.innerHTML = nextNumberOne + " / " + nextNumberTwo;
+      numberOne = nextNumberOne;
+      numberTwo = nextNumberTwo;
+      nextPageData(numberOne, numberTwo);
+    }
+  });
+}
+
 function nextPageData(firstNumber: any, secondNumber: any) {
-  // Fetching information
+  // Fetching information that will display when you go to the next or previous page.
   fetch(
     "http://localhost:2050/records?from=" + firstNumber + "&to=" + secondNumber,
     {
@@ -108,100 +213,12 @@ function nextPageData(firstNumber: any, secondNumber: any) {
       let columnDataList = JSON.parse(data);
       infoColumns.innerHTML = "";
       for (let i = 0; i < columnDataList.length; i++) {
-        createGrid(columnDataList[i]);
+        dynamicGrid(columnDataList[i]);
       }
     });
 }
 
-function nextPrevious(firstId: any, finalId: any) {
-  let nextBtn: any = document.querySelector(".next-records-btn");
-  let previousBtn: any = document.querySelector(".previous-records-btn");
-  let resetBtn: any = document.querySelector(".reset-records-btn");
-  let lastPageBtn: any = document.querySelector(".last-records-btn");
-  let currentPage: any = document.querySelector(".current-page");
-
-  let numberOne: number = firstId;
-  let numberTwo: number = finalId;
-  const amountRecords: number = 15;
-
-  currentPage.innerHTML = numberOne + " -> " + numberTwo + " First Page";
-
-  if (numberOne === 0 && numberTwo === 14) {
-    previousBtn.disabled = true;
-  } else {
-    //pass
-  }
-
-  resetBtn.addEventListener("click", () => {
-    let nextNumberOne: number = 0;
-    let nextNumberTwo: number = 14;
-    previousBtn.disabled = true;
-    nextBtn.disabled = false;
-
-    currentPage.innerHTML = "";
-    currentPage.innerHTML = nextNumberOne + " -> " + nextNumberTwo;
-    numberOne = nextNumberOne;
-    numberTwo = nextNumberTwo;
-    nextPageData(numberOne, numberTwo);
-  });
-
-  lastPageBtn.addEventListener("click", () => {
-    let nextNumberOne: number = 999985;
-    let nextNumberTwo: number = 999999;
-    nextBtn.disabled = true;
-    previousBtn.disabled = false;
-
-    currentPage.innerHTML = "";
-    currentPage.innerHTML = nextNumberOne + " -> " + nextNumberTwo;
-    numberOne = nextNumberOne;
-    numberTwo = nextNumberTwo;
-    nextPageData(numberOne, numberTwo);
-  });
-
-  nextBtn.addEventListener("click", () => {
-    let nextNumberOne: number = numberOne + amountRecords;
-    let nextNumberTwo: number = numberTwo + amountRecords;
-    previousBtn.disabled = false;
-
-    if (nextNumberOne === 999985 && nextNumberTwo === 999999) {
-      currentPage.innerHTML = "";
-      currentPage.innerHTML =
-        nextNumberOne + " -> " + nextNumberTwo + " Final Page";
-      numberOne = nextNumberOne;
-      numberTwo = nextNumberTwo;
-      nextPageData(numberOne, numberTwo);
-      nextBtn.disabled = true;
-    } else {
-      currentPage.innerHTML = "";
-      currentPage.innerHTML = nextNumberOne + " -> " + nextNumberTwo;
-      numberOne = nextNumberOne;
-      numberTwo = nextNumberTwo;
-      nextPageData(numberOne, numberTwo);
-    }
-  });
-
-  previousBtn.addEventListener("click", () => {
-    let nextNumberOne: number = numberOne - amountRecords;
-    let nextNumberTwo: number = numberTwo - amountRecords;
-    nextBtn.disabled = false;
-
-    if (nextNumberOne === 0 && nextNumberTwo === 14) {
-      currentPage.innerHTML = "";
-      currentPage.innerHTML =
-        nextNumberOne + " -> " + nextNumberTwo + " First Page";
-      numberOne = nextNumberOne;
-      numberTwo = nextNumberTwo;
-      nextPageData(numberOne, numberTwo);
-      previousBtn.disabled = true;
-    } else {
-      currentPage.innerHTML = "";
-      currentPage.innerHTML = nextNumberOne + " -> " + nextNumberTwo;
-      numberOne = nextNumberOne;
-      numberTwo = nextNumberTwo;
-      nextPageData(numberOne, numberTwo);
-    }
-  });
-}
+// Checks if you looking for a single or multiple records.
 function recordSelection() {
   let selectionArea: any = recordNav;
   let recordSelector: any = document.querySelector("#record-selection");
@@ -212,11 +229,139 @@ function recordSelection() {
     recordSelectionValue === "multiple" ||
     recordSelectionValue === "single"
   ) {
-    if (recordSelectionValue === "multiple") {
+    if (recordSelectionValue === "single") {
+      let multipleSingleRecordSelection = `
+    <button id="return-btn">Return</button>
+      <div id="user-input-data">
+        <div class="navigation-input-area-id" id="id">
+          <label class="record-labels" for="record-id"
+            >Enter record ID :
+          </label>
+          <input
+            type="number"
+            min="0"
+            name="record-id"
+            id="record-id"
+            class="navigation-input"
+            value="0"
+          />
+        </div>
+      </div>
+    <button id="get-record-btn">See Record</button>
+    `;
+      selectionArea.innerHTML = "";
+      selectionArea.innerHTML = multipleSingleRecordSelection;
+
+      let returnBtn: any = document.querySelector("#return-btn");
+
+      returnBtn.addEventListener("click", () => {
+        let recordsViewed: any;
+        let viewedRecords: any = [];
+        for (let i = 0; i < records.length; i++) {
+          recordsViewed = JSON.parse(records[i])["ID"];
+          viewedRecords.push(recordsViewed);
+        }
+        alert("Records you have viewed " + viewedRecords);
+        headingColumns.innerHTML = "";
+        infoColumns.innerHTML = "";
+        fetchData();
+        createNavigation();
+      });
+
+      let getSingleRecord: any = document.querySelector("#get-record-btn");
+
+      getSingleRecord.addEventListener("click", () => {
+        infoColumns.innerHTML = "";
+        // Id input
+        let IdSelection: any = document.querySelector("#record-id");
+
+        //Values Needed
+        let IdValue = IdSelection.value;
+        let numberCheck: number = 12 - Number(IdValue);
+
+        // Value checks
+        if (IdValue.length === 0) {
+          alert("You have entered an incorrect character.");
+        } else {
+          if (IdValue > 999999) {
+            alert("The record you are looking for does not exist");
+            IdValue = 0;
+          } else {
+            //pass
+          }
+
+          if (typeof numberCheck === "number") {
+            let record = {
+              ID: IdValue,
+            };
+
+            let arrayRecord = JSON.stringify(record);
+            let isInArray = records.includes(arrayRecord);
+            let finalSingleId: number;
+            let properId: any;
+
+            if (IdValue > 999984) {
+              properId = IdValue;
+              finalSingleId = 999999;
+              IdValue = 999984;
+            } else {
+              finalSingleId = Number(IdValue) + 15;
+            }
+
+            if (isInArray === false || isInArray === true) {
+              if (isInArray === true) {
+                let removeIndex = records.indexOf(record["ID"]);
+                records.splice(removeIndex);
+              } else {
+                //pass
+              }
+
+              // Fetching information
+              fetch(
+                "http://localhost:2050/records?from=" +
+                  IdValue +
+                  "&to=" +
+                  finalSingleId,
+                {
+                  method: "GET",
+                  headers: { "Content-Type": "application/json" },
+                }
+              )
+                .then((response) => response.text())
+                .then((data) => {
+                  let columnDataList = JSON.parse(data);
+
+                  infoColumns.innerHTML += "";
+                  for (let i = 0; i < columnDataList.length; i++) {
+                    if (IdValue == 999984) {
+                      IdValue = properId;
+                      console.log(properId);
+                    } else {
+                      //pass
+                    }
+                    createGridSingle(columnDataList[i], IdValue);
+                  }
+                });
+
+              records.push(arrayRecord);
+
+              for (let i = 0; i < records.length; i++) {
+                JSON.parse(records[i]);
+              }
+            } else {
+              alert("There is a problem accessing the record.");
+            }
+          } else {
+            alert("Enter apropriate inputs please.");
+          }
+        }
+      });
+
+      records = records;
+    } else if (recordSelectionValue === "multiple") {
       let multipleRecordSelection = `
-        <button id="multiple-return-btn" class="return-btn">Return</button>
-        <div id="user-input-data">
-        <div class="navigation-input-area">
+      <button id="return-btn">Return</button>
+      <div id="user-input-data">
           <div class="navigation-input-area-id" id="from-id">
             <label class="record-labels" for="record-id"
               >Enter starting record ID :
@@ -229,31 +374,23 @@ function recordSelection() {
               class="navigation-input"
               value="0"
             />
-          </div>
-          <div class="navigation-input-area-id" id="from-id">
-            <label class="record-labels" for="record-id"
-              >Enter stop record ID :
-            </label>
             <input
-              type="number"
-              min="0"
-              name="record-id"
-              id="to-record-id"
-              class="navigation-input"
-              value="15"
-            />
+            type="number"
+            readonly
+            disabled
+            min="0"
+            name="record-id"
+            id="to-record-id"
+            class="navigation-input"
+          />
           </div>
-        </div>
       </div>
-      <button id="multiple-submit-btn" class="submit-btn" >Get Records</button>
+      <button id="submit-btn">Get Records</button>
       `;
       selectionArea.innerHTML = "";
       selectionArea.innerHTML = multipleRecordSelection;
 
-      let returnBtn: any = document.querySelector(
-        "#multiple-return-btn.return-btn"
-      );
-
+      let returnBtn: any = document.querySelector("#return-btn");
       returnBtn.addEventListener("click", () => {
         records = [];
         headingColumns.innerHTML = "";
@@ -262,10 +399,8 @@ function recordSelection() {
         createNavigation();
       });
 
-      let multipleSubmitBtn: any = document.querySelector(
-        "#multiple-submit-btn.submit-btn"
-      );
-      multipleSubmitBtn.addEventListener("click", () => {
+      let SubmitBtn: any = document.querySelector("#submit-btn");
+      SubmitBtn.addEventListener("click", () => {
         let fromIdSelection: any = document.querySelector(
           "#from-record-id.navigation-input"
         );
@@ -274,217 +409,81 @@ function recordSelection() {
         );
 
         let fromIdValue = fromIdSelection.value;
-        let toIdValue = toIdSelection.value;
 
-        if (fromIdValue.length === 0 || toIdValue === 0) {
-          alert(
-            "You left one of the record id inputs empty or you have entered an incorrect character."
-          );
-        } else {
-          if (
-            (fromIdValue !== null && toIdValue !== null) ||
-            (fromIdValue !== "" && toIdValue !== "")
-          ) {
-            const totalRecordsAllowed = 16;
-            let recordCount: number =
-              Number(toIdValue) - Number(fromIdValue) + 1;
-            if (
-              recordCount > totalRecordsAllowed ||
-              typeof recordCount !== "number"
-            ) {
-              let excessRecords = recordCount - totalRecordsAllowed;
-              toIdValue = toIdValue - excessRecords;
-              alert(
-                "The data you entered is incorrect or you trying to access to much records only " +
-                  totalRecordsAllowed +
-                  " records can be accessed at a time. You have " +
-                  excessRecords +
-                  " excess records"
-              );
-              // Fetching information
-              fetch(
-                "http://localhost:2050/records?from=" +
-                  fromIdValue +
-                  "&to=" +
-                  toIdValue,
-                {
-                  method: "GET",
-                  headers: { "Content-Type": "application/json" },
-                }
-              )
-                .then((response) => response.text())
-                .then((data) => {
-                  let columnDataList = JSON.parse(data);
-
-                  infoColumns.innerHTML = "";
-                });
-            } else if (recordCount <= 16 || typeof recordCount === "number") {
-              // Fetching information
-              fetch(
-                "http://localhost:2050/records?from=" +
-                  fromIdValue +
-                  "&to=" +
-                  toIdValue,
-                {
-                  method: "GET",
-                  headers: { "Content-Type": "application/json" },
-                }
-              )
-                .then((response) => response.text())
-                .then((data) => {
-                  let columnDataList = JSON.parse(data);
-
-                  infoColumns.innerHTML = "";
-                  for (let i = 0; i < columnDataList.length; i++) {}
-                });
-            }
-          } else {
-            alert(
-              "Sorry there has been a problem. Please check your inputs make sure you have both filled."
-            );
-          }
-        }
-      });
-    } else if (recordSelectionValue === "single") {
-      let multipleSingleRecordSelection = `
-      <button id="multiple-single-return-btn" class="return-btn">Return</button>
-      <div id="user-input-data">
-        <div class="navigation-input-area">
-          <div class="navigation-input-area-id" id="id">
-            <label class="record-labels" for="record-id"
-              >Enter record ID :
-            </label>
-            <input
-              type="number"
-              min="0"
-              name="record-id"
-              id="record-id"
-              class="navigation-input"
-              value="0"
-            />
-          </div>
-          <div id="multiple-single-selection" class="navigation-input-area-id">
-            <label class="record-labels" for="record-id"
-              >Enter record content letter (Optional) :
-            </label>
-            <select
-              name="record-content"
-              class="navigation-input"
-              id="record-content"
-            >
-              <option value="none">Select Letter</option>
-              <option value="a">A</option>
-              <option value="b">B</option>
-              <option value="c">C</option>
-              <option value="d">D</option>
-              <option value="e">E</option>
-              <option value="f">F</option>
-              <option value="g">G</option>
-              <option value="h">H</option>
-              <option value="i">I</option>
-              <option value="j">J</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <button id="add-records-btn" class="add-btn">See Records</button>
-      `;
-      selectionArea.innerHTML = "";
-      selectionArea.innerHTML = multipleSingleRecordSelection;
-      let returnBtn: any = document.querySelector(
-        "#multiple-single-return-btn.return-btn"
-      );
-      returnBtn.addEventListener("click", () => {
-        alert("Records you have viewed " + records);
-        headingColumns.innerHTML = "";
-        infoColumns.innerHTML = "";
-        fetchData();
-        createNavigation();
-      });
-      let addMulitpleSingularRecords: any = document.querySelector(
-        "#add-records-btn.add-btn"
-      );
-
-      addMulitpleSingularRecords.addEventListener("click", () => {
-        // Inputs and selects
-        let IdSelection: any = document.querySelector(
-          "#record-id.navigation-input"
-        );
-
-        let letterValueSelection: any =
-          document.querySelector("#record-content");
-
-        //Values Needed
-        let IdValue = IdSelection.value;
-        let letterValue = letterValueSelection.value;
-        let numberCheck: number = 12 - Number(IdValue);
-        const recordAmount: number = 16;
-        let amountOfRecords = records.length;
-
-        if (amountOfRecords > recordAmount) {
-          alert("That is the total amount of records that can be added");
-        } else if (amountOfRecords === 0) {
-          infoColumns.innerHTML = "";
+        if (fromIdValue > 999984 && fromIdValue <= 999999) {
+          fromIdValue = 999984;
+          alert("You have reached the final page");
         } else {
           //pass
         }
 
-        if (IdValue.length === 0 || letterValue === "none") {
-          alert(
-            "You left one of the record id inputs empty or you have entered an incorrect character."
-          );
+        const totalRecordsAllowed = 15;
+
+        let toIdSelectionValue = (toIdSelection.value =
+          Number(fromIdValue) + 15);
+        let toIdValue = toIdSelectionValue;
+
+        let recordCount: number = Number(toIdValue) - Number(fromIdValue);
+
+        if (recordCount !== 15 || fromIdValue > 999999) {
+          fromIdSelection.value = "0";
+          toIdSelection.value = "14";
+          alert("Your entered ID is not correct or does not exist");
         } else {
-          if (
-            typeof numberCheck === "number" &&
-            typeof letterValue === "string"
-          ) {
-            let record = {
-              Id: IdValue,
-              letterId: letterValue,
-            };
-            let arrayRecord = JSON.stringify(record);
-            let isInArray = records.includes(arrayRecord);
-
-            if (isInArray === false) {
-              // Fetching information
-              fetch(
-                "http://localhost:2050/records?from=" +
-                  IdValue +
-                  "&to=" +
-                  IdValue,
-                {
-                  method: "GET",
-                  headers: { "Content-Type": "application/json" },
-                }
-              )
-                .then((response) => response.text())
-                .then((data) => {
-                  let columnDataList = JSON.parse(data);
-
-                  infoColumns.innerHTML += "";
-                  console.log(columnDataList);
-                });
-              records.push(arrayRecord);
-
-              for (let i = 0; i < records.length; i++) {
-                JSON.parse(records[i]);
+          if (totalRecordsAllowed === recordCount && fromIdValue <= 999999) {
+            // Fetching information
+            fetch(
+              "http://localhost:2050/records?from=" +
+                fromIdValue +
+                "&to=" +
+                toIdValue,
+              {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
               }
-            } else {
-              alert("The record was already added");
-            }
+            )
+              .then((response) => response.text())
+              .then((data) => {
+                let columnDataList = JSON.parse(data);
+
+                infoColumns.innerHTML = "";
+                for (let i = 0; i < columnDataList.length; i++) {
+                  dynamicGrid(columnDataList[i]);
+                }
+              });
           } else {
-            alert("Enter apropriate inputs please");
+            alert("Sorry there has been a problem. Please check your inputs.");
           }
         }
       });
-      records = records;
     } else {
-      alert(
-        "Sorry there has been a problem. The page will reload can you please try again."
-      );
+      alert("Sorry there has been a problem.");
       window.location.reload();
     }
   } else {
-    alert("Error");
+    alert("Something went wrong.");
+  }
+}
+
+// Highlights the record you are searching for.
+function createGridSingle(columnData: string, highlightedRecord: any) {
+  // Creates the row that the info will display and adds it to the infoColumnsArea.
+  let infoDataRow = `<div id="info-row-${columnData[0]}" class="info-rows"></div>`;
+  infoColumns.innerHTML += infoDataRow;
+
+  // Gets the created rows.
+  let finalInfoDataRow: any = document.querySelector(
+    "#info-row-" + columnData[0] + ".info-rows"
+  );
+
+  // Loops through the data.
+  for (let x = 0; x < columnData.length; x++) {
+    let Div = `<p class="info-row-data">${columnData[x]}</p>`;
+    finalInfoDataRow.innerHTML += Div;
+  }
+  if (highlightedRecord == columnData[0]) {
+    finalInfoDataRow.style.color = "red";
+  } else {
+    //pass
   }
 }
