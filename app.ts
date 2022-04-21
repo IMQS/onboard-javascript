@@ -123,7 +123,6 @@ function colHeading(heading: string) {
 
 //// Targets content div to create the actual table and fill with data
 
-let columnRowData: any = []
 
 function cols(content: any) {
     let rows = `<div id=row-${content[0]} class="rows"></div>`;
@@ -381,13 +380,21 @@ function resizing() {
 }
 
 let runit: any;
+let resizeInProgress: any = false
+let resizeStatus: any;
 
 window.addEventListener("resize", () => {
     clearTimeout(runit);
-    runit = setTimeout(resizing, 100)
+    clearTimeout(resizeStatus)
+    resizeInProgress = true
+    resizeStatus = setTimeout(resizeStatusFalse, 100)
+    runit = setTimeout(resizing, 200)
     
 });
 
+function resizeStatusFalse() {
+    resizeInProgress = false
+}
 
 function prevRe() {
     let windowHeight = window.innerHeight;
