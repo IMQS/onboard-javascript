@@ -273,21 +273,95 @@ function nextCheck() {
 //// Prev Function
 
 function prev() {
-    if (paramOne == 0) {
-        paramTwo = "999999"
-        
-        prevRe()
-    } else {
-        let prevAmount: any = (paramTwo - paramOne) + 1
+    let windowHeight = window.innerHeight;
 
-        let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
-        let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
-        paramOne = intOne.toString()
-        paramTwo = intTwo.toString()
-
-        prevRe()
+    if (windowHeight < 600 && windowHeight >= 480) {
+        if (paramOne <= 6) {
+            paramOne = 999993
+            prevRe()
+        } else {
+            let prevAmount: any = (paramTwo - paramOne) + 1
+    
+            let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
+            let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
+            paramOne = intOne.toString()
+            paramTwo = intTwo.toString()
+            console.log("more than 6");
+            console.log(intOne);
+    
+            prevRe()
+        }
+        prevCounter = 0
+    } 
+    else if (windowHeight < 480 && windowHeight >= 400) {
+        if (paramOne <= 4) {
+            paramOne = 999995
+            
+            prevRe()
+        } else {
+            let prevAmount: any = (paramTwo - paramOne) + 1
+    
+            let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
+            let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
+            paramOne = intOne.toString()
+            paramTwo = intTwo.toString()
+    
+            prevRe()
+        }
+        prevCounter = 0
     }
-    prevCounter = 0
+    else if (windowHeight < 400 && windowHeight > 300) {
+        if (paramOne <= 2) {
+            paramOne = 999997
+            
+            prevRe()
+        } else {
+            let prevAmount: any = (paramTwo - paramOne) + 1
+    
+            let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
+            let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
+            paramOne = intOne.toString()
+            paramTwo = intTwo.toString()
+    
+            prevRe()
+        }
+        prevCounter = 0
+    }
+    else if (windowHeight <= 300) {
+        if (paramOne <= 1) {
+            paramOne = 999998
+            
+            prevRe()
+        } else {
+            let prevAmount: any = (paramTwo - paramOne) + 1
+    
+            let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
+            let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
+            paramOne = intOne.toString()
+            paramTwo = intTwo.toString()
+    
+            prevRe()
+        }
+        prevCounter = 0
+    }
+    else {
+        if (paramOne <= 9) {
+            paramOne = 999990
+            
+            prevRe()
+        } else {
+            let prevAmount: any = (paramTwo - paramOne) + 1
+    
+            let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
+            let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
+            paramOne = intOne.toString()
+            paramTwo = intTwo.toString()
+    
+            prevRe()
+        }
+        prevCounter = 0
+    }
+
 }
 
 prevButton.addEventListener("click", () => {
@@ -367,7 +441,7 @@ function resizing() {
     }
     else {
         if (paramOne > 999990) {
-            paramOne = 999990
+            paramOne = 0
         } else {
             //pass
         }
@@ -400,11 +474,6 @@ function prevRe() {
     let windowHeight = window.innerHeight;
 
     if (windowHeight < 600 && windowHeight >= 480) {
-        if (paramOne == 0) {
-            paramOne = 999993
-        } else {
-            //pass
-        }
         paramTwo = parseInt(paramOne) + 6
         paramTwo = paramTwo.toString()
         clearTable()
@@ -412,11 +481,6 @@ function prevRe() {
         getTable()
     } 
     else if (windowHeight < 480 && windowHeight >= 400) {
-        if (paramOne == 0) {
-            paramOne = 999995
-        } else {
-            //pass
-        }
         paramTwo = parseInt(paramOne) + 4
         paramTwo = paramTwo.toString()
         clearTable()
@@ -424,11 +488,6 @@ function prevRe() {
         getTable()
     } 
     else if (windowHeight < 400 && windowHeight > 300) {
-        if (paramOne == 0) {
-            paramOne = 999997
-        } else {
-            //pass
-        }
         paramTwo = parseInt(paramOne) + 2
         paramTwo = paramTwo.toString()
         clearTable()
@@ -436,11 +495,6 @@ function prevRe() {
         getTable()
     } 
     else if (windowHeight <= 300) {
-        if (paramOne == 0) {
-            paramOne = 999999
-        } else {
-            //pass
-        }
         paramTwo = parseInt(paramOne) + 1
         paramTwo = paramTwo.toString()
         clearTable()
@@ -448,11 +502,6 @@ function prevRe() {
         getTable()
     }
     else {
-        if (paramOne == 0) {
-            paramOne = 999990
-        } else {
-            //pass
-        }
         paramTwo = parseInt(paramOne) + 9
         paramTwo = paramTwo.toString()
         clearTable()
