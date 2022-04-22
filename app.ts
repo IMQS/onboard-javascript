@@ -45,8 +45,8 @@ function dynamicGrid(columnData: any) {
 
   // Loops through
   for (let x = 0; x < columnData.length; x++) {
-    let Div = `<p class="info-row-data">${columnData[x]}</p>`;
-    finalInfoDataRow.innerHTML += Div;
+    let infoData = `<p class="info-row-data">${columnData[x]}</p>`;
+    finalInfoDataRow.innerHTML += infoData;
   }
 }
 
@@ -67,8 +67,31 @@ function fetchData() {
         createHeadingGrid(headings);
       }
 
-      let fromNumber = 0;
-      let toNumber = 14;
+      let fromNumber: any = 0;
+      let toNumber: any = 14;
+
+      window.addEventListener("resize", () => {
+        if (window.innerHeight <= 500) {
+          toNumber = fromNumber + 10;
+          window.location.reload();
+        } else if (window.innerHeight > 500) {
+          toNumber = fromNumber + 14;
+          window.location.reload();
+        } else {
+          console.log("Nothing");
+        }
+
+        nextPrevious(fromNumber, toNumber);
+        fetchDataScreenSize(fromNumber, toNumber);
+      });
+
+      if (window.innerHeight <= 500) {
+        toNumber = fromNumber + 10;
+      } else if (window.innerHeight > 500) {
+        toNumber = fromNumber + 14;
+      } else {
+        console.log("Nothing");
+      }
 
       nextPrevious(fromNumber, toNumber);
 
@@ -83,17 +106,36 @@ function fetchData() {
         .then((response) => response.text())
         .then((data) => {
           let columnDataList = JSON.parse(data);
+          infoColumns.innerHTML = "";
           for (let i = 0; i < columnDataList.length; i++) {
-            // createGrid(columnDataList[i]);
             dynamicGrid(columnDataList[i]);
           }
         });
     });
-
   createNavigation();
 }
 
 fetchData();
+
+// Adds data in the heading and info grid on a smaller screen.
+function fetchDataScreenSize(fromNumber: any, toNumber: any) {
+  // Fetching information
+  fetch(
+    "http://localhost:2050/records?from=" + fromNumber + "&to=" + toNumber,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+    .then((response) => response.text())
+    .then((data) => {
+      let columnDataList = JSON.parse(data);
+      infoColumns.innerHTML = "";
+      for (let i = 0; i < columnDataList.length; i++) {
+        dynamicGrid(columnDataList[i]);
+      }
+    });
+}
 
 // The functionality to move through an amount of records.
 function nextPrevious(firstId: any, finalId: any) {
@@ -111,92 +153,111 @@ function nextPrevious(firstId: any, finalId: any) {
   // The id's of the records that represent the first and last record of the page.
   let numberOne: number = firstId;
   let numberTwo: number = finalId;
-  const amountRecords: number = 15;
 
-  // Dsplays the current page.
-  currentPage.innerHTML = numberOne + " / " + numberTwo + " First Page";
+  const amountRecords: number = finalId - firstId;
 
-  if (numberOne === 0 && numberTwo === 14) {
-    previousBtn.disabled = true;
-  } else {
-    //pass
-  }
+  let navigation = document.querySelector(".next-previous-navigation-btns");
 
-  // The button that takes you to the first page.
-  firstPageBtn.addEventListener("click", () => {
-    let nextNumberOne: number = 0;
-    let nextNumberTwo: number = 14;
-    previousBtn.disabled = true;
-    nextBtn.disabled = false;
+  if (recordNav.contains(navigation) === true) {
+    // Displays the current page.
+    currentPage.innerHTML = numberOne + " / " + numberTwo + " First Page";
 
-    currentPage.innerHTML = "";
-    currentPage.innerHTML =
-      nextNumberOne + " / " + nextNumberTwo + " First Page";
-    numberOne = nextNumberOne;
-    numberTwo = nextNumberTwo;
-    nextPageData(numberOne, numberTwo);
-  });
-
-  // The button that takes you to the last page.
-  lastPageBtn.addEventListener("click", () => {
-    let nextNumberOne: number = 999985;
-    let nextNumberTwo: number = 999999;
-    nextBtn.disabled = true;
-    previousBtn.disabled = false;
-
-    currentPage.innerHTML = "";
-    currentPage.innerHTML =
-      nextNumberOne + " / " + nextNumberTwo + " Last Page";
-    numberOne = nextNumberOne;
-    numberTwo = nextNumberTwo;
-    nextPageData(numberOne, numberTwo);
-  });
-
-  // The button that takes you to the next page.
-  nextBtn.addEventListener("click", () => {
-    let nextNumberOne: number = numberOne + amountRecords;
-    let nextNumberTwo: number = numberTwo + amountRecords;
-    previousBtn.disabled = false;
-
-    if (nextNumberOne === 999985 && nextNumberTwo === 999999) {
-      currentPage.innerHTML = "";
-      currentPage.innerHTML =
-        nextNumberOne + " / " + nextNumberTwo + " Final Page";
-      numberOne = nextNumberOne;
-      numberTwo = nextNumberTwo;
-      nextPageData(numberOne, numberTwo);
-      nextBtn.disabled = true;
+    if ((numberOne === 0 && numberTwo === 14) || numberTwo === 10) {
+      previousBtn.disabled = true;
     } else {
-      currentPage.innerHTML = "";
-      currentPage.innerHTML = nextNumberOne + " / " + nextNumberTwo;
-      numberOne = nextNumberOne;
-      numberTwo = nextNumberTwo;
-      nextPageData(numberOne, numberTwo);
+      //pass
     }
-  });
 
-  // The button that takes you to the previous page.
-  previousBtn.addEventListener("click", () => {
-    let nextNumberOne: number = numberOne - amountRecords;
-    let nextNumberTwo: number = numberTwo - amountRecords;
-    nextBtn.disabled = false;
+    // The button that takes you to the first page.
+    firstPageBtn.addEventListener("click", () => {
+      let nextNumberOne: number = 0;
+      let nextNumberTwo: number = nextNumberOne + amountRecords;
+      previousBtn.disabled = true;
+      nextBtn.disabled = false;
 
-    if (nextNumberOne === 0 && nextNumberTwo === 14) {
       currentPage.innerHTML = "";
       currentPage.innerHTML =
         nextNumberOne + " / " + nextNumberTwo + " First Page";
       numberOne = nextNumberOne;
       numberTwo = nextNumberTwo;
       nextPageData(numberOne, numberTwo);
-      previousBtn.disabled = true;
-    } else {
+    });
+
+    // The button that takes you to the last page.
+    lastPageBtn.addEventListener("click", () => {
+      let nextNumberOne: any;
+
+      if (numberTwo === 10) {
+        nextNumberOne = 999989;
+      } else if (numberTwo === 14) {
+        nextNumberOne = 999984;
+      } else {
+        //pass
+      }
+
+      let nextNumberTwo: number = 999999;
+      nextBtn.disabled = true;
+      previousBtn.disabled = false;
+
       currentPage.innerHTML = "";
-      currentPage.innerHTML = nextNumberOne + " / " + nextNumberTwo;
+      currentPage.innerHTML =
+        nextNumberOne + " / " + nextNumberTwo + " Last Page";
       numberOne = nextNumberOne;
       numberTwo = nextNumberTwo;
       nextPageData(numberOne, numberTwo);
-    }
-  });
+    });
+
+    // The button that takes you to the next page.
+    nextBtn.addEventListener("click", () => {
+      let nextNumberOne: number = numberOne + amountRecords;
+      let nextNumberTwo: number = numberTwo + amountRecords;
+      previousBtn.disabled = false;
+
+      if (
+        nextNumberOne === 999985 ||
+        (nextNumberOne === 999989 && nextNumberTwo === 999999)
+      ) {
+        currentPage.innerHTML = "";
+        currentPage.innerHTML =
+          nextNumberOne + " / " + nextNumberTwo + " Final Page";
+        numberOne = nextNumberOne;
+        numberTwo = nextNumberTwo;
+        nextPageData(numberOne, numberTwo);
+        nextBtn.disabled = true;
+      } else {
+        currentPage.innerHTML = "";
+        currentPage.innerHTML = nextNumberOne + " / " + nextNumberTwo;
+        numberOne = nextNumberOne;
+        numberTwo = nextNumberTwo;
+        nextPageData(numberOne, numberTwo);
+      }
+    });
+
+    // The button that takes you to the previous page.
+    previousBtn.addEventListener("click", () => {
+      let nextNumberOne: number = numberOne - amountRecords;
+      let nextNumberTwo: number = numberTwo - amountRecords;
+      nextBtn.disabled = false;
+
+      if (nextNumberOne === 0 && nextNumberTwo === amountRecords) {
+        currentPage.innerHTML = "";
+        currentPage.innerHTML =
+          nextNumberOne + " / " + nextNumberTwo + " First Page";
+        numberOne = nextNumberOne;
+        numberTwo = nextNumberTwo;
+        nextPageData(numberOne, numberTwo);
+        previousBtn.disabled = true;
+      } else {
+        currentPage.innerHTML = "";
+        currentPage.innerHTML = nextNumberOne + " / " + nextNumberTwo;
+        numberOne = nextNumberOne;
+        numberTwo = nextNumberTwo;
+        nextPageData(numberOne, numberTwo);
+      }
+    });
+  } else {
+    //pass
+  }
 }
 
 function nextPageData(firstNumber: any, secondNumber: any) {
@@ -230,7 +291,7 @@ function recordSelection() {
     recordSelectionValue === "single"
   ) {
     if (recordSelectionValue === "single") {
-      let multipleSingleRecordSelection = `
+      let SingleRecordSelection = `
     <button id="return-btn">Return</button>
       <div id="user-input-data">
         <div class="navigation-input-area-id" id="id">
@@ -246,11 +307,14 @@ function recordSelection() {
             value="0"
           />
         </div>
+        <p class="amount-of-records"></p>
       </div>
+    <button id="add-record-btn">Add Record</button>
+    <button id="clear-record-btn">Clear Records</button>
     <button id="get-record-btn">See Record</button>
     `;
       selectionArea.innerHTML = "";
-      selectionArea.innerHTML = multipleSingleRecordSelection;
+      selectionArea.innerHTML = SingleRecordSelection;
 
       let returnBtn: any = document.querySelector("#return-btn");
 
@@ -261,27 +325,62 @@ function recordSelection() {
           recordsViewed = JSON.parse(records[i])["ID"];
           viewedRecords.push(recordsViewed);
         }
-        alert("Records you have viewed " + viewedRecords);
-        headingColumns.innerHTML = "";
-        infoColumns.innerHTML = "";
-        fetchData();
-        createNavigation();
+        if (viewedRecords.length === 0) {
+          headingColumns.innerHTML = "";
+          infoColumns.innerHTML = "";
+          fetchData();
+          createNavigation();
+        } else {
+          alert("Records you have viewed " + viewedRecords);
+          headingColumns.innerHTML = "";
+          infoColumns.innerHTML = "";
+          fetchData();
+          createNavigation();
+        }
       });
 
+      let clearBtn: any = document.querySelector("#clear-record-btn");
+      let amountOfRecords: any = document.querySelector(".amount-of-records");
+      let addRecord: any = document.querySelector("#add-record-btn");
       let getSingleRecord: any = document.querySelector("#get-record-btn");
 
-      getSingleRecord.addEventListener("click", () => {
-        infoColumns.innerHTML = "";
-        // Id input
-        let IdSelection: any = document.querySelector("#record-id");
+      if (records.length === 0) {
+        getSingleRecord.disabled = true;
+        clearBtn.disabled = true;
+      } else {
+      }
 
-        //Values Needed
+      window.addEventListener("resize", () => {
+        if (window.innerHeight <= 500) {
+          amountOfRecords.innerHTML = records.length + " / " + "10";
+          window.location.reload();
+        } else if (window.innerHeight > 500) {
+          amountOfRecords.innerHTML = records.length + " / " + "15";
+          window.location.reload();
+        } else {
+          console.log("Nothing");
+          window.location.reload();
+        }
+      });
+
+      if (window.innerHeight <= 500) {
+        amountOfRecords.innerHTML = records.length + " / " + "10";
+      } else if (window.innerHeight > 500) {
+        amountOfRecords.innerHTML = records.length + " / " + "15";
+      } else {
+        console.log("Nothing");
+      }
+
+      addRecord.addEventListener("click", () => {
+        clearBtn.disabled = false;
+        getSingleRecord.disabled = false;
+        let IdSelection: any = document.querySelector("#record-id");
         let IdValue = IdSelection.value;
         let numberCheck: number = 12 - Number(IdValue);
 
-        // Value checks
-        if (IdValue.length === 0) {
+        if (IdValue.length === 0 || IdValue < 0) {
           alert("You have entered an incorrect character.");
+          window.location.reload();
         } else {
           if (IdValue > 999999) {
             alert("The record you are looking for does not exist");
@@ -291,22 +390,51 @@ function recordSelection() {
           }
 
           if (typeof numberCheck === "number") {
+            addRecord.disabled = false;
+            IdSelection.readonly = false;
+            let recordAmount: any;
+
+            window.addEventListener("resize", () => {
+              if (window.innerHeight <= 500) {
+                recordAmount = 10;
+                window.location.reload();
+              } else if (window.innerHeight > 500) {
+                recordAmount = 15;
+                window.location.reload();
+              } else {
+                console.log("Nothing");
+                window.location.reload();
+              }
+            });
+
+            if (window.innerHeight <= 500) {
+              recordAmount = 10;
+            } else if (window.innerHeight > 500) {
+              recordAmount = 15;
+            } else {
+              console.log("Nothing");
+            }
+
+            clearBtn.addEventListener("click", () => {
+              if (records.length === 0) {
+                clearBtn.disabled = true;
+              } else {
+                addRecord.disabled = false;
+                clearBtn.disabled = true;
+                getSingleRecord.disabled = true;
+                records = [];
+                amountOfRecords.innerHTML =
+                  records.length + " / " + recordAmount;
+                alert("Records been cleared");
+              }
+            });
+
             let record = {
               ID: IdValue,
             };
 
             let arrayRecord = JSON.stringify(record);
             let isInArray = records.includes(arrayRecord);
-            let finalSingleId: number;
-            let properId: any;
-
-            if (IdValue > 999984) {
-              properId = IdValue;
-              finalSingleId = 999999;
-              IdValue = 999984;
-            } else {
-              finalSingleId = Number(IdValue) + 15;
-            }
 
             if (isInArray === false || isInArray === true) {
               if (isInArray === true) {
@@ -316,38 +444,25 @@ function recordSelection() {
                 //pass
               }
 
-              // Fetching information
-              fetch(
-                "http://localhost:2050/records?from=" +
-                  IdValue +
-                  "&to=" +
-                  finalSingleId,
-                {
-                  method: "GET",
-                  headers: { "Content-Type": "application/json" },
-                }
-              )
-                .then((response) => response.text())
-                .then((data) => {
-                  let columnDataList = JSON.parse(data);
+              console.log(records.length, recordAmount);
 
-                  infoColumns.innerHTML += "";
-                  for (let i = 0; i < columnDataList.length; i++) {
-                    if (IdValue == 999984) {
-                      IdValue = properId;
-                      console.log(properId);
-                    } else {
-                      //pass
-                    }
-                    createGridSingle(columnDataList[i], IdValue);
-                  }
-                });
-
-              records.push(arrayRecord);
+              if (records.length === recordAmount) {
+                addRecord.disabled = true;
+                IdSelection.readonly = true;
+                alert(
+                  "Thats the maximun. To view your records click see record button."
+                );
+              } else {
+                records.push(arrayRecord);
+              }
 
               for (let i = 0; i < records.length; i++) {
                 JSON.parse(records[i]);
               }
+
+              console.log(records);
+              records = records;
+              amountOfRecords.innerHTML = records.length + " / " + recordAmount;
             } else {
               alert("There is a problem accessing the record.");
             }
@@ -355,6 +470,38 @@ function recordSelection() {
             alert("Enter apropriate inputs please.");
           }
         }
+      });
+
+      getSingleRecord.addEventListener("click", () => {
+        infoColumns.innerHTML = "";
+
+        let recordIdValue: any;
+        let lastRecord: any;
+
+        for (let i = 0; i < records.length; i++) {
+          recordIdValue = Number(JSON.parse(records[i])["ID"]);
+          lastRecord = Number(JSON.parse(records[records.length - 1])["ID"]);
+
+          fetch(
+            "http://localhost:2050/records?from=" +
+              recordIdValue +
+              "&to=" +
+              recordIdValue,
+            {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            }
+          )
+            .then((response) => response.text())
+            .then((data) => {
+              let columnDataList = JSON.parse(data);
+              infoColumns.innerHTML += "";
+              for (let x = 0; x < columnDataList.length; x++) {
+                dynamicGrid(columnDataList[x]);
+              }
+            });
+        }
+        console.log(lastRecord);
       });
 
       records = records;
@@ -417,15 +564,39 @@ function recordSelection() {
           //pass
         }
 
-        const totalRecordsAllowed = 15;
+        let totalRecordsAllowed: any;
+
+        window.addEventListener("resize", () => {
+          if (window.innerHeight <= 500) {
+            totalRecordsAllowed = 10;
+            window.location.reload();
+          } else if (window.innerHeight > 500) {
+            totalRecordsAllowed = 15;
+            window.location.reload();
+          } else {
+            console.log("Nothing");
+          }
+        });
+
+        if (window.innerHeight <= 500) {
+          totalRecordsAllowed = 10;
+        } else if (window.innerHeight > 500) {
+          totalRecordsAllowed = 15;
+        } else {
+          console.log("Nothing");
+        }
 
         let toIdSelectionValue = (toIdSelection.value =
-          Number(fromIdValue) + 15);
+          Number(fromIdValue) + totalRecordsAllowed);
         let toIdValue = toIdSelectionValue;
 
         let recordCount: number = Number(toIdValue) - Number(fromIdValue);
 
-        if (recordCount !== 15 || fromIdValue > 999999) {
+        if (
+          recordCount !== totalRecordsAllowed ||
+          fromIdValue > 999999 ||
+          fromIdSelection < 0
+        ) {
           fromIdSelection.value = "0";
           toIdSelection.value = "14";
           alert("Your entered ID is not correct or does not exist");
@@ -462,28 +633,5 @@ function recordSelection() {
     }
   } else {
     alert("Something went wrong.");
-  }
-}
-
-// Highlights the record you are searching for.
-function createGridSingle(columnData: string, highlightedRecord: any) {
-  // Creates the row that the info will display and adds it to the infoColumnsArea.
-  let infoDataRow = `<div id="info-row-${columnData[0]}" class="info-rows"></div>`;
-  infoColumns.innerHTML += infoDataRow;
-
-  // Gets the created rows.
-  let finalInfoDataRow: any = document.querySelector(
-    "#info-row-" + columnData[0] + ".info-rows"
-  );
-
-  // Loops through the data.
-  for (let x = 0; x < columnData.length; x++) {
-    let Div = `<p class="info-row-data">${columnData[x]}</p>`;
-    finalInfoDataRow.innerHTML += Div;
-  }
-  if (highlightedRecord == columnData[0]) {
-    finalInfoDataRow.style.color = "red";
-  } else {
-    //pass
   }
 }
