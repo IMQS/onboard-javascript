@@ -191,7 +191,9 @@ function idJump() {
     } 
     else if ( searchOne > 999990 && searchOne < 1000000 && searchOne >= 0 && searchOne !== 'e') {
         clearTable()
-        fetch("http://localhost:2050/records?from=" + searchOne + "&to=" + 999999, {
+        let lastParamOne = 999999 - toConvert
+
+        fetch("http://localhost:2050/records?from=" + lastParamOne + "&to=" + 999999, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -212,17 +214,12 @@ function idJump() {
         .then((data) => {
             data = JSON.parse(data);
             let count = data;
-            let currentStats = "Showing results from ID " + searchOne + " to " + 999999 + " out of " + count + " results.";
+            let currentStats = "Showing results from ID " + lastParamOne + " to " + 999999 + " out of " + count + " results.";
             pageStats.innerHTML = currentStats;
         })
     }
      else {
         alert("There are no records with that ID! Please check that your input does not exceed 999 999 and is not a negative amount.")
-        clearTable()
-        paramOne = 0
-        paramTwo = 9
-        stats()
-        getTable()
     }
     search.value = clear
 }
@@ -233,9 +230,7 @@ function idJump() {
 
 function next() {
     if (paramTwo == 999999) {
-        paramOne = "0"
-
-        resizing()
+        alert("You have reached the final page")
     } else {
         let nextAmount: any = (paramTwo - paramOne) + 1
 
@@ -277,8 +272,8 @@ function prev() {
 
     if (windowHeight < 600 && windowHeight >= 480) {
         if (paramOne <= 6) {
-            paramOne = 999993
-            prevRe()
+            paramOne = 0
+            alert("This is the first page")
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
@@ -295,9 +290,8 @@ function prev() {
     } 
     else if (windowHeight < 480 && windowHeight >= 400) {
         if (paramOne <= 4) {
-            paramOne = 999995
-            
-            prevRe()
+            paramOne = 0
+            alert("This is the first page")
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
@@ -312,9 +306,8 @@ function prev() {
     }
     else if (windowHeight < 400 && windowHeight > 300) {
         if (paramOne <= 2) {
-            paramOne = 999997
-            
-            prevRe()
+            paramOne = 0
+            alert("This is the first page")
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
@@ -329,9 +322,8 @@ function prev() {
     }
     else if (windowHeight <= 300) {
         if (paramOne <= 1) {
-            paramOne = 999998
-            
-            prevRe()
+            paramOne = 0
+            alert("This is the first page")
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
@@ -346,9 +338,8 @@ function prev() {
     }
     else {
         if (paramOne <= 9) {
-            paramOne = 999990
-            
-            prevRe()
+            paramOne = 0
+            alert("This is the first page")
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
@@ -441,7 +432,7 @@ function resizing() {
     }
     else {
         if (paramOne > 999990) {
-            paramOne = 0
+            paramOne = 999990
         } else {
             //pass
         }
@@ -463,7 +454,6 @@ window.addEventListener("resize", () => {
     resizeInProgress = true
     resizeStatus = setTimeout(resizeStatusFalse, 100)
     runit = setTimeout(resizing, 200)
-    
 });
 
 function resizeStatusFalse() {
