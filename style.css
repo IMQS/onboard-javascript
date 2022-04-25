@@ -5,126 +5,112 @@
 }
 
 body {
-    height: 100vh;
-    width: 100%;
+    font-size: 1em;
     overflow-y: hidden;
     overflow-x: hidden;
-    font-size: 15px;
-}
-
-#Headings {
-    display: flex;
-    flex-direction: row;
-    min-width: 100%;
-}
-
-#col_heading {
-    border: 1px solid black;
     width: 100%;
-    min-height: 10vh;
-    display: grid;
-    place-items: center;
-    padding: 1px;
-}
-
-#Content {
-    display: flex;
-    flex-direction: column;
-    min-width: 100%;
-    height: calc(100vh - 15vh);
-}
-
-.rows {
     height: 100vh;
-    display: flex;
-    flex-direction: row;
-    min-width: 100%;
 }
 
-.row-cols {
-    border: 1px solid black;
-    height: 100%;
-    width: 100%;
-    display: grid;
-    place-items: center;
-}
+/* Navigation */
 
 .nav {
-    min-height: 5vh;
-    display: grid;
-    place-items: center;
     background-color: #000;
-    padding: 1px;
+    display: flex;
+    flex-direction: row;
+    color: #fff;
+    height: 5%;
+    width: 100%;
 }
 
 #pageStats {
-    color: #fff;
-    /* font-size:1.1em; */
-    padding: 5px;
     position: absolute;
     left: 1%;
+    top: 1%;
 }
-
 
 #jumpID {
-    color: #fff;
-    /* font-size: 1.1em; */
-    padding: 5px;
-    display: flex;
-    flex-direction: row;
-    text-align: center;
-    gap: 20px;
+    position: absolute;
+    left: 50%;
+    top: 1%;
+    transform: translate(-50%, -1%);
 }
 #jumpID input {
+    border: none;
+    margin-right: 20px;
+    padding: 7px 10px;
     text-align: center;
-    padding: 3px;
-    /* width: 100px; */
-}
-#jumpID button {
-    padding: 5px;
-    cursor: pointer;
-    border-radius: 50px;
-    border: 1px solid black;
-    width: 120px;
-    margin: 0 35px;
-    font-weight: bold;
-    text-transform: capitalize;
-    transition: ease-in 0.3s;
-}
-#jumpID button:hover {
-    letter-spacing: 2px;
 }
 
 .btns {
-    color: #fff;
-    padding: 5px;
     position: absolute;
     right: 1%;
+    top: 1%;
+}
+.btns .next {
+    margin-left: 20px;
 }
 
-.btns button {
-    padding: 5px;
+button {
+    border: none;
+    padding: 5px 10px;
+    border-radius: 10px;
+    width: 100px;
+    color: #000;
+    background-color: #fff;
     cursor: pointer;
-    border-radius: 50px;
-    border: 1px solid black;
-    width: 80px;
-    margin: 0 25px;
+    transition: all 0.3s;
+    transition-timing-function: ease-in-out;
+}
+button:hover {
+    letter-spacing: 1px;
+    color: #fff;
+    background-color: #000;
+    border: 1px solid #fff;
+}
+
+/* Headings */
+
+#Headings {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
+    height: 10vh;
+}
+#col_heading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    font-size: 1em;
     font-weight: bold;
-    text-transform: uppercase;
-    transition: ease-in 0.3s;
-}
-.btns button:hover {
-    letter-spacing: 3px;
+    border: 1px solid #000;
 }
 
-@media screen and (max-width: 1050px) {
-    #pageStats {
-        font-size: 0.8em;
-    }
-
-    #jumpID {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
+/* Table */
+#Content {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 15vh);
+    width: 100%;
+}
+.rows {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+}
+.row-cols {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    font-size: 0.8em;
+    border: 1px solid #000;
 }

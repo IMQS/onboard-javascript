@@ -244,7 +244,7 @@ let next = () => {
     }
 }
 
-next = nextDebounce(next, 200)
+next = nextDebounce(next, 500)
 
 nextButton.addEventListener("click", next)
 
@@ -341,7 +341,7 @@ let prev = () => {
 
 }
 
-prev = prevDebounce(prev, 200)
+prev = prevDebounce(prev, 500)
 
 prevButton.addEventListener("click", prev)
 
@@ -427,7 +427,7 @@ let resizing = () => {
     }
 }
 
-resizing = debounce(resizing, 200)
+resizing = debounce(resizing, 500)
 
 window.addEventListener("resize", resizing)
 
