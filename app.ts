@@ -1,10 +1,9 @@
 const headings: any = document.querySelector("#Headings");
 const content_cols: any = document.querySelector("#Content");
-const lists: any = document.querySelector('#content_row')
 const pageStats: any = document.getElementById('pageStats')
-const clear = "";
 const nextButton: any = document.querySelector("#next");
 const prevButton: any = document.querySelector("#prev");
+const clear = "";
 let paramOne: any = "0"
 let paramTwo: any = "9"
 let contentNeeded: any = [];
@@ -245,7 +244,7 @@ let next = () => {
     }
 }
 
-next = nextDebounce(next, 500)
+next = nextDebounce(next, 200)
 
 nextButton.addEventListener("click", next)
 
@@ -342,7 +341,7 @@ let prev = () => {
 
 }
 
-prev = prevDebounce(prev, 500)
+prev = prevDebounce(prev, 200)
 
 prevButton.addEventListener("click", prev)
 
@@ -428,7 +427,7 @@ let resizing = () => {
     }
 }
 
-resizing = debounce(resizing, 500)
+resizing = debounce(resizing, 200)
 
 window.addEventListener("resize", resizing)
 
