@@ -2,6 +2,15 @@
 let recordNav: any = document.querySelector("#record-navigation-container"); //Navigation area;
 let headingColumns: any = document.querySelector("#column-headings-container"); //Headings;
 let infoColumns: any = document.querySelector("#info-columns-container"); //Information;
+let debounce = (func: any, delay: any) => {
+  let timer: any;
+  return function () {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func();
+    }, delay);
+  };
+};
 
 // Creates the navigation.
 function createNavigation() {
@@ -9,8 +18,6 @@ function createNavigation() {
   <div class="next-previous-navigation-btns">
     <button class="previous-records-btn">Previous</button>
     <button class="next-records-btn">Next</button>
-    <button class="reset-records-btn">First Page</button>
-    <button class="last-records-btn">Last Page</button>
   </div>
   <div class="select-confirm">
   <select name="record-selection" id="record-selection">
@@ -50,6 +57,36 @@ function dynamicGrid(columnData: any) {
   }
 }
 
+function screenSizeCheck() {
+  let fromNumber: any;
+  let toNumber: any;
+  let recordDiff: any;
+
+  if (typeof fromNumber && typeof toNumber === "undefined") {
+    fromNumber = 0;
+  } else if (typeof fromNumber === "number" && fromNumber !== 0) {
+    console.log(fromNumber);
+    //pass
+  }
+
+  let resizeScreen = () => {
+    if (window.innerHeight > 500) {
+      recordDiff = 14;
+    } else if (window.innerHeight <= 500) {
+      recordDiff = 10;
+    }
+
+    toNumber = fromNumber + recordDiff;
+
+    fetchDataScreenSize(fromNumber, toNumber);
+  };
+
+  resizeScreen = debounce(resizeScreen, 500);
+  window.addEventListener("resize", resizeScreen);
+  resizeScreen();
+  nextPrevious(fromNumber);
+}
+
 // Adds data in the heading and info grid.
 function fetchData() {
   // Gets headings array
@@ -66,56 +103,10 @@ function fetchData() {
         headings = headingDataList[i];
         createHeadingGrid(headings);
       }
-
-      let fromNumber: any = 0;
-      let toNumber: any = 14;
-
-      window.addEventListener("resize", () => {
-        if (window.innerHeight <= 500) {
-          toNumber = fromNumber + 10;
-          window.location.reload();
-        } else if (window.innerHeight > 500) {
-          toNumber = fromNumber + 14;
-          window.location.reload();
-        } else {
-          console.log("Nothing");
-        }
-
-        nextPrevious(fromNumber, toNumber);
-        fetchDataScreenSize(fromNumber, toNumber);
-      });
-
-      if (window.innerHeight <= 500) {
-        toNumber = fromNumber + 10;
-      } else if (window.innerHeight > 500) {
-        toNumber = fromNumber + 14;
-      } else {
-        console.log("Nothing");
-      }
-
-      nextPrevious(fromNumber, toNumber);
-
-      // Fetching information
-      fetch(
-        "http://localhost:2050/records?from=" + fromNumber + "&to=" + toNumber,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        }
-      )
-        .then((response) => response.text())
-        .then((data) => {
-          let columnDataList = JSON.parse(data);
-          infoColumns.innerHTML = "";
-          for (let i = 0; i < columnDataList.length; i++) {
-            dynamicGrid(columnDataList[i]);
-          }
-        });
+      screenSizeCheck();
     });
   createNavigation();
 }
-
-fetchData();
 
 // Adds data in the heading and info grid on a smaller screen.
 function fetchDataScreenSize(fromNumber: any, toNumber: any) {
@@ -137,146 +128,71 @@ function fetchDataScreenSize(fromNumber: any, toNumber: any) {
     });
 }
 
+fetchData();
+
 // The functionality to move through an amount of records.
-function nextPrevious(firstId: any, finalId: any) {
-  // Btn's used to move from page to page.
+function nextPrevious(firstId: any) {
+  let navigation = document.querySelector(".next-previous-navigation-btns");
+
   let nextBtn: any = document.querySelector(".next-records-btn");
   let previousBtn: any = document.querySelector(".previous-records-btn");
 
-  // Btn's used to move directly to the last and first page.
-  let firstPageBtn: any = document.querySelector(".reset-records-btn");
-  let lastPageBtn: any = document.querySelector(".last-records-btn");
-
-  // The area where the current page is shown.
   let currentPage: any = document.querySelector(".current-page");
-
-  // The id's of the records that represent the first and last record of the page.
-  let numberOne: number = firstId;
-  let numberTwo: number = finalId;
-
-  const amountRecords: number = finalId - firstId;
-
-  let navigation = document.querySelector(".next-previous-navigation-btns");
+  let finalId: any;
 
   if (recordNav.contains(navigation) === true) {
-    // Displays the current page.
-    currentPage.innerHTML = numberOne + " / " + numberTwo + " First Page";
-
-    if ((numberOne === 0 && numberTwo === 14) || numberTwo === 10) {
-      previousBtn.disabled = true;
-    } else {
-      //pass
-    }
-
-    // The button that takes you to the first page.
-    firstPageBtn.addEventListener("click", () => {
-      let nextNumberOne: number = 0;
-      let nextNumberTwo: number = nextNumberOne + amountRecords;
-      previousBtn.disabled = true;
-      nextBtn.disabled = false;
-
-      currentPage.innerHTML = "";
-      currentPage.innerHTML =
-        nextNumberOne + " / " + nextNumberTwo + " First Page";
-      numberOne = nextNumberOne;
-      numberTwo = nextNumberTwo;
-      nextPageData(numberOne, numberTwo);
-    });
-
-    // The button that takes you to the last page.
-    lastPageBtn.addEventListener("click", () => {
-      let nextNumberOne: any;
-
-      if (numberTwo === 10) {
-        nextNumberOne = 999989;
-      } else if (numberTwo === 14) {
-        nextNumberOne = 999984;
-      } else {
-        //pass
+    let resizeScreen = () => {
+      if (window.innerHeight > 500) {
+        finalId = firstId + 14;
+      } else if (window.innerHeight <= 500) {
+        finalId = firstId + 10;
       }
 
-      let nextNumberTwo: number = 999999;
+      currentPage.innerHTML =
+        firstId +
+        " / " +
+        finalId +
+        " " +
+        (finalId - firstId) +
+        " records only.";
+
+      console.log(firstId, finalId);
+
+      fetchDataScreenSize(firstId, finalId);
+    };
+
+    resizeScreen();
+
+    if (firstId === 0) {
+      previousBtn.disabled = true;
+      nextBtn.disabled = false;
+    } else if (firstId === 999985 || 999989) {
       nextBtn.disabled = true;
       previousBtn.disabled = false;
+    }
 
-      currentPage.innerHTML = "";
-      currentPage.innerHTML =
-        nextNumberOne + " / " + nextNumberTwo + " Last Page";
-      numberOne = nextNumberOne;
-      numberTwo = nextNumberTwo;
-      nextPageData(numberOne, numberTwo);
-    });
-
-    // The button that takes you to the next page.
     nextBtn.addEventListener("click", () => {
-      let nextNumberOne: number = numberOne + amountRecords;
-      let nextNumberTwo: number = numberTwo + amountRecords;
       previousBtn.disabled = false;
+      firstId = firstId + (finalId - firstId);
+      finalId = finalId + (finalId - firstId);
 
-      if (
-        nextNumberOne === 999985 ||
-        (nextNumberOne === 999989 && nextNumberTwo === 999999)
-      ) {
-        currentPage.innerHTML = "";
-        currentPage.innerHTML =
-          nextNumberOne + " / " + nextNumberTwo + " Final Page";
-        numberOne = nextNumberOne;
-        numberTwo = nextNumberTwo;
-        nextPageData(numberOne, numberTwo);
-        nextBtn.disabled = true;
-      } else {
-        currentPage.innerHTML = "";
-        currentPage.innerHTML = nextNumberOne + " / " + nextNumberTwo;
-        numberOne = nextNumberOne;
-        numberTwo = nextNumberTwo;
-        nextPageData(numberOne, numberTwo);
-      }
+      resizeScreen = debounce(resizeScreen, 500);
+      window.addEventListener("resize", resizeScreen);
+      resizeScreen();
     });
 
-    // The button that takes you to the previous page.
     previousBtn.addEventListener("click", () => {
-      let nextNumberOne: number = numberOne - amountRecords;
-      let nextNumberTwo: number = numberTwo - amountRecords;
       nextBtn.disabled = false;
+      firstId = firstId + (finalId - firstId);
+      finalId = finalId + (finalId - firstId);
 
-      if (nextNumberOne === 0 && nextNumberTwo === amountRecords) {
-        currentPage.innerHTML = "";
-        currentPage.innerHTML =
-          nextNumberOne + " / " + nextNumberTwo + " First Page";
-        numberOne = nextNumberOne;
-        numberTwo = nextNumberTwo;
-        nextPageData(numberOne, numberTwo);
-        previousBtn.disabled = true;
-      } else {
-        currentPage.innerHTML = "";
-        currentPage.innerHTML = nextNumberOne + " / " + nextNumberTwo;
-        numberOne = nextNumberOne;
-        numberTwo = nextNumberTwo;
-        nextPageData(numberOne, numberTwo);
-      }
+      resizeScreen = debounce(resizeScreen, 500);
+      window.addEventListener("resize", resizeScreen);
+      resizeScreen();
     });
   } else {
     //pass
   }
-}
-
-function nextPageData(firstNumber: any, secondNumber: any) {
-  // Fetching information that will display when you go to the next or previous page.
-  fetch(
-    "http://localhost:2050/records?from=" + firstNumber + "&to=" + secondNumber,
-    {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    }
-  )
-    .then((response) => response.text())
-    .then((data) => {
-      let columnDataList = JSON.parse(data);
-      infoColumns.innerHTML = "";
-      for (let i = 0; i < columnDataList.length; i++) {
-        dynamicGrid(columnDataList[i]);
-      }
-    });
 }
 
 // Checks if you looking for a single or multiple records.
@@ -350,122 +266,80 @@ function recordSelection() {
       } else {
       }
 
-      window.addEventListener("resize", () => {
-        if (window.innerHeight <= 500) {
-          amountOfRecords.innerHTML = records.length + " / " + "10";
-          window.location.reload();
-        } else if (window.innerHeight > 500) {
-          amountOfRecords.innerHTML = records.length + " / " + "15";
-          window.location.reload();
-        } else {
-          console.log("Nothing");
-          window.location.reload();
-        }
-      });
-
-      if (window.innerHeight <= 500) {
-        amountOfRecords.innerHTML = records.length + " / " + "10";
-      } else if (window.innerHeight > 500) {
-        amountOfRecords.innerHTML = records.length + " / " + "15";
-      } else {
-        console.log("Nothing");
-      }
-
       addRecord.addEventListener("click", () => {
         clearBtn.disabled = false;
-        getSingleRecord.disabled = false;
         let IdSelection: any = document.querySelector("#record-id");
         let IdValue = IdSelection.value;
         let numberCheck: number = 12 - Number(IdValue);
 
+        if (IdValue > 999999) {
+          alert("The record you are looking for does not exist");
+          IdValue = 0;
+        } else {
+          //pass
+        }
+
         if (IdValue.length === 0 || IdValue < 0) {
           alert("You have entered an incorrect character.");
-          window.location.reload();
-        } else {
-          if (IdValue > 999999) {
-            alert("The record you are looking for does not exist");
-            IdValue = 0;
+          IdValue = 0;
+        }
+
+        if (typeof numberCheck === "number") {
+          addRecord.disabled = false;
+          IdSelection.readonly = false;
+          let recordAmount: any;
+
+          if (window.innerHeight > 500) {
+            recordAmount = 15;
           } else {
-            //pass
+            recordAmount = 11;
           }
 
-          if (typeof numberCheck === "number") {
-            addRecord.disabled = false;
-            IdSelection.readonly = false;
-            let recordAmount: any;
-
-            window.addEventListener("resize", () => {
-              if (window.innerHeight <= 500) {
-                recordAmount = 10;
-                window.location.reload();
-              } else if (window.innerHeight > 500) {
-                recordAmount = 15;
-                window.location.reload();
-              } else {
-                console.log("Nothing");
-                window.location.reload();
-              }
-            });
-
-            if (window.innerHeight <= 500) {
-              recordAmount = 10;
-            } else if (window.innerHeight > 500) {
-              recordAmount = 15;
+          clearBtn.addEventListener("click", () => {
+            if (records.length === 0) {
+              clearBtn.disabled = true;
             } else {
-              console.log("Nothing");
-            }
-
-            clearBtn.addEventListener("click", () => {
-              if (records.length === 0) {
-                clearBtn.disabled = true;
-              } else {
-                addRecord.disabled = false;
-                clearBtn.disabled = true;
-                getSingleRecord.disabled = true;
-                records = [];
-                amountOfRecords.innerHTML =
-                  records.length + " / " + recordAmount;
-                alert("Records been cleared");
-              }
-            });
-
-            let record = {
-              ID: IdValue,
-            };
-
-            let arrayRecord = JSON.stringify(record);
-            let isInArray = records.includes(arrayRecord);
-
-            if (isInArray === false || isInArray === true) {
-              if (isInArray === true) {
-                let removeIndex = records.indexOf(record["ID"]);
-                records.splice(removeIndex);
-              } else {
-                //pass
-              }
-
-              console.log(records.length, recordAmount);
-
-              if (records.length === recordAmount) {
-                addRecord.disabled = true;
-                IdSelection.readonly = true;
-                alert(
-                  "Thats the maximun. To view your records click see record button."
-                );
-              } else {
-                records.push(arrayRecord);
-              }
-
-              for (let i = 0; i < records.length; i++) {
-                JSON.parse(records[i]);
-              }
-
-              console.log(records);
-              records = records;
+              addRecord.disabled = false;
+              clearBtn.disabled = true;
+              getSingleRecord.disabled = true;
+              records = [];
               amountOfRecords.innerHTML = records.length + " / " + recordAmount;
-            } else {
-              alert("There is a problem accessing the record.");
+              alert("Records been cleared");
             }
+          });
+
+          let record = {
+            ID: IdValue,
+          };
+
+          let arrayRecord = JSON.stringify(record);
+          let isInArray = records.includes(arrayRecord);
+
+          if (isInArray === false || isInArray === true) {
+            if (isInArray === true) {
+              let removeIndex = records.indexOf(record["ID"]);
+              records.splice(removeIndex);
+            } else {
+              //pass
+            }
+
+            if (records.length === recordAmount) {
+              addRecord.disabled = true;
+              IdSelection.readonly = true;
+              getSingleRecord.disabled = false;
+              alert(
+                "Thats the maximun. To view your records click see record button."
+              );
+            } else {
+              records.push(arrayRecord);
+            }
+
+            for (let i = 0; i < records.length; i++) {
+              JSON.parse(records[i]);
+            }
+
+            records = records;
+            amountOfRecords.innerHTML = records.length + " / " + recordAmount;
           } else {
             alert("Enter apropriate inputs please.");
           }
@@ -565,26 +439,6 @@ function recordSelection() {
         }
 
         let totalRecordsAllowed: any;
-
-        window.addEventListener("resize", () => {
-          if (window.innerHeight <= 500) {
-            totalRecordsAllowed = 10;
-            window.location.reload();
-          } else if (window.innerHeight > 500) {
-            totalRecordsAllowed = 15;
-            window.location.reload();
-          } else {
-            console.log("Nothing");
-          }
-        });
-
-        if (window.innerHeight <= 500) {
-          totalRecordsAllowed = 10;
-        } else if (window.innerHeight > 500) {
-          totalRecordsAllowed = 15;
-        } else {
-          console.log("Nothing");
-        }
 
         let toIdSelectionValue = (toIdSelection.value =
           Number(fromIdValue) + totalRecordsAllowed);
