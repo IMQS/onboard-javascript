@@ -5,18 +5,9 @@ const pageStats: any = document.getElementById('pageStats')
 const clear = "";
 const nextButton: any = document.querySelector("#next");
 const prevButton: any = document.querySelector("#prev");
-let arrChild: any = []
 let paramOne: any = "0"
 let paramTwo: any = "9"
 let contentNeeded: any = [];
-let nextCounter = 0;
-let nextBtnStatus: any = false;
-let nextTurnFalse: any;
-let nextActCheck: any;
-let prevCounter = 0;
-let prevBtnStatus: any = false;
-let prevTurnFalse: any;
-let prevActCheck: any;
 
 // Fetch requests
 
@@ -228,46 +219,49 @@ function idJump() {
 
 //// Next Function
 
-function next() {
+const nextDebounce = (fn: any, delay: any) => {
+    let timer: any;
+    return function() {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+            fn()
+        }, delay)
+    }
+}
+
+let next = () => {
+    
     if (paramTwo == 999999) {
         alert("You have reached the final page")
     } else {
         let nextAmount: any = (paramTwo - paramOne) + 1
-
-        let intOne = parseInt(paramOne) + (nextAmount * nextCounter)
-        let intTwo = parseInt(paramTwo) + (nextAmount * nextCounter)
+        
+        let intOne = parseInt(paramOne) + nextAmount
+        let intTwo = parseInt(paramTwo) + nextAmount
         paramOne = intOne.toString()
         paramTwo = intTwo.toString()
 
         resizing()
     }
-    nextCounter = 0
 }
 
-nextButton.addEventListener("click", () => {
-    clearTimeout(nextTurnFalse)
-    clearTimeout(nextBtnStatus)
-    nextCounter += 1
-    nextBtnStatus = true
-    nextTurnFalse = setTimeout(nextBtnFalse, 100)
-    nextActCheck = setTimeout(nextCheck, 200)
-})
+next = nextDebounce(next, 500)
 
-function nextBtnFalse() {
-    nextBtnStatus = false
-}
-
-function nextCheck() {
-    if (nextBtnStatus) {
-        // pass
-    } else {
-        next()
-    }
-}
+nextButton.addEventListener("click", next)
 
 //// Prev Function
 
-function prev() {
+const prevDebounce = (fn: any, delay: any) => {
+    let timer: any;
+    return function() {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+            fn()
+        }, delay)
+    }
+}
+
+let prev = () => {
     let windowHeight = window.innerHeight;
 
     if (windowHeight < 600 && windowHeight >= 480) {
@@ -277,16 +271,13 @@ function prev() {
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
-            let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
-            let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
+            let intOne = parseInt(paramOne) - prevAmount
+            let intTwo = parseInt(paramTwo) - prevAmount
             paramOne = intOne.toString()
             paramTwo = intTwo.toString()
-            console.log("more than 6");
-            console.log(intOne);
     
             prevRe()
         }
-        prevCounter = 0
     } 
     else if (windowHeight < 480 && windowHeight >= 400) {
         if (paramOne <= 4) {
@@ -295,14 +286,13 @@ function prev() {
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
-            let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
-            let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
+            let intOne = parseInt(paramOne) - prevAmount
+            let intTwo = parseInt(paramTwo) - prevAmount
             paramOne = intOne.toString()
             paramTwo = intTwo.toString()
     
             prevRe()
         }
-        prevCounter = 0
     }
     else if (windowHeight < 400 && windowHeight > 300) {
         if (paramOne <= 2) {
@@ -311,14 +301,13 @@ function prev() {
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
-            let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
-            let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
+            let intOne = parseInt(paramOne) - prevAmount
+            let intTwo = parseInt(paramTwo) - prevAmount
             paramOne = intOne.toString()
             paramTwo = intTwo.toString()
     
             prevRe()
         }
-        prevCounter = 0
     }
     else if (windowHeight <= 300) {
         if (paramOne <= 1) {
@@ -327,14 +316,13 @@ function prev() {
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
-            let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
-            let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
+            let intOne = parseInt(paramOne) - prevAmount
+            let intTwo = parseInt(paramTwo) - prevAmount
             paramOne = intOne.toString()
             paramTwo = intTwo.toString()
     
             prevRe()
         }
-        prevCounter = 0
     }
     else {
         if (paramOne <= 9) {
@@ -343,43 +331,37 @@ function prev() {
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
-            let intOne = parseInt(paramOne) - (prevAmount * prevCounter)
-            let intTwo = parseInt(paramTwo) - (prevAmount * prevCounter)
+            let intOne = parseInt(paramOne) - prevAmount
+            let intTwo = parseInt(paramTwo) - prevAmount
             paramOne = intOne.toString()
             paramTwo = intTwo.toString()
     
             prevRe()
         }
-        prevCounter = 0
     }
 
 }
 
-prevButton.addEventListener("click", () => {
-    clearTimeout(prevTurnFalse)
-    clearTimeout(prevBtnStatus)
-    prevCounter += 1
-    prevBtnStatus = true
-    prevTurnFalse = setTimeout(prevBtnFalse, 100)
-    prevActCheck = setTimeout(prevCheck, 200)
-})
+prev = prevDebounce(prev, 500)
 
-function prevBtnFalse() {
-    prevBtnStatus = false
-}
+prevButton.addEventListener("click", prev)
 
-function prevCheck() {
-    if (prevBtnStatus) {
-        // pass
-    } else {
-        prev()
+
+// Resizing 
+
+let count = 0;
+
+const debounce = (fn: any, delay: any) => {
+    let timer: any;
+    return function() {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+            fn()
+        }, delay)
     }
 }
 
-
-
-
-function resizing() {
+let resizing = () => {
     let windowHeight = window.innerHeight;
 
     if (windowHeight < 600 && windowHeight >= 480) {
@@ -436,7 +418,9 @@ function resizing() {
         } else {
             //pass
         }
+        
         paramTwo = parseInt(paramOne) + 9
+        
         paramTwo = paramTwo.toString()
         clearTable()
         stats()
@@ -444,21 +428,10 @@ function resizing() {
     }
 }
 
-let runit: any;
-let resizeInProgress: any = false
-let resizeStatus: any;
+resizing = debounce(resizing, 500)
 
-window.addEventListener("resize", () => {
-    clearTimeout(runit);
-    clearTimeout(resizeStatus)
-    resizeInProgress = true
-    resizeStatus = setTimeout(resizeStatusFalse, 100)
-    runit = setTimeout(resizing, 200)
-});
+window.addEventListener("resize", resizing)
 
-function resizeStatusFalse() {
-    resizeInProgress = false
-}
 
 function prevRe() {
     let windowHeight = window.innerHeight;
