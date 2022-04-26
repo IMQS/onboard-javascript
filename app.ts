@@ -155,6 +155,8 @@ function idJump() {
         toConvert = 9
     }
 
+    let currentOne: any = paramOne
+    let currentTwo: any = paramTwo
     let search: any = document.querySelector('#idJump');
     let searchOne = search.value
     let convert = parseInt(searchOne) + toConvert
@@ -164,52 +166,17 @@ function idJump() {
 
     if (searchOne !== "" && searchOne <= 999990 && searchOne >= 0 && searchOne !== 'e') {
         clearTable()
-        fetch("http://localhost:2050/records?from=" + paramOne + "&to=" + paramTwo, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
-        .then((res) => res.text())
-        .then((data) => {
-            data = JSON.parse(data);
-            let contentList = data;
-            for (let i = 0; i < contentList.length; i++) {
-                contentNeeded.push(contentList[i])
-                cols(contentList[i])
-            }
-        });
+        getTable()
         stats()
     } 
-    else if ( searchOne > 999990 && searchOne < 1000000 && searchOne >= 0 && searchOne !== 'e') {
-        clearTable()
-        let lastParamOne = 999999 - toConvert
-
-        fetch("http://localhost:2050/records?from=" + lastParamOne + "&to=" + 999999, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
-        .then((res) => res.text())
-        .then((data) => {
-            data = JSON.parse(data);
-            let contentList = data;
-            for (let i = 0; i < contentList.length; i++) {
-                contentNeeded.push(contentList[i])
-                cols(contentList[i])
-            }
-        });
-        fetch("http://localhost:2050/recordCount", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        })
-        .then((res) => res.text())
-        .then((data) => {
-            data = JSON.parse(data);
-            let count = data;
-            let currentStats = "Showing results from ID " + lastParamOne + " to " + 999999 + " out of " + count + " results.";
-            pageStats.innerHTML = currentStats;
-        })
+    else if ( searchOne > 999990 && searchOne < 1000000 && searchOne >= 0 && searchOne !== 'e') {     
+        resizing()
     }
      else {
+        paramOne = currentOne
+        paramTwo = currentTwo
         alert("There are no records with that ID! Please check that your input does not exceed 999 999 and is not a negative amount.")
+        
     }
     search.value = clear
 }
@@ -217,10 +184,12 @@ function idJump() {
 // Nav Buttons
 
 //// Next Function
+let nextCount = 0
 
 const nextDebounce = (fn: any, delay: any) => {
     let timer: any;
     return function() {
+        nextCount++
         clearTimeout(timer)
         timer = setTimeout(() => {
             fn()
@@ -234,11 +203,15 @@ let next = () => {
         alert("You have reached the final page")
     } else {
         let nextAmount: any = (paramTwo - paramOne) + 1
+        let nextCountAmount: any = nextAmount * nextCount
         
-        let intOne = parseInt(paramOne) + nextAmount
-        let intTwo = parseInt(paramTwo) + nextAmount
+        
+        let intOne = parseInt(paramOne) + nextCountAmount
+        let intTwo = parseInt(paramTwo) + nextCountAmount
         paramOne = intOne.toString()
         paramTwo = intTwo.toString()
+
+        nextCount = 0
 
         resizing()
     }
@@ -250,9 +223,12 @@ nextButton.addEventListener("click", next)
 
 //// Prev Function
 
+let prevCount = 0
+
 const prevDebounce = (fn: any, delay: any) => {
     let timer: any;
     return function() {
+        prevCount++
         clearTimeout(timer)
         timer = setTimeout(() => {
             fn()
@@ -269,16 +245,16 @@ let prev = () => {
         }
         else if (paramOne <= 6) {
             paramOne = 0
-            clearTable()
-            stats()
-            getTable()
+            resizing()
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
+            let prevCountAmount = prevAmount * prevCount
     
-            let intOne = parseInt(paramOne) - prevAmount
-            let intTwo = parseInt(paramTwo) - prevAmount
+            let intOne = parseInt(paramOne) - prevCountAmount
+            let intTwo = parseInt(paramTwo) - prevCountAmount
             paramOne = intOne.toString()
             paramTwo = intTwo.toString()
+            prevCount = 0
     
             prevRe()
         }
@@ -289,16 +265,16 @@ let prev = () => {
         }
         else if (paramOne <= 4) {
             paramOne = 0
-            clearTable()
-            stats()
-            getTable()
+            resizing()
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
+            let prevCountAmount = prevAmount * prevCount
     
-            let intOne = parseInt(paramOne) - prevAmount
-            let intTwo = parseInt(paramTwo) - prevAmount
+            let intOne = parseInt(paramOne) - prevCountAmount
+            let intTwo = parseInt(paramTwo) - prevCountAmount
             paramOne = intOne.toString()
             paramTwo = intTwo.toString()
+            prevCount = 0
     
             prevRe()
         }
@@ -309,16 +285,16 @@ let prev = () => {
         }
         else if (paramOne <= 2) {
             paramOne = 0
-            clearTable()
-            stats()
-            getTable()
+            resizing()
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
+            let prevCountAmount = prevAmount * prevCount
     
-            let intOne = parseInt(paramOne) - prevAmount
-            let intTwo = parseInt(paramTwo) - prevAmount
+            let intOne = parseInt(paramOne) - prevCountAmount
+            let intTwo = parseInt(paramTwo) - prevCountAmount
             paramOne = intOne.toString()
             paramTwo = intTwo.toString()
+            prevCount = 0
     
             prevRe()
         }
@@ -329,16 +305,16 @@ let prev = () => {
         }
         else if (paramOne <= 1) {
             paramOne = 0
-            clearTable()
-            stats()
-            getTable()
+            resizing()
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
+            let prevCountAmount = prevAmount * prevCount
     
-            let intOne = parseInt(paramOne) - prevAmount
-            let intTwo = parseInt(paramTwo) - prevAmount
+            let intOne = parseInt(paramOne) - prevCountAmount
+            let intTwo = parseInt(paramTwo) - prevCountAmount
             paramOne = intOne.toString()
             paramTwo = intTwo.toString()
+            prevCount = 0
     
             prevRe()
         }
@@ -348,16 +324,16 @@ let prev = () => {
             alert("This is the first page")
         } else if(paramOne <= 9) {
             paramOne = 0
-            clearTable()
-            stats()
-            getTable()
+            resizing()
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
+            let prevCountAmount = prevAmount * prevCount
     
-            let intOne = parseInt(paramOne) - prevAmount
-            let intTwo = parseInt(paramTwo) - prevAmount
+            let intOne = parseInt(paramOne) - prevCountAmount
+            let intTwo = parseInt(paramTwo) - prevCountAmount
             paramOne = intOne.toString()
             paramTwo = intTwo.toString()
+            prevCount = 0
     
             prevRe()
         }
