@@ -264,9 +264,14 @@ let prev = () => {
     let windowHeight = window.innerHeight;
 
     if (windowHeight < 600 && windowHeight >= 480) {
-        if (paramOne <= 6) {
-            paramOne = 0
+        if (paramOne == 0) {
             alert("This is the first page")
+        }
+        else if (paramOne <= 6) {
+            paramOne = 0
+            clearTable()
+            stats()
+            getTable()
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
@@ -279,9 +284,14 @@ let prev = () => {
         }
     } 
     else if (windowHeight < 480 && windowHeight >= 400) {
-        if (paramOne <= 4) {
-            paramOne = 0
+        if (paramOne == 0) {
             alert("This is the first page")
+        }
+        else if (paramOne <= 4) {
+            paramOne = 0
+            clearTable()
+            stats()
+            getTable()
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
@@ -294,9 +304,14 @@ let prev = () => {
         }
     }
     else if (windowHeight < 400 && windowHeight > 300) {
-        if (paramOne <= 2) {
-            paramOne = 0
+        if (paramOne == 0) {
             alert("This is the first page")
+        }
+        else if (paramOne <= 2) {
+            paramOne = 0
+            clearTable()
+            stats()
+            getTable()
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
@@ -309,9 +324,14 @@ let prev = () => {
         }
     }
     else if (windowHeight <= 300) {
-        if (paramOne <= 1) {
-            paramOne = 0
+        if (paramOne == 0) {
             alert("This is the first page")
+        }
+        else if (paramOne <= 1) {
+            paramOne = 0
+            clearTable()
+            stats()
+            getTable()
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
@@ -324,9 +344,13 @@ let prev = () => {
         }
     }
     else {
-        if (paramOne <= 9) {
-            paramOne = 0
+        if (paramOne == 0) {
             alert("This is the first page")
+        } else if(paramOne <= 9) {
+            paramOne = 0
+            clearTable()
+            stats()
+            getTable()
         } else {
             let prevAmount: any = (paramTwo - paramOne) + 1
     
