@@ -2,13 +2,11 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    overflow-y: hidden;
+    overflow-x: hidden;
 }
 
 body {
-    font-size: 1em;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    width: 100%;
     height: 100vh;
 }
 
@@ -99,7 +97,7 @@ button:hover {
 }
 .rows {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     flex-direction: row;
     height: 100%;
@@ -111,6 +109,13 @@ button:hover {
     align-items: center;
     height: 100%;
     width: 100%;
-    font-size: 0.8em;
+    font-size: 1em;
     border: 1px solid #000;
+    word-wrap: break-word;
+}
+
+@media screen and (max-width:800px) {
+    .row-cols {
+        font-size: 0.7em;
+    }
 }
