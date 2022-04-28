@@ -137,7 +137,18 @@ function nextPrevious(firstId: any) {
       previousBtn.disabled = true;
       nextBtn.disabled = false;
       firstId = 0;
-      finalId = finalId + (finalId - firstId);
+
+      if (window.innerHeight > 500) {
+        finalId = firstId + 14;
+      } else if (window.innerHeight <= 500 && window.innerHeight > 350) {
+        finalId = firstId + 10;
+      } else if (window.innerHeight <= 350 && window.innerHeight > 170) {
+        finalId = firstId + 2;
+      } else if (window.innerHeight <= 170) {
+        finalId = firstId + 1;
+      } else {
+        //pass
+      }
 
       resizeScreen = debounce(resizeScreen, 700);
       window.addEventListener("resize", resizeScreen);
