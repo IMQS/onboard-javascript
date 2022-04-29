@@ -10,8 +10,8 @@ const getNoOfRows = () => {
 
 // Variables
 
-let paramOne: number = 0;
-let paramTwo: number = paramOne + getNoOfRows();
+let paramOne = 0;
+let paramTwo = paramOne + getNoOfRows();
 
 //// Functions To Create/Clear The HTML
 
@@ -159,7 +159,7 @@ window.onload = function () {
 const nextButton: any = document.querySelector("#next");
 let nextCount = 0;
 
-const nextDebounce = (fn: any, delay: any) => {
+const nextDebounce = (fn: any, delay: number) => {
   let timer: any;
   return function () {
     nextCount++;
@@ -175,8 +175,8 @@ let next = () => {
     alert("You have reached the final page");
   }
 
-  let nextAmount: number = paramTwo - paramOne + 1;
-  let nextCountAmount: number = nextAmount * nextCount;
+  let nextAmount = paramTwo - paramOne + 1;
+  let nextCountAmount = nextAmount * nextCount;
   paramOne = paramOne + nextCountAmount;
   paramTwo = paramOne + getNoOfRows();
 
@@ -202,7 +202,7 @@ nextButton.addEventListener("click", next);
 const prevButton: any = document.querySelector("#prev");
 let prevCount = 0;
 
-const prevDebounce = (fn: any, delay: any) => {
+const prevDebounce = (fn: any, delay: number) => {
   let timer: any;
   return function () {
     prevCount++;
@@ -217,8 +217,8 @@ let prev = () => {
   if (paramOne === 0) {
     alert("You Are On The First Page");
   } else {
-    let prevAmount: number = paramTwo - paramOne + 1;
-    let prevCountAmount: number = prevAmount * prevCount;
+    let prevAmount = paramTwo - paramOne + 1;
+    let prevCountAmount = prevAmount * prevCount;
 
     let intOne = paramOne - prevCountAmount;
 
@@ -246,7 +246,7 @@ prevButton.addEventListener("click", prev);
 const input: any = document.querySelector("input");
 
 let idJump = () => {
-  let currentID: number = paramOne;
+  let currentID = paramOne;
   let search = input.value;
   let end = parseInt(search) + getNoOfRows();
 
