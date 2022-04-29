@@ -1,199 +1,162 @@
-const headings: any = document.querySelector("#Headings");
-const content_cols: any = document.querySelector("#Content");
-const pageStats: any = document.getElementById("pageStats");
-const nextButton: any = document.querySelector("#next");
-const prevButton: any = document.querySelector("#prev");
-const clear = "";
-let paramOne: any = "0";
-let paramTwo: any = "9";
-let contentNeeded: any = [];
+// Function To Get Number Of Rows That Can Be Displayed While Still Being Readable
 
-// Fetch requests
+const getNoOfRows = () => {
+  const height = window.innerHeight;
 
-//// Heading Row(The Columns)
+  let number = height / 40;
+  let noOfRows = Math.floor(number);
+  return noOfRows;
+};
 
-function getColumns() {
-  fetch("http://localhost:2050/columns", {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((res) => res.text())
-    .then((data) => {
-      data = JSON.parse(data);
-      let colList = data;
-      for (let i = 0; i < colList.length; i++) {
-        colHeading(colList[i]);
-      }
-    });
-}
+// Variables
 
-//// Table Content
+let paramOne: number = 0;
+let paramTwo: number = paramOne + getNoOfRows();
 
-function getTable() {
-  fetch("http://localhost:2050/records?from=" + paramOne + "&to=" + paramTwo, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((res) => res.text())
-    .then((data) => {
-      data = JSON.parse(data);
-      let contentList = data;
-      for (let i = 0; i < contentList.length; i++) {
-        let contentListContent: any = contentList[i];
-        cols(contentListContent);
-      }
-    });
-}
+//// Functions To Create/Clear The HTML
 
-//// Display the current shown results
+// Heading Row
 
-function stats() {
-  fetch("http://localhost:2050/recordCount", {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((res) => res.text())
-    .then((data) => {
-      data = JSON.parse(data);
-      let count = data;
-      let currentStats =
-        "Showing results from " +
-        paramOne +
-        " to " +
-        paramTwo +
-        " out of " +
-        count +
-        " results.";
-      pageStats.innerHTML = currentStats;
-    });
-}
+const createHeadingRow = (headingData: string) => {
+  const heading: any = document.querySelector("#heading");
 
-// Loads all intial fields/data
+  let headings = `<div class="headings" id="headings">${headingData}</div>`;
+  heading.innerHTML += headings;
+};
 
-window.onload = function () {
-  let windowHeight = window.innerHeight;
+// Table Content
 
-  if (windowHeight < 600 && windowHeight >= 480) {
-    paramOne = paramOne;
-    paramTwo = parseInt(paramOne) + 6;
-    paramTwo = paramTwo.toString();
-    stats();
-    getColumns();
-    getTable();
-  } else if (windowHeight < 480 && windowHeight >= 400) {
-    paramOne = paramOne;
-    paramTwo = parseInt(paramOne) + 4;
-    paramTwo = paramTwo.toString();
-    stats();
-    getColumns();
-    getTable();
-  } else if (windowHeight < 400 && windowHeight > 300) {
-    paramOne = paramOne;
-    paramTwo = parseInt(paramOne) + 2;
-    paramTwo = paramTwo.toString();
-    stats();
-    getColumns();
-    getTable();
-  } else if (windowHeight <= 300) {
-    paramOne = paramOne;
-    paramTwo = parseInt(paramOne) + 1;
-    paramTwo = paramTwo.toString();
-    stats();
-    getColumns();
-    getTable();
-  } else {
-    stats();
-    getColumns();
-    getTable();
+const createTableContent = (contentData: string) => {
+  const content: any = document.querySelector("#content");
+
+  let table = `<div id="row-${contentData[0]}" class="rows"></div>`;
+  content.innerHTML += table;
+
+  let rows: any = document.querySelector("#row-" + contentData[0] + ".rows");
+  for (let x = 0; x < contentData.length; x++) {
+    let rowCols = `<div class="row_cols">${contentData[x]}</div>`;
+    rows.innerHTML += rowCols;
   }
 };
 
-// Displaying data into html
+// Clear Table Content
 
-//// Targets heading div to creating the 1st row(Column names)
+const clearTable = () => {
+  const content: any = document.querySelector("#content");
+  const clear = "";
 
-function colHeading(heading: string) {
-  let headingCol = `<div id="col_heading" class="col_heading">${heading}</div>`;
-  headings.innerHTML += headingCol;
-}
+  content.innerHTML = clear;
+};
 
-//// Targets content div to create the actual table and fill with data
+//// Fetch Requests
 
-function cols(content: any) {
-  let rows = `<div id=row-${content[0]} class="rows"></div>`;
+// Heading Row (Getting the columns data)
 
-  content_cols.innerHTML += rows;
-
-  let finalRow: any = document.querySelector("#row-" + content[0] + ".rows");
-
-  for (let x = 0; x < content.length; x++) {
-    let rowCols = `<div class="row-cols">${content[x]}</div>`;
-    finalRow.innerHTML += rowCols;
+const getHeadings = () => {
+  try {
+    fetch("http://localhost:2050/columns", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.text())
+      .then((data) => {
+        data = JSON.parse(data);
+        let headingData = data;
+        for (let i = 0; i < headingData.length; i++) {
+          createHeadingRow(headingData[i]);
+        }
+      });
+  } catch (error) {
+    console.log(error);
   }
-}
+};
 
-// Clear Table (content div)
+// Table Content (Getting the table's data)
 
-function clearTable() {
-  content_cols.innerHTML = clear;
-}
+const getTable = () => {
+  try {
+    fetch("http://localhost:2050/records?from=" + paramOne + "&to=" + paramTwo, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.text())
+      .then((data) => {
+        data = JSON.parse(data);
+        let contentData = data;
+        for (let i = 0; i < contentData.length; i++) {
+          createTableContent(contentData[i]);
+        }
+      });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-// Jump to ID
+// Displays The Current Results Being Shown
 
-function idJump() {
-  let windowHeight = window.innerHeight;
-  let toConvert: any;
+const stats = () => {
+  const pageStats: any = document.querySelector("#pageStats");
 
-  if (windowHeight < 600 && windowHeight >= 480) {
-    toConvert = 6;
-  } else if (windowHeight < 480 && windowHeight >= 400) {
-    toConvert = 4;
-  } else if (windowHeight < 400 && windowHeight > 300) {
-    toConvert = 2;
-  } else if (windowHeight <= 300) {
-    toConvert = 1;
+  try {
+    fetch("http://localhost:2050/recordCount", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.text())
+      .then((data) => {
+        data = JSON.parse(data);
+        let count = data;
+        let currentStats = "Showing results from " + paramOne + " to " + paramTwo + " out of " + count + " results.";
+        pageStats.innerHTML = currentStats;
+      });
+  } catch (error) {}
+};
+
+//// Debounce
+
+const debounce = (fn: any, delay: number) => {
+  let timer: number;
+  return function () {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn();
+    }, delay);
+  };
+};
+
+//// Sizing And Resizing
+
+let resizing = () => {
+  let end = paramOne + getNoOfRows();
+
+  if (end > 999999) {
+    paramTwo = 999999;
+    paramOne = paramTwo - getNoOfRows();
   } else {
-    toConvert = 9;
+    paramOne;
+    paramTwo = paramOne + getNoOfRows();
   }
+  clearTable();
+  getTable();
+  stats();
+};
 
-  let currentOne: any = paramOne;
-  let currentTwo: any = paramTwo;
-  let search: any = document.querySelector("#idJump");
-  let searchOne = search.value;
-  let convert = parseInt(searchOne) + toConvert;
-  let searchTwo = convert.toString();
-  paramOne = searchOne;
-  paramTwo = searchTwo;
+resizing = debounce(resizing, 500);
 
-  if (
-    searchOne !== "" &&
-    searchOne <= 999990 &&
-    searchOne >= 0 &&
-    searchOne !== "e"
-  ) {
-    clearTable();
-    getTable();
-    stats();
-  } else if (
-    searchOne > 999990 &&
-    searchOne < 1000000 &&
-    searchOne >= 0 &&
-    searchOne !== "e"
-  ) {
-    resizing();
-  } else {
-    paramOne = currentOne;
-    paramTwo = currentTwo;
-    alert(
-      "There are no records with that ID! Please check that your input does not exceed 999 999 and is not a negative amount."
-    );
-  }
-  search.value = clear;
-}
+window.addEventListener("resize", resizing);
 
-// Nav Buttons
+//// On Window Load
 
-//// Next Function
+window.onload = function () {
+  getHeadings();
+  getTable();
+  stats();
+};
+
+//// Navigation
+
+// Next
+const nextButton: any = document.querySelector("#next");
 let nextCount = 0;
 
 const nextDebounce = (fn: any, delay: any) => {
@@ -208,29 +171,35 @@ const nextDebounce = (fn: any, delay: any) => {
 };
 
 let next = () => {
-  if (paramTwo == 999999) {
+  if (paramTwo === 999999) {
     alert("You have reached the final page");
-  } else {
-    let nextAmount: any = paramTwo - paramOne + 1;
-    let nextCountAmount: any = nextAmount * nextCount;
-
-    let intOne = parseInt(paramOne) + nextCountAmount;
-    let intTwo = parseInt(paramTwo) + nextCountAmount;
-    paramOne = intOne.toString();
-    paramTwo = intTwo.toString();
-
-    nextCount = 0;
-
-    resizing();
   }
+
+  let nextAmount: number = paramTwo - paramOne + 1;
+  let nextCountAmount: number = nextAmount * nextCount;
+  paramOne = paramOne + nextCountAmount;
+  paramTwo = paramOne + getNoOfRows();
+
+  let end = paramOne + getNoOfRows();
+
+  if (end > 999999) {
+    paramTwo = 999999;
+    paramOne = paramTwo - getNoOfRows();
+  }
+
+  nextCount = 0;
+
+  clearTable();
+  getTable();
+  stats();
 };
 
 next = nextDebounce(next, 500);
 
 nextButton.addEventListener("click", next);
 
-//// Prev Function
-
+// Previous
+const prevButton: any = document.querySelector("#prev");
 let prevCount = 0;
 
 const prevDebounce = (fn: any, delay: any) => {
@@ -245,98 +214,27 @@ const prevDebounce = (fn: any, delay: any) => {
 };
 
 let prev = () => {
-  let windowHeight = window.innerHeight;
-
-  if (windowHeight < 600 && windowHeight >= 480) {
-    if (paramOne == 0) {
-      alert("This is the first page");
-    } else if (paramOne <= 6) {
-      paramOne = 0;
-      resizing();
-    } else {
-      let prevAmount: any = paramTwo - paramOne + 1;
-      let prevCountAmount = prevAmount * prevCount;
-
-      let intOne = parseInt(paramOne) - prevCountAmount;
-      let intTwo = parseInt(paramTwo) - prevCountAmount;
-      paramOne = intOne.toString();
-      paramTwo = intTwo.toString();
-      prevCount = 0;
-
-      prevRe();
-    }
-  } else if (windowHeight < 480 && windowHeight >= 400) {
-    if (paramOne == 0) {
-      alert("This is the first page");
-    } else if (paramOne <= 4) {
-      paramOne = 0;
-      resizing();
-    } else {
-      let prevAmount: any = paramTwo - paramOne + 1;
-      let prevCountAmount = prevAmount * prevCount;
-
-      let intOne = parseInt(paramOne) - prevCountAmount;
-      let intTwo = parseInt(paramTwo) - prevCountAmount;
-      paramOne = intOne.toString();
-      paramTwo = intTwo.toString();
-      prevCount = 0;
-
-      prevRe();
-    }
-  } else if (windowHeight < 400 && windowHeight > 300) {
-    if (paramOne == 0) {
-      alert("This is the first page");
-    } else if (paramOne <= 2) {
-      paramOne = 0;
-      resizing();
-    } else {
-      let prevAmount: any = paramTwo - paramOne + 1;
-      let prevCountAmount = prevAmount * prevCount;
-
-      let intOne = parseInt(paramOne) - prevCountAmount;
-      let intTwo = parseInt(paramTwo) - prevCountAmount;
-      paramOne = intOne.toString();
-      paramTwo = intTwo.toString();
-      prevCount = 0;
-
-      prevRe();
-    }
-  } else if (windowHeight <= 300) {
-    if (paramOne == 0) {
-      alert("This is the first page");
-    } else if (paramOne <= 1) {
-      paramOne = 0;
-      resizing();
-    } else {
-      let prevAmount: any = paramTwo - paramOne + 1;
-      let prevCountAmount = prevAmount * prevCount;
-
-      let intOne = parseInt(paramOne) - prevCountAmount;
-      let intTwo = parseInt(paramTwo) - prevCountAmount;
-      paramOne = intOne.toString();
-      paramTwo = intTwo.toString();
-      prevCount = 0;
-
-      prevRe();
-    }
+  if (paramOne === 0) {
+    alert("You Are On The First Page");
   } else {
-    if (paramOne == 0) {
-      alert("This is the first page");
-    } else if (paramOne <= 9) {
+    let prevAmount: number = paramTwo - paramOne + 1;
+    let prevCountAmount: number = prevAmount * prevCount;
+
+    let intOne = paramOne - prevCountAmount;
+
+    if (intOne < 0) {
       paramOne = 0;
-      resizing();
     } else {
-      let prevAmount: any = paramTwo - paramOne + 1;
-      let prevCountAmount = prevAmount * prevCount;
-
-      let intOne = parseInt(paramOne) - prevCountAmount;
-      let intTwo = parseInt(paramTwo) - prevCountAmount;
-      paramOne = intOne.toString();
-      paramTwo = intTwo.toString();
-      prevCount = 0;
-
-      prevRe();
+      paramOne = intOne;
     }
+
+    paramTwo = paramOne + getNoOfRows();
+
+    prevCount = 0;
+
+    clearTable();
+    getTable();
+    stats();
   }
 };
 
@@ -344,119 +242,36 @@ prev = prevDebounce(prev, 500);
 
 prevButton.addEventListener("click", prev);
 
-// Resizing
+// ID Jump
+const input: any = document.querySelector("input");
 
-let count = 0;
+let idJump = () => {
+  let currentID: number = paramOne;
+  let search = input.value;
+  let end = parseInt(search) + getNoOfRows();
 
-const debounce = (fn: any, delay: any) => {
-  let timer: any;
-  return function () {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      fn();
-    }, delay);
-  };
+  if (search !== NaN && search !== "" && search < 1000000 && search >= 0) {
+    if (end > 999999) {
+      paramTwo = 999999;
+      paramOne = paramTwo - getNoOfRows();
+    } else {
+      paramOne = parseInt(search);
+      paramTwo = paramOne + getNoOfRows();
+    }
+  } else if (search === "") {
+    //pass
+  } else {
+    alert("Make Sure Your Desired ID Is Not A Negative Number Or Doesn't Exceed 999999");
+    paramOne = currentID;
+    paramTwo = paramOne + getNoOfRows();
+    input.value = "";
+  }
+
+  clearTable();
+  stats();
+  getTable();
 };
 
-let resizing = () => {
-  let windowHeight = window.innerHeight;
+idJump = debounce(idJump, 500);
 
-  if (windowHeight < 600 && windowHeight >= 480) {
-    if (paramOne > 999993) {
-      paramOne = 999993;
-    } else {
-      //pass
-    }
-    paramTwo = parseInt(paramOne) + 6;
-    paramTwo = paramTwo.toString();
-    clearTable();
-    stats();
-    getTable();
-  } else if (windowHeight < 480 && windowHeight >= 400) {
-    if (paramOne > 999995) {
-      paramOne = 999995;
-    } else {
-      //pass
-    }
-    paramTwo = parseInt(paramOne) + 4;
-    paramTwo = paramTwo.toString();
-    clearTable();
-    stats();
-    getTable();
-  } else if (windowHeight < 400 && windowHeight > 300) {
-    if (paramOne > 999997) {
-      paramOne = 999997;
-    } else {
-      //pass
-    }
-    paramTwo = parseInt(paramOne) + 2;
-    paramTwo = paramTwo.toString();
-    clearTable();
-    stats();
-    getTable();
-  } else if (windowHeight <= 300) {
-    if (paramOne > 999998) {
-      paramOne = 999998;
-    } else {
-      //pass
-    }
-    paramTwo = parseInt(paramOne) + 1;
-    paramTwo = paramTwo.toString();
-    clearTable();
-    stats();
-    getTable();
-  } else {
-    if (paramOne > 999990) {
-      paramOne = 999990;
-    } else {
-      //pass
-    }
-
-    paramTwo = parseInt(paramOne) + 9;
-
-    paramTwo = paramTwo.toString();
-    clearTable();
-    stats();
-    getTable();
-  }
-};
-
-resizing = debounce(resizing, 500);
-
-window.addEventListener("resize", resizing);
-
-function prevRe() {
-  let windowHeight = window.innerHeight;
-
-  if (windowHeight < 600 && windowHeight >= 480) {
-    paramTwo = parseInt(paramOne) + 6;
-    paramTwo = paramTwo.toString();
-    clearTable();
-    stats();
-    getTable();
-  } else if (windowHeight < 480 && windowHeight >= 400) {
-    paramTwo = parseInt(paramOne) + 4;
-    paramTwo = paramTwo.toString();
-    clearTable();
-    stats();
-    getTable();
-  } else if (windowHeight < 400 && windowHeight > 300) {
-    paramTwo = parseInt(paramOne) + 2;
-    paramTwo = paramTwo.toString();
-    clearTable();
-    stats();
-    getTable();
-  } else if (windowHeight <= 300) {
-    paramTwo = parseInt(paramOne) + 1;
-    paramTwo = paramTwo.toString();
-    clearTable();
-    stats();
-    getTable();
-  } else {
-    paramTwo = parseInt(paramOne) + 9;
-    paramTwo = paramTwo.toString();
-    clearTable();
-    stats();
-    getTable();
-  }
-}
+window.addEventListener("input", idJump);
