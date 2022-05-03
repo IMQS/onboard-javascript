@@ -11,6 +11,14 @@ let debounce = (func: any, delay: number) => {
   };
 };
 
+let tryCatch = (func: any) => {
+  try {
+    func;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 function createNavigation() {
   let recordNav: any = document.querySelector("#record-navigation-container"); //Navigation area;
   recordNav.innerHTML = `
@@ -72,7 +80,7 @@ let nextPrevious = (fromNumber: number) => {
   let nextBtn: any = document.querySelector(".next-records-btn");
   let nextPage = () => {
     fromNumber = fromNumber + numberOfRows * count;
-    dataRowCreation(fromNumber);
+    tryCatch(dataRowCreation(fromNumber));
     count = 0;
   };
 
@@ -85,7 +93,7 @@ let nextPrevious = (fromNumber: number) => {
   let previousBtn: any = document.querySelector(".previous-records-btn");
   let previousPage = () => {
     fromNumber = fromNumber - numberOfRows * count;
-    dataRowCreation(fromNumber);
+    tryCatch(dataRowCreation(fromNumber));
     count = 0;
   };
 
@@ -104,7 +112,7 @@ let nextPrevious = (fromNumber: number) => {
   let firstBtn: any = document.querySelector(".first-page-btn");
   let firstPage = () => {
     fromNumber = 0;
-    dataRowCreation(fromNumber);
+    tryCatch(dataRowCreation(fromNumber));
   };
 
   firstPage = debounce(firstPage, 500);
@@ -116,7 +124,7 @@ let nextPrevious = (fromNumber: number) => {
   let lastPage = () => {
     let toNumber = 999999;
     fromNumber = toNumber - numberOfRows;
-    dataRowCreation(fromNumber);
+    tryCatch(dataRowCreation(fromNumber));
   };
 
   lastPage = debounce(lastPage, 500);
@@ -129,18 +137,18 @@ function dataRowCreation(fromNumber: number) {
   let toNumber: number;
 
   let resizeScreen = () => {
+    let nextBtn: any = document.querySelector(".next-records-btn");
+    nextBtn.disabled = false;
     let numberOfRows = Math.floor(window.innerHeight / 50);
     toNumber = fromNumber + numberOfRows;
 
     if (toNumber >= 999999) {
       let nextBtn: any = document.querySelector(".next-records-btn");
-      let lastBtn: any = document.querySelector(".last-page-btn");
 
       toNumber = 999999;
       fromNumber = toNumber - numberOfRows;
 
       nextBtn.disabled = true;
-      lastBtn.disabled = false;
     }
 
     fetch("http://localhost:2050/records?from=" + fromNumber + "&to=" + toNumber, {
@@ -163,8 +171,8 @@ function dataRowCreation(fromNumber: number) {
 
   resizeScreen = debounce(resizeScreen, 500);
   window.addEventListener("resize", resizeScreen);
-  resizeScreen();
-  nextPrevious(fromNumber);
+  tryCatch(resizeScreen());
+  tryCatch(nextPrevious(fromNumber));
 }
 
 headingRowCreation();
