@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"time"
 )
-
 const recordCount = 1000000
 const columnCount = 11 
 const delayResponse = 500 * time.Millisecond
