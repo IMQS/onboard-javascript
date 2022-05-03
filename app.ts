@@ -241,33 +241,34 @@ window.onload = function () {
 }
 
 // ID Jump
+{
+  let idJump = () => {
+    let toParameter = getParameters(fromParameter);
+    let currentID = fromParameter;
+    let search = input.value;
+    let end = parseInt(search) + getNoOfRows();
 
-let idJump = () => {
-  let toParameter = getParameters(fromParameter);
-  let currentID = fromParameter;
-  let search = input.value;
-  let end = parseInt(search) + getNoOfRows();
-
-  if (search !== NaN && search !== "" && search < 1000000 && search >= 0) {
-    if (end > 999999) {
-      toParameter = 999999;
-      fromParameter = toParameter - getNoOfRows();
-    } else {
-      fromParameter = parseInt(search);
+    if (search !== NaN && search !== "" && search < 1000000 && search >= 0) {
+      if (end > 999999) {
+        toParameter = 999999;
+        fromParameter = toParameter - getNoOfRows();
+      } else {
+        fromParameter = parseInt(search);
+        toParameter = fromParameter + getNoOfRows();
+      }
+    } else if (search !== "") {
+      alert("Make Sure Your Desired ID Is Not A Negative Number Or Doesn't Exceed 999999");
+      fromParameter = currentID;
       toParameter = fromParameter + getNoOfRows();
+      input.value = "";
+    } else {
+      //pass
     }
-  } else if (search !== "") {
-    alert("Make Sure Your Desired ID Is Not A Negative Number Or Doesn't Exceed 999999");
-    fromParameter = currentID;
-    toParameter = fromParameter + getNoOfRows();
-    input.value = "";
-  } else {
-    //pass
-  }
 
-  clearTable();
-  stats();
-  getTable();
-};
+    clearTable();
+    stats();
+    getTable();
+  };
 
-window.addEventListener("input", debounce(idJump, 500));
+  window.addEventListener("input", debounce(idJump, 500));
+}
