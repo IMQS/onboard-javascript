@@ -1,7 +1,4 @@
 let fromParameter = 0;
-const input: any = document.querySelector("input");
-const prevButton: any = document.querySelector("#prev");
-const nextButton: any = document.querySelector("#next");
 
 const getParameters = (fromParameter: number) => {
   let toParameter: number;
@@ -153,89 +150,95 @@ window.onload = function () {
 //// Navigation
 
 // Next
-let nextCount = 0;
+{
+  let nextCount = 0;
+  const nextButton: any = document.querySelector("#next");
 
-const nextDebounce = (fn: any, delay: number) => {
-  let timer: any;
-  return function () {
-    nextCount++;
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      fn();
-    }, delay);
+  const nextDebounce = (fn: any, delay: number) => {
+    let timer: any;
+    return function () {
+      nextCount++;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        fn();
+      }, delay);
+    };
   };
-};
 
-let next = () => {
-  let toParameter = getParameters(fromParameter);
+  let next = () => {
+    let toParameter = getParameters(fromParameter);
 
-  if (toParameter === 999999) {
-    alert("You have reached the final page");
-  }
-
-  let nextAmount = toParameter - fromParameter + 1;
-  let nextCountAmount = nextAmount * nextCount;
-  fromParameter = fromParameter + nextCountAmount;
-  toParameter = fromParameter + getNoOfRows();
-
-  let end = fromParameter + getNoOfRows();
-
-  if (end > 999999) {
-    toParameter = 999999;
-    fromParameter = toParameter - getNoOfRows();
-  }
-
-  nextCount = 0;
-
-  clearTable();
-  getTable();
-  stats();
-};
-
-nextButton.addEventListener("click", nextDebounce(next, 500));
-
-// Previous
-let prevCount = 0;
-
-const prevDebounce = (fn: any, delay: number) => {
-  let timer: any;
-  return function () {
-    prevCount++;
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      fn();
-    }, delay);
-  };
-};
-
-let prev = () => {
-  let toParameter = getParameters(fromParameter);
-
-  if (fromParameter === 0) {
-    alert("You Are On The First Page");
-  } else {
-    let prevAmount = toParameter - fromParameter + 1;
-    let prevCountAmount = prevAmount * prevCount;
-
-    let intOne = fromParameter - prevCountAmount;
-
-    if (intOne < 0) {
-      fromParameter = 0;
-    } else {
-      fromParameter = intOne;
+    if (toParameter === 999999) {
+      alert("You have reached the final page");
     }
 
+    let nextAmount = toParameter - fromParameter + 1;
+    let nextCountAmount = nextAmount * nextCount;
+    fromParameter = fromParameter + nextCountAmount;
     toParameter = fromParameter + getNoOfRows();
 
-    prevCount = 0;
+    let end = fromParameter + getNoOfRows();
+
+    if (end > 999999) {
+      toParameter = 999999;
+      fromParameter = toParameter - getNoOfRows();
+    }
+
+    nextCount = 0;
 
     clearTable();
     getTable();
     stats();
-  }
-};
+  };
 
-prevButton.addEventListener("click", prevDebounce(prev, 500));
+  nextButton.addEventListener("click", nextDebounce(next, 500));
+}
+
+// Previous
+{
+  let prevCount = 0;
+  const prevButton: any = document.querySelector("#prev");
+
+  const prevDebounce = (fn: any, delay: number) => {
+    let timer: any;
+    return function () {
+      prevCount++;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        fn();
+      }, delay);
+    };
+  };
+
+  let prev = () => {
+    let toParameter = getParameters(fromParameter);
+
+    if (fromParameter === 0) {
+      alert("You Are On The First Page");
+    } else {
+      let prevAmount = toParameter - fromParameter + 1;
+      let prevCountAmount = prevAmount * prevCount;
+
+      let intOne = fromParameter - prevCountAmount;
+
+      if (intOne < 0) {
+        fromParameter = 0;
+      } else {
+        fromParameter = intOne;
+      }
+
+      toParameter = fromParameter + getNoOfRows();
+
+      prevCount = 0;
+
+      clearTable();
+      getTable();
+      stats();
+    }
+  };
+
+  prevButton.addEventListener("click", prevDebounce(prev, 500));
+}
 
 // ID Jump
 
