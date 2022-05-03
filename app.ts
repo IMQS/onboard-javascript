@@ -1,4 +1,14 @@
-// Function To Get Number Of Rows That Can Be Displayed While Still Being Readable
+let fromParameter = 0;
+
+function getParameters(fromParameter: number) {
+  let toParameter: number;
+  const height = window.innerHeight;
+
+  let noOfRows = Math.floor(height / 40);
+  toParameter = fromParameter + noOfRows;
+
+  return toParameter;
+}
 
 const getNoOfRows = () => {
   const height = window.innerHeight;
@@ -7,11 +17,6 @@ const getNoOfRows = () => {
   let noOfRows = Math.floor(number);
   return noOfRows;
 };
-
-// Variables
-
-let paramOne = 0;
-let paramTwo = paramOne + getNoOfRows();
 
 //// Functions To Create/Clear The HTML
 
@@ -53,63 +58,52 @@ const clearTable = () => {
 // Heading Row (Getting the columns data)
 
 const getHeadings = () => {
-  try {
-    fetch("http://localhost:2050/columns", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+  fetch("http://localhost:2050/columns", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((res) => res.text())
+    .then((data) => {
+      let headingData = JSON.parse(data);
+      for (let i = 0; i < headingData.length; i++) {
+        createHeadingRow(headingData[i]);
+      }
+      getParameters((fromParameter = 0));
     })
-      .then((res) => res.text())
-      .then((data) => {
-        data = JSON.parse(data);
-        let headingData = data;
-        for (let i = 0; i < headingData.length; i++) {
-          createHeadingRow(headingData[i]);
-        }
-      });
-  } catch (error) {
-    console.log(error);
-  }
+    .catch((error) => {
+      console.log("Call Hector", error);
+    });
 };
 
 // Table Content (Getting the table's data)
 
 const getTable = () => {
-  try {
-    fetch("http://localhost:2050/records?from=" + paramOne + "&to=" + paramTwo, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+  let toParameter = getParameters(fromParameter);
+
+  fetch(`http://localhost:2050/records?from=${fromParameter}&to=${toParameter}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((res) => res.text())
+    .then((data) => {
+      let contentData = JSON.parse(data);
+      for (let i = 0; i < contentData.length; i++) {
+        createTableContent(contentData[i]);
+      }
     })
-      .then((res) => res.text())
-      .then((data) => {
-        data = JSON.parse(data);
-        let contentData = data;
-        for (let i = 0; i < contentData.length; i++) {
-          createTableContent(contentData[i]);
-        }
-      });
-  } catch (error) {
-    console.log(error);
-  }
+    .catch((error) => {
+      console.log(error);
+    });
 };
 
 // Displays The Current Results Being Shown
 
 const stats = () => {
   const pageStats: any = document.querySelector("#pageStats");
+  let toParameter = getParameters(fromParameter);
 
-  try {
-    fetch("http://localhost:2050/recordCount", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((res) => res.text())
-      .then((data) => {
-        data = JSON.parse(data);
-        let count = data;
-        let currentStats = "Showing results from " + paramOne + " to " + paramTwo + " out of " + count + " results.";
-        pageStats.innerHTML = currentStats;
-      });
-  } catch (error) {}
+  let currentStats = `Showing results from ${fromParameter} to ${toParameter} out of 1 000 000 results.`;
+  pageStats.innerHTML = currentStats;
 };
 
 //// Debounce
@@ -127,14 +121,14 @@ const debounce = (fn: any, delay: number) => {
 //// Sizing And Resizing
 
 let resizing = () => {
-  let end = paramOne + getNoOfRows();
+  let end = fromParameter + getNoOfRows();
+  let toParameter: number;
 
   if (end > 999999) {
-    paramTwo = 999999;
-    paramOne = paramTwo - getNoOfRows();
+    toParameter = 999999;
+    fromParameter = toParameter - getNoOfRows();
   } else {
-    paramOne;
-    paramTwo = paramOne + getNoOfRows();
+    toParameter = fromParameter + getNoOfRows();
   }
   clearTable();
   getTable();
@@ -171,20 +165,22 @@ const nextDebounce = (fn: any, delay: number) => {
 };
 
 let next = () => {
-  if (paramTwo === 999999) {
+  let toParameter = getParameters(fromParameter);
+
+  if (toParameter === 999999) {
     alert("You have reached the final page");
   }
 
-  let nextAmount = paramTwo - paramOne + 1;
+  let nextAmount = toParameter - fromParameter + 1;
   let nextCountAmount = nextAmount * nextCount;
-  paramOne = paramOne + nextCountAmount;
-  paramTwo = paramOne + getNoOfRows();
+  fromParameter = fromParameter + nextCountAmount;
+  toParameter = fromParameter + getNoOfRows();
 
-  let end = paramOne + getNoOfRows();
+  let end = fromParameter + getNoOfRows();
 
   if (end > 999999) {
-    paramTwo = 999999;
-    paramOne = paramTwo - getNoOfRows();
+    toParameter = 999999;
+    fromParameter = toParameter - getNoOfRows();
   }
 
   nextCount = 0;
@@ -194,9 +190,7 @@ let next = () => {
   stats();
 };
 
-next = nextDebounce(next, 500);
-
-nextButton.addEventListener("click", next);
+nextButton.addEventListener("click", nextDebounce(next, 500));
 
 // Previous
 const prevButton: any = document.querySelector("#prev");
@@ -214,21 +208,23 @@ const prevDebounce = (fn: any, delay: number) => {
 };
 
 let prev = () => {
-  if (paramOne === 0) {
+  let toParameter = getParameters(fromParameter);
+
+  if (fromParameter === 0) {
     alert("You Are On The First Page");
   } else {
-    let prevAmount = paramTwo - paramOne + 1;
+    let prevAmount = toParameter - fromParameter + 1;
     let prevCountAmount = prevAmount * prevCount;
 
-    let intOne = paramOne - prevCountAmount;
+    let intOne = fromParameter - prevCountAmount;
 
     if (intOne < 0) {
-      paramOne = 0;
+      fromParameter = 0;
     } else {
-      paramOne = intOne;
+      fromParameter = intOne;
     }
 
-    paramTwo = paramOne + getNoOfRows();
+    toParameter = fromParameter + getNoOfRows();
 
     prevCount = 0;
 
@@ -238,33 +234,32 @@ let prev = () => {
   }
 };
 
-prev = prevDebounce(prev, 500);
-
-prevButton.addEventListener("click", prev);
+prevButton.addEventListener("click", prevDebounce(prev, 500));
 
 // ID Jump
 const input: any = document.querySelector("input");
+let toParameter = getParameters(fromParameter);
 
 let idJump = () => {
-  let currentID = paramOne;
+  let currentID = fromParameter;
   let search = input.value;
   let end = parseInt(search) + getNoOfRows();
 
   if (search !== NaN && search !== "" && search < 1000000 && search >= 0) {
     if (end > 999999) {
-      paramTwo = 999999;
-      paramOne = paramTwo - getNoOfRows();
+      toParameter = 999999;
+      fromParameter = toParameter - getNoOfRows();
     } else {
-      paramOne = parseInt(search);
-      paramTwo = paramOne + getNoOfRows();
+      fromParameter = parseInt(search);
+      toParameter = fromParameter + getNoOfRows();
     }
-  } else if (search === "") {
-    //pass
-  } else {
+  } else if (search !== "") {
     alert("Make Sure Your Desired ID Is Not A Negative Number Or Doesn't Exceed 999999");
-    paramOne = currentID;
-    paramTwo = paramOne + getNoOfRows();
+    fromParameter = currentID;
+    toParameter = fromParameter + getNoOfRows();
     input.value = "";
+  } else {
+    //pass
   }
 
   clearTable();
@@ -272,6 +267,4 @@ let idJump = () => {
   getTable();
 };
 
-idJump = debounce(idJump, 500);
-
-window.addEventListener("input", idJump);
+window.addEventListener("input", debounce(idJump, 500));
