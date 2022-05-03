@@ -242,6 +242,8 @@ window.onload = function () {
 
 // ID Jump
 {
+  const input: any = document.querySelector("input");
+
   let idJump = () => {
     let toParameter = getParameters(fromParameter);
     let currentID = fromParameter;
