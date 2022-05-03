@@ -1,6 +1,9 @@
 let fromParameter = 0;
+const input: any = document.querySelector("input");
+const prevButton: any = document.querySelector("#prev");
+const nextButton: any = document.querySelector("#next");
 
-function getParameters(fromParameter: number) {
+const getParameters = (fromParameter: number) => {
   let toParameter: number;
   const height = window.innerHeight;
 
@@ -8,7 +11,7 @@ function getParameters(fromParameter: number) {
   toParameter = fromParameter + noOfRows;
 
   return toParameter;
-}
+};
 
 const getNoOfRows = () => {
   const height = window.innerHeight;
@@ -150,7 +153,6 @@ window.onload = function () {
 //// Navigation
 
 // Next
-const nextButton: any = document.querySelector("#next");
 let nextCount = 0;
 
 const nextDebounce = (fn: any, delay: number) => {
@@ -193,7 +195,6 @@ let next = () => {
 nextButton.addEventListener("click", nextDebounce(next, 500));
 
 // Previous
-const prevButton: any = document.querySelector("#prev");
 let prevCount = 0;
 
 const prevDebounce = (fn: any, delay: number) => {
@@ -237,10 +238,9 @@ let prev = () => {
 prevButton.addEventListener("click", prevDebounce(prev, 500));
 
 // ID Jump
-const input: any = document.querySelector("input");
-let toParameter = getParameters(fromParameter);
 
 let idJump = () => {
+  let toParameter = getParameters(fromParameter);
   let currentID = fromParameter;
   let search = input.value;
   let end = parseInt(search) + getNoOfRows();
