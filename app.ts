@@ -1,18 +1,25 @@
 let headingColumns: any = document.querySelector("#column-headings-container"); // Headings
 let infoColumns: any = document.querySelector("#info-columns-container"); // Information
-let debounce = (func: any, delay: number) => {
-  let timer: number;
-  return function () {
-    clearTimeout(timer);
+let fromNumber: number = 0;
+let count: number = 0;
+let timeout: number = 0;
 
-    timer = setTimeout(() => {
+window.onload = () => {
+  fromNumber = 0;
+};
+
+let debounce = (func: any, delay: number) => {
+  return function () {
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
       func();
     }, delay);
   };
 };
 
 let createNavigation = () => {
-  let recordNav: any = document.querySelector("#record-navigation-container"); //Navigation area;
+  let recordNav: any = document.querySelector("#record-navigation-container"); // Navigation area
   recordNav.innerHTML = `
   <div class="navigation-btns">
     <button value="first" class="first-page-btn">First Page</button>  
@@ -56,91 +63,32 @@ function recordSelection() {
   selectionArea.innerHTML = singleRecordSelection;
 
   let returnBtn: any = document.querySelector("#return-btn");
+  let recordIdValue: any = document.querySelector("#record-id.navigation-input");
+  let numberOfRows = Math.floor(window.innerHeight / 50);
 
   returnBtn.addEventListener("click", () => {
-    headingColumns.innerHTML = "";
-    infoColumns.innerHTML = "";
-    headingRowCreation();
     createNavigation();
+    let currentPage: any = document.querySelector(".current-page");
+    currentPage.innerHTML = `${fromNumber}  / ${fromNumber + numberOfRows}.`;
   });
 
   let getSingleRecord: any = document.querySelector("#get-record-btn");
 
   getSingleRecord.addEventListener("click", () => {
-    let recordIdValue: any = document.querySelector("#record-id.navigation-input");
-    let fromNumber: number = Number(recordIdValue.value);
+    fromNumber = Number(recordIdValue.value);
+    let toNumber = fromNumber + numberOfRows;
     let check = ["undefined", "string", ""];
 
     if (check.includes(typeof fromNumber) || fromNumber < 0) {
       alert("Does not exists");
       recordIdValue.value = "0";
     } else if (typeof fromNumber === "number" && fromNumber >= 0) {
-      dataRowCreation(fromNumber);
+      getRecords(fromNumber, toNumber);
     } else {
       alert("Error");
     }
   });
 }
-
-let pageNavigation = (fromNumber: number, numberOfRows: number) => {
-  let count: number = 0;
-  let value: string;
-
-  let nextBtn: any = document.querySelector(".next-records-btn");
-  let previousBtn: any = document.querySelector(".previous-records-btn");
-  let firstPageBtn: any = document.querySelector(".first-page-btn");
-  let lastPageBtn: any = document.querySelector(".last-page-btn");
-
-  if (fromNumber + numberOfRows === 999999) {
-    nextBtn.disabled = true;
-    previousBtn.disabled = false;
-  } else if (fromNumber === 0) {
-    nextBtn.disabled = false;
-    previousBtn.disabled = true;
-  }
-
-  let navigation = () => {
-    console.log(value);
-
-    if (value === "next") {
-      fromNumber = fromNumber + numberOfRows * count;
-    } else if (value === "previous") {
-      fromNumber = fromNumber - numberOfRows * count;
-    } else if (value === "first") {
-      fromNumber = 0;
-    } else if (value === "last") {
-      let toNumber = 999999;
-      fromNumber = toNumber - numberOfRows;
-      console.log(fromNumber, numberOfRows);
-    }
-
-    dataRowCreation(fromNumber), 500;
-  };
-
-  navigation = debounce(navigation, 1000);
-
-  nextBtn.addEventListener("click", () => {
-    count++;
-    value = nextBtn.value;
-    navigation();
-  });
-
-  previousBtn.addEventListener("click", () => {
-    count++;
-    value = previousBtn.value;
-    navigation();
-  });
-
-  firstPageBtn.addEventListener("click", () => {
-    value = firstPageBtn.value;
-    navigation();
-  });
-
-  lastPageBtn.addEventListener("click", () => {
-    value = lastPageBtn.value;
-    navigation();
-  });
-};
 
 function createHeadingGrid(headings: any) {
   let headingsData: any = `<h1 class="column-heading">${headings}</h1>`;
@@ -161,12 +109,11 @@ let headingRowCreation = () => {
         headings = headingDataList[i];
         createHeadingGrid(headings);
       }
-      dataRowCreation(0);
+      resizeScreenData();
     })
     .catch((error) => {
       console.log(error);
     });
-  createNavigation();
 };
 
 function dynamicGrid(columnData: any) {
@@ -183,57 +130,132 @@ function dynamicGrid(columnData: any) {
   }
 }
 
-function dataRowCreation(fromNumber: number) {
+let resizeScreenData = () => {
   let toNumber: number;
+  let selectionArea: any = document.querySelector("#record-navigation-container");
 
-  let resizeScreenData = () => {
-    let selectionArea: any = document.querySelector("#record-navigation-container");
+  if (selectionArea.contains(document.querySelector(".navigation-btns"))) {
+    let numberOfRows = Math.floor(window.innerHeight / 50);
 
-    if (selectionArea.contains(document.querySelector(".navigation-btns"))) {
-      let nextBtn: any = document.querySelector(".next-records-btn");
-      let previousBtn: any = document.querySelector(".previous-records-btn");
-      let numberOfRows = Math.floor(window.innerHeight / 50);
+    nextBtn.disabled = false;
+    previousBtn.disabled = false;
 
-      nextBtn.disabled = false;
+    if (fromNumber + numberOfRows >= 999999) {
+      let toNumber = 999999;
+      fromNumber = toNumber - numberOfRows;
+      nextBtn.disabled = true;
       previousBtn.disabled = false;
-
-      if (fromNumber + numberOfRows > 999999) {
-        let toNumber = 999999;
-        fromNumber = toNumber - numberOfRows;
-        nextBtn.disabled = true;
-        previousBtn.disabled = false;
-      } else if (fromNumber < 0) {
-        nextBtn.disabled = false;
-        previousBtn.disabled = true;
-        fromNumber = 0;
-      }
-      toNumber = fromNumber + numberOfRows;
-
-      pageNavigation(fromNumber, numberOfRows);
-      let currentPage: any = document.querySelector(".current-page");
-      currentPage.innerHTML = currentPage.innerHTML = `${fromNumber}  / ${toNumber}  ${Number(numberOfRows) + 1} records only.`;
+    } else if (fromNumber <= 0) {
+      nextBtn.disabled = false;
+      previousBtn.disabled = true;
+      fromNumber = 0;
     }
 
-    fetch("http://localhost:2050/records?from=" + fromNumber + "&to=" + toNumber, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        let columnDataList = JSON.parse(data);
-        infoColumns.innerHTML = "";
-        for (let i = 0; i < columnDataList.length; i++) {
-          dynamicGrid(columnDataList[i]);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+    toNumber = fromNumber + numberOfRows;
 
-  resizeScreenData = debounce(resizeScreenData, 500);
-  window.addEventListener("resize", resizeScreenData);
-  resizeScreenData();
+    getRecords(fromNumber, toNumber);
+  }
+};
+
+function getRecords(fromNumber: number, toNumber: number) {
+  fetch("http://localhost:2050/records?from=" + fromNumber + "&to=" + toNumber, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => response.text())
+    .then((data) => {
+      let columnDataList = JSON.parse(data);
+      infoColumns.innerHTML = "";
+      for (let i = 0; i < columnDataList.length; i++) {
+        dynamicGrid(columnDataList[i]);
+      }
+
+      let currentPage: any = document.querySelector(".current-page");
+      currentPage.innerHTML = `${fromNumber}  / ${toNumber}.`;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
+resizeScreenData = debounce(resizeScreenData, 100);
+window.addEventListener("resize", resizeScreenData);
+createNavigation();
 headingRowCreation();
+
+let nextBtn: any = document.querySelector(".next-records-btn");
+let previousBtn: any = document.querySelector(".previous-records-btn");
+let firstPageBtn: any = document.querySelector(".first-page-btn");
+let lastPageBtn: any = document.querySelector(".last-page-btn");
+
+let nextPage = () => {
+  let numberOfRows = Math.floor(window.innerHeight / 50);
+  fromNumber = fromNumber + numberOfRows * count;
+  let toNumber = fromNumber + numberOfRows;
+
+  if (toNumber >= 999999) {
+    toNumber = 999999;
+    fromNumber = toNumber - numberOfRows;
+    nextBtn.disabled = true;
+    previousBtn.disabled = false;
+  }
+
+  getRecords(fromNumber, toNumber);
+  count = 0;
+};
+
+nextBtn.addEventListener("click", () => {
+  count++;
+  nextPage = debounce(nextPage, 100);
+  nextPage();
+});
+
+let previousPage = () => {
+  let numberOfRows = Math.floor(window.innerHeight / 50);
+  fromNumber = fromNumber - numberOfRows * count;
+  let toNumber = fromNumber + numberOfRows;
+
+  if (fromNumber <= 0) {
+    nextBtn.disabled = false;
+    previousBtn.disabled = true;
+    fromNumber = 0;
+  }
+
+  getRecords(fromNumber, toNumber);
+  count = 0;
+};
+
+previousBtn.addEventListener("click", () => {
+  count++;
+  previousPage = debounce(previousPage, 100);
+  previousPage();
+});
+
+let firstPage = () => {
+  fromNumber = 0;
+  let numberOfRows = Math.floor(window.innerHeight / 50);
+  let toNumber = fromNumber + numberOfRows;
+  previousBtn.disabled = true;
+  nextBtn.disabled = false;
+
+  getRecords(fromNumber, toNumber);
+};
+
+firstPageBtn.addEventListener("click", () => {
+  firstPage();
+});
+
+let lastPage = () => {
+  let toNumber = 999999;
+  let numberOfRows = Math.floor(window.innerHeight / 50);
+  fromNumber = toNumber - numberOfRows;
+  nextBtn.disabled = true;
+  previousBtn.disabled = false;
+
+  getRecords(fromNumber, toNumber);
+};
+
+lastPageBtn.addEventListener("click", () => {
+  console.log("Hello");
+  lastPage();
+});
