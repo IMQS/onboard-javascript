@@ -2,19 +2,15 @@ let fromParameter = 0;
 
 const getParameters = (fromParameter: number) => {
   let toParameter: number;
-  const height = window.innerHeight;
+  let noOfRows = getNoOfRows();
 
-  let noOfRows = Math.floor(height / 40);
   toParameter = fromParameter + noOfRows;
-
   return toParameter;
 };
 
 const getNoOfRows = () => {
   const height = window.innerHeight;
-
-  let number = height / 40;
-  let noOfRows = Math.floor(number);
+  let noOfRows = Math.floor(height / 40);
   return noOfRows;
 };
 
