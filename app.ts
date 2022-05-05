@@ -1,4 +1,19 @@
 let fromParameter = 0;
+let timer: number;
+let recordCount = 0;
+
+//// On Window Load
+
+window.onload = function () {
+  getRecordCount()
+    .then(() => {
+      return getHeadings();
+    })
+    .then(() => {
+      return getTable();
+    });
+  console.log("CALL HECTOR!!!");
+};
 
 const getParameters = (fromParameter: number) => {
   let toParameter: number;
@@ -40,15 +55,6 @@ const createTableContent = (contentData: string) => {
   }
 };
 
-// Clear Table Content
-
-const clearTable = () => {
-  const content: any = document.querySelector("#content");
-  const clear = "";
-
-  content.innerHTML = clear;
-};
-
 //// Fetch Requests
 
 // Heading Row (Getting the columns data)
@@ -74,7 +80,16 @@ const getHeadings = () => {
 // Table Content (Getting the table's data)
 
 const getTable = () => {
+  const content: any = document.querySelector("#content");
   let toParameter = getParameters(fromParameter);
+  const pageStats: any = document.querySelector("#pageStats");
+
+  // Clears Table
+  content.innerHTML = "";
+
+  // Displays The Current Results Being Shown
+  let currentStats = `Showing results from ${fromParameter} to ${toParameter} out of ${recordCount} results.`;
+  pageStats.innerHTML = currentStats;
 
   fetch(`http://localhost:2050/records?from=${fromParameter}&to=${toParameter}`, {
     method: "GET",
@@ -92,20 +107,27 @@ const getTable = () => {
     });
 };
 
-// Displays The Current Results Being Shown
-
-const stats = () => {
-  const pageStats: any = document.querySelector("#pageStats");
-  let toParameter = getParameters(fromParameter);
-
-  let currentStats = `Showing results from ${fromParameter} to ${toParameter} out of 1 000 000 results.`;
-  pageStats.innerHTML = currentStats;
+let getRecordCount = () => {
+  return fetch("http://localhost:2050/recordCount", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((res) => res.text())
+    .then((data) => {
+      recordCount = JSON.parse(data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
+
+// getRecordCount();
+// getHeadings();
+// getTable();
 
 //// Debounce
 
 const debounce = (fn: any, delay: number) => {
-  let timer: number;
   return function () {
     clearTimeout(timer);
     timer = setTimeout(() => {
@@ -126,22 +148,12 @@ let resizing = () => {
   } else {
     toParameter = fromParameter + getNoOfRows();
   }
-  clearTable();
   getTable();
-  stats();
 };
 
 resizing = debounce(resizing, 500);
 
 window.addEventListener("resize", resizing);
-
-//// On Window Load
-
-window.onload = function () {
-  getHeadings();
-  getTable();
-  stats();
-};
 
 //// Navigation
 
@@ -151,7 +163,6 @@ window.onload = function () {
   const nextButton: any = document.querySelector("#next");
 
   const nextDebounce = (fn: any, delay: number) => {
-    let timer: any;
     return function () {
       nextCount++;
       clearTimeout(timer);
@@ -182,9 +193,7 @@ window.onload = function () {
 
     nextCount = 0;
 
-    clearTable();
     getTable();
-    stats();
   };
 
   nextButton.addEventListener("click", nextDebounce(next, 500));
@@ -196,7 +205,6 @@ window.onload = function () {
   const prevButton: any = document.querySelector("#prev");
 
   const prevDebounce = (fn: any, delay: number) => {
-    let timer: any;
     return function () {
       prevCount++;
       clearTimeout(timer);
@@ -227,9 +235,7 @@ window.onload = function () {
 
       prevCount = 0;
 
-      clearTable();
       getTable();
-      stats();
     }
   };
 
@@ -259,12 +265,8 @@ window.onload = function () {
       fromParameter = currentID;
       toParameter = fromParameter + getNoOfRows();
       input.value = "";
-    } else {
-      //pass
     }
 
-    clearTable();
-    stats();
     getTable();
   };
 
