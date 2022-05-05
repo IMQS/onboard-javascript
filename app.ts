@@ -118,8 +118,6 @@ let recordCount = () => {
     });
 };
 
-recordCount();
-
 let headingRowCreation = () => {
   fetch("http://localhost:2050/columns", {
     method: "GET",
@@ -204,10 +202,11 @@ function getRecords(fromNumber: number, toNumber: number) {
     });
 }
 
-resizeScreenData = debounce(resizeScreenData, 100);
-window.addEventListener("resize", resizeScreenData);
+recordCount();
 createNavigation();
 headingRowCreation();
+resizeScreenData = debounce(resizeScreenData, 100);
+window.addEventListener("resize", resizeScreenData);
 
 let nextBtn: any = document.querySelector(".next-records-btn");
 let previousBtn: any = document.querySelector(".previous-records-btn");
