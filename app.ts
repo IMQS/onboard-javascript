@@ -1,6 +1,6 @@
 let fromParameter = 0;
 let timer: number;
-let recordCount = 0;
+let recordCount: number;
 
 //// On Window Load
 
@@ -15,7 +15,7 @@ window.onload = function () {
   console.log("CALL HECTOR!!!");
 };
 
-const getParameters = (fromParameter: number) => {
+const getParameters = (fromParameter: number): number => {
   let toParameter: number;
   let noOfRows = getNoOfRows();
 
@@ -23,7 +23,7 @@ const getParameters = (fromParameter: number) => {
   return toParameter;
 };
 
-const getNoOfRows = () => {
+const getNoOfRows = (): number => {
   const height = window.innerHeight;
   let noOfRows = Math.floor(height / 40);
   return noOfRows;
@@ -121,10 +121,6 @@ let getRecordCount = () => {
     });
 };
 
-// getRecordCount();
-// getHeadings();
-// getTable();
-
 //// Debounce
 
 const debounce = (fn: any, delay: number) => {
@@ -141,9 +137,10 @@ const debounce = (fn: any, delay: number) => {
 let resizing = () => {
   let end = fromParameter + getNoOfRows();
   let toParameter: number;
+  let maxRecordsID = recordCount - 1;
 
-  if (end > 999999) {
-    toParameter = 999999;
+  if (end > maxRecordsID) {
+    toParameter = maxRecordsID;
     fromParameter = toParameter - getNoOfRows();
   } else {
     toParameter = fromParameter + getNoOfRows();
@@ -174,8 +171,9 @@ window.addEventListener("resize", resizing);
 
   let next = () => {
     let toParameter = getParameters(fromParameter);
+    let maxRecordsID = recordCount - 1;
 
-    if (toParameter === 999999) {
+    if (toParameter === maxRecordsID) {
       alert("You have reached the final page");
     }
 
@@ -186,8 +184,8 @@ window.addEventListener("resize", resizing);
 
     let end = fromParameter + getNoOfRows();
 
-    if (end > 999999) {
-      toParameter = 999999;
+    if (end > maxRecordsID) {
+      toParameter = maxRecordsID;
       fromParameter = toParameter - getNoOfRows();
     }
 
@@ -231,8 +229,6 @@ window.addEventListener("resize", resizing);
         fromParameter = intOne;
       }
 
-      toParameter = fromParameter + getNoOfRows();
-
       prevCount = 0;
 
       getTable();
@@ -251,10 +247,11 @@ window.addEventListener("resize", resizing);
     let currentID = fromParameter;
     let search = input.value;
     let end = parseInt(search) + getNoOfRows();
+    let maxRecordsID = recordCount - 1;
 
-    if (search !== NaN && search !== "" && search < 1000000 && search >= 0) {
-      if (end > 999999) {
-        toParameter = 999999;
+    if (search !== NaN && search !== "" && search <= maxRecordsID && search >= 0) {
+      if (end > maxRecordsID) {
+        toParameter = maxRecordsID;
         fromParameter = toParameter - getNoOfRows();
       } else {
         fromParameter = parseInt(search);
