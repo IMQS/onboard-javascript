@@ -1,6 +1,7 @@
 let headingColumns: any = document.querySelector("#column-headings-container"); // Headings
 let infoColumns: any = document.querySelector("#info-columns-container"); // Information
 let fromNumber: number = 0;
+let recordNumberTotal: number;
 let count: number = 0;
 let timeout: number = 0;
 
@@ -59,7 +60,6 @@ function recordSelection() {
     <button id="get-record-btn">See Record</button>
     `;
 
-  selectionArea.innerHTML = "";
   selectionArea.innerHTML = singleRecordSelection;
 
   let returnBtn: any = document.querySelector("#return-btn");
@@ -77,15 +77,24 @@ function recordSelection() {
   getSingleRecord.addEventListener("click", () => {
     fromNumber = Number(recordIdValue.value);
     let toNumber = fromNumber + numberOfRows;
+    let finalRecord = recordNumberTotal - 1;
+
+    if (toNumber > finalRecord) {
+      toNumber = finalRecord;
+      fromNumber = toNumber - numberOfRows;
+    }
+
     let check = ["undefined", "string", ""];
 
-    if (check.includes(typeof fromNumber) || fromNumber < 0) {
-      alert("Does not exists");
-      recordIdValue.value = "0";
-    } else if (typeof fromNumber === "number" && fromNumber >= 0) {
-      getRecords(fromNumber, toNumber);
-    } else {
-      alert("Error");
+    try {
+      if (check.includes(typeof fromNumber) || fromNumber < 0) {
+        alert("Does not exists");
+        recordIdValue.value = "0";
+      } else if (typeof fromNumber === "number" && fromNumber >= 0) {
+        getRecords(fromNumber, toNumber);
+      }
+    } catch (error) {
+      alert(error);
     }
   });
 }
@@ -94,6 +103,22 @@ function createHeadingGrid(headings: any) {
   let headingsData: any = `<h1 class="column-heading">${headings}</h1>`;
   headingColumns.innerHTML += headingsData;
 }
+
+let recordCount = () => {
+  fetch("http://localhost:2050/recordCount", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => response.text())
+    .then((data) => {
+      recordNumberTotal = JSON.parse(data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+recordCount();
 
 let headingRowCreation = () => {
   fetch("http://localhost:2050/columns", {
@@ -140,9 +165,10 @@ let resizeScreenData = () => {
     nextBtn.disabled = false;
     previousBtn.disabled = false;
 
-    if (fromNumber + numberOfRows >= 999999) {
-      let toNumber = 999999;
-      fromNumber = toNumber - numberOfRows;
+    let finalRecord = recordNumberTotal - 1;
+
+    if (fromNumber + numberOfRows >= finalRecord) {
+      fromNumber = finalRecord - numberOfRows;
       nextBtn.disabled = true;
       previousBtn.disabled = false;
     } else if (fromNumber <= 0) {
@@ -158,7 +184,7 @@ let resizeScreenData = () => {
 };
 
 function getRecords(fromNumber: number, toNumber: number) {
-  fetch("http://localhost:2050/records?from=" + fromNumber + "&to=" + toNumber, {
+  fetch(`http://localhost:2050/records?from=${fromNumber}&to=${toNumber}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   })
@@ -193,9 +219,10 @@ let nextPage = () => {
   fromNumber = fromNumber + numberOfRows * count;
   let toNumber = fromNumber + numberOfRows;
 
-  if (toNumber >= 999999) {
-    toNumber = 999999;
-    fromNumber = toNumber - numberOfRows;
+  let finalRecord = recordNumberTotal - 1;
+
+  if (toNumber >= finalRecord) {
+    fromNumber = finalRecord - numberOfRows;
     nextBtn.disabled = true;
     previousBtn.disabled = false;
   }
@@ -246,16 +273,15 @@ firstPageBtn.addEventListener("click", () => {
 });
 
 let lastPage = () => {
-  let toNumber = 999999;
+  let finalRecord = recordNumberTotal - 1;
   let numberOfRows = Math.floor(window.innerHeight / 50);
-  fromNumber = toNumber - numberOfRows;
+  fromNumber = finalRecord - numberOfRows;
   nextBtn.disabled = true;
   previousBtn.disabled = false;
 
-  getRecords(fromNumber, toNumber);
+  getRecords(fromNumber, finalRecord);
 };
 
 lastPageBtn.addEventListener("click", () => {
-  console.log("Hello");
   lastPage();
 });
