@@ -73,7 +73,7 @@ const getHeadings = () => {
       getParameters((fromParameter = 0));
     })
     .catch((error) => {
-      console.log("Call Hector", error);
+      console.log(error);
     });
 };
 
