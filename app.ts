@@ -1,9 +1,9 @@
 let headingColumns: any = document.querySelector("#column-headings-container"); // Headings
 let infoColumns: any = document.querySelector("#info-columns-container"); // Information
-let fromNumber: number = 0;
+let fromNumber = 0;
 let recordNumberTotal: number;
-let count: number = 0;
-let timeout: number = 0;
+let count = 0;
+let timeout = 0;
 
 window.onload = () => {
   fromNumber = 0;
@@ -67,9 +67,7 @@ function recordSelection() {
   let numberOfRows = Math.floor(window.innerHeight / 50);
 
   returnBtn.addEventListener("click", () => {
-    createNavigation();
-    let currentPage: any = document.querySelector(".current-page");
-    currentPage.innerHTML = `${fromNumber}  / ${fromNumber + numberOfRows}.`;
+    window.location.reload();
   });
 
   let getSingleRecord: any = document.querySelector("#get-record-btn");
@@ -203,17 +201,20 @@ function getRecords(fromNumber: number, toNumber: number) {
 }
 
 recordCount();
+resizeScreenData = debounce(resizeScreenData, 500);
+window.addEventListener("resize", resizeScreenData);
 createNavigation();
 headingRowCreation();
-resizeScreenData = debounce(resizeScreenData, 100);
-window.addEventListener("resize", resizeScreenData);
 
 let nextBtn: any = document.querySelector(".next-records-btn");
 let previousBtn: any = document.querySelector(".previous-records-btn");
 let firstPageBtn: any = document.querySelector(".first-page-btn");
 let lastPageBtn: any = document.querySelector(".last-page-btn");
 
+console.log(fromNumber);
+
 let nextPage = () => {
+  console.log(fromNumber);
   let numberOfRows = Math.floor(window.innerHeight / 50);
   fromNumber = fromNumber + numberOfRows * count;
   let toNumber = fromNumber + numberOfRows;
@@ -232,7 +233,7 @@ let nextPage = () => {
 
 nextBtn.addEventListener("click", () => {
   count++;
-  nextPage = debounce(nextPage, 100);
+  nextPage = debounce(nextPage, 500);
   nextPage();
 });
 
@@ -253,7 +254,7 @@ let previousPage = () => {
 
 previousBtn.addEventListener("click", () => {
   count++;
-  previousPage = debounce(previousPage, 100);
+  previousPage = debounce(previousPage, 500);
   previousPage();
 });
 
