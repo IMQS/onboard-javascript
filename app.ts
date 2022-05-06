@@ -41,26 +41,39 @@ function createHeadingRow(headingData: string) {
 
 // Table Content
 function createTableContent(contentData: string) {
-    const content: any = document.querySelector("#content");
+    const content: HTMLElement | null = document.getElementById("content");
 
     let table = `<div id="row-${contentData[0]}" class="rows"></div>`;
-    content.innerHTML += table;
+    if (content !== null) {
+        content.innerHTML += table;
+    }
 
-    let rows: any = document.querySelector("#row-" + contentData[0] + ".rows");
+    let rows: HTMLElement | null = document.getElementById("row-" + contentData[0]);
     for (let x = 0; x < contentData.length; x++) {
         let rowCols = `<div class="row_cols">${contentData[x]}</div>`;
-        rows.innerHTML += rowCols;
+        if (rows !== null) {
+            rows.innerHTML += rowCols;
+        }
     }
 }
 
 //// Fetch Requests
+// Response Error Handling
+function handleErrors(response: Response) {
+    if (!response.ok) {
+        throw Error(response.statusText);
+    }
+    return response;
+}
+
 // Heading Row (Getting the columns data)
 function getHeadings() {
     return fetch("http://localhost:2050/columns", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })
-        .then((res) => res.text())
+        .then(handleErrors)
+        .then((response) => response.text())
         .then((data) => {
             let headingData = JSON.parse(data);
             for (let i = 0; i < headingData.length; i++) {
@@ -75,43 +88,50 @@ function getHeadings() {
 
 // Table Content (Getting the table's data)
 function getTable() {
-    const content: any = document.querySelector("#content");
+    const content: HTMLElement | null = document.getElementById("content");
     let toParameter = getParameters(fromParameter);
-    const pageStats: any = document.querySelector("#pageStats");
+    const pageStats: HTMLElement | null = document.getElementById("pageStats");
 
     // Clears Table
-    content.innerHTML = "";
+    if (content !== null) {
+        content.innerHTML = "";
+    }
 
     // Displays The Current Results Being Shown
     let currentStats = `Showing results from ${fromParameter} to ${toParameter} out of ${recordCount} results.`;
-    pageStats.innerHTML = currentStats;
+    if (pageStats !== null) {
+        pageStats.innerHTML = currentStats;
+    }
 
     return fetch(`http://localhost:2050/records?from=${fromParameter}&to=${toParameter}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })
-        .then((res) => res.text())
+        .then(handleErrors)
+        .then((res: Response) => res.text())
         .then((data) => {
             let contentData = JSON.parse(data);
             for (let i = 0; i < contentData.length; i++) {
                 createTableContent(contentData[i]);
             }
         })
-        .catch((error) => {
+        .catch((error: Error) => {
             console.log(error);
         });
 }
 
+// Gets Total Of All Records
 function getRecordCount() {
     return fetch("http://localhost:2050/recordCount", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })
-        .then((res) => res.text())
+        .then(handleErrors)
+        .then((res: Response) => res.text())
         .then((data) => {
             recordCount = JSON.parse(data);
         })
-        .catch((error) => {
+        .catch((error: Error) => {
             console.log(error);
         });
 }
@@ -192,7 +212,7 @@ window.addEventListener("resize", debounce(resizing, 500));
 // Previous
 {
     let prevCount = 0;
-    const prevButton: any = document.querySelector("#prev");
+    const prevButton: HTMLElement | null = document.getElementById("prev");
 
     const prevDebounce = (fn: any, delay: number) => {
         return function () {
@@ -227,7 +247,9 @@ window.addEventListener("resize", debounce(resizing, 500));
         }
     };
 
-    prevButton.addEventListener("click", prevDebounce(prev, 500));
+    if (prevButton !== null) {
+        prevButton.addEventListener("click", prevDebounce(prev, 500));
+    }
 }
 
 // ID Jump
