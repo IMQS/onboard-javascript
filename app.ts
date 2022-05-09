@@ -4,6 +4,10 @@ let recordCount: number;
 
 //// On Window Load
 window.onload = function () {
+    const next = new Next(); // next class
+    const prev = new Prev(); // prev class
+    window.addEventListener("input", debounce(idJump, 500));
+    window.addEventListener("resize", debounce(resizing, 500));
     getRecordCount()
         .then(() => {
             return getHeadings();
@@ -11,10 +15,10 @@ window.onload = function () {
         .then(() => {
             return getTable();
         });
-    console.log("CALL HECTOR!!!");
 };
 
-function getParameters(fromParameter: number) {
+// Gets The 2nd paramater from the 1st parameter
+function getParameters(fromParameter: number): number {
     let toParameter: number;
     let noOfRows = getNoOfRows();
 
@@ -22,13 +26,14 @@ function getParameters(fromParameter: number) {
     return toParameter;
 }
 
+// Gets the number of rows on the screen
 function getNoOfRows(): number {
     const height = window.innerHeight;
     let noOfRows = Math.floor(height / 40);
     return noOfRows;
 }
 
-//// Functions To Create/Clear The HTML
+//// Functions To Create The HTML
 // Heading Row
 function createHeadingRow(headingData: string) {
     const heading: HTMLElement | null = document.getElementById("heading");
@@ -40,17 +45,19 @@ function createHeadingRow(headingData: string) {
 }
 
 // Table Content
-function createTableContent(contentData: string) {
+function createTableContent(contentData: any) {
     const content: HTMLElement | null = document.getElementById("content");
 
     let table = `<div id="row-${contentData[0]}" class="rows"></div>`;
     if (content !== null) {
         content.innerHTML += table;
+    } else {
+        alert("ERROR");
     }
 
     let rows: HTMLElement | null = document.getElementById("row-" + contentData[0]);
-    for (let x = 0; x < contentData.length; x++) {
-        let rowCols = `<div class="row_cols">${contentData[x]}</div>`;
+    for (let x of contentData) {
+        let rowCols = `<div class="row_cols">${x}</div>`;
         if (rows !== null) {
             rows.innerHTML += rowCols;
         }
@@ -67,19 +74,18 @@ function handleErrors(response: Response) {
 }
 
 // Heading Row (Getting the columns data)
-function getHeadings() {
+function getHeadings(): Promise<void> {
     return fetch("http://localhost:2050/columns", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })
         .then(handleErrors)
-        .then((response) => response.text())
-        .then((data) => {
-            let headingData = JSON.parse(data);
-            for (let i = 0; i < headingData.length; i++) {
-                createHeadingRow(headingData[i]);
+        .then((response: Response) => response.json())
+        .then((data: string) => {
+            let headingData = data;
+            for (let heading of headingData) {
+                createHeadingRow(heading);
             }
-            getParameters(0);
         })
         .catch((error: Error) => {
             console.log(error);
@@ -87,7 +93,7 @@ function getHeadings() {
 }
 
 // Table Content (Getting the table's data)
-function getTable() {
+function getTable(): Promise<void> {
     const content: HTMLElement | null = document.getElementById("content");
     let toParameter = getParameters(fromParameter);
     const pageStats: HTMLElement | null = document.getElementById("pageStats");
@@ -108,11 +114,11 @@ function getTable() {
         headers: { "Content-Type": "application/json" },
     })
         .then(handleErrors)
-        .then((res: Response) => res.text())
-        .then((data) => {
-            let contentData = JSON.parse(data);
-            for (let i = 0; i < contentData.length; i++) {
-                createTableContent(contentData[i]);
+        .then((res: Response) => res.json())
+        .then((data: string) => {
+            let contentData = data;
+            for (let content of contentData) {
+                createTableContent(content);
             }
         })
         .catch((error: Error) => {
@@ -121,15 +127,15 @@ function getTable() {
 }
 
 // Gets Total Of All Records
-function getRecordCount() {
+function getRecordCount(): Promise<void> {
     return fetch("http://localhost:2050/recordCount", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })
         .then(handleErrors)
-        .then((res: Response) => res.text())
-        .then((data) => {
-            recordCount = JSON.parse(data);
+        .then((res: Response) => res.json())
+        .then((data: number) => {
+            recordCount = data;
         })
         .catch((error: Error) => {
             console.log(error);
@@ -155,131 +161,128 @@ function resizing() {
     if (end > maxRecordsID) {
         toParameter = maxRecordsID;
         fromParameter = toParameter - getNoOfRows();
-    } else {
-        toParameter = fromParameter + getNoOfRows();
     }
     getTable();
 }
 
-window.addEventListener("resize", debounce(resizing, 500));
-
 //// Navigation
 // Next
-{
-    let nextCount = 0;
-    const nextButton: HTMLElement | null = document.getElementById("next");
+class Next {
+    nextCount: number;
+    nextButton: HTMLElement | null;
 
-    const nextDebounce = (fn: any, delay: number) => {
-        return function () {
-            nextCount++;
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                fn();
-            }, delay);
+    constructor() {
+        this.nextCount = 0;
+        this.nextButton = document.getElementById("next");
+
+        const nextDebounce = (fn: any, delay: number) => {
+            return () => {
+                this.nextCount++;
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                    fn();
+                }, delay);
+            };
         };
-    };
 
-    let next = () => {
-        let toParameter = getParameters(fromParameter);
-        let maxRecordsID = recordCount - 1;
+        let next = () => {
+            let toParameter = getParameters(fromParameter);
+            let maxRecordsID = recordCount - 1;
 
-        if (toParameter === maxRecordsID) {
-            alert("You have reached the final page");
-        }
+            if (toParameter === maxRecordsID) {
+                alert("You have reached the final page");
+            }
 
-        let nextAmount = toParameter - fromParameter + 1;
-        let nextCountAmount = nextAmount * nextCount;
-        fromParameter = fromParameter + nextCountAmount;
-        toParameter = fromParameter + getNoOfRows();
+            let nextAmount = toParameter - fromParameter + 1;
+            let nextCountAmount = nextAmount * this.nextCount;
+            fromParameter = fromParameter + nextCountAmount;
+            toParameter = fromParameter + getNoOfRows();
 
-        let end = fromParameter + getNoOfRows();
+            let end = fromParameter + getNoOfRows();
 
-        if (end > maxRecordsID) {
-            toParameter = maxRecordsID;
-            fromParameter = toParameter - getNoOfRows();
-        }
+            if (end > maxRecordsID) {
+                toParameter = maxRecordsID;
+                fromParameter = toParameter - getNoOfRows();
+            }
 
-        nextCount = 0;
+            this.nextCount = 0;
 
-        getTable();
-    };
+            getTable();
+        };
 
-    if (nextButton !== null) {
-        nextButton.addEventListener("click", nextDebounce(next, 500));
+        this.nextButton?.addEventListener("click", nextDebounce(next, 500));
     }
 }
 
 // Previous
-{
-    let prevCount = 0;
-    const prevButton: HTMLElement | null = document.getElementById("prev");
+class Prev {
+    prevCount: number;
+    prevButton: HTMLElement | null;
 
-    const prevDebounce = (fn: any, delay: number) => {
-        return function () {
-            prevCount++;
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                fn();
-            }, delay);
+    constructor() {
+        this.prevCount = 0;
+        this.prevButton = document.getElementById("prev");
+
+        const prevDebounce = (fn: any, delay: number) => {
+            return () => {
+                this.prevCount++;
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                    fn();
+                }, delay);
+            };
         };
-    };
 
-    let prev = () => {
-        let toParameter = getParameters(fromParameter);
+        let prev = () => {
+            let toParameter = getParameters(fromParameter);
 
-        if (fromParameter === 0) {
-            alert("You Are On The First Page");
-        } else {
-            let prevAmount = toParameter - fromParameter + 1;
-            let prevCountAmount = prevAmount * prevCount;
-
-            let intOne = fromParameter - prevCountAmount;
-
-            if (intOne < 0) {
-                fromParameter = 0;
+            if (fromParameter === 0) {
+                alert("You Are On The First Page");
             } else {
-                fromParameter = intOne;
+                let prevAmount = toParameter - fromParameter + 1;
+                let prevCountAmount = prevAmount * this.prevCount;
+
+                let intOne = fromParameter - prevCountAmount;
+
+                if (intOne < 0) {
+                    fromParameter = 0;
+                } else {
+                    fromParameter = intOne;
+                }
+
+                this.prevCount = 0;
+
+                getTable();
             }
+        };
 
-            prevCount = 0;
-
-            getTable();
-        }
-    };
-
-    if (prevButton !== null) {
-        prevButton.addEventListener("click", prevDebounce(prev, 500));
+        this.prevButton?.addEventListener("click", prevDebounce(prev, 500));
     }
 }
 
 // ID Jump
-{
+function idJump() {
     const input: any = document.querySelector("input");
+    let toParameter = getParameters(fromParameter);
+    let currentID = fromParameter;
+    let search = input.value;
+    let end = parseInt(search) + getNoOfRows();
+    let maxRecordsID = recordCount - 1;
 
-    let idJump = () => {
-        let toParameter = getParameters(fromParameter);
-        let currentID = fromParameter;
-        let search = input.value;
-        let end = parseInt(search) + getNoOfRows();
-        let maxRecordsID = recordCount - 1;
-
-        if (search !== NaN && search !== "" && search <= maxRecordsID && search >= 0) {
-            if (end > maxRecordsID) {
-                toParameter = maxRecordsID;
-                fromParameter = toParameter - getNoOfRows();
-            } else {
-                fromParameter = parseInt(search);
-                toParameter = fromParameter + getNoOfRows();
-            }
-        } else if (search !== "") {
-            alert("Make Sure Your Desired ID Is Not A Negative Number Or Doesn't Exceed 999999");
-            fromParameter = currentID;
+    if (search !== NaN && search !== "" && search <= maxRecordsID && search >= 0) {
+        if (end > maxRecordsID) {
+            toParameter = maxRecordsID;
+            fromParameter = toParameter - getNoOfRows();
+        } else {
+            fromParameter = parseInt(search);
             toParameter = fromParameter + getNoOfRows();
-            input.value = "";
         }
+    } else if (search !== "") {
+        alert("Make Sure Your Desired ID Is Not A Negative Number Or Doesn't Exceed 999999");
+        fromParameter = currentID;
+        toParameter = fromParameter + getNoOfRows();
+        input.value = "";
+    }
 
-        getTable();
-    };
-
-    window.addEventListener("input", debounce(idJump, 500));
+    getTable();
 }
