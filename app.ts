@@ -210,7 +210,9 @@ class Next {
             getTable();
         };
 
-        this.nextButton?.addEventListener("click", nextDebounce(next, 500));
+        if (this.nextButton) {
+            this.nextButton.addEventListener("click", nextDebounce(next, 500));
+        }
     }
 }
 
@@ -256,7 +258,9 @@ class Prev {
             }
         };
 
-        this.prevButton?.addEventListener("click", prevDebounce(prev, 500));
+        if (this.prevButton) {
+            this.prevButton.addEventListener("click", prevDebounce(prev, 500));
+        }
     }
 }
 
