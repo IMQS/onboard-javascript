@@ -1,5 +1,6 @@
 let fromParameter = 0;
 let recordCount: number;
+const el = document.getElementById
 
 // Gets The 2nd paramater from the 1st parameter
 function getParameters(fromParameter: number): number {
