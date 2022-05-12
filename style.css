@@ -1,0 +1,115 @@
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+
+body {
+	height: 100vh;
+}
+
+/* Navigation */
+
+#nav {
+	background-color: #000;
+	display: flex;
+	flex-direction: row;
+	color: #fff;
+	height: 5%;
+	width: 100%;
+}
+
+#pageStats {
+	position: absolute;
+	left: 1%;
+	top: 1%;
+}
+
+#jumpID {
+	position: absolute;
+	left: 50%;
+	top: 1%;
+	transform: translate(-50%, -1%);
+}
+#jumpID input {
+	border: none;
+	margin-right: 20px;
+	padding: 7px 10px;
+	text-align: center;
+}
+
+#btns {
+	position: absolute;
+	right: 1%;
+	top: 1%;
+}
+#btns .next {
+	margin-left: 20px;
+}
+
+button {
+	border: none;
+	padding: 5px 10px;
+	border-radius: 10px;
+	width: 100px;
+	color: #000;
+	background-color: #fff;
+	cursor: pointer;
+	transition: all 0.3s;
+	transition-timing-function: ease-in-out;
+}
+button:hover {
+	letter-spacing: 1px;
+	color: #fff;
+	background-color: #000;
+	border: 1px solid #fff;
+}
+
+/* Headings */
+
+#heading {
+	display: flex;
+	justify-content: space-between;
+	align-items: center; 
+	flex-direction: row;
+	width: 100%;
+	height: 10vh;
+}
+#headings {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	width: 100%;
+	font-size: 1em;
+	font-weight: bold;
+	border: 1px solid #000;
+}
+
+/* Table */
+#content {
+	display: flex;
+	flex-direction: column;
+	height: 85vh;
+	width: 100%;
+}
+.rows {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;
+	height: 100%;
+	width: 100%;
+}
+.row_cols {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	width: 100%;
+	font-size: 1em;
+	border: 1px solid #000;
+	word-wrap: break-word;
+}

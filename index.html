@@ -1,13 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-	<title>JS Onboard Project</title>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Onboarding JavaScript Task</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+	<link rel="stylesheet" href="style.css" />
+	<script src="app.js"></script>
 </head>
 
 <body>
-	<p>Hello</p>
+	<div id="nav">
+		<label id="pageStats"></label>
+		<div id="jumpID">
+			<input type="number" id="idJump" placeholder="Input A Starting ID" />
+			<!-- <button>Jump to ID</button> -->
+		</div>
+		<div id="btns">
+			<button class="prev" id="prev">Prev</button>
+			<button class="next" id="next">Next</button>
+		</div>
+	</div>
+	<div id="heading"></div>
+	<div id="content"></div>
 </body>
 
 </html>
-
