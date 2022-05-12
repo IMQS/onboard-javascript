@@ -3,14 +3,6 @@ let recordNumberTotal: number;
 let count = 0;
 let timeout = 0;
 
-window.onload = () => {
-	createNavigation();
-	recordCount();
-	headingRowCreation();
-	fromNumber = 0;
-	new pageNavigation();
-};
-
 function checkResponseError(response: Response) {
 	if (!response.ok) {
 		throw Error(response.statusText);
@@ -18,7 +10,7 @@ function checkResponseError(response: Response) {
 	return response;
 }
 
-function debounce(func: any, delay: number) {
+function debounce(func: () => void, delay: number) {
 	return function () {
 		clearTimeout(timeout);
 
@@ -53,12 +45,13 @@ function getRecords(fromNumber: number, toNumber: number): Promise<void> {
 	})
 		.then(checkResponseError)
 		.then((response: Response) => response.json())
-		.then((data: string) => {
+		.then((data: TemplateStringsArray) => {
+
 			let infoColumns: HTMLElement | null = document.getElementById("info-columns-container"); // Information
 			let currentPage: HTMLElement | null = document.getElementById("current-page");
 
 			if (infoColumns !== null) {
-				(infoColumns as HTMLDivElement).innerHTML = "";
+				infoColumns.innerHTML = "";
 
 				for (let i of data) {
 					dynamicGrid(i);
@@ -66,7 +59,7 @@ function getRecords(fromNumber: number, toNumber: number): Promise<void> {
 			}
 
 			if (currentPage !== null) {
-				(currentPage as HTMLParagraphElement).innerHTML = `${fromNumber}  / ${toNumber}.`;
+				currentPage.innerHTML = `${fromNumber}  / ${toNumber}.`;
 			}
 		})
 		.catch((error: Error) => {
@@ -78,8 +71,11 @@ function recordSelection() {
 	let recordNav: HTMLElement | null = document.getElementById("record-navigation-container"); // Navigation area
 	if (!recordNav) {
 		alert("The navigation is not working correctly refresh the page");
-	} else {
-		let singleRecordSelection = `
+		return;
+
+	}
+
+	let singleRecordSelection = `
 		<button id="return-btn">Return</button>
 		<div id="user-input-data">
 			<div class="navigation-input-area-id" id="id">
@@ -90,25 +86,30 @@ function recordSelection() {
 		</div>
 		<button id="get-record-btn">See Record</button>`;
 
-		recordNav.innerHTML = singleRecordSelection;
+	recordNav.innerHTML = singleRecordSelection;
 
-		let returnBtn: HTMLElement | null = document.getElementById("return-btn");
-		let recordIdInput: HTMLElement | null = document.getElementById("record-id");
-		let numberOfRows = Math.floor(window.innerHeight / 50);
-		let getSingleRecord: HTMLElement | null = document.getElementById("get-record-btn");
+	let returnBtn: HTMLElement | null = document.getElementById("return-btn");
+	let recordIdInput = <HTMLInputElement | null>document.getElementById("record-id");
+	let numberOfRows = Math.floor(window.innerHeight / 50);
+	let getSingleRecord: HTMLElement | null = document.getElementById("get-record-btn");
 
-		if (returnBtn !== null) {
-			// Resets to the first page
-			returnBtn.addEventListener("click", () => {
-				createNavigation();
-				fromNumber = 0;
-				getRecords(fromNumber, fromNumber + numberOfRows);
-			});
-		}
+	if (returnBtn !== null) {
+		// Resets to the first page
+		returnBtn.addEventListener("click", () => {
+			createNavigation();
+			recordCount();
+			resizeScreenData()
+			fromNumber = 0;
+			getRecords(fromNumber, fromNumber + numberOfRows)
+			new PageNavigation();
+		});
+	}
 
-		if (getSingleRecord !== null) {
-			getSingleRecord.addEventListener("click", () => {
-				let recordIdValue = (recordIdInput as HTMLInputElement).value;
+	if (getSingleRecord !== null) {
+		getSingleRecord.addEventListener("click", () => {
+			if (recordIdInput !== null) {
+
+				let recordIdValue = recordIdInput.value;
 				fromNumber = Number(recordIdValue);
 
 				let toNumber = fromNumber + numberOfRows;
@@ -127,8 +128,8 @@ function recordSelection() {
 				} else if (typeof fromNumber === "number" && fromNumber >= 0) {
 					getRecords(fromNumber, toNumber);
 				}
-			});
-		}
+			}
+		});
 	}
 }
 
@@ -137,7 +138,7 @@ function createHeadingGrid(headings: string) {
 	let headingsData = `<h1 class="column-heading">${headings}</h1>`;
 
 	if (headingColumns !== null) {
-		(headingColumns as HTMLDivElement).innerHTML += headingsData;
+		headingColumns.innerHTML += headingsData;
 	}
 }
 
@@ -163,7 +164,7 @@ function headingRowCreation(): Promise<void> {
 	})
 		.then(checkResponseError)
 		.then((response: Response) => response.json())
-		.then((data: string) => {
+		.then((data: TemplateStringsArray) => {
 			for (let i of data) {
 				createHeadingGrid(i);
 			}
@@ -196,26 +197,28 @@ function dynamicGrid(columnData: string) {
 function resizeScreenData() {
 	let toNumber: number;
 	let recordNav: HTMLElement | null = document.getElementById("record-navigation-container");
-	let nextBtn: HTMLElement | null = document.getElementById("next-records-btn");
-	let previousBtn: HTMLElement | null = document.getElementById("previous-records-btn");
+	let nextBtn = <HTMLButtonElement | null>document.getElementById("next-records-btn");
+	let previousBtn = <HTMLButtonElement | null>document.getElementById("previous-records-btn");
 	let navBtns = document.getElementById("navigation-btns");
 	if (recordNav !== null) {
 		if (recordNav.contains(navBtns as HTMLDivElement)) {
 			let numberOfRows = Math.floor(window.innerHeight / 50);
 
-			(nextBtn as HTMLButtonElement).disabled = false;
-			(previousBtn as HTMLButtonElement).disabled = false;
+			nextBtn!.disabled = false;
+			previousBtn!.disabled = false;
 
 			let finalRecord = recordNumberTotal - 1;
 
 			if (fromNumber + numberOfRows >= finalRecord) {
 				fromNumber = finalRecord - numberOfRows;
-				(nextBtn as HTMLButtonElement).disabled = true;
-				(previousBtn as HTMLButtonElement).disabled = false;
+
+				nextBtn!.disabled = true;
+				previousBtn!.disabled = false;
 			} else if (fromNumber <= 0) {
-				(nextBtn as HTMLButtonElement).disabled = false;
-				(previousBtn as HTMLButtonElement).disabled = true;
 				fromNumber = 0;
+
+				nextBtn!.disabled = false;
+				previousBtn!.disabled = true;
 			}
 
 			toNumber = fromNumber + numberOfRows;
@@ -225,21 +228,29 @@ function resizeScreenData() {
 	}
 }
 
-window.addEventListener("resize", debounce(resizeScreenData, 500));
+function navigationDebounce(func: (argOne: number, argTwo: number) => void, delay: number) {
+	return function (argOne: number, argTwo: number) {
+		clearTimeout(timeout);
 
-class pageNavigation {
-	nextBtn: HTMLElement | null;
-	previousBtn: HTMLElement | null;
-	firstPageBtn: HTMLElement | null;
-	lastPageBtn: HTMLElement | null;
-	confirmationBtn: HTMLElement | null;
+		timeout = setTimeout(() => {
+			func(argOne, argTwo);
+		}, delay);
+	};
+}
+
+class PageNavigation {
+	nextBtn: HTMLButtonElement | null;
+	previousBtn: HTMLButtonElement | null;
+	firstPageBtn: HTMLButtonElement | null;
+	lastPageBtn: HTMLButtonElement | null;
+	confirmationBtn: HTMLButtonElement | null;
 
 	constructor() {
-		this.nextBtn = document.getElementById("next-records-btn");
-		this.previousBtn = document.getElementById("previous-records-btn");
-		this.firstPageBtn = document.getElementById("first-page-btn");
-		this.lastPageBtn = document.getElementById("last-page-btn");
-		this.confirmationBtn = document.getElementById("confirmation-btn");
+		this.nextBtn = <HTMLButtonElement | null>document.getElementById("next-records-btn");
+		this.previousBtn = <HTMLButtonElement | null>document.getElementById("previous-records-btn");
+		this.firstPageBtn = <HTMLButtonElement | null>document.getElementById("first-page-btn");
+		this.lastPageBtn = <HTMLButtonElement | null>document.getElementById("last-page-btn");
+		this.confirmationBtn = <HTMLButtonElement | null>document.getElementById("confirmation-btn");
 
 		if (this.confirmationBtn !== null) {
 			this.confirmationBtn.addEventListener("click", recordSelection);
@@ -248,72 +259,78 @@ class pageNavigation {
 		if (this.nextBtn !== null && this.previousBtn !== null && this.firstPageBtn !== null && this.lastPageBtn !== null) {
 			let nextPage = () => {
 				let numberOfRows = Math.floor(window.innerHeight / 50);
-				fromNumber = fromNumber + numberOfRows * count;
+				fromNumber = fromNumber + numberOfRows;
 				let toNumber = fromNumber + numberOfRows;
 
 				let finalRecord = recordNumberTotal - 1;
-
-				(this.previousBtn as HTMLButtonElement).disabled = false;
+				this.previousBtn!.disabled = false;
 
 				if (toNumber >= finalRecord) {
-					(this.nextBtn as HTMLButtonElement).disabled = true;
+					this.nextBtn!.disabled = true;
 					fromNumber = finalRecord - numberOfRows;
 				}
 
-				getRecords(fromNumber, toNumber);
-				count = 0;
+				console.log(fromNumber, toNumber);
+
+				navigationDebounce(getRecords, 50)(fromNumber, toNumber)
 			};
-			this.nextBtn.addEventListener("click", () => {
-				count++;
-				nextPage = debounce(nextPage, 500);
-				nextPage();
-			});
+
+
+			this.nextBtn.addEventListener("click", nextPage);
 
 			let previousPage = () => {
 				let numberOfRows = Math.floor(window.innerHeight / 50);
-				fromNumber = fromNumber - numberOfRows * count;
+				fromNumber = fromNumber - numberOfRows;
 				let toNumber = fromNumber + numberOfRows;
-				(this.nextBtn as HTMLButtonElement).disabled = false;
+
+				this.nextBtn!.disabled = false;
 
 				if (fromNumber <= 0) {
-					(this.previousBtn as HTMLButtonElement).disabled = true;
+					this.previousBtn!.disabled = true;
 					fromNumber = 0;
 				}
 
-				getRecords(fromNumber, toNumber);
-				count = 0;
+				console.log(fromNumber, toNumber);
+
+				navigationDebounce(getRecords, 50)(fromNumber, toNumber)
 			};
-			this.previousBtn.addEventListener("click", () => {
-				count++;
-				previousPage = debounce(previousPage, 500);
-				previousPage();
-			});
+
+			this.previousBtn.addEventListener("click", previousPage);
 
 			let firstPage = () => {
 				fromNumber = 0;
 				let numberOfRows = Math.floor(window.innerHeight / 50);
 				let toNumber = fromNumber + numberOfRows;
-				(this.nextBtn as HTMLButtonElement).disabled = false;
-				(this.previousBtn as HTMLButtonElement).disabled = true;
+
+				this.nextBtn!.disabled = false;
+				this.previousBtn!.disabled = true;
 
 				getRecords(fromNumber, toNumber);
 			};
-			this.firstPageBtn.addEventListener("click", () => {
-				firstPage();
-			});
+
+			this.firstPageBtn.addEventListener("click", firstPage);
 
 			let lastPage = () => {
 				let finalRecord = recordNumberTotal - 1;
 				let numberOfRows = Math.floor(window.innerHeight / 50);
 				fromNumber = finalRecord - numberOfRows;
-				(this.nextBtn as HTMLButtonElement).disabled = true;
-				(this.previousBtn as HTMLButtonElement).disabled = false;
+
+				this.nextBtn!.disabled = true;
+				this.previousBtn!.disabled = false;
 
 				getRecords(fromNumber, finalRecord);
 			};
-			this.lastPageBtn.addEventListener("click", () => {
-				lastPage();
-			});
+
+			this.lastPageBtn.addEventListener("click", lastPage);
 		}
 	}
+}
+
+window.onload = () => {
+	createNavigation();
+	recordCount();
+	headingRowCreation();
+	fromNumber = 0;
+	new PageNavigation();
+	window.addEventListener("resize", debounce(resizeScreenData, 500));
 }
