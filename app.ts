@@ -1,6 +1,5 @@
 let fromParameter = 0;
 let recordCount: number;
-const el = document.getElementById
 
 // Gets The 2nd paramater from the 1st parameter
 function getParameters(fromParameter: number): number {
@@ -66,7 +65,7 @@ function getHeadings(): Promise<void> {
 	})
 		.then(handleErrors)
 		.then((response: Response) => response.json())
-		.then((headingData: string | string[]) => {
+		.then((headingData: string[]) => {
 			for (let heading of headingData) {
 				createHeadingColumn(heading);
 			}
@@ -99,7 +98,7 @@ function getTable(): Promise<void> {
 	})
 		.then(handleErrors)
 		.then((res: Response) => res.json())
-		.then((contentData: string | string[]) => {
+		.then((contentData: string[]) => {
 			for (let x of contentData) {
 				appendTableContent(x);
 			}
@@ -153,18 +152,16 @@ function resizing() {
 // Next
 class Next {
 	nextButton: HTMLElement | null;
-	nextTimer: number = 0
+	nextTimer: number = 0;
 
 	constructor() {
 		this.nextButton = document.getElementById("next");
 
 		const nextDebounce = (fn: () => void, delay: number) => {
-			return () => {
-				clearTimeout(this.nextTimer);
-				this.nextTimer = setTimeout(() => {
-					fn();
-				}, delay);
-			};
+			clearTimeout(this.nextTimer);
+			this.nextTimer = setTimeout(() => {
+				fn();
+			}, delay);
 		};
 
 		let next = () => {
@@ -186,7 +183,7 @@ class Next {
 				fromParameter = toParameter - getNoOfRows();
 			}
 
-			nextDebounce(getTable, 500)()
+			nextDebounce(getTable, 500);
 		};
 
 		if (this.nextButton) {
@@ -198,18 +195,16 @@ class Next {
 // Previous
 class Prev {
 	prevButton: HTMLElement | null;
-	prevTimer: number = 0
+	prevTimer: number = 0;
 
 	constructor() {
 		this.prevButton = document.getElementById("prev");
 
 		const prevDebounce = (fn: () => void, delay: number) => {
-			return () => {
-				clearTimeout(this.prevTimer);
-				this.prevTimer = setTimeout(() => {
-					fn();
-				}, delay);
-			};
+			clearTimeout(this.prevTimer);
+			this.prevTimer = setTimeout(() => {
+				fn();
+			}, delay);
 		};
 
 		let prev = () => {
@@ -228,7 +223,7 @@ class Prev {
 					fromParameter = intOne;
 				}
 
-				prevDebounce(getTable, 500)()
+				prevDebounce(getTable, 500);
 			}
 		};
 
@@ -243,11 +238,11 @@ function idJump() {
 	const input: HTMLInputElement | null = document.querySelector("input");
 	let toParameter = getParameters(fromParameter);
 	let currentID = fromParameter;
-	let search: string
+	let search: string;
 	if (input) {
 		search = input.value;
 	} else {
-		return alert("ERROR!!!")
+		return alert("ERROR!!!");
 	}
 	let end = parseInt(search) + getNoOfRows();
 	let maxRecordsID = recordCount - 1;
