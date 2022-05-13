@@ -22,7 +22,7 @@ function debounce(func: () => void, delay: number) {
 
 function createNavigation() {
 	let recordNav: HTMLElement | null = document.getElementById("record-navigation-container"); // Navigation area
-	if (recordNav !== null) {
+	if (recordNav) {
 		recordNav.innerHTML = `
 		<div id="navigation-btns">
 			<button value="first" id="first-page-btn">First Page</button>
@@ -45,12 +45,12 @@ function getRecords(fromNumber: number, toNumber: number): Promise<void> {
 	})
 		.then(checkResponseError)
 		.then((response: Response) => response.json())
-		.then((data: TemplateStringsArray) => {
+		.then((data: string[]) => {
 
 			let infoColumns: HTMLElement | null = document.getElementById("info-columns-container"); // Information
 			let currentPage: HTMLElement | null = document.getElementById("current-page");
 
-			if (infoColumns !== null) {
+			if (infoColumns) {
 				infoColumns.innerHTML = "";
 
 				for (let i of data) {
@@ -58,7 +58,7 @@ function getRecords(fromNumber: number, toNumber: number): Promise<void> {
 				}
 			}
 
-			if (currentPage !== null) {
+			if (currentPage) {
 				currentPage.innerHTML = `${fromNumber}  / ${toNumber}.`;
 			}
 		})
@@ -93,21 +93,20 @@ function recordSelection() {
 	let numberOfRows = Math.floor(window.innerHeight / 50);
 	let getSingleRecord: HTMLElement | null = document.getElementById("get-record-btn");
 
-	if (returnBtn !== null) {
+	if (returnBtn) {
 		// Resets to the first page
 		returnBtn.addEventListener("click", () => {
 			createNavigation();
-			recordCount();
-			resizeScreenData()
+			resizeScreenData();
 			fromNumber = 0;
-			getRecords(fromNumber, fromNumber + numberOfRows)
+			getRecords(fromNumber, fromNumber + numberOfRows);
 			new PageNavigation();
 		});
 	}
 
-	if (getSingleRecord !== null) {
+	if (getSingleRecord) {
 		getSingleRecord.addEventListener("click", () => {
-			if (recordIdInput !== null) {
+			if (recordIdInput) {
 
 				let recordIdValue = recordIdInput.value;
 				fromNumber = Number(recordIdValue);
@@ -137,7 +136,7 @@ function createHeadingGrid(headings: string) {
 	let headingColumns: HTMLElement | null = document.getElementById("column-headings-container"); // Headings
 	let headingsData = `<h1 class="column-heading">${headings}</h1>`;
 
-	if (headingColumns !== null) {
+	if (headingColumns) {
 		headingColumns.innerHTML += headingsData;
 	}
 }
@@ -164,7 +163,7 @@ function headingRowCreation(): Promise<void> {
 	})
 		.then(checkResponseError)
 		.then((response: Response) => response.json())
-		.then((data: TemplateStringsArray) => {
+		.then((data: string[]) => {
 			for (let i of data) {
 				createHeadingGrid(i);
 			}
@@ -180,11 +179,11 @@ function dynamicGrid(columnData: string) {
 	// Creates the row that the info will display and adds it to the infoColumnsArea.
 	let infoDataRow = `<div id="info-row-${columnData[0]}" class="info-rows"></div>`;
 
-	if (infoColumns !== null) {
+	if (infoColumns) {
 		infoColumns.innerHTML += infoDataRow;
 		// Gets the created rows.
 		let finalInfoDataRow = document.getElementById("info-row-" + columnData[0]);
-		if (finalInfoDataRow !== null) {
+		if (finalInfoDataRow) {
 			// Loops through
 			for (let x of columnData) {
 				let infoData = `<p class="info-row-data">${x}</p>`;
@@ -200,25 +199,25 @@ function resizeScreenData() {
 	let nextBtn = <HTMLButtonElement | null>document.getElementById("next-records-btn");
 	let previousBtn = <HTMLButtonElement | null>document.getElementById("previous-records-btn");
 	let navBtns = document.getElementById("navigation-btns");
-	if (recordNav !== null) {
-		if (recordNav.contains(navBtns as HTMLDivElement)) {
+	if (recordNav) {
+		if (recordNav.contains(navBtns as HTMLDivElement) && nextBtn && previousBtn) {
 			let numberOfRows = Math.floor(window.innerHeight / 50);
 
-			nextBtn!.disabled = false;
-			previousBtn!.disabled = false;
+			nextBtn.disabled = false;
+			previousBtn.disabled = false;
 
 			let finalRecord = recordNumberTotal - 1;
 
 			if (fromNumber + numberOfRows >= finalRecord) {
 				fromNumber = finalRecord - numberOfRows;
 
-				nextBtn!.disabled = true;
-				previousBtn!.disabled = false;
+				nextBtn.disabled = true;
+				previousBtn.disabled = false;
 			} else if (fromNumber <= 0) {
 				fromNumber = 0;
 
-				nextBtn!.disabled = false;
-				previousBtn!.disabled = true;
+				nextBtn.disabled = false;
+				previousBtn.disabled = true;
 			}
 
 			toNumber = fromNumber + numberOfRows;
@@ -226,16 +225,6 @@ function resizeScreenData() {
 			getRecords(fromNumber, toNumber);
 		}
 	}
-}
-
-function navigationDebounce(func: (argOne: number, argTwo: number) => void, delay: number) {
-	return function (argOne: number, argTwo: number) {
-		clearTimeout(timeout);
-
-		timeout = setTimeout(() => {
-			func(argOne, argTwo);
-		}, delay);
-	};
 }
 
 class PageNavigation {
@@ -246,17 +235,28 @@ class PageNavigation {
 	confirmationBtn: HTMLButtonElement | null;
 
 	constructor() {
+
+		function navigationDebounce(func: (argOne: number, argTwo: number) => void, delay: number) {
+			return function (argOne: number, argTwo: number) {
+				clearTimeout(timeout);
+
+				timeout = setTimeout(() => {
+					func(argOne, argTwo);
+				}, delay);
+			};
+		}
+
 		this.nextBtn = <HTMLButtonElement | null>document.getElementById("next-records-btn");
 		this.previousBtn = <HTMLButtonElement | null>document.getElementById("previous-records-btn");
 		this.firstPageBtn = <HTMLButtonElement | null>document.getElementById("first-page-btn");
 		this.lastPageBtn = <HTMLButtonElement | null>document.getElementById("last-page-btn");
 		this.confirmationBtn = <HTMLButtonElement | null>document.getElementById("confirmation-btn");
 
-		if (this.confirmationBtn !== null) {
+		if (this.confirmationBtn) {
 			this.confirmationBtn.addEventListener("click", recordSelection);
 		}
 
-		if (this.nextBtn !== null && this.previousBtn !== null && this.firstPageBtn !== null && this.lastPageBtn !== null) {
+		if (this.nextBtn && this.previousBtn && this.firstPageBtn && this.lastPageBtn) {
 			let nextPage = () => {
 				let numberOfRows = Math.floor(window.innerHeight / 50);
 				fromNumber = fromNumber + numberOfRows;
@@ -289,8 +289,6 @@ class PageNavigation {
 					this.previousBtn!.disabled = true;
 					fromNumber = 0;
 				}
-
-				console.log(fromNumber, toNumber);
 
 				navigationDebounce(getRecords, 50)(fromNumber, toNumber)
 			};
@@ -328,7 +326,6 @@ class PageNavigation {
 
 window.onload = () => {
 	createNavigation();
-	recordCount();
 	headingRowCreation();
 	fromNumber = 0;
 	new PageNavigation();
