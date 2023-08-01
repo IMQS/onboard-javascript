@@ -1,0 +1,56 @@
+/* body with overflow hidden for no scrolling  */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .grid-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    
+  }
+  
+  .grid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    border: 1px solid #36454F;
+  }
+  
+  .grid-header, .grid-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+  }
+  
+  .grid-header {
+    background-color: #36454F;
+    font-weight: bold;
+    padding: 10px;
+    color: aliceblue;
+  }
+  
+  .grid-body {
+    padding: 10px;
+  }
+
+  .grid-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    color: white;
+    background-color: #36454F;
+  }
+
+  button {
+    cursor: pointer;
+    padding: 5px 10px;
+    margin: 0 5px;
+    color: white;
+    background-color: #36454F;
+  }
