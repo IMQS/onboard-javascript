@@ -4,47 +4,50 @@ body, html {
     padding: 0;
     height: 100%;
     overflow: hidden;
+    font-family: ui-rounded;
   }
+
   
   .grid-container {
     height: 100%;
     display: flex;
     flex-direction: column;
-    
+    overflow: hidden;
+    text-align: center;
   }
   
-  .grid {
+  
+  #grid {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: auto;
-    border: 1px solid #36454F;
+    border: 1px solid #333333;
   }
   
-  .grid-header, .grid-body {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1px;
-  }
   
-  .grid-header {
-    background-color: #36454F;
+  table{
+    overflow: hidden;
+  }
+  thead{
+    background-color: #333333;
     font-weight: bold;
-    padding: 10px;
-    color: aliceblue;
+    padding: 30px;
+    color: white;
   }
   
-  .grid-body {
-    padding: 10px;
+  td {
+    padding: 15px;
+    align-content: center;
   }
 
   .grid-controls {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 15px;
     color: white;
-    background-color: #36454F;
+    background-color: #333333;
   }
 
   button {
@@ -52,5 +55,8 @@ body, html {
     padding: 5px 10px;
     margin: 0 5px;
     color: white;
-    background-color: #36454F;
+    background-color: #5a5f61;
+  }
+  #pageInfo{
+    font-weight: 100;
   }
