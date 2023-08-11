@@ -6,42 +6,74 @@ body, html {
     overflow: hidden;
     font-family: ui-rounded;
   }
-
+.top{
+text-align: center;
+}
+  /* search form styling  */
+input[type="text"] {
+   display: flex;
+   flex-direction: row;
+    border: 1px solid #333333;
+    border-radius: 0px;
+    padding: 5px;
+    width: 40%;
+    margin-left: 30%;
+   
+  }
   
+#searchButton {
+    border: none;
+    border-radius: 0px;
+    background-color: #747679;
+    color: white;
+   cursor: pointer;
+   padding: 5px 10px;
+   margin: 5px;
+   color: white;
+  }
   .grid-container {
     height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     text-align: center;
+    overflow: hidden;
   }
   
   
-  #grid {
+#grid {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: auto;
     border: 1px solid #333333;
   }
-  
-  
-  table{
+  /* table */
+table{
+    height: 100%;
     overflow: hidden;
+    border: 1px solid #333333;
+    
   }
-  thead{
-    background-color: #333333;
-    font-weight: bold;
-    padding: 30px;
-    color: white;
-  }
-  
-  td {
-    padding: 15px;
-    align-content: center;
+tr{
+    border: 1px solid #333333;
   }
 
-  .grid-controls {
+thead{
+    background-color: #333333;
+    font-weight: bold;
+    padding: 25px;
+    color: white;
+    width: 100px;
+  }
+  
+td {
+    padding: 10px;
+    align-content: center;
+    
+  }
+
+.grid-controls {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -50,13 +82,21 @@ body, html {
     background-color: #333333;
   }
 
-  button {
-    cursor: pointer;
-    padding: 5px 10px;
-    margin: 0 5px;
-    color: white;
-    background-color: #5a5f61;
+ 
+#pageInfo{
+    font-weight: 300;
+    background-color: #333333;
+    
   }
-  #pageInfo{
-    font-weight: 100;
-  }
+ 
+
+/* button */
+.btn{
+  cursor: pointer;
+  padding: 5px 10px;
+  margin: 0 5px;
+  color: white;
+  background-color: #5a5f61;
+}
+
+

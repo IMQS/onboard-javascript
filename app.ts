@@ -9,6 +9,7 @@ interface GridData {
   }
   
   // Constants and variables used for pages  and data storage.
+
   const PAGE_SIZE = 10;
   let currentPage = 1;
   let totalItems = 0;
@@ -16,11 +17,13 @@ interface GridData {
   let columnNames: ColumnName[] = [];
   
   // Entry point after the DOM has loaded.
+ 
   $(document).ready(() => {
     fetchRecordCount(); // Fetch the total number of records.
     fetchColumns(); // Fetch the column names for the grid.
     fetchRecords(); // Fetch the initial records to render the grid.
-    setupControls(); // Set up pagination controls with event handlers.
+    setupControls(); // Set up page controls with event handlers.
+    
   });
   
   // Fetch the total number of records.
@@ -58,39 +61,88 @@ interface GridData {
     });
   }
   
-  // Fetch records based on the current pagination settings.
   function fetchRecords() {
-    const from = (currentPage - 1)*PAGE_SIZE;
-    const to = from + PAGE_SIZE  ;
+    const from = (currentPage - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE;
     $.ajax({
       url: `http://localhost:2050/records?from=${from}&to=${to}`,
       method: 'GET',
       success: (response) => {
         let res = JSON.parse(response);
-        
+  
         data = []; // Reset the data array for the current page
         for (let i = 0; i < res.length; i++) {
-            const record = res[i];
-            if (Array.isArray(record)) { // Ensure the record is an array
-              const obj: GridData = {};
-              for (let j = 0; j < columnNames.length && j < record.length; j++) {
-                const columnName = columnNames[j].name;
-                const columnValue = record[j];
-                obj[columnName] = columnValue; // Map column names to their corresponding values.
-              }
-              data.push(obj); // Add the row to the data array
-            } else {
-              console.error(`Invalid record format at index ${i}`);
+          const record = res[i];
+          if (Array.isArray(record)) { // Ensure the record is an array
+            const obj: GridData = {};
+            for (let j = 0; j < columnNames.length && j < record.length; j++) {
+              const columnName = columnNames[j].name;
+              const columnValue = record[j];
+              obj[columnName] = columnValue; // Map column names to their corresponding values.
             }
+            data.push(obj); // Add the row to the data array
+          } else {
+            console.error(`Invalid record format at index ${i}`);
           }
+        }
+  
         console.table(data);
-       createGrid()
+        createGrid(); 
       },
       error: () => {
         console.error('Failed to fetch records');
       }
     });
   }
+  
+  function updateGrid() {
+    const fromVal = $('#searchInputFrom').val();
+    const toVal = $('#searchInputTo').val();
+  
+    if (typeof fromVal === 'string' && typeof toVal === 'string') {
+      const from = parseInt(fromVal, 10);
+      const to = parseInt(toVal, 10);
+  
+      if (!isNaN(from) && !isNaN(to)) {
+        $.ajax({
+          url: `http://localhost:2050/records?from=${from}&to=${to}`,
+          method: 'GET',
+          success: (response) => {
+            let newData = JSON.parse(response);
+            console.table(newData);
+            if (Array.isArray(newData)) {
+              data = [];
+              for (let i = 0; i < newData.length; i++) {
+                const record = newData[i];
+                if (Array.isArray(record)) { // Ensure the record is an array
+                  const obj: GridData = {};
+                  for (let j = 0; j < columnNames.length && j < record.length; j++) {
+                    const columnName = columnNames[j].name;
+                    const columnValue = record[j];
+                    obj[columnName] = columnValue; // Map column names to their corresponding values.
+                  }
+                  data.push(obj); // Add the row to the data array
+                } else {
+                  console.error(`Invalid record format at index ${i}`);
+                }
+              }
+              createGrid(); // Update the grid with the new data
+              console.log(data);
+
+            } else {
+              console.warn('Invalid response format. Expected an array.');
+            }
+          },
+          error: () => {
+            console.error('Failed to fetch records');
+            alert('Someone needs to go back to the creche!');
+          }
+        });
+      }
+    }
+  }
+  
+  
   
   // Render the grid with the fetched data.
   function createGrid() {
@@ -130,9 +182,12 @@ interface GridData {
       gridElement.appendChild(table);
     }
     updatePageInfo();
+    
+   
   }
   
-  // Set up pagination controls with event handlers.
+  
+  // Set up page controls with event handlers.
   function setupControls() {
     $('#prevBtn').on('click', () => {
       if (currentPage > 1) {

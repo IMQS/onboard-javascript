@@ -3,19 +3,25 @@
 <head>
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
-	<link rel="stylesheet" href="Styles.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="/Styles.css">
+	
 </head>
 
 <body>
+	
 	<div class="grid-container">
-		<h3>Onboarding Project</h3>
+		<div class="top">
+			<h3>Onboarding-project</h3>
+			<input type="text" id="searchInputFrom" placeholder="Enter From ID">
+		   <input type="text" id="searchInputTo" placeholder="Enter To ID">
+		   <button id="searchButton" onclick=" updateGrid()">Search</button>
+		</div>
 		<div id="grid">
 		</div>
 		<div class="grid-controls">
-		<button id="prevBtn"><i class="fa fa-arrow-left" style="color: white;"></i></button>
-		<span id="pageInfo"></span>
-		<button id="nextBtn"><i class="fa fa-arrow-right" style="color: white;"></i></button>
+		<button id="prevBtn" class="btn">Prev</button>
+		<span id="pageInfo" ></span>
+		<button id="nextBtn" class="btn">Next</button>
 		</div>
 		</div>
 	<script src="/app.js"></script>
