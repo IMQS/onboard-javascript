@@ -3,7 +3,7 @@ interface GridData {
     [key: string]: any;
   }
   
-  // Define an interface for column names with a single property 'name' of type string.
+  // Define an interface for column names 
   interface ColumnName {
     name: string;
   }
@@ -28,6 +28,10 @@ interface GridData {
   
   // Fetch the total number of records.
   function fetchRecordCount() {
+ // Show the spinner before making the  request  and hide the input elements
+ $('#spinner').show();
+ $('.top').hide();
+
 
     $.ajax({
       url: 'http://localhost:2050/recordCount',
@@ -38,12 +42,20 @@ interface GridData {
       },
       error: () => {
         console.error('Failed to fetch record count');
+      },
+      complete: () => {
+        // Hide the spinner after the AJAX request is completed
+        $('#spinner').hide();
+        $('.top').show();
       }
     });
   }
   
   // Fetch the column names for the grid.
   function fetchColumns() {
+    $('#spinner').show();
+    $('.top').hide();
+
     $.ajax({
       url: 'http://localhost:2050/columns',
       method: 'GET',
@@ -57,11 +69,20 @@ interface GridData {
       
       error: () => {
         console.error('Failed to fetch columns');
+      },
+      complete: () => {
+        // Hide the spinner after the AJAX request is completed
+        $('#spinner').hide();
+        $('.top').show();
       }
     });
   }
   
   function fetchRecords() {
+   
+    $('#spinner').show();
+    $('.top').hide();
+
     const from = (currentPage - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE;
     $.ajax({
@@ -91,11 +112,17 @@ interface GridData {
       },
       error: () => {
         console.error('Failed to fetch records');
+      },
+      complete:() =>{
+        $('#spinner').hide();
+        $('.top').show();
       }
     });
   }
-  
+  // update grid to display search by ID items 
   function updateGrid() {
+    $('#spinner').show();
+    $('.top').hide();
     const fromVal = $('#searchInputFrom').val();
     const toVal = $('#searchInputTo').val();
   
@@ -114,19 +141,20 @@ interface GridData {
               data = [];
               for (let i = 0; i < newData.length; i++) {
                 const record = newData[i];
-                if (Array.isArray(record)) { // Ensure the record is an array
+                if (Array.isArray(record)) { 
                   const obj: GridData = {};
                   for (let j = 0; j < columnNames.length && j < record.length; j++) {
                     const columnName = columnNames[j].name;
                     const columnValue = record[j];
                     obj[columnName] = columnValue; // Map column names to their corresponding values.
                   }
-                  data.push(obj); // Add the row to the data array
+                  data.push(obj); 
                 } else {
                   console.error(`Invalid record format at index ${i}`);
                 }
               }
               createGrid(); // Update the grid with the new data
+              updatePageInfo();
               console.log(data);
 
             } else {
@@ -136,6 +164,10 @@ interface GridData {
           error: () => {
             console.error('Failed to fetch records');
             alert('Someone needs to go back to the creche!');
+          },
+          complete: () => {
+            $('#spinner').hide(); 
+            $('.top').show();
           }
         });
       }
@@ -146,7 +178,6 @@ interface GridData {
   
   // Render the grid with the fetched data.
   function createGrid() {
-   
     const gridElement = document.getElementById('grid');
     if (gridElement) {
       gridElement.innerHTML = ''; // Clear the existing grid .
@@ -210,5 +241,10 @@ interface GridData {
     const totalPages = Math.ceil(totalItems / PAGE_SIZE);
     const pageInfo = `Page ${currentPage} of ${totalPages}`;
     $('#pageInfo').text(pageInfo); // Update the page information text.
+  }
+
+  // reload page 
+  function pageReload(){
+    location.reload();
   }
   

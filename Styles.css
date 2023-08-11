@@ -4,10 +4,12 @@ body, html {
     padding: 0;
     height: 100%;
     overflow: hidden;
-    font-family: ui-rounded;
+    font-family: system-ui;
   }
+
 .top{
-text-align: center;
+  text-align: center;
+  background-color: #7d8081;
 }
   /* search form styling  */
 input[type="text"] {
@@ -21,16 +23,17 @@ input[type="text"] {
    
   }
   
-#searchButton {
-    border: none;
-    border-radius: 0px;
-    background-color: #747679;
-    color: white;
-   cursor: pointer;
-   padding: 5px 10px;
-   margin: 5px;
-   color: white;
-  }
+  #searchButton {
+      border: none;
+      border-radius: 0px;
+      background-color: #747679;
+      color: white;
+      cursor: pointer;
+      padding: 5px 10px;
+      margin: 5px;
+      color: white;
+    }
+   
   .grid-container {
     height: 100%;
     display: flex;
@@ -47,7 +50,7 @@ input[type="text"] {
     flex-direction: column;
     overflow: auto;
     border: 1px solid #333333;
-  }
+   }
   /* table */
 table{
     height: 100%;
@@ -65,13 +68,13 @@ thead{
     padding: 25px;
     color: white;
     width: 100px;
-  }
+    }
   
 td {
     padding: 10px;
     align-content: center;
     
-  }
+}
 
 .grid-controls {
     display: flex;
@@ -87,9 +90,7 @@ td {
     font-weight: 300;
     background-color: #333333;
     
-  }
- 
-
+}
 /* button */
 .btn{
   cursor: pointer;
@@ -99,4 +100,14 @@ td {
   background-color: #5a5f61;
 }
 
+#reloadBtn{
+  border: none;
+  border-radius: 0px;
+  background-color: #747679;
+  color: white;
+  cursor: pointer;
+  padding: 5px 10px;
+  margin: 5px;
+  color: white;
+}
 
