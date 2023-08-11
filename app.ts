@@ -154,11 +154,10 @@ interface GridData {
                 }
               }
               createGrid(); // Update the grid with the new data
-              updatePageInfo();
               console.log(data);
 
             } else {
-              console.warn('Invalid response format. Expected an array.');
+              console.warn('Invalid response format. Unexpected output .');
             }
           },
           error: () => {
