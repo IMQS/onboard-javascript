@@ -2,7 +2,7 @@
 async function fetchRecordCount(): Promise<number> {
   try {
     const recordCount = await fetch(`http://192.168.4.133:2050/recordCount`);
-   
+
     if (!recordCount.ok) {
       throw new Error('Failed to fetch record count');
     }
@@ -42,22 +42,22 @@ fetchColumns();
 
 async function fetchRecords(): Promise<any[][]> {
   try {
-  let count: number = await fetchRecordCount() - 1;
-  const response = await fetch(`http://192.168.4.133:2050/records?from=0&to=35`);
+    let count: number = await fetchRecordCount() - 1;
+    const response = await fetch(`http://192.168.4.133:2050/records?from=0&to=35`);
 
-      if (!response.ok) {
-        throw new Error("Sorry, there's a problem in the network");
-      }
-      const records = await response.json();
-      return records;
-  
-      
-    }catch(error) {
-      console.error("Error fetching records:", error);
-      throw error;
+    if (!response.ok) {
+      throw new Error("Sorry, there's a problem in the network");
     }
+    const records = await response.json();
+    return records;
+
+
+  } catch (error) {
+    console.error("Error fetching records:", error);
+    throw error;
   }
-  
+}
+
 
 
 
@@ -65,48 +65,48 @@ async function fetchRecords(): Promise<any[][]> {
 fetchRecords()
 
 async function displayRecords(): Promise<void> {
-try{
-  const recArray: any[][] = await fetchRecords();
+  try {
+    const recArray: any[][] = await fetchRecords();
 
-  for (let r = 0; r <35; r++) {
-    $("tbody").append(`<tr class="row"></tr>`);
-    const lastRow = $(".row:last"); 
-    for (let i = 0; i < recArray[r].length; i++) {
-      lastRow.append(`<td>${recArray[r][i]}</td>`);
-     
-      
-    } 
+    for (let r = 0; r < 35; r++) {
+      $("tbody").append(`<tr class="row"></tr>`);
+      const lastRow = $(".row:last");
+      for (let i = 0; i < recArray[r].length; i++) {
+        lastRow.append(`<td>${recArray[r][i]}</td>`);
+
+
+      }
+    }
+  } catch (error) {
+    console.error("Error displaying records:", error);
   }
-}catch(error){
-  console.error("Error displaying records:", error);
-}
 }
 displayRecords()
 
 
 
 async function rightArrow(): Promise<void> {
+  let searchValue = $('#searchInput').val() as string
+  
   let count: number = await fetchRecordCount() - 1;
-  console.log(count);
+
   const firstRow = document.querySelector("#recordsTable tbody");
-  console.log(firstRow)
+
   if (firstRow) {
     const cells = firstRow.querySelectorAll("td");
     const firstRecord: string[] = [];
     cells.forEach((cell) => {
       firstRecord.push(cell.textContent || "");
     });
-    console.log("First Record:", firstRecord[0]);
-
 
     const firstID = parseFloat(firstRecord[0]);
-    console.log(firstID)
+
 
     if (0 <= firstID && firstID <= (count - 35)) {
       let clearTable = document.querySelector('tbody') as HTMLTableSectionElement | null;
       if (clearTable) {
         clearTable.innerHTML = "";
-
+ 
         let firstRecord = + firstID + 35
         let lastRecord = + firstRecord + 34
 
@@ -120,17 +120,38 @@ async function rightArrow(): Promise<void> {
           })
           .then((records: any[]) => {
             const recArray = records;
-            console.log(recArray);
+            if (searchValue) {
 
-            for (let r = 0; r <35; r++) {
-              $("tbody").append(`<tr class="row"></tr>`);
-              const lastRow = $(".row:last"); 
-              for (let i = 0; i < recArray[r].length; i++) {
-                lastRow.append(`<td>${recArray[r][i]}</td>`);
-               
-                
-              } 
-            }
+              let filter = recArray.filter((item) => {
+                for (let i = 0; i < item.length; i++) {
+                  if (item[i].toLowerCase().includes(searchValue.toLowerCase())) {
+                    return true;
+
+                  }
+
+                }
+                return false;
+              });
+              const tbody = $("tbody");
+              tbody.empty();
+
+              for (let r = 0; r < 35 && r < filter.length; r++) {
+                const row = $('<tr class="row"></tr>');
+                for (let i = 0; i < filter[r].length; i++) {
+                  row.append(`<td>${filter[r][i]}</td>`);
+                }
+                tbody.append(row);
+              }
+
+            } else for (let r = 0; r < 35; r++) {
+                $("tbody").append(`<tr class="row"></tr>`);
+                const lastRow = $(".row:last");
+                for (let i = 0; i < recArray[r].length; i++) {
+                  lastRow.append(`<td>${recArray[r][i]}</td>`);
+
+
+                }
+              }
           })
           .catch((error) => {
             console.error("Error fetching records:", error);
@@ -142,21 +163,22 @@ async function rightArrow(): Promise<void> {
 }
 
 async function leftArrow(): Promise<void> {
+  let searchValue = $('#searchInput').val() as string
   let count: number = await fetchRecordCount() - 1;
-  console.log(count);
+ 
   const firstRow = document.querySelector("#recordsTable tbody");
-  console.log(firstRow)
+ 
   if (firstRow) {
     const cells = firstRow.querySelectorAll("td");
     const firstRecord: string[] = [];
     cells.forEach((cell) => {
       firstRecord.push(cell.textContent || "");
     });
-   
+
 
 
     const firstID = parseFloat(firstRecord[0]);
-    
+
 
     if (35 <= firstID && firstID <= (count)) {
       let clearTable = document.querySelector('tbody') as HTMLTableSectionElement | null;
@@ -164,10 +186,10 @@ async function leftArrow(): Promise<void> {
         clearTable.innerHTML = "";
 
         let firstRecord = firstID - 35
-       
-        let lastRecord =firstRecord + 34
-      
-        
+
+        let lastRecord = firstRecord + 34
+
+
 
         fetch(`http://192.168.4.133:2050/records?from=${firstRecord}&to=${lastRecord}`)
           .then((response: Response) => {
@@ -179,17 +201,41 @@ async function leftArrow(): Promise<void> {
           })
           .then((records: any[]) => {
             const recArray = records;
-            console.log(recArray);
+           
+            if (searchValue) {
 
-            for (let r = 0; r <35; r++) {
-              $("tbody").append(`<tr class="row"></tr>`);
-              const lastRow = $(".row:last"); 
-              for (let i = 0; i < recArray[r].length; i++) {
-                lastRow.append(`<td>${recArray[r][i]}</td>`);
-               
-                
-              } 
-            }
+              let filter = recArray.filter((item) => {
+                for (let i = 0; i < item.length; i++) {
+                  if (item[i].toLowerCase().includes(searchValue.toLowerCase())) {
+                    return true;
+
+                  }
+
+                }
+                return false;
+              });
+              const tbody = $("tbody");
+              tbody.empty();
+
+              for (let r = 0; r < 35 && r < filter.length; r++) {
+                const row = $('<tr class="row"></tr>');
+                for (let i = 0; i < filter[r].length; i++) {
+                  row.append(`<td>${filter[r][i]}</td>`);
+                }
+                tbody.append(row);
+              }
+
+            } else for (let r = 0; r < 35; r++) {
+                $("tbody").append(`<tr class="row"></tr>`);
+                const lastRow = $(".row:last");
+                for (let i = 0; i < recArray[r].length; i++) {
+                  lastRow.append(`<td>${recArray[r][i]}</td>`);
+
+
+                }
+              }
+
+           
           })
           .catch((error) => {
             console.error("Error fetching records:", error);
@@ -203,54 +249,54 @@ async function leftArrow(): Promise<void> {
 
 
 
-$('#searchInput').on('keyup',async () => {
+$('#searchInput').on('keyup', async () => {
   const inputValue = $('#searchInput').val() as string;
-  console.log(inputValue);
-  
 
-  if(!inputValue.length){
+
+
+  if (!inputValue.length) {
     displayRecords()
   }
   const recArray: any[] = await fetchRecords();
-  
 
-  let filter = recArray.filter((item)=>{
+
+  let filter = recArray.filter((item) => {
     for (let i = 0; i < item.length; i++) {
       if (item[i].toLowerCase().includes(inputValue.toLowerCase())) {
-        return true; 
-       
-      }
-      
-    }
-    return false; 
-    });
-    const tbody = $("tbody");
-    tbody.empty(); 
-  
-    for (let r = 0; r < 35 && r < filter.length; r++) {
-      const row = $('<tr class="row"></tr>');
-      for (let i = 0; i < filter[r].length; i++) {
-        row.append(`<td>${filter[r][i]}</td>`);
-      }
-      tbody.append(row);
-    }
-  
-  })
+        return true;
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
+      }
 
- 
-  
-  
- 
+    }
+    return false;
+  });
+  const tbody = $("tbody");
+  tbody.empty();
+
+  for (let r = 0; r < 35 && r < filter.length; r++) {
+    const row = $('<tr class="row"></tr>');
+    for (let i = 0; i < filter[r].length; i++) {
+      row.append(`<td>${filter[r][i]}</td>`);
+    }
+    tbody.append(row);
+  }
+
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
