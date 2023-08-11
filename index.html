@@ -3,10 +3,36 @@
 <head>
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+	<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-	<p>Hello</p>
+	
+	<h1 class="heading">OnBoard-Javascript</h1>
+	<div class="search-container">
+		<form id="searchForm">
+			<input type="text" id="searchInput" placeholder="Search.." name="search">
+		  </form>
+	</div>
+
+
+	<table id="recordsTable">
+		<thead>
+		  <tr class="head">
+		  </tr>
+		</thead>
+		
+		<tbody>
+			
+		</tbody>
+
+	<div class="showRecords">
+    <button onclick="rightArrow()" class="arrow-right"></button>
+	<div id="page"> 1 - 35 Records per Page</div>
+    <button onclick="leftArrow()" class="arrow-left"></button>
+    </div>
+	  
+	<script src="app.js"></script>
 </body>
 
 </html>

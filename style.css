@@ -1,0 +1,92 @@
+body{
+  overflow: hidden;
+  background-color: #f7e7ce;
+}
+table{
+    width: 100%;
+    table-layout: fixed;
+  
+}
+table, th, td {
+    border: 1px solid #4B3832;
+    border-collapse: collapse;
+    text-align: center; 
+    color: black;
+}
+
+td:hover{
+    color: #97694F;
+  }
+
+.heading  {
+   text-align: center;
+   text-decoration: underline;
+   color: #4B3832;
+   
+}
+
+.showRecords{
+
+  transform: translate(49rem, -0.5rem);
+  position: absolute;
+  bottom: 0px;
+  padding: 1rem;
+ 
+
+}
+.showRecords #page{
+  display: inline-block;
+  font-size: 1.2rem;
+
+}
+
+
+.arrow-right,
+.arrow-left{
+  border: none;
+  background-color: transparent;
+
+}
+
+.arrow-right,
+.arrow-left{
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border-top: 10px solid #4B3832;
+  border-left: 10px solid #4B3832;
+  
+  
+ 
+}
+
+.arrow-right,
+.arrow-left:hover {
+  color: #97694F;
+}
+
+.arrow-right{
+ transform: rotate(135deg);
+ float: right;
+
+
+}
+
+.arrow-left{
+ transform: rotate(-45deg);
+ float: left;
+}
+
+.search-container {
+  float: right;
+}
+.search-container input[type=text] {
+  padding: 6px;
+  margin-bottom: 3px;
+  font-size: 17px;
+  border: 2px solid #4B3832;
+  background-color: #f7e7ce;
+ 
+}
+
+
