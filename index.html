@@ -6,13 +6,18 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <h1>JavaScript Onboarding Project</h1>
+    <h1 class="header">JavaScript Onboarding Project</h1>
     <div class="heading">
         <p class="results">Displaying ID's 1 - 20 out of 1 000 000</p>
-        <form id="search-form" class="search-form">
-            <input class="search-input" type="text" placeholder="Search a record" required >
-            <button type="submit" class="search-btn">Search</button>
-        </form>
+        <div class="search-container">
+            <form id="search-form" class="search-form">
+                <input class="search-input" type="number" placeholder="Search a record" required >
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+            <div class="results-box">
+                <p>1 - 20</p>
+            </div>
+        </div>
     </div>
     <div class="table-container">
         <table class="table">

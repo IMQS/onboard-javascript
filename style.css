@@ -11,6 +11,7 @@
 body {
     background-color: #141A27;
     background-attachment: fixed;
+    height: 100vh;
 }
  
 body::-webkit-scrollbar {
@@ -20,14 +21,14 @@ body::-webkit-scrollbar {
 h1 {
     text-align: center;
     font-family: 'Atma', cursive;
-    font-size: 40px;
+    font-size: 2.5rem;
     color: #4DD2C6;
 }
  
 .results {
     font-family: 'Atma', cursive;
     font-weight: 500;
-    font-size: 30px;
+    font-size: 2rem;
     color: #A1AFC2;
 }
  
@@ -39,35 +40,42 @@ h1 {
 }
  
 .table-container {
-    max-height: 75vh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: 80vh; /* Use full viewport height */
     border: 1px solid #4DD2C6;
-    /* box-shadow: inset 0px 0px 33px -7px rgba(255, 255, 255, 0.363); */
-}
+    box-sizing: border-box;
+    padding: 20px; /* Add some padding for a bit of breathing room */
+    overflow: hidden; /* Hide any overflowing content */
+  }
  
 .table-container::-webkit-scrollbar {
     display: none;
 }
  
 table {
-    width: 100%;
-    /* padding: 6px; */
-    /* background-color: #ffffff1f; */
-    table-layout: fixed;
-}
+    flex-grow: 1; /* Allow the table to expand within the container */
+    width: 100%; /* Take full width of the container */
+    border-collapse: collapse;
+    table-layout: fixed; /* Use a fixed layout to prevent column widths from changing */
+  }
  
 th {
     /* border-bottom: 1px solid #3b3b3b; */
     font-family: 'Atma', cursive;
-    font-size: 20px;
-    border-bottom: 0.5px solid #4DD2C6;
-    border-right: 0.5px solid #4DD2C6;
+    font-size: 1rem;
+    border: 0.5px solid #4DD2C6;
+    /* border-right: 0.5px solid #4DD2C6; */
     color: #4DD2C6;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-height: 10px; 
+    padding: 2px;
 }
 
 thead {
-    position: sticky;
-    top: 0;
+    /* position: sticky; */
+    /* top: 0; */
     border: 1px solid #4DD2C6 !important;
     background-color: #141A27;
     border: 1px solid white !important;
@@ -78,6 +86,10 @@ thead {
     font-family: 'Atma', cursive;
     color: #A1AFC2;
     font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-height: 10px; 
+    padding: 2px;
 }
 
 .search-input {
@@ -119,7 +131,7 @@ input:focus{
 .pagination {
     display: flex;
     justify-content: center;
-    padding: 30px 0px;
+    /* padding-top: 30px; */
 }
  
 .pagination a {
@@ -151,4 +163,62 @@ input:focus{
 
 .next:hover, .prev:hover {
     color: white !important;
+}
+
+.header {
+    height: 5vh;
+}
+.heading {
+    height: 5vh;
+}
+.table-container {
+    height: 80vh;
+}
+.wrapper {
+    height: 10vh;
+    display: flex;
+    align-items: center;
+}
+
+/* .pagination {
+    margin: auto 0px;    
+} */
+
+.table-container {
+  display: flex;
+  flex-direction: column;
+  height: 80vh; /* Use full viewport height */
+  box-sizing: border-box;
+  padding: 20px; /* Add some padding for a bit of breathing room */
+  overflow: hidden; /* Hide any overflowing content */
+}
+
+table {
+  flex-grow: 2; /* Allow the table to expand within the container */
+  width: 100%; /* Take full width of the container */
+  border-collapse: collapse;
+  table-layout: fixed; /* Use a fixed layout to prevent column widths from changing */
+}
+
+th, td {
+  padding: 0.2px; /* Reduced padding for cells */
+  text-align: center;
+  /* border-bottom: 1px solid #ddd; */
+  white-space: nowrap; /* Prevent line breaks within cells */
+  /* overflow: hidden;  */
+  text-overflow: ellipsis; /* Show ellipsis (...) for content that overflows */
+  max-height: fit-content; /* Set a small maximum height for cells */
+  /* font-size: 10px;  */
+}
+
+.search-container {
+    position: relative;
+}
+
+.results-box {
+    width: 228.23px;
+    height: 50px;
+    background-color: white;
+    position: absolute;
+    top: 189;
 }
