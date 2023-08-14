@@ -30,8 +30,6 @@ window.onload = function () {
         );
   
         let data: any[] = await response.json();
-        console.log(data);
-  
         let tableData = "";
         data.forEach((record: string[]) => {
           tableData += "<tr>";
@@ -144,10 +142,6 @@ window.onload = function () {
           $("#recordRange").html(
             `<li>Displaying from Record <span>${firstRecordID}</span> to Record <span>${lastRecordID}</span> </li>`
           );
-          $("#recordRange").css({
-            border: "5px dotted var(--primary-color)",
-            padding: "1rem",
-          });
         } else {
           $("#recordRange").html("No records found.");
         }
@@ -159,11 +153,11 @@ window.onload = function () {
     $("#searchForm").submit(function (event) {
       event.preventDefault();
       let searchValue = $("#searchInput").val();
-  
+    
       if (searchValue !== undefined) {
         searchValue = searchValue.toString().toUpperCase();
-  
-        // Allows the css to have empty value before the css styling to the search results of the search has been done
+    
+        // Reset previous search styling and messages
         $("#tableHeaderRow th").css("background-color", "");
         $("#tableBody td").css({
           "background-color": "",
@@ -171,37 +165,34 @@ window.onload = function () {
           border: "",
         });
         $("#searchResultsMessage").text("");
-  
-        // This hides all the th and td that is not corresponding to the search results
-        $("#tableHeaderRow th").each(function () {
-          let columnText = $(this).text().toUpperCase();
-          if (columnText === searchValue || columnText === "ID") {
-            $(this).show();
-  
-            // This displays the matching result of the records searched
-            let columnIndex = $(this).index();
-            $("#tableBody tr").each(function () {
-              let row = $(this);
-              row.find("td").eq(columnIndex).show();
-              row.find("td").eq(columnIndex).css({
-                "background-color": "var(--quaternary-color)",
-                color: "var(--tertiary-color)",
-                "font-weight": "900",
-                border: "2px solid var(--secondary-color)",
-              });
-            });
-  
-            // Display search results message
-            $("#searchResultsMessage").html(
-              `<li>Results for "<span>${searchValue}</span>" </li>`
-            );
-          }
-          $("#searchResultsMessage").css({
-            border: "5px dotted var(--primary-color)",
-            padding: "1rem",
+    
+        // Loop through each row to find matching rows
+        $("#tableBody tr").each(function () {
+          let row = $(this);
+          let matchingCells = row.find("td").filter(function () {
+            return $(this).text().toUpperCase().includes(searchValue);
           });
+    
+          if (matchingCells.length > 0) {
+            row.show(); // Show the row if there are matching cells
+            matchingCells.css({
+              "background-color": "var(--quaternary-color)",
+              color: "var(--tertiary-color)",
+              "font-weight": "900",
+              border: "2px solid var(--secondary-color)",
+            });
+          } else {
+            row.hide(); // Hide the row if there are no matching cells
+          }
         });
+    
+        // Display search results message
+        $("#searchResultsMessage").html(
+          `<li>Results for "<span>${searchValue}</span>" </li>`
+        );
       }
     });
+    
+    
   };
   

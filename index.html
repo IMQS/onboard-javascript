@@ -3,59 +3,46 @@
   <head>
     <title>JS Onboard Project</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
   </head>
   <body>
-    <h1>IMQS Onboarding Project</h1>
+    <h2>IMQS Onboarding Project</h2>
     <ul class="display">
       <div id="recordRange"></div>
       <div id="searchResultsMessage"></div>
     </ul>
 
-    <ul class="navigation">
-      <li>
-        <button onclick="window.location.reload()">Reset Filters</button>
-      </li>
-      <li>
-        <button id="sortAscButton">Sort By ASC (ID)</button>
-        <button id="sortDescButton">Sort By DESC (ID)</button>
-      </li>
-      <li>
-        <!-- Fetch Records Form -->
-        <form id="rangeForm">
-          <div class="form-group">
-            <input
-              type="number"
-              id="fromInput"
-              placeholder="Enter Start ID Range value"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <input
-              type="number"
-              id="toInput"
-              placeholder="Enter End ID Range value"
-              required
-            />
-          </div>
-          <button type="submit">Fetch Record/(s)</button>
-        </form>
-      </li>
-      <li>
-        <form id="searchForm">
-          <div class="form-group">
-            <input
-              type="text"
-              id="searchInput"
-              placeholder="Search by First Letter of Record"
-              required
-            />
-          </div>
+    <div class="navigation">
+      <button onclick="window.location.reload()">Reset Filters</button>
+
+      <button id="sortAscButton">Sort ASC (ID)</button>
+      <button id="sortDescButton">Sort DESC (ID)</button>
+
+      <!-- Fetch Records Form -->
+
+      <form id="rangeForm">
+        <div class="form-group">
+          <input type="number" id="fromInput" placeholder="Enter Start ID Range value" required />
+        </div>
+        <div class="form-group">
+          <input type="number" id="toInput" placeholder="Enter End ID Range value"required />
+        </div>
+        <div class="form-group">
+          <button type="submit">Fetch Record / (s)</button>
+        </div>
+      </form>
+
+      <form id="searchForm">
+        <div class="form-group">
+          <input type="text" id="searchInput" placeholder="Search by First Letter of Record"required />
+        </div>
+        <div class="form-group">
           <button type="submit">Search</button>
-        </form>
-      </li>
-    </ul>
+        </div>
+      </form>
+
+    </div>
+
     <div class="table-container">
       <table>
         <thead>
@@ -68,7 +55,7 @@
         </tbody>
       </table>
     </div>
-    <h3>Total Records: <span id="totalRecordCount"></span></h3>
+    <!-- <h3>Total Records: <span id="totalRecordCount"></span></h3> -->
     <script src="/app.js"></script>
   </body>
 </html>
