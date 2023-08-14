@@ -10,7 +10,7 @@ interface GridData {
   
   // Constants and variables used for pages  and data storage.
 
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 30;
   let currentPage = 1;
   let totalItems = 0;
   let data: GridData[] = [];
@@ -19,15 +19,15 @@ interface GridData {
   // Entry point after the DOM has loaded.
  
   $(document).ready(() => {
-    fetchRecordCount(); // Fetch the total number of records.
-    fetchColumns(); // Fetch the column names for the grid.
-    fetchRecords(); // Fetch the initial records to render the grid.
-    setupControls(); // Set up page controls with event handlers.
-    
+    fetchRecordCount(); 
+    fetchColumns();
+    fetchRecords();
+    setupControls(); 
+    createGrid();
   });
   
   // Fetch the total number of records.
-  function fetchRecordCount() {
+function fetchRecordCount() {
  // Show the spinner before making the  request  and hide the input elements
  $('#spinner').show();
  $('.top').hide();
@@ -44,7 +44,7 @@ interface GridData {
         console.error('Failed to fetch record count');
       },
       complete: () => {
-        // Hide the spinner after the AJAX request is completed
+        // Hide the spinner after  request is completed
         $('#spinner').hide();
         $('.top').show();
       }
@@ -75,7 +75,7 @@ interface GridData {
     });
   }
   
-  function fetchRecords() {
+function fetchRecords() {
     $('#spinner').show();
     $('.top').hide();
     const from = (currentPage - 1) * PAGE_SIZE;
@@ -88,7 +88,7 @@ interface GridData {
         data = []; // Reset the data array for the current page
         for (let i = 0; i < res.length; i++) {
           const record = res[i];
-          if (Array.isArray(record)) { // Ensure the record is an array
+          if (Array.isArray(record)) { 
             const obj: GridData = {};
             for (let j = 0; j < columnNames.length && j < record.length; j++) {
               const columnName = columnNames[j].name;
@@ -96,7 +96,9 @@ interface GridData {
               obj[columnName] = columnValue; // Map column names to their corresponding values.
             }
             data.push(obj); // Add the row to the data array
-          } 
+          } else{
+            console.log('array is empty');
+          }
         }
         console.table(data);
         createGrid(); 
@@ -116,12 +118,32 @@ interface GridData {
     $('.top').hide();
     const fromVal = $('#searchInputFrom').val();
     const toVal = $('#searchInputTo').val();
+
+    if (!fromVal || !toVal) {
+      $('#spinner').hide();
+      $('.top').show();
+      alert('Please enter both "From" and "To" values.');
+      return;
+    }
   
     if (typeof fromVal === 'string' && typeof toVal === 'string') {
       const from = parseInt(fromVal, 10);
       const to = parseInt(toVal, 10);
 
-      if (!isNaN(from) && !isNaN(to)) {
+    if (isNaN(from) || isNaN(to)) {
+    $('#spinner').hide();
+    $('.top').show();
+    alert('Please enter valid numeric values.');
+    return;
+  }
+      
+  if (from > to || to - from > 10000) {
+    $('#spinner').hide();
+    $('.top').show();
+    alert('Please enter a valid range (1-999999) with a maximum of 10000 records.');
+    return;
+  }
+  if (!isNaN(from) && !isNaN(to)) {
         $.ajax({
           url: `http://localhost:2050/records?from=${from}&to=${to}`,
           method: 'GET',
@@ -149,7 +171,9 @@ interface GridData {
           },
           error: () => {
             console.error('Failed to fetch records');
-            alert('Someone needs to go back to the creche!');
+            $('#spinner').hide()
+            $('.top').show()
+            alert('Please enter a valid range! (1-999999)');
           },
           complete: () => {
             $('#spinner').hide(); 
@@ -161,7 +185,7 @@ interface GridData {
   }
   
   // Render the grid with the fetched data.
-  function createGrid() {
+ function createGrid() {
     const gridElement = document.getElementById('grid');
     if (gridElement) {
       gridElement.innerHTML = ''; // Clear the existing grid .
@@ -184,9 +208,9 @@ interface GridData {
       const tbody = document.createElement('tbody');
       data.forEach((row) => {
         const tr = document.createElement('tr');
-        columnNames.forEach((column) => {
+        columnNames.forEach(async (column) => {
           const td = document.createElement('td');
-          td.textContent = row[column.name];
+          td.textContent = await(row[column.name]);
           tr.appendChild(td);
         });
         tbody.appendChild(tr);

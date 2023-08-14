@@ -59,15 +59,22 @@ input[type="text"] {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    overflow:auto;
     border: 1px solid #333333;
    }
   /* table */
-table{
+  table{
+    -ms-overflow-style: none; 
+    scrollbar-width: none;  
     height: 100%;
-    overflow: hidden;
+    overflow: none;
     border: 1px solid #333333;
-    
+    display: block;
+    overflow: auto;
+    /* border-collapse: collapse; */
+  }
+  table::-webkit-scrollbar { 
+    display: none;  
   }
 tr{
     border: 1px solid #333333;
@@ -78,13 +85,16 @@ thead{
     font-weight: bold;
     padding: 25px;
     color: white;
-    width: 100px;
+    position: sticky; 
+    top: 0;
+    padding: 15px;
+    z-index: 2;
     }
   
 td {
-    padding: 10px;
-    align-content: center;
     
+    align-content: center;
+    width: 350px;   
 }
 
 .grid-controls {
@@ -94,6 +104,8 @@ td {
     padding: 15px;
     color: white;
     background-color: #333333;
+    position: sticky;
+    bottom: 0;
   }
 
  
