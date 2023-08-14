@@ -55,7 +55,6 @@ interface GridData {
   function fetchColumns() {
     $('#spinner').show();
     $('.top').hide();
-
     $.ajax({
       url: 'http://localhost:2050/columns',
       method: 'GET',
@@ -64,9 +63,7 @@ interface GridData {
         // Convert the column names to ColumnName objects and store in columnNames array.
         columnNames = res.map((columnName: any) => ({ name: columnName }));
         data = new Array<GridData>(columnNames.length); // Initialize the data array with the number of columns.
-      
       },
-      
       error: () => {
         console.error('Failed to fetch columns');
       },
@@ -79,10 +76,8 @@ interface GridData {
   }
   
   function fetchRecords() {
-   
     $('#spinner').show();
     $('.top').hide();
-
     const from = (currentPage - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE;
     $.ajax({
@@ -90,7 +85,6 @@ interface GridData {
       method: 'GET',
       success: (response) => {
         let res = JSON.parse(response);
-  
         data = []; // Reset the data array for the current page
         for (let i = 0; i < res.length; i++) {
           const record = res[i];
@@ -102,11 +96,8 @@ interface GridData {
               obj[columnName] = columnValue; // Map column names to their corresponding values.
             }
             data.push(obj); // Add the row to the data array
-          } else {
-            console.error(`Invalid record format at index ${i}`);
-          }
+          } 
         }
-  
         console.table(data);
         createGrid(); 
       },
@@ -129,7 +120,7 @@ interface GridData {
     if (typeof fromVal === 'string' && typeof toVal === 'string') {
       const from = parseInt(fromVal, 10);
       const to = parseInt(toVal, 10);
-  
+
       if (!isNaN(from) && !isNaN(to)) {
         $.ajax({
           url: `http://localhost:2050/records?from=${from}&to=${to}`,
@@ -149,16 +140,12 @@ interface GridData {
                     obj[columnName] = columnValue; // Map column names to their corresponding values.
                   }
                   data.push(obj); 
-                } else {
-                  console.error(`Invalid record format at index ${i}`);
-                }
+                } 
               }
               createGrid(); // Update the grid with the new data
               console.log(data);
 
-            } else {
-              console.warn('Invalid response format. Unexpected output .');
-            }
+            } 
           },
           error: () => {
             console.error('Failed to fetch records');
@@ -172,8 +159,6 @@ interface GridData {
       }
     }
   }
-  
-  
   
   // Render the grid with the fetched data.
   function createGrid() {
@@ -215,8 +200,7 @@ interface GridData {
     
    
   }
-  
-  
+
   // Set up page controls with event handlers.
   function setupControls() {
     $('#prevBtn').on('click', () => {
@@ -230,11 +214,11 @@ interface GridData {
       const totalPages = Math.ceil(totalItems / PAGE_SIZE);
       if (currentPage < totalPages) {
         currentPage++; // Go to the next page.
-        fetchRecords(); // Fetch records for the new page.
+        fetchRecords();
       }
     });
   }
-  
+
   // Update the page information display.
   function updatePageInfo() {
     const totalPages = Math.ceil(totalItems / PAGE_SIZE);
