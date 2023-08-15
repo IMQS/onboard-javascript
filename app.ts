@@ -1,6 +1,10 @@
 window.onload = () => {
 
   let api: string = "http://localhost:2050/";
+  let isFunctionRunning = false;
+  console.log(isFunctionRunning);
+  
+
 
   // This function  will handle retrieving the records from the api
   async function getRecords(fromID: number, toID: number): Promise<Array<Array<string>>> {
@@ -60,21 +64,39 @@ window.onload = () => {
 
   // This function will loop through and display the records on the table.
   async function showRecords(fromID: number, toID: number): Promise<void> {
+    console.log(isFunctionRunning);
+    
+    if (isFunctionRunning) {
+      return;
+    }
+    isFunctionRunning = true;
     try {
       $("tbody").empty();
       let records = await getRecords(fromID, toID);
+      $('.results').empty().append(`Displaying ID's ${fromID} - ${toID}`)
       for (let i = 0; i < records.length; i++) {
         $("tbody").append(`<tr class="body-row">`);
         for (let n = 0; n < records[i].length; n++) {
-          $(".body-row:last-child").append(`<td>${records[i][n]}</td>`);
+          $(".body-row:last-child").append(`<td><span>${records[i][n]}</span></td>`);
         }
         $("tbody").append(`</tr>`);
       }
-
+      
+      let inputNumber: string = $('.search-input').val() as string
+      $("span").each(function () {
+        const lowercasedID: string = $(this).text() as string; 
+        if (lowercasedID == inputNumber) {
+          $(this).css({ "background-color": "#FFFF00", "color": "black" });
+        } else {
+          $(this).css({ "background-color": "initial", "color": "#A1AFC2  " });
+        }
+      });
+      
     } catch (error) {
       console.error(error);
       throw error;
     }
+    isFunctionRunning = false;
   }
   showRecords(1, 20);
 
@@ -93,10 +115,12 @@ window.onload = () => {
       $(".pagination").append(`<a class="next">&raquo;</a>`);
 
       // Adding a click event on the  pagination pages to display the appropriate number of records for that specific page number.
-      $(".pagination-item").on("click", function (): void {
+
+      $(".pagination-item").on("click", async function dynamicPagination(): Promise<Array<number>>{
+        let maxRecords: number = await adjustDisplayedRecords() 
         let pageNumber: any = $(this).attr("id");
-        let toID = parseInt(pageNumber) * 20;
-        let fromID: number = toID - 19;
+        let toID = parseInt(pageNumber) * maxRecords;
+        let fromID: number = toID - (maxRecords - 1);
         $(".pagination-item").removeClass("active");
         $(this).addClass("active");
         showRecords(fromID, toID);
@@ -104,20 +128,27 @@ window.onload = () => {
         $(".results").append(
           `Displaying ID's ${fromID} - ${toID} out of ${stringCount}`
         );
+        return [fromID, toID]
       });
 
       // Adding a click event to the next button of the pagination.
-      $(".next").on("click", function () {
-        $(".pagination").fadeOut("fast", function () {
+      $(".next").on("click", async function () {
+        if (isFunctionRunning) {
+          return;
+        }
+        isFunctionRunning = true
           start = start + 20;
           end = end + 20;
           $(".pagination").empty();
-          pageNumbers(start, end);
-          $(".pagination").fadeIn("fast");
-        });
+          await pageNumbers(start, end);
       });
+      isFunctionRunning = false
 
       // Adding a if statement in the case that pagination start with the page number 1. In the else statement a click event is added for the next button of the pagination.
+      if(isFunctionRunning) {
+        return;
+      }
+      isFunctionRunning = true
       if (start == 1) {
         $(".prev").css({ display: "none" });
       } else {
@@ -131,6 +162,7 @@ window.onload = () => {
           });
         });
       }
+      isFunctionRunning = false
 
     } catch (error) {
       console.error(error);
@@ -139,83 +171,78 @@ window.onload = () => {
   }
   pageNumbers(1, 20);
 
-  // This function handles returning the records and also doing the filter on the returned records for the search.
-  async function searchArrays(keyword: string): Promise<Array<Array<string>>> {
-    try {
-      
-      let data = await fetch(`${api}records?from=1&to=9999`);
-      const arrayOfArrays: Array<Array<string>> = await data.json();
-      return arrayOfArrays.filter((arr): boolean => {
-        if(keyword !== ""){
-          console.log(typeof keyword)
-          for (let i = 0; i < 11; i++) {
-            const elementMatches = arr[i].toLowerCase().includes(keyword.toLowerCase());
-            if (elementMatches) {
-              console.log
-              return true;
-            }
-          };
-        } else {
-          $(".results").empty();
-          $(".results").append(`Can't leave search field empty`);    
-        }
-        return false;
-      });
-
-    } catch (error) {
-      console.error(error);
-      throw error;
+  async function resultsRange(event: any) {
+    if (isFunctionRunning) {
+      return;
     }
-  }
+    isFunctionRunning = true;
+    event.preventDefault();
+    let inputNumber: string = $('.search-input').val() as string
+    let inputNumberInt = parseInt(inputNumber);
+    if(inputNumber !== '') {
+      let end:number = Math.ceil(inputNumberInt / 20) * 20;
+      let start: number = end - 19;
+      if(inputNumberInt < 1000000) {
+        if(end === 1000000){
+          end = end - 1;
+        } else null
+        $('.results-box').remove()
+        $('.search-container').append(`
+                                      <div class="results-box">
+                                        <p class="results-select">${start} - ${end}</p>
+                                      </div>
+                                      `)
+        $('.results-box').on('click', resultsSelect)
 
-  // The following is the search function that will be attached the on click.
-  // In the function the filtered that is returned and looped through to replace the current data in the table and also highlighting where the keyword is similar to the results.
-  async function searchResultsDisplay(event: any): Promise<void> {
-    try {
-      event.preventDefault();
-      let keyword: string = $(".search-input").val() as 
-      string;
-      keyword = keyword.toLowerCase();
-      let searchResult: Array<Array<string>> = await searchArrays(keyword);
-      console.log(searchResult, keyword);
-      if(keyword !== '') {
-        $(".results").css({'background-color': 'initial', 'color': 'initial'})
-        $("tbody").empty();
-        $(".results").empty();
-        $(".results").append(`${searchResult.length} RESULTS FOR "${keyword}"`).css({'color': '#A1AFC2'});
-      } else {
-        $("tbody").empty();
-        $(".results").empty().append(`Search field requires a value`).css({'background-color': 'red', 'color': 'white'})
-      }
-
-      for (let i = 0; i < searchResult.length; i++) {
-        let newRow = $('<tr class="body-row"></tr>');
-        for (let n = 0; n < searchResult[i].length; n++) {
-          let recordValue = searchResult[i][n];
-          let lowercasedRecordValue = recordValue.toLowerCase();
-          let $span = $(`<span class="highlight ${lowercasedRecordValue}">${recordValue}</span>`);
-          newRow.append(`<td></td>`).find("td:last").append($span);
-        }
-        $("tbody").append(newRow);
-      }
-
-      // Loop through all <span> elements after appending them to the table
+        // Loop through all <span> elements after appending them to the search container
       $("span").each(function () {
-        const lowercasedID: string = $(this).text().toLowerCase();
-        if (lowercasedID.includes(keyword)) {
-          $(this).css({ "background-color": "#FFFF00", "color": "black" });
+        const lowercasedID: string = $(this).text() as string; 
+        if (lowercasedID == inputNumber) {
+          $(this).css({ "background-colovoidr": "#FFFF00", "color": "black" });
         } else {
           $(this).css({ "background-color": "initial", "color": "#A1AFC2  " });
         }
       });
 
-    } catch (error) {
-      console.error("Error fetching data:", error);
+        } else {
+          $('.results-box').remove()
+        }
+      } else {
+        $('.results-box').remove()
+      }
+      isFunctionRunning = false;
     }
-  };
-
   // Attach click event to the search button using jQuery
-  $(".search-btn").on("click", searchResultsDisplay);
+  
+  async function resultsSelect() {
+    if (isFunctionRunning) {
+      return;
+    }
+    isFunctionRunning = true;
+    let idRange = $('.results-select').text();
+    let rangeArray = null
+    rangeArray = idRange.split('-');
+    $('.results-box').remove()
+    let start = parseInt(rangeArray[0])
+    let end = parseInt(rangeArray[1])
+    isFunctionRunning = false;
+    await showRecords(start, end)
+  }
+  
+  $(".search-input").on("keyup", resultsRange);
+
+  async function adjustDisplayedRecords(): Promise<number> {
+    const screenHeight = $(window).height();
+    const maxRecords = Math.floor(screenHeight / 45);
+    $('tbody').empty()
+    console.log( maxRecords);
+    
+    await showRecords(1, maxRecords) 
+    return maxRecords
+  } 
+  
+  $(window).on('resize', adjustDisplayedRecords);
+  // $(document).ready(adjustDisplayedRecords);
 
 };
 

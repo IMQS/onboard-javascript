@@ -222,3 +222,10 @@ th, td {
     position: absolute;
     top: 189;
 }
+
+.results-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
