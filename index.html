@@ -6,41 +6,32 @@
     <script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
   </head>
   <body>
-    <h2>IMQS Onboarding Project</h2>
-    <ul class="display">
-      <div id="recordRange"></div>
-      <div id="searchResultsMessage"></div>
-    </ul>
+    <h3>IMQS Onboarding Project</h3>
+    <!-- <h4>Total Records: <span id="totalRecordCount"></span></h4> -->
 
     <div class="navigation">
-      <button onclick="window.location.reload()">Reset Filters</button>
-
-      <button id="sortAscButton">Sort ASC (ID)</button>
-      <button id="sortDescButton">Sort DESC (ID)</button>
-
-      <!-- Fetch Records Form -->
-
+      <div id="recordRange"></div>
       <form id="rangeForm">
         <div class="form-group">
-          <input type="number" id="fromInput" placeholder="Enter Start ID Range value" required />
+          <input type="number" id="fromInput" placeholder="Start Value ID" min="0" max="999999" required/>
         </div>
         <div class="form-group">
-          <input type="number" id="toInput" placeholder="Enter End ID Range value"required />
+          <input type="number" id="toInput" placeholder="End Value ID" min="0" max="999999" required/>
         </div>
         <div class="form-group">
-          <button type="submit">Fetch Record / (s)</button>
+          <button type="submit">Fetch</button>
         </div>
       </form>
-
-      <form id="searchForm">
+      <!-- <form id="searchForm">
         <div class="form-group">
-          <input type="text" id="searchInput" placeholder="Search by First Letter of Record"required />
+          <input type="text" id="searchInput" placeholder="Search Record" required/>
         </div>
         <div class="form-group">
           <button type="submit">Search</button>
         </div>
-      </form>
+      </form> -->
 
+      <div id="searchResultsMessage"></div>
     </div>
 
     <div class="table-container">
@@ -55,7 +46,10 @@
         </tbody>
       </table>
     </div>
-    <!-- <h3>Total Records: <span id="totalRecordCount"></span></h3> -->
+    <div class="navigation">
+      <button id="prevPageButton">Previous Page</button>
+      <button id="nextPageButton">Next Page</button>
+    </div>
     <script src="/app.js"></script>
   </body>
 </html>
