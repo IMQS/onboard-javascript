@@ -7,16 +7,27 @@
 </head>
 
 <body>
-	
+	<div id="loader" ></div>
 	<h1 class="heading">OnBoard-Javascript</h1>
+
+
 	<div class="search-container">
 		<form id="searchForm">
 			<input type="text" id="searchInput" placeholder="Search.." name="search" autocomplete="off">
-			
+			<button class="btnSearch" type="submit">Submit</button>	
 		  </form>
 	</div>
+	
+
+	<div class="showRecords">
+		<button onclick="rightArrow()" class="arrow-right"></button>
+		<div id="page"></div>
+		<button onclick="leftArrow()" class="arrow-left"></button>
+		</div>
 
 
+
+    <div class="tableRecords">
 	<table id="recordsTable">
 		<thead>
 		  <tr class="head">
@@ -26,12 +37,10 @@
 		<tbody>
 			
 		</tbody>
-
-	<div class="showRecords">
-    <button onclick="rightArrow()" class="arrow-right"></button>
-	<div id="page"> 1 - 35 Records per Page</div>
-    <button onclick="leftArrow()" class="arrow-left"></button>
+	</table>
     </div>
+	
+	
 	  
 	<script src="app.js"></script>
 </body>
