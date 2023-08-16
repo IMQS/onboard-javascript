@@ -2,47 +2,50 @@ window.onload = function () {
   // Global variables
   const IMQS: string = "http://localhost:2050";
   let totalRecordCount: number;
-  let currentPage: number =  1;
-  const recordsPerPage: number = 26;
+  let currentPage: number = 1;
+  const recordsPerPage: number = 32;
 
   // Displaying the columns and creating the th dynamically as the columns
   async function fetchAndDisplayColumns(): Promise<void> {
     try {
       let columns: string[] = await (await fetch(`${IMQS}/columns`)).json();
       let tableHeaderRow = $("#tableHeaderRow");
-  
+
       columns.forEach((columnName: string) => {
         let th = document.createElement("th");
         th.textContent = columnName;
         tableHeaderRow.append(th);
       });
-  
+
       await fetchTotalRecordCount();
       await displayPageData((currentPage - 1) * recordsPerPage, recordsPerPage);
     } catch (error) {
       console.log("ERROR:", error);
     }
   }
-  
+
   async function goToPage(pageNumber: number): Promise<void> {
     currentPage = pageNumber;
     let fromRecord = (currentPage - 1) * recordsPerPage;
     await displayPageData(fromRecord, recordsPerPage);
   }
-  
+
   $("#prevPageButton").on("click", async () => {
     if (currentPage > 1) {
-      await goToPage(currentPage - 1);
+      currentPage--;
+      let fromRecord = (currentPage - 1) * recordsPerPage;
+      await displayPageData(fromRecord, recordsPerPage);
     }
   });
-  
+
   $("#nextPageButton").on("click", async () => {
     const nextPage = Math.ceil(totalRecordCount / recordsPerPage);
     if (currentPage < nextPage) {
-      await goToPage(currentPage + 1);
+      currentPage++;
+      let fromRecord = (currentPage - 1) * recordsPerPage;
+      await displayPageData(fromRecord, recordsPerPage);
     }
   });
-  
 
   async function displayPageData(
     fromRecord: number,
@@ -62,13 +65,18 @@ window.onload = function () {
         });
         tableData += "</tr>";
       });
+  
+      // Adjust recordsToDisplay for the last page
+      if (currentPage * recordsPerPage > totalRecordCount) {
+        recordsToDisplay = totalRecordCount % recordsPerPage;
+      }
+  
       $("#tableBody").html(tableData);
     } catch (error) {
       console.log("ERROR:", error);
     }
   }
   
-
   // This displays the actual NUMBER of Total records on the html
   async function fetchTotalRecordCount(): Promise<void> {
     try {
@@ -83,108 +91,68 @@ window.onload = function () {
   }
 
   // Displays records from 1 to 30 on the initial page
-  displayPageData(1, 30);
+  displayPageData(1, 26);
 
   fetchTotalRecordCount();
   fetchAndDisplayColumns();
 
-  // Filter to display range from a certain ID to another ID
-  $("#rangeForm").submit(async (event) => {
-    event.preventDefault();
-    let fromInput = $("#fromInput");
-    let toInput = $("#toInput");
-    let from = parseInt((fromInput.val() as string) || "0");
-    let to = parseInt((toInput.val() as string) || "0");
-
-    if (!isNaN(from) && !isNaN(to)) {
-      await fetchRecords(from, to);
-    }
-  });
-
-  async function fetchRecords(from: number, to: number): Promise<void> {
+  $("#searchForm").submit(async function (e) {
+    e.preventDefault();
+    let searchValue = parseInt($("#searchInput").val() as string); // Convert to number
+  
+    $("#loader").show();
+    $("#searchResultsMessage").show();
+    $("#tableWrapper").hide();
+  
     try {
-      let response = await fetch(`${IMQS}/records?from=${from}&to=${to}`);
-      let data: any[] = await response.json();
-
-      let tableData = "";
-      for (let i = 0; i < data.length; i++) {
-        let record = data[i];
-        tableData += "<tr>";
-        for (let j = 0; j < record.length; j++) {
-          let value = record[j];
-          tableData += `<td>${value}</td>`;
+      let response = await fetch(`${IMQS}/records?from=0&to=${totalRecordCount - 1}`);
+      let allRecords: any[] = await response.json();
+  
+      let searchIndexes = allRecords.reduce((indexes: number[], record: any[], index: number) => {
+        let idValue = parseInt(record[0]);
+        if (idValue === searchValue) {
+          indexes.push(index);
         }
-        tableData += "</tr>";
-      }
-      $("#tableBody").html(tableData);
-
-      // Display record range
-      if (data.length > 0) {
-        let firstRecordID = data[0][0];
-        let lastRecordID = data[data.length - 1][0];
-        $("#recordRange").html(
-          `<div>Displaying from Record <span>${firstRecordID}</span> to Record <span>${lastRecordID}</span> </div>`
+        return indexes;
+      }, []);
+  
+      if (searchIndexes.length > 0) {
+        let targetPage = Math.ceil((searchIndexes[0] + 1) / recordsPerPage);
+        if (targetPage > Math.ceil(totalRecordCount / recordsPerPage)) {
+          targetPage = Math.ceil(totalRecordCount / recordsPerPage);
+        }
+        
+  
+        currentPage = targetPage;
+        let fromValue = (currentPage - 1) * recordsPerPage;
+  
+        await displayPageData(fromValue, recordsPerPage);
+  
+        // Reset previous row background color
+        $("#tableBody tr").css("background-color", "");
+  
+        searchIndexes.forEach((searchIndex: any) => {
+          let rowIndex = searchIndex % recordsPerPage;
+          let rowElement = $("#tableBody tr").eq(rowIndex);
+          rowElement.css("background-color", "yellow");
+        });
+  
+        $("#searchResultsMessage").html(
+          `<div>Showing search Results for Record number ${searchValue}</div>`
         );
       } else {
+        $("#tableBody").html("");
         $("#recordRange").html("No records found.");
+        $("#searchResultsMessage").html(
+          `<div>No results found for ID "<span>${searchValue}</span>"</div>`
+        );
       }
     } catch (error) {
       console.log("ERROR:", error);
+    } finally {
+      $("#loader").hide();
+      $("#tableWrapper").show();
     }
-  }
-
-  $("#searchForm").submit(function (e) {
-    e.preventDefault();
-    let searchValue = $("#searchInput").val();
-
-    if (typeof searchValue === "string") {
-      searchValue = searchValue.toUpperCase();
-    }
-
-    // Reset previous search styling and messages
-    $("#tableHeaderRow th").css("background-color", "");
-    $("#tableBody td").css({
-      "background-color": "",
-      color: "",
-      border: "",
-    });
-
-    $("#searchResultsMessage").text("");
-
-    // Adjust display and height of search result rows
-    $("#tableBody tr").each(function () {
-      let row = $(this);
-      let matchingCells = row.find("td").filter(function () {
-        let cellText: any = $(this).text();
-        return cellText.toUpperCase().includes(searchValue);
-      });
-
-      if (matchingCells.length > 0) {
-        row.show();
-        matchingCells.css({
-          "background-color": "var(--quaternary-color)",
-          color: "var(--tertiary-color)",
-          "font-weight": "900",
-          border: "2px solid var(--secondary-color)",
-        });
-
-        // Set height and display property for search result rows
-        row.css({
-          height: "auto"
-  
-        });
-      } else {
-        // row.hide();
-        console.log("ERROR:");
-      }
-    });
-
-    // Display search results message
-    $("#searchResultsMessage").html(
-      `<div>Results for "<span>${searchValue}</span>" </div>`
-    );
-  }); 
+  });
+   
 };
-
-
-  
