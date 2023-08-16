@@ -42,11 +42,11 @@ h1 {
 .table-container {
     display: flex;
     flex-direction: column;
-    height: 80vh; /* Use full viewport height */
+    height: 80vh; 
     border: 1px solid #4DD2C6;
     box-sizing: border-box;
-    padding: 20px; /* Add some padding for a bit of breathing room */
-    overflow: hidden; /* Hide any overflowing content */
+    padding: 20px; 
+    overflow: hidden; 
   }
  
 .table-container::-webkit-scrollbar {
@@ -54,18 +54,16 @@ h1 {
 }
  
 table {
-    flex-grow: 1; /* Allow the table to expand within the container */
-    width: 100%; /* Take full width of the container */
+    flex-grow: 1;
+    width: 100%; 
     border-collapse: collapse;
-    table-layout: fixed; /* Use a fixed layout to prevent column widths from changing */
+    table-layout: fixed; 
   }
  
 th {
-    /* border-bottom: 1px solid #3b3b3b; */
     font-family: 'Atma', cursive;
     font-size: 1rem;
     border: 0.5px solid #4DD2C6;
-    /* border-right: 0.5px solid #4DD2C6; */
     color: #4DD2C6;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -140,7 +138,6 @@ input:focus{
  
 .active {
     color: #4DD2C6 !important;
-    /* background-color: #af79e6; */
     border: 1px solid #4DD2C6 !important;  
 }
 
@@ -167,35 +164,28 @@ input:focus{
     align-items: center;
 }
 
-/* .pagination {
-    margin: auto 0px;    
-} */
-
 .table-container {
   display: flex;
   flex-direction: column;
-  height: 80vh; /* Use full viewport height */
+  height: 80vh; 
   box-sizing: border-box;
-  padding: 20px; /* Add some padding for a bit of breathing room */
-  overflow: hidden; /* Hide any overflowing content */
+  padding: 20px; 
+  overflow: hidden; 
 }
 
 table {
-  flex-grow: 2; /* Allow the table to expand within the container */
-  width: 100%; /* Take full width of the container */
+  flex-grow: 2;
+  width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; /* Use a fixed layout to prevent column widths from changing */
+  table-layout: fixed; 
 }
 
 th, td {
-  padding: 0.2px; /* Reduced padding for cells */
+  padding: 0.2px; 
   text-align: center;
-  /* border-bottom: 1px solid #ddd; */
-  white-space: nowrap; /* Prevent line breaks within cells */
-  /* overflow: hidden;  */
-  text-overflow: ellipsis; /* Show ellipsis (...) for content that overflows */
-  max-height: fit-content; /* Set a small maximum height for cells */
-  /* font-size: 10px;  */
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+  max-height: fit-content; 
 }
 
 .search-container {
@@ -235,7 +225,11 @@ a {
     right: 0;
     top: 0;
     bottom: 0;
-    /* transform: translate(-50%, 0); */
+  }
+
+  .results-select {
+    font-family: 'Atma', cursive;
+    font-size: 1.4rem;
   }
   
   @keyframes rot {

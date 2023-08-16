@@ -11,6 +11,7 @@ window.onload = () => {
   // This function  will handle retrieving the records from the api
   async function getRecords(fromID: number, toID: number): Promise<Array<Array<string>>> {
     try {
+      console.log(fromID, toID)
       const data = await fetch(`${api}records?from=${fromID}&to=${toID}`);
       const records: Array<Array<string>> = await data.json();
       return records;
@@ -70,10 +71,12 @@ window.onload = () => {
     }
     isFunctionRunning = true;
     try {
+      console.log(fromID, toID)
       $("tbody").empty();
       loader()
       let records = await getRecords(fromID, toID);
       let count: number = await getRecordCount();
+      console.log(records)
       let stringCount = count.toLocaleString().replace(/,/g, " ");
       $('.results').empty().append(`Displaying ID's ${fromID} - ${toID} out of ${stringCount}`)
       for (let i = 0; i < records.length; i++) {
@@ -233,21 +236,42 @@ window.onload = () => {
     isFunctionRunning = false;
     await showRecords(start, end)
     const screenHeight = $(window).height();
-    const maxRecords = Math.floor(parseInt(screenHeight as any) / 45);
+    const maxRecords = Math.floor(parseInt(screenHeight as any) / 50);
     currentPage = Math.floor(end / maxRecords)
   }
 
   // When adjusting the height and on different screen sizes. This function would responsible for calculating how much records should be displayed based on the height of the window itself. 
   async function adjustDisplayedRecords(): Promise<number> {
+
     const screenHeight = $(window).height();
-    const maxRecords = Math.floor(parseInt(screenHeight as any) / 45);
+    console.log(screenHeight);    
+    const maxRecords = Math.floor(parseInt(screenHeight as any) / 50);
     currentFromID = (currentPage - 1) * maxRecords + 1;
     currentToID = currentPage * maxRecords;
+    console.log(currentFromID, currentToID);   
     $("tbody").empty();
     await showRecords(currentFromID, currentToID);
     return maxRecords;
   }
-  $(window).on('resize', adjustDisplayedRecords);
+
+  let resizeTimer: ReturnType<typeof setTimeout>;
+
+$(window).on('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(async () => {
+    const maxRecords: number = await adjustDisplayedRecords();
+
+    // Example: Update a visual indicator based on the maxRecords value.
+    if (maxRecords > 10) {
+      $('.indicator').text('Many records displayed');
+    } else {
+      $('.indicator').text('Few records displayed');
+    }
+
+    // Perform other TypeScript-specific actions based on the maxRecords value.
+
+  }, 200);
+});
 
   // Just a loader to display when the table is empty and records is being fetched. 
   function loader() {
