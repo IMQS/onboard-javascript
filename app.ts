@@ -2,7 +2,9 @@ window.onload = () => {
 
   let api: string = "http://localhost:2050/";
   let isFunctionRunning = false;
-  console.log(isFunctionRunning);
+  let currentPage = 1;
+  let currentFromID = 1;
+  let currentToID = 20;
   
 
 
@@ -11,7 +13,6 @@ window.onload = () => {
     try {
       const data = await fetch(`${api}records?from=${fromID}&to=${toID}`);
       const records: Array<Array<string>> = await data.json();
-      console.log(fromID, toID);
       return records;
 
     } catch (error) {
@@ -64,16 +65,17 @@ window.onload = () => {
 
   // This function will loop through and display the records on the table.
   async function showRecords(fromID: number, toID: number): Promise<void> {
-    console.log(isFunctionRunning);
-    
     if (isFunctionRunning) {
       return;
     }
     isFunctionRunning = true;
     try {
       $("tbody").empty();
+      loader()
       let records = await getRecords(fromID, toID);
-      $('.results').empty().append(`Displaying ID's ${fromID} - ${toID}`)
+      let count: number = await getRecordCount();
+      let stringCount = count.toLocaleString().replace(/,/g, " ");
+      $('.results').empty().append(`Displaying ID's ${fromID} - ${toID} out of ${stringCount}`)
       for (let i = 0; i < records.length; i++) {
         $("tbody").append(`<tr class="body-row">`);
         for (let n = 0; n < records[i].length; n++) {
@@ -107,7 +109,6 @@ window.onload = () => {
       let stringCount = count.toLocaleString().replace(/,/g, " ");
       $(".pagination").append(`<a class="prev">&laquo;</a>`);
       for (let i = start; i <= end; i++) {
-        console.log(start, end);
         $(".pagination").append(
           `<a id="${i}" class="pagination-item">${i}</a>`
         );
@@ -117,7 +118,9 @@ window.onload = () => {
       // Adding a click event on the  pagination pages to display the appropriate number of records for that specific page number.
 
       $(".pagination-item").on("click", async function dynamicPagination(): Promise<Array<number>>{
-        let maxRecords: number = await adjustDisplayedRecords() 
+        currentPage = parseInt($(this).attr("id") as any);
+        let maxRecords = await adjustDisplayedRecords();
+        // let maxRecords: number = await adjustDisplayedRecords() 
         let pageNumber: any = $(this).attr("id");
         let toID = parseInt(pageNumber) * maxRecords;
         let fromID: number = toID - (maxRecords - 1);
@@ -171,6 +174,7 @@ window.onload = () => {
   }
   pageNumbers(1, 20);
 
+  // In this function wil do the extract the number entered in the search. Then it would take that and calculate the range which should be displayed for the user to click on. 
   async function resultsRange(event: any) {
     if (isFunctionRunning) {
       return;
@@ -194,11 +198,11 @@ window.onload = () => {
                                       `)
         $('.results-box').on('click', resultsSelect)
 
-        // Loop through all <span> elements after appending them to the search container
+        // Loop through all <span> elements after appending them to the search container and highlighting the specific is that was searched. 
       $("span").each(function () {
         const lowercasedID: string = $(this).text() as string; 
         if (lowercasedID == inputNumber) {
-          $(this).css({ "background-colovoidr": "#FFFF00", "color": "black" });
+          $(this).css({ "background-color": "#FFFF00", "color": "black" });
         } else {
           $(this).css({ "background-color": "initial", "color": "#A1AFC2  " });
         }
@@ -212,8 +216,9 @@ window.onload = () => {
       }
       isFunctionRunning = false;
     }
-  // Attach click event to the search button using jQuery
-  
+    $(".search-input").on("keyup", resultsRange);
+
+  // After the range has been returned to the user. The user can click on it and that will show the range of records on the table. 
   async function resultsSelect() {
     if (isFunctionRunning) {
       return;
@@ -227,22 +232,32 @@ window.onload = () => {
     let end = parseInt(rangeArray[1])
     isFunctionRunning = false;
     await showRecords(start, end)
+    const screenHeight = $(window).height();
+    const maxRecords = Math.floor(parseInt(screenHeight as any) / 45);
+    currentPage = Math.floor(end / maxRecords)
   }
-  
-  $(".search-input").on("keyup", resultsRange);
 
+  // When adjusting the height and on different screen sizes. This function would responsible for calculating how much records should be displayed based on the height of the window itself. 
   async function adjustDisplayedRecords(): Promise<number> {
     const screenHeight = $(window).height();
-    const maxRecords = Math.floor(screenHeight / 45);
-    $('tbody').empty()
-    console.log( maxRecords);
-    
-    await showRecords(1, maxRecords) 
-    return maxRecords
-  } 
-  
+    const maxRecords = Math.floor(parseInt(screenHeight as any) / 45);
+    currentFromID = (currentPage - 1) * maxRecords + 1;
+    currentToID = currentPage * maxRecords;
+    $("tbody").empty();
+    await showRecords(currentFromID, currentToID);
+    return maxRecords;
+  }
   $(window).on('resize', adjustDisplayedRecords);
-  // $(document).ready(adjustDisplayedRecords);
+
+  // Just a loader to display when the table is empty and records is being fetched. 
+  function loader() {
+    let content = $('tbody').text();
+    if(content == '') {
+      $('.results').append('<div class="loader"></div>')
+    } else {
+      $('.loader').css({'display': 'none'})
+    }
+  }
 
 };
 
