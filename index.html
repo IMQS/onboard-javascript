@@ -10,24 +10,24 @@
 <body>
 	
 	<div class="grid-container">	
-<div id="spinner" style="display: none; height: 100%;">
+    <div id="spinner" style="display: none; z-index: 10002;">
 	<img src="spinner.gif" alt="Loading..." />
-  </div>
-		<div class="top">
-			<h3>Onboarding-project</h3>
-			<input type="text" id="searchInputFrom" placeholder="Enter From ID">
-		   <input type="text" id="searchInputTo" placeholder="Enter To ID">
-		   <button id="searchButton" onclick=" updateGrid()">Search</button>
-		   <button id="reloadBtn"  onclick="pageReload()">Reset</button>
-		</div>
+    </div>
 		<div id="grid">
 		</div>
+		</div>
+		
 		<div class="grid-controls">
-		<button id="prevBtn" class="btn">Prev</button>
-		<span id="pageInfo" ></span>
-		<button id="nextBtn" class="btn">Next</button>
-		</div>
-		</div>
+			<div class="records"></div>
+			<button id="prevBtn" class="btn">Prev</button>
+			<span id="pageInfo" ></span>
+			<button id="nextBtn" class="btn">Next</button>
+			<div class="search-container">
+				<input type="text" id="toInput" placeholder="Search ID...">
+				<button id="searchBtn"  class="btn">Search</button>
+			  </div>
+			  
+			</div>	
 	<script src="/app.js"></script>
 </body>
 

@@ -1,257 +1,274 @@
-// Define an interface for the grid data, allowing any string keys and any values.
 interface GridData {
-    [key: string]: any;
-  }
-  
-  // Define an interface for column names 
-  interface ColumnName {
-    name: string;
-  }
-  
-  // Constants and variables used for pages  and data storage.
+  [key: string]: any;
+}
 
-  const PAGE_SIZE = 30;
-  let currentPage = 1;
-  let totalItems = 0;
-  let data: GridData[] = [];
-  let columnNames: ColumnName[] = [];
-  
-  // Entry point after the DOM has loaded.
- 
-  $(document).ready(() => {
-    fetchRecordCount(); 
-    fetchColumns();
-    fetchRecords();
-    setupControls(); 
-    createGrid();
-  });
-  
-  // Fetch the total number of records.
-function fetchRecordCount() {
- // Show the spinner before making the  request  and hide the input elements
- $('#spinner').show();
- $('.top').hide();
+interface ColumnName {
+  name: string;
+}
 
-
-    $.ajax({
-      url: 'http://localhost:2050/recordCount',
-      method: 'GET',
-      success: (response: number) => {
-        totalItems = response;
-        // console.log(response); 
-      },
-      error: () => {
-        console.error('Failed to fetch record count');
-      },
-      complete: () => {
-        // Hide the spinner after  request is completed
-        $('#spinner').hide();
-        $('.top').show();
-      }
-    });
-  }
+class ApiData {
+  pageSize: number;
+  currentPage: number = 1;
+  data: GridData[] = [];
+  totalItems: number = 0;
+  columnNames: ColumnName[] = [];
+  maxGridHeight: number = 0;
   
-  // Fetch the column names for the grid.
-  function fetchColumns() {
-    $('#spinner').show();
-    $('.top').hide();
-    $.ajax({
-      url: 'http://localhost:2050/columns',
-      method: 'GET',
-      success: (response) => {
-        let res = JSON.parse(response);
-        // Convert the column names to ColumnName objects and store in columnNames array.
-        columnNames = res.map((columnName: any) => ({ name: columnName }));
-        data = new Array<GridData>(columnNames.length); // Initialize the data array with the number of columns.
-      },
-      error: () => {
-        console.error('Failed to fetch columns');
-      },
-      complete: () => {
-        // Hide the spinner after the AJAX request is completed
-        $('#spinner').hide();
-        $('.top').show();
-      }
-    });
-  }
-  
-function fetchRecords() {
-    $('#spinner').show();
-    $('.top').hide();
-    const from = (currentPage - 1) * PAGE_SIZE;
-    const to = from + PAGE_SIZE;
-    $.ajax({
-      url: `http://localhost:2050/records?from=${from}&to=${to}`,
-      method: 'GET',
-      success: (response) => {
-        let res = JSON.parse(response);
-        data = []; // Reset the data array for the current page
-        for (let i = 0; i < res.length; i++) {
-          const record = res[i];
-          if (Array.isArray(record)) { 
-            const obj: GridData = {};
-            for (let j = 0; j < columnNames.length && j < record.length; j++) {
-              const columnName = columnNames[j].name;
-              const columnValue = record[j];
-              obj[columnName] = columnValue; // Map column names to their corresponding values.
-            }
-            data.push(obj); // Add the row to the data array
-          } else{
-            console.log('array is empty');
-          }
-        }
-        console.table(data);
-        createGrid(); 
-      },
-      error: () => {
-        console.error('Failed to fetch records');
-      },
-      complete:() =>{
-        $('#spinner').hide();
-        $('.top').show();
-      }
-    });
-  }
-  // update grid to display search by ID items 
-  function updateGrid() {
-    $('#spinner').show();
-    $('.top').hide();
-    const fromVal = $('#searchInputFrom').val();
-    const toVal = $('#searchInputTo').val();
 
-    if (!fromVal || !toVal) {
-      $('#spinner').hide();
-      $('.top').show();
-      alert('Please enter both "From" and "To" values.');
-      return;
-    }
-  
-    if (typeof fromVal === 'string' && typeof toVal === 'string') {
-      const from = parseInt(fromVal, 10);
-      const to = parseInt(toVal, 10);
-
-    if (isNaN(from) || isNaN(to)) {
-    $('#spinner').hide();
-    $('.top').show();
-    alert('Please enter valid numeric values.');
-    return;
+  constructor(pageSize: number) {
+    this.pageSize = pageSize;
   }
+
+  async initialize() {
+    try {
+      this.adjustGridHeight();
+      await this.recordCount();
+      await this.fetchColumns();
+      await this.fetchRecords();
+      this.setupControls();
       
-  if (from > to || to - from > 10000) {
-    $('#spinner').hide();
-    $('.top').show();
-    alert('Please enter a valid range (1-999999) with a maximum of 10000 records.');
-    return;
-  }
-  if (!isNaN(from) && !isNaN(to)) {
-        $.ajax({
-          url: `http://localhost:2050/records?from=${from}&to=${to}`,
-          method: 'GET',
-          success: (response) => {
-            let newData = JSON.parse(response);
-            console.table(newData);
-            if (Array.isArray(newData)) {
-              data = [];
-              for (let i = 0; i < newData.length; i++) {
-                const record = newData[i];
-                if (Array.isArray(record)) { 
-                  const obj: GridData = {};
-                  for (let j = 0; j < columnNames.length && j < record.length; j++) {
-                    const columnName = columnNames[j].name;
-                    const columnValue = record[j];
-                    obj[columnName] = columnValue; // Map column names to their corresponding values.
-                  }
-                  data.push(obj); 
-                } 
-              }
-              createGrid(); // Update the grid with the new data
-              console.log(data);
-
-            } 
-          },
-          error: () => {
-            console.error('Failed to fetch records');
-            $('#spinner').hide()
-            $('.top').show()
-            alert('Please enter a valid range! (1-999999)');
-          },
-          complete: () => {
-            $('#spinner').hide(); 
-            $('.top').show();
-          }
-        });
-      }
+      
+    } catch (error) {
+      console.error('Error during initialization:', error);
     }
   }
   
-  // Render the grid with the fetched data.
- function createGrid() {
+  async recordCount() {
+    try {
+      const response = await this.fetchData('http://localhost:2050/recordCount');
+      this.totalItems = response;
+    } catch (error) {
+      console.error('Failed to fetch record count', error);
+      throw error;
+    }
+  }
+
+  async fetchColumns() {
+    try {
+      const response = await this.fetchData('http://localhost:2050/columns');
+      const res = JSON.parse(response);
+      this.columnNames = res.map((columnName: any) => ({ name: columnName }));
+      this.data = new Array<GridData>(this.columnNames.length);
+    } catch (error) {
+      console.error('Failed to fetch columns', error);
+      throw error;
+    }
+  }
+
+  async fetchRecords() {
+    try {
+      const from = (this.currentPage - 1) * this.pageSize;
+      const to = from + this.pageSize;
+      //  Display spinner while fetching records
+    $('#spinner').show();
+      const response = await this.fetchData(`http://localhost:2050/records?from=${from}&to=${to}`);
+      const res = JSON.parse(response);
+      this.data = res.map((record: any) => {
+        const obj: GridData = {};
+        for (let j = 0; j < this.columnNames.length && j < record.length; j++) {
+          const columnName = this.columnNames[j].name;
+          const columnValue = record[j];
+          obj[columnName] = columnValue;
+        }
+        return obj;
+      });
+      $('#spinner').hide();
+     this.displayRecords();
+    } catch (error) {
+      console.error('Failed to fetch records', error);
+      throw error;
+    }
+  }
+  adjustGridHeight() {
+    const gridElement = document.getElementById('grid');
+    const pageCntrl = $('.grid-controls').innerHeight();
+    const screenHeight = $(window).innerHeight();
+    if (gridElement && pageCntrl !== undefined && screenHeight !== undefined) {
+      this.maxGridHeight = screenHeight - pageCntrl;
+      gridElement.style.height = `${this.maxGridHeight}px`;
+      gridElement.style.overflow = 'none';
+    }
+  }
+  
+  async searchRecords(from: number, to: number) {
+    try {
+      // Display spinner while fetching records
+      $('#spinner').show();
+
+      const response = await this.fetchData(`http://localhost:2050/records?from=${from}&to=${to}`);
+      const res = JSON.parse(response);
+      this.data = res.map((record: any) => {
+        const obj: GridData = {};
+        for (let j = 0; j < this.columnNames.length && j < record.length; j++) {
+          const columnName = this.columnNames[j].name;
+          const columnValue = record[j];
+          obj[columnName] = columnValue;
+        }
+        return obj;
+      });
+
+      $('#spinner').hide();
+      this.displayRecords();
+      // this.updatePageInfo();
+    } catch (error) {
+      console.error('Failed to fetch records', error);
+      alert('please enter values in the range (0-999999)')
+      
+      throw error;
+    }
+  }
+
+  private async fetchData(url: string): Promise<any> {
+    try {
+      $('#overlay').show();
+      const response = await $.ajax({
+        url,
+        method: 'GET',
+      });
+      $('#overlay').hide();
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private setupControls() {
+    $('#prevBtn').on('click', () => this.handlePageChange(-1));
+    $('#nextBtn').on('click', () => this.handlePageChange(1));
+    $(window).on('resize', debounce(this.handleResize, 350));
+    
+   
+  }
+
+  private handlePageChange(delta: number) {
+    const totalPages = Math.ceil(this.totalItems / this.pageSize);
+    const newPage = this.currentPage + delta;
+    
+    if (newPage >= 1 && newPage <= totalPages) {
+      this.currentPage = newPage;
+      this.fetchRecords().then(this.displayRecords);
+      this.updatePageInfo();
+    }
+  }
+
+  private handleResize = () => {
+    const newWindowHeight = Math.floor($(window).innerHeight() as number);
+    const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;
+
+    if (newGridSize >= 0) {
+      this.pageSize = newGridSize;
+      this.fetchRecords().then(this.displayRecords);
+      this.adjustGridHeight();
+    }
+  };
+
+ 
+
+  private displayRecords = () => {
+    const gridTemplate = new GridTemplate(this.columnNames, this.data);
+    gridTemplate.displayRecords();
+    this.updatePageInfo();
+    
+  };
+
+   updatePageInfo() {
+    const totalPages = Math.ceil(this.totalItems / this.pageSize);
+    const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
+    const from = (this.currentPage - 1) * this.pageSize;
+    const to = (this.currentPage)*this.pageSize
+    $('#pageInfo').text(pageInfo);
+    $('.records').text(`Showing records ${from} to ${to}`);
+  }
+}
+
+class GridTemplate {
+  private columnNames: ColumnName[] = [];
+  private dataRecords: GridData[] = [];
+
+  constructor(columnNames: ColumnName[], dataRecords: GridData[]) {
+    this.columnNames = columnNames;
+    this.dataRecords = dataRecords;
+  }
+
+  setDataRecords(dataRecords: GridData[]): void {
+    this.dataRecords = dataRecords;
+  }
+
+  displayRecords(): void {
     const gridElement = document.getElementById('grid');
     if (gridElement) {
-      gridElement.innerHTML = ''; // Clear the existing grid .
-  
-      // Create table element
+      gridElement.innerHTML = '';
+
       const table = document.createElement('table');
-  
-      // Create table header
       const thead = document.createElement('thead');
       const headerRow = document.createElement('tr');
-      columnNames.forEach((column) => {
+      this.columnNames.forEach((column) => {
         const th = document.createElement('th');
         th.textContent = column.name;
         headerRow.appendChild(th);
       });
       thead.appendChild(headerRow);
       table.appendChild(thead);
-  
-      // Create table body
+
       const tbody = document.createElement('tbody');
-      data.forEach((row) => {
+      this.dataRecords.forEach((row) => {
         const tr = document.createElement('tr');
-        columnNames.forEach(async (column) => {
+        this.columnNames.forEach((column) => {
           const td = document.createElement('td');
-          td.textContent = await(row[column.name]);
+          td.textContent = row[column.name];
           tr.appendChild(td);
         });
         tbody.appendChild(tr);
       });
       table.appendChild(tbody);
-  
-      // Append the table to the grid element
       gridElement.appendChild(table);
+      
     }
-    updatePageInfo();
-    
-   
   }
+ 
+}
 
-  // Set up page controls with event handlers.
-  function setupControls() {
-    $('#prevBtn').on('click', () => {
-      if (currentPage > 1) {
-        currentPage--; // Go to the previous page.
-        fetchRecords(); // Fetch records for the new page.
-      }
+const PAGE_SIZE = 35;
+const gridRatio = 0.46;
+const rowHeight = 16;
+
+function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
+  let timeout: number;
+
+  return (...args: Parameters<F>): Promise<ReturnType<F>> => {
+    clearTimeout(timeout);
+
+    return new Promise((resolve) => {
+      timeout = setTimeout(() => {
+        resolve(func(...args));
+      }, waitFor);
     });
-  
-    $('#nextBtn').on('click', () => {
-      const totalPages = Math.ceil(totalItems / PAGE_SIZE);
-      if (currentPage < totalPages) {
-        currentPage++; // Go to the next page.
-        fetchRecords();
-      }
-    });
-  }
+  };
+}
 
-  // Update the page information display.
-  function updatePageInfo() {
-    const totalPages = Math.ceil(totalItems / PAGE_SIZE);
-    const pageInfo = `Page ${currentPage} of ${totalPages}`;
-    $('#pageInfo').text(pageInfo); // Update the page information text.
-  }
+$(document).ready(() => {
+  const windowHeight = Math.floor($(window).innerHeight() as number);
+  const initialGridSize = Math.floor((windowHeight * gridRatio) / rowHeight) - 1;
+  const apidata = new ApiData(initialGridSize);
+  $('#searchBtn').on('click', () => {
+    const to = parseInt($('#toInput').val() as string);
 
-  // reload page 
-  function pageReload(){
-    location.reload();
-  }
-  
+    if (!isNaN(to)) {  
+      const from = Math.max(0, to - apidata.pageSize + 1); 
+      apidata.searchRecords(from, to);
+      // const totalPages = Math.ceil(apidata.totalItems / apidata.pageSize);
+      // apidata.currentPage = Math.ceil(to / apidata.pageSize);
+      // apidata.currentPage = Math.min(apidata.currentPage, totalPages);
+      // apidata.updatePageInfo();
+    }
+    $('#toInput').val('');
+  });
+
+
+  apidata.initialize();
+  const overlay = $('<div id="overlay"></div>');
+  $('body').append(overlay);
+});
+
+
+
