@@ -1,49 +1,47 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>JS Onboard Project</title>
-    <link rel="stylesheet" href="style.css" />
-    <script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
-  </head>
-  <body>
-    <h2>IMQS Onboarding Project</h2>
 
-    <div class="navigation">
-      <div id="recordRange"></div>
-      <button id="prevPageButton">Previous Page</button>
-      <form id="searchForm">
-        <div class="form-group">
-          <input type="number" id="searchInput" placeholder="Search Record By ID" min="1" max="999999" required/>
-        </div>
-        <div class="form-group">
-          <button type="submit">Search</button>
-        </div>
-      </form>
-      <button id="nextPageButton">Next Page</button>
-    </div>
+<head>
+  <title>JS Onboard Project</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+</head>
 
+<body>
+  <div class="navigation">
     <p id="searchResultsMessage"></p>
-
-    <div class="table-container">
-      <div id="loader" style="display: none;">
-        <div class="loader">
-          <div class="loader-text">Fetching Records . . .</div>
-          <div class="loader-bar"></div>
-        </div>                 
+    <button id="prevPageButton">Previous Page</button>
+    <form id="searchForm">
+      <div class="form-group">
+        <input type="number" id="searchInput" placeholder="Search Record By ID" min="1" max="999999" required />
       </div>
-      <div id="tableWrapper">
-        <table>
-          <thead>
-            <tr id="tableHeaderRow">
-              <!-- The Columns will be created here and be displayed as th -->
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <!-- The Records will be created here and be displayed as td -->
-          </tbody>
-        </table>
+      <div class="form-group">
+        <button type="submit">Search</button>
+      </div>
+    </form>
+    <button id="nextPageButton">Next Page</button>
+  </div>
+  <div class="table-container">
+    <div id="loader" style="display: none">
+      <div class="loader">
+        <div class="loader-text">Fetching Records . . .</div>
+        <div class="loader-bar"></div>
       </div>
     </div>
-    <script src="/app.js"></script>
-  </body>
+    <div id="tableWrapper">
+      <table>
+        <thead>
+          <tr id="tableHeaderRow">
+            <!-- The Columns will be created here and be displayed as th -->
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- The Records will be created here and be displayed as td -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="/app.js"></script>
+</body>
+
 </html>
