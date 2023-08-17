@@ -1,15 +1,17 @@
 window.onload = function () {
-  // displayPageData(1, 26);
   updateRecordsPerPage();
   fetchTotalRecordCount();
   fetchAndDisplayColumns();
-  window.addEventListener("resize", updateRecordsPerPage);
 };
+
 // Global variables
 const IMQS: string = "http://localhost:2050";
 let totalRecordCount: number;
 let currentPage: number = 1;
 let recordsPerPage: number = 32;
+let resizeTimeout: number | undefined;
+let searchResultDisplay = false;
+let searchResultIndexes: number[] = [];
 
 // Displaying the columns and creating the th dynamically as the columns
 async function fetchAndDisplayColumns(): Promise<void> {
@@ -27,65 +29,38 @@ async function fetchAndDisplayColumns(): Promise<void> {
     console.log("ERROR:", error);
   }
 }
-
-async function goToPage(pageNumber: number): Promise<void> {
-  currentPage = pageNumber;
-  let fromRecord = (currentPage - 1) * recordsPerPage;
-  await displayPageData(fromRecord, recordsPerPage);
-}
-
-$("#prevPageButton").on("click", async () => {
-  if (currentPage > 1) {
-    currentPage--;
-    let fromRecord = (currentPage - 1) * recordsPerPage;
-    await displayPageData(fromRecord, recordsPerPage);
-  }
-});
-
-$("#nextPageButton").on("click", async () => {
-  const nextPage = Math.ceil(totalRecordCount / recordsPerPage);
-  if (currentPage < nextPage) {
-    let fromValue;
-    let recordsToDisplay;
-
-    // Check if it's the last page
-    if (currentPage === nextPage - 1) {
-      fromValue = currentPage * recordsPerPage;
-      recordsToDisplay = totalRecordCount - fromValue;
-    } else {
-      fromValue = currentPage * recordsPerPage;
-      recordsToDisplay = recordsPerPage;
-    }
-
-    currentPage++;
-
-    await displayPageData(fromValue, recordsToDisplay);
-  }
-});
-
-async function displayPageData(
-  fromRecord: number,
-  recordsToDisplay: number
-): Promise<void> {
+async function displayPageData(fromRecord: number, recordsToDisplay: number) {
   try {
+    // Cap fromRecord at 999999
+    fromRecord = Math.min(fromRecord, 999999);
+
+    // Calculate the maximum number of records that can be displayed
+    const maxRecordsToDisplay = Math.min(
+      totalRecordCount - fromRecord,
+      recordsToDisplay
+    );
+
     let response = await fetch(
       `${IMQS}/records?from=${fromRecord}&to=${
-        fromRecord + recordsToDisplay - 1
+        fromRecord + maxRecordsToDisplay - 1
       }`
     );
-    let data: any[] = await response.json();
+    let data = await response.json();
     let tableData = "";
-    data.forEach((record: string[]) => {
+
+    if (currentPage * recordsPerPage > totalRecordCount) {
+      // Adjust recordsToDisplay for the last page
+      recordsToDisplay = totalRecordCount - fromRecord;
+    }
+
+    data.forEach((record: any[]) => {
       tableData += "<tr>";
       record.forEach((value: string) => {
         tableData += `<td>${value}</td>`;
       });
       tableData += "</tr>";
     });
-    // Adjust recordsToDisplay for the last page
-    if (currentPage * recordsPerPage > totalRecordCount) {
-      recordsToDisplay = totalRecordCount % recordsPerPage;
-    }
+
     $("#tableBody").html(tableData);
   } catch (error) {
     console.log("ERROR:", error);
@@ -103,38 +78,60 @@ async function fetchTotalRecordCount(): Promise<void> {
   }
 }
 
+// Function to handle resizing events
+function handleResize() {
+  // Clear the previous timeout
+  clearTimeout(resizeTimeout);
+
+  // Timeout to call the updateRecordsPerPage function
+  resizeTimeout = setTimeout(() => {
+    updateRecordsPerPage();
+  }, 300);
+}
+
+// Attach the debounced handler to the window resize event
+window.addEventListener("resize", handleResize);
+
 // Function to calculate and update records per page based on screen height
 async function updateRecordsPerPage() {
   const screenHeight = window.innerHeight;
   const estimatedRowHeight = 32;
   const oldRecordsPerPage = recordsPerPage;
 
+  // Show the loader while calculating
   // $("#loader").show();
 
   recordsPerPage = Math.floor(screenHeight / estimatedRowHeight);
-  recordsPerPage = Math.max(recordsPerPage - 1, 1);
+  recordsPerPage = Math.min(recordsPerPage - 3, 999999);
+  recordsPerPage = Math.max(recordsPerPage, 1);
 
-  // console.log(`Calculating...`);
-
-  // Adding a delay
-  // await new Promise((resolve) => setTimeout(resolve, 3000));
+  // Simulate a delay for calculation
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   if (recordsPerPage !== oldRecordsPerPage) {
-    // Show a loader while fetching and displaying data
+    // Show another loader while fetching and displaying data
     // $("#loader").show();
 
     console.log(`Fetching and displaying data...`);
 
     // Simulate a delay for fetching and displaying data
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    console.log(`Records per page: ${recordsPerPage}`);
-
-    // Hide the loader after data is displayed
-    $("#loader").hide();
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Calculate the new fromRecord based on the current page
     const fromRecord = (currentPage - 1) * recordsPerPage;
+    const toRecord = fromRecord + recordsPerPage - 1;
+
+    // Calculate actual record numbers being displayed
+    const actualFromRecord = Math.min(fromRecord + 1, totalRecordCount);
+    const actualToRecord = Math.min(toRecord + 1, totalRecordCount);
+
+    alert(`Displaying records from ${actualFromRecord} to ${actualToRecord}`);
+    console.log(
+      `Displaying records from ${actualFromRecord} to ${actualToRecord}`
+    );
+
+    // Hide the loader after data is displayed
+    $("#loader").hide();
 
     // Display the new data
     await displayPageData(fromRecord, recordsPerPage);
@@ -167,7 +164,7 @@ $("#searchForm").submit(async function (e) {
       let fromValue;
       let recordsToDisplay;
       if (searchValue >= 999992) {
-        // Display the last 27 records
+        // Display the last 7 records
         targetPage = Math.ceil(totalRecordCount / recordsPerPage);
         fromValue = Math.max((targetPage - 1) * recordsPerPage, 0);
         recordsToDisplay = totalRecordCount - fromValue;
@@ -200,5 +197,34 @@ $("#searchForm").submit(async function (e) {
   } finally {
     $("#loader").hide();
     $("#tableWrapper").show();
+  }
+});
+
+$("#prevPageButton").on("click", async () => {
+  if (currentPage > 1) {
+    currentPage--;
+    let fromRecord = (currentPage - 1) * recordsPerPage;
+    await displayPageData(fromRecord, recordsPerPage);
+  }
+});
+
+$("#nextPageButton").on("click", async () => {
+  const nextPage = Math.ceil(totalRecordCount / recordsPerPage);
+  if (currentPage < nextPage) {
+    let fromValue;
+    let recordsToDisplay;
+
+    // Check if it's the last page
+    if (currentPage === nextPage - 1) {
+      fromValue = currentPage * recordsPerPage;
+      recordsToDisplay = totalRecordCount - fromValue;
+    } else {
+      fromValue = currentPage * recordsPerPage;
+      recordsToDisplay = recordsPerPage;
+    }
+
+    currentPage++;
+
+    await displayPageData(fromValue, recordsToDisplay);
   }
 });
