@@ -80,10 +80,7 @@ async function fetchTotalRecordCount(): Promise<void> {
 
 // Function to handle resizing events
 function handleResize() {
-  // Clear the previous timeout
   clearTimeout(resizeTimeout);
-
-  // Timeout to call the updateRecordsPerPage function
   resizeTimeout = setTimeout(() => {
     updateRecordsPerPage();
   }, 300);
@@ -108,33 +105,59 @@ async function updateRecordsPerPage() {
   // Simulate a delay for calculation
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  if (recordsPerPage !== oldRecordsPerPage) {
-    // Show another loader while fetching and displaying data
-    // $("#loader").show();
+  if (searchResultDisplay) {
+    // If a search result is being displayed, adjust fromRecord accordingly
+    const searchIndex = searchResultIndexes[0];
+    const searchPage = Math.ceil((searchIndex + 1) / recordsPerPage);
+    const newFromRecord = (searchPage - 1) * recordsPerPage;
+    const newToRecord = newFromRecord + recordsPerPage - 1;
+    const actualFromRecord = Math.min(newFromRecord + 1, totalRecordCount);
+    const actualToRecord = Math.min(newToRecord + 1, totalRecordCount);
 
-    console.log(`Fetching and displaying data...`);
-
-    // Simulate a delay for fetching and displaying data
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // Calculate the new fromRecord based on the current page
-    const fromRecord = (currentPage - 1) * recordsPerPage;
-    const toRecord = fromRecord + recordsPerPage - 1;
-
-    // Calculate actual record numbers being displayed
-    const actualFromRecord = Math.min(fromRecord + 1, totalRecordCount);
-    const actualToRecord = Math.min(toRecord + 1, totalRecordCount);
-
-    alert(`Displaying records from ${actualFromRecord} to ${actualToRecord}`);
     console.log(
-      `Displaying records from ${actualFromRecord} to ${actualToRecord}`
+      `Displaying search result from ${actualFromRecord} to ${actualToRecord}`
     );
 
-    // Hide the loader after data is displayed
-    $("#loader").hide();
-
     // Display the new data
-    await displayPageData(fromRecord, recordsPerPage);
+    await displayPageData(newFromRecord, recordsPerPage);
+    $("#tableBody tr").css("background-color", "");
+    searchResultIndexes.forEach((searchIndex: any) => {
+      const rowIndex = searchIndex % recordsPerPage;
+      const rowElement = $("#tableBody tr").eq(rowIndex);
+      rowElement.css("background-color", "yellow");
+    });
+  } else if (recordsPerPage !== oldRecordsPerPage) {
+    // $("#loader").show();
+
+    recordsPerPage = Math.floor(screenHeight / estimatedRowHeight);
+    recordsPerPage = Math.min(recordsPerPage - 3, 999999);
+    recordsPerPage = Math.max(recordsPerPage, 1);
+
+    // Simulate a delay for calculation
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    if (recordsPerPage !== oldRecordsPerPage) {
+      console.log(`Fetching and displaying data...`);
+
+      // Simulate a delay for fetching and displaying data
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Calculate the new fromRecord based on the current page
+      const fromRecord = (currentPage - 1) * recordsPerPage;
+      const toRecord = fromRecord + recordsPerPage - 1;
+
+      const actualFromRecord = Math.min(fromRecord + 1, totalRecordCount);
+      const actualToRecord = Math.min(toRecord + 1, totalRecordCount);
+
+      console.log(
+        `Displaying records from ${actualFromRecord} to ${actualToRecord}`
+      );
+
+      $("#loader").hide();
+
+      // Display the new data
+      await displayPageData(fromRecord, recordsPerPage);
+    }
   }
 }
 
@@ -160,9 +183,11 @@ $("#searchForm").submit(async function (e) {
       []
     );
     if (searchIndexes.length > 0) {
-      let targetPage;
-      let fromValue;
-      let recordsToDisplay;
+      searchResultDisplay = true;
+      searchResultIndexes = searchIndexes;
+      let targetPage: any;
+      let fromValue: any;
+      let recordsToDisplay: any;
       if (searchValue >= 999992) {
         // Display the last 7 records
         targetPage = Math.ceil(totalRecordCount / recordsPerPage);
@@ -180,12 +205,13 @@ $("#searchForm").submit(async function (e) {
       searchIndexes.forEach((searchIndex: any) => {
         let rowIndex = searchIndex % recordsPerPage;
         let rowElement = $("#tableBody tr").eq(rowIndex);
-        rowElement.css("background-color", "yellow");
+        rowElement.css("background-color", "var(--results-color)");
       });
       $("#searchResultsMessage").html(
         `<div>Showing search Results for Record number ${searchValue}</div>`
       );
     } else {
+      searchResultDisplay = false;
       $("#tableBody").html("");
       $("#recordRange").html("No records found.");
       $("#searchResultsMessage").html(
