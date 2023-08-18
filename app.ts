@@ -1,7 +1,13 @@
+var firstNumber: number = 0;
+console.log
+var lastNumber: number;
+console.log
+
+
 
 async function fetchRecordCount(): Promise<number> {
   try {
-    const recordCount = await fetch(`http://192.168.4.133:2050/recordCount`);
+    const recordCount = await fetch(`http://localhost:2050/recordCount`);
     if (!recordCount.ok) {
       throw new Error('Failed to fetch record count');
     }
@@ -17,13 +23,13 @@ async function fetchRecordCount(): Promise<number> {
 
 
 function fetchColumns(): void {
-  fetch("http://192.168.4.133:2050/columns")
+  fetch("http://localhost:2050/columns")
     .then((response: Response) => {
       return response.json() as Promise<string[]>;
     })
     .then((columns: string[]) => {
       const colArray = columns;
-      console.log(colArray);
+
       for (let c = 0; c < colArray.length; c++) {
         $(".head").append(`<th>${colArray[c]}</th>`);
       }
@@ -31,47 +37,96 @@ function fetchColumns(): void {
 }
 fetchColumns();
 
-async function fetchRecords(): Promise<any[][]> {
-  try {
-    let count: number = await fetchRecordCount() - 1;
-    const response = await fetch(`http://192.168.4.133:2050/records?from=0&to=${count}`);
-    if (!response.ok) {
-      throw new Error("Sorry, there's a problem in the network");
-    }
-    const records = await response.json();
-    return records;
-  } catch (error) {
-    console.error("Error fetching records:", error);
-    throw error;
-  }
+
+
+async function adjustRowsByScreenHeight(): Promise<number> {
+  $('#loader').show()
+  const tableBody = document.querySelector('.tableRecords tbody') as HTMLElement;
+  const rowHeight = 30
+  const maxRows = Math.floor(tableBody.clientHeight / rowHeight);
+  
+  return maxRows;
+
 }
-fetchRecords()
+
+async function fetchRecords(from: number, to: number): Promise<any[]> {
+
+  const response = await fetch(`http://localhost:2050/records?from=${from}&to=${to}`);
+  if (!response.ok) {
+    throw new Error("Sorry, there's a problem with the network");
+  }
+
+  return response.json();
+
+}
+
+
+$(window).on('resize', async (event: any) => {
+  event.preventDefault()
+  $('#page').empty();
+  // const count: number = await fetchRecordCount() - 1;
+  // const calculatedRows = await adjustRowsByScreenHeight();
+
+  // console.log(firstNumber)
+  // console.log(lastNumber)
+  // if (firstNumber < 0) {
+  //   firstNumber = 0;
+  // }
+
+  // if (lastNumber > count) {
+  //   lastNumber = count;
+  // } else {
+  //   lastNumber = firstNumber + (calculatedRows-1);
+  // }
+
+  await displayRecords();
+
+})
 
 async function displayRecords(): Promise<void> {
   try {
     $('#loader').show()
-    fetch(`http://192.168.4.133:2050/records?from=0&to=19`)
-      .then((response: Response) => {
+    const calculatedRows = await adjustRowsByScreenHeight();
+    const inputValue = $('#searchInput').val() as number;
+  
 
-        if (!response.ok) {
-          throw new Error("Sorry, there's a problem in the network");
-        }
-        return response.json() as Promise<any[]>;
-      })
-      .then((records: any[]) => {
-        const recArray = records;
-        $('#loader').hide()
+    if (!lastNumber) {
+      lastNumber = firstNumber + (calculatedRows - 1);
+    }
+    if (firstNumber < 0) {
+      firstNumber = 0;
+    }
+    if (lastNumber >= 999999) {
+      lastNumber = 999999;
+    }else{
+      lastNumber = firstNumber + (calculatedRows - 1);
+    }
 
-        for (let r = 0; r < 20; r++) {
-          $("tbody").append(`<tr class="row"></tr>`);
-          const lastRow = $(".row:last");
-          for (let i = 0; i < recArray[r].length; i++) {
-            lastRow.append(`<td>${recArray[r][i]}</td>`);
-          }
+    const records = await fetchRecords(firstNumber, lastNumber);
+    const tbody = $("tbody");
+    tbody.empty();
+    for (let r = 0; r < records.length; r++) {
+      $("tbody").append(`<tr class="row"></tr>`);
+      const lastRow = $(".row:last");
+      for (let i = 0; i < records[r].length; i++) {
+        lastRow.append(`<td>${records[r][i]}</td>`);
+
+       
+
+      } 
+      if(records[r].includes(inputValue)){
+          console.log(records[r]);
+          lastRow.css('background-color', '#DDC0B4'); 
+        
         }
-        $('#page').empty()
-        $('#page').append(`Showing record: 1 - 19`)
-      })
+      tbody.append(lastRow);
+
+    }
+  
+    $('#page').empty();
+    $('#page').append(`Showing record: ${firstNumber} - ${lastNumber}`);
+    $('#loader').hide()
+
   } catch (error) {
     console.error("Error displaying records:", error);
   }
@@ -79,110 +134,81 @@ async function displayRecords(): Promise<void> {
 displayRecords()
 
 
+async function updateRecordsAndResize(inputValue: number) {
+  const count: number = await fetchRecordCount() - 1;
+
+  if (isNaN(inputValue) || inputValue > count) {
+    alert(`${inputValue} is not a number within the range`);
+    $('#searchInput').val('');
+    return;
+  }
+
+  // Calculate a range of numbers around the inputValue
+  const range = await adjustRowsByScreenHeight(); // Adjust this value to control the range size
+  firstNumber = Math.max(0, inputValue - Math.floor(range / inputValue));
+  console.log(firstNumber);
+
+  lastNumber = Math.min(count, firstNumber + range - 1);
+  console.log(lastNumber);
+ 
+ 
+
+  await adjustRowsByScreenHeight();
+
+  await displayRecords();
+}
+
 
 $('.btnSearch').on('click', async (event: any) => {
-  event.preventDefault()
-  console.log('hello')
+  event.preventDefault();
   const inputValue = $('#searchInput').val() as number;
-  if (isNaN(inputValue)) {
-    alert(`${inputValue} is not a number`);
-    $('#searchInput').val('')
+  console.log(inputValue)
 
-  } else {
 
-    const firstNumber = Math.floor(inputValue / 10) * 10;
-    const lastNumber = firstNumber + 19
-    const tbody = $("tbody");
-    tbody.empty();
-    $('#page').empty();
-    try {
-      $('#loader').show()
-      fetch(`http://192.168.4.133:2050/records?from=${firstNumber}&to=${lastNumber}`)
-        .then((response: Response) => {
-
-          if (!response.ok) {
-            throw new Error("Sorry, there's a problem in the network");
-          }
-          return response.json() as Promise<any[]>;
-        })
-        .then((records: any[]) => {
-          const recArray = records;
-          $('#loader').hide()
-
-          for (let r = 0; r < 20; r++) {
-            $("tbody").append(`<tr class="row"></tr>`);
-            const lastRow = $(".row:last");
-            for (let i = 0; i < recArray[r].length; i++) {
-              lastRow.append(`<td>${recArray[r][i]}</td>`);
-            }
-          }
-          $('#page').empty()
-          $('#page').append(`Showing record: ${firstNumber} - ${lastNumber}`)
-        })
-    } catch (error) {
-      console.error("Error displaying records:", error);
-    }
-  }
-})
-
+  await updateRecordsAndResize(inputValue);
+});
 
 
 async function rightArrow(): Promise<void> {
-  const firstRow = document.querySelector("#recordsTable tbody");
-  if (firstRow) {
-    const cells = firstRow.querySelectorAll("td");
-    const firstRecord: string[] = [];
-    cells.forEach((cell) => {
-      firstRecord.push(cell.textContent || "");
-    });
-    const firstID = parseFloat(firstRecord[0]);
-    if (0 <= firstID) {
-      let clearTable = document.querySelector('tbody') as HTMLTableSectionElement | null;
-      if (clearTable) {
-        clearTable.innerHTML = "";
-
-        let firstRecord = + firstID + 20
-        let lastRecord = + firstRecord + 19
-        $('#page').empty()
-        $('#page').append(`Showing record: ${firstRecord} - ${lastRecord}`)
-
-        $('#loader').show()
-        fetch(`http://192.168.4.133:2050/records?from=${firstRecord}&to=${lastRecord}`)
-          .then((response: Response) => {
-
-            if (!response.ok) {
-              throw new Error("Sorry, there's a problem in the network");
-            }
-            return response.json() as Promise<any[]>;
-          })
-          .then((records: any[]) => {
-            const recArray = records;
-            $('#loader').hide()
-
-            for (let r = 0; r < 20; r++) {
-              $("tbody").append(`<tr class="row"></tr>`);
-              const lastRow = $(".row:last");
-              for (let i = 0; i < recArray[r].length; i++) {
-                lastRow.append(`<td>${recArray[r][i]}</td>`);
-
-
-              }
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching records:", error);
-          });
-
-      }
-    }
-  }
-}
-
-async function leftArrow(): Promise<void> {
-  let searchValue = $('#searchInput').val() as string
+  const lastRow = document.querySelector("#recordsTable tbody .row:last-child");
   let count: number = await fetchRecordCount() - 1;
 
-  const firstRow = document.querySelector("#recordsTable tbody");
+
+  if (lastRow) {
+    const cells = lastRow.querySelectorAll("td");
+    const lastRecord: string[] = [];
+    cells.forEach((cell) => {
+      lastRecord.push(cell.textContent || "");
+    });
+    const lastID = parseFloat(lastRecord[0]);
+    console.log(lastID);
+
+    if (0 <= lastID && lastID <= (count)) {
+      const tbody = $("tbody");
+      tbody.empty();
+
+      firstNumber = lastID + 1;
+
+      const calculatedRows = await adjustRowsByScreenHeight();
+
+      lastNumber = firstNumber + (calculatedRows - 1)
+
+      await adjustRowsByScreenHeight();
+      await displayRecords();
+
+    }
+
+  }
+}
+
+
+
+async function leftArrow(): Promise<void> {
+
+  let count: number = await fetchRecordCount() - 1;
+
+
+  const firstRow = document.querySelector("#recordsTable tbody .row:first-child");
 
   if (firstRow) {
     const cells = firstRow.querySelectorAll("td");
@@ -191,50 +217,41 @@ async function leftArrow(): Promise<void> {
       firstRecord.push(cell.textContent || "");
     });
     const firstID = parseFloat(firstRecord[0]);
-    if (20 <= firstID && firstID <= (count)) {
-      let clearTable = document.querySelector('tbody') as HTMLTableSectionElement | null;
-      if (clearTable) {
-        clearTable.innerHTML = "";
-
-        let firstRecord = firstID - 20
-
-        let lastRecord = firstRecord + 19
-        $('#page').empty()
-        $('#page').append(`Showing record: ${firstRecord} - ${lastRecord}`)
-        $('#loader').show()
-        fetch(`http://192.168.4.133:2050/records?from=${firstRecord}&to=${lastRecord}`)
-          .then((response: Response) => {
-
-            if (!response.ok) {
-              throw new Error("Sorry, there's a problem in the network");
-            }
-            return response.json() as Promise<any[]>;
-          })
-          .then((records: any[]) => {
-            const recArray = records;
-            $('#loader').hide()
+    console.log(firstID)
 
 
-            for (let r = 0; r < 20; r++) {
-              $("tbody").append(`<tr class="row"></tr>`);
-              const lastRow = $(".row:last");
-              for (let i = 0; i < recArray[r].length; i++) {
-                lastRow.append(`<td>${recArray[r][i]}</td>`);
+    const tbody = $("tbody");
+    tbody.empty();
+
+    const calculatedRows = await adjustRowsByScreenHeight();
+    console.log(calculatedRows);
+
+    firstNumber = firstID - (calculatedRows + 1)
+    console.log(firstRecord);
 
 
-              }
-            }
+    lastNumber = firstNumber + (calculatedRows)
+    console.log(lastNumber);
 
+    await adjustRowsByScreenHeight();
 
-          })
-          .catch((error) => {
-            console.error("Error fetching records:", error);
-          });
-
-      }
-    }
+    await displayRecords();
   }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

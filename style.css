@@ -5,12 +5,16 @@ body{
   margin: 0;
 }
 .tableRecords{
- 
-  height: 90vh;
+
   position: absolute;
   display: flex;
-  
-
+ 
+}
+.tableRecords tbody{
+   height: 85vh;
+}
+#recordsTable tbody .row td {
+  height: 1rem;
 }
 
 
@@ -20,7 +24,8 @@ body{
 table{
     width: 100%;
     table-layout: fixed;
-    flex-shrink: 0.2;
+  
+    margin-bottom: 5%;
    
    
    
@@ -44,6 +49,7 @@ table, th, td {
 
 td:hover{
     color: #97694F;
+    background-color:#DDC0B4;
   }
 
 .heading  {
@@ -53,6 +59,7 @@ td:hover{
    
    
 }
+
 
 .showRecords{
 
