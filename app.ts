@@ -1,7 +1,7 @@
 window.onload = function () {
-  updateRecordsPerPage();
-  fetchTotalRecordCount();
   fetchAndDisplayColumns();
+  fetchTotalRecordCount();
+  updateRecordsPerPage();
 };
 
 // Global variables
@@ -30,6 +30,8 @@ async function fetchAndDisplayColumns(): Promise<void> {
   }
 }
 async function displayPageData(fromRecord: number, recordsToDisplay: number) {
+  const nextPage = Math.ceil(totalRecordCount / recordsPerPage);
+  $("#currentPageNumber").text(`Page ${currentPage} out of ${nextPage}`);
   try {
     // Cap fromRecord at 999999
     fromRecord = Math.min(fromRecord, 999999);
@@ -78,12 +80,18 @@ async function fetchTotalRecordCount(): Promise<void> {
   }
 }
 
+// Function to update the current page display
+function updateCurrentPageDisplay() {
+  const nextPage = Math.ceil(totalRecordCount / recordsPerPage);
+  $("#currentPageNumber").text(`${currentPage} / ${nextPage}`);
+}
+
 // Function to handle resizing events
 function handleResize() {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
     updateRecordsPerPage();
-  }, 300);
+  }, 100);
 }
 
 // Attach the debounced handler to the window resize event
@@ -96,7 +104,8 @@ async function updateRecordsPerPage() {
   const oldRecordsPerPage = recordsPerPage;
 
   // Show the loader while calculating
-  // $("#loader").show();
+  $("#loader").show();
+  $("#tableWrapper").hide();
 
   recordsPerPage = Math.floor(screenHeight / estimatedRowHeight);
   recordsPerPage = Math.min(recordsPerPage - 3, 999999);
@@ -140,7 +149,7 @@ async function updateRecordsPerPage() {
       console.log(`Fetching and displaying data...`);
 
       // Simulate a delay for fetching and displaying data
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Calculate the new fromRecord based on the current page
       const fromRecord = (currentPage - 1) * recordsPerPage;
@@ -154,6 +163,7 @@ async function updateRecordsPerPage() {
       );
 
       $("#loader").hide();
+      $("#tableWrapper").show();
 
       // Display the new data
       await displayPageData(fromRecord, recordsPerPage);
@@ -164,7 +174,7 @@ async function updateRecordsPerPage() {
 $("#searchForm").submit(async function (e) {
   e.preventDefault();
   let searchValue = parseInt($("#searchInput").val() as string); // Convert to number
-  $("#loader").show();
+  $("#searching").show();
   $("#searchResultsMessage").show();
   $("#tableWrapper").hide();
   try {
@@ -172,19 +182,19 @@ $("#searchForm").submit(async function (e) {
       `${IMQS}/records?from=0&to=${totalRecordCount - 1}`
     );
     let allRecords: any[] = await response.json();
-    let searchIndexes = allRecords.reduce(
-      (indexes: number[], record: any[], index: number) => {
-        let idValue = parseInt(record[0]);
-        if (idValue === searchValue) {
-          indexes.push(index);
-        }
-        return indexes;
-      },
-      []
-    );
-    if (searchIndexes.length > 0) {
+
+    let searchIndex = -1;
+    for (let i = 0; i < allRecords.length; i++) {
+      let idValue = parseInt(allRecords[i][0]);
+      if (idValue === searchValue) {
+        searchIndex = i;
+        break;
+      }
+    }
+
+    if (searchIndex !== -1) {
       searchResultDisplay = true;
-      searchResultIndexes = searchIndexes;
+      searchResultIndexes = [searchIndex];
       let targetPage: any;
       let fromValue: any;
       let recordsToDisplay: any;
@@ -194,19 +204,19 @@ $("#searchForm").submit(async function (e) {
         fromValue = Math.max((targetPage - 1) * recordsPerPage, 0);
         recordsToDisplay = totalRecordCount - fromValue;
       } else {
-        targetPage = Math.ceil((searchIndexes[0] + 1) / recordsPerPage);
+        targetPage = Math.ceil((searchIndex + 1) / recordsPerPage);
         fromValue = (targetPage - 1) * recordsPerPage;
         recordsToDisplay = recordsPerPage;
       }
       currentPage = targetPage;
+
       await displayPageData(fromValue, recordsToDisplay);
       // Reset previous row background color
       $("#tableBody tr").css("background-color", "");
-      searchIndexes.forEach((searchIndex: any) => {
-        let rowIndex = searchIndex % recordsPerPage;
-        let rowElement = $("#tableBody tr").eq(rowIndex);
-        rowElement.css("background-color", "var(--results-color)");
-      });
+      let rowIndex = searchIndex % recordsPerPage;
+      let rowElement = $("#tableBody tr").eq(rowIndex);
+      rowElement.css("background-color", "var(--results-color)");
+
       $("#searchResultsMessage").html(
         `<div>Showing search Results for Record number ${searchValue}</div>`
       );
@@ -221,16 +231,18 @@ $("#searchForm").submit(async function (e) {
   } catch (error) {
     console.log("ERROR:", error);
   } finally {
-    $("#loader").hide();
+    $("#searching").hide();
     $("#tableWrapper").show();
   }
 });
 
 $("#prevPageButton").on("click", async () => {
+  const nextPage = Math.ceil(totalRecordCount / recordsPerPage);
   if (currentPage > 1) {
     currentPage--;
     let fromRecord = (currentPage - 1) * recordsPerPage;
     await displayPageData(fromRecord, recordsPerPage);
+    $("#currentPageNumber").text(`Page ${currentPage} out of ${nextPage}`);
   }
 });
 
@@ -252,5 +264,8 @@ $("#nextPageButton").on("click", async () => {
     currentPage++;
 
     await displayPageData(fromValue, recordsToDisplay);
+
+    // Display the current page number relative to total pages
+    $("#currentPageNumber").text(`Page ${currentPage} out of ${nextPage}`);
   }
 });
