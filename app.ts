@@ -75,6 +75,7 @@
       loader()
       let records = await getRecords(fromID, toID);
       let count: number = await getRecordCount();
+      count = count - 1
       let stringCount = count.toLocaleString().replace(/,/g, " ");
       $('.results').empty().append(`Displaying ID's ${fromID} - ${toID} out of ${stringCount}`)
       for (let i = 0; i < records.length; i++) {
@@ -125,6 +126,8 @@
         let pageNumber: any = $(this).attr("id");
         let toID = parseInt(pageNumber) * maxRecords;
         let fromID: number = toID - (maxRecords - 1);
+        currentFromID = fromID;
+        console.log(fromID)
         if(fromID > count || toID > count) {
           toID = count - 1 ;
           fromID = toID - maxRecords
@@ -200,7 +203,7 @@
         end = 1000000
       }
       let start: number = (end - maxRecords + 1);
-      currentPage = Math.floor(end / maxRecords)
+      currentPage = Math.ceil(end / maxRecords)
       if(inputNumberInt < 1000000) {
         if(end === 1000000){
           end = end - 1;
@@ -268,13 +271,13 @@
       let inputNumberInt = parseInt(inputNumber)
       let newCurrentPage = Math.ceil(inputNumberInt / maxRecords)
       console.log(newCurrentPage)
-      currentPage = newCurrentPage
+      // currentPage = newCurrentPage
     }
-    currentToID = currentPage * maxRecords;
+     currentToID = currentFromID + maxRecords;
     if(currentToID > 999999) {
       currentToID = 999999
     }
-    currentFromID = (currentPage - 1) * maxRecords + 1;
+    // currentFromID = (currentPage - 1) * maxRecords + 1;
     
 
     $("tbody").empty();
@@ -305,8 +308,8 @@
   
 window.onload = () => {
   showColumns();
-  adjustDisplayedRecords();
   pageNumbers(1, 10);
+  adjustDisplayedRecords();
   $(window).on('resize', resize);
 };
 
