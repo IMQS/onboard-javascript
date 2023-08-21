@@ -20,7 +20,7 @@ body, html {
     border-collapse: collapse;
   }
 tr{
-    border: 1px solid #333333;
+   border: 1px solid #333333;
   }
 thead{
     background-color: #333333e0;
@@ -30,6 +30,7 @@ thead{
   
 td {
     padding: 2px;
+    
     align-content: center;
     width: 350px;   
 }
@@ -58,7 +59,7 @@ td {
   color: white;
   background-color: #5a5f61;
 }
-#toInput{
+#fromInput{
   padding: 5px 10px;
   margin: 0 5px;
   background-color: #232425;

@@ -13,7 +13,7 @@ class ApiData {
   totalItems: number = 0;
   columnNames: ColumnName[] = [];
   maxGridHeight: number = 0;
-  
+ 
 
   constructor(pageSize: number) {
     this.pageSize = pageSize;
@@ -22,7 +22,7 @@ class ApiData {
   async initialize() {
     try {
       this.adjustGridHeight();
-      await this.recordCount();
+      await this.recordCount(); 
       await this.fetchColumns();
       await this.fetchRecords();
       this.setupControls();
@@ -94,7 +94,6 @@ class ApiData {
     try {
       // Display spinner while fetching records
       $('#spinner').show();
-
       const response = await this.fetchData(`http://localhost:2050/records?from=${from}&to=${to}`);
       const res = JSON.parse(response);
       this.data = res.map((record: any) => {
@@ -104,17 +103,18 @@ class ApiData {
           const columnValue = record[j];
           obj[columnName] = columnValue;
         }
+        
         return obj;
       });
 
       $('#spinner').hide();
       this.displayRecords();
-      // this.updatePageInfo();
+      
+     
     } catch (error) {
       console.error('Failed to fetch records', error);
       alert('please enter values in the range (0-999999)')
-      
-      throw error;
+     return;
     }
   }
 
@@ -136,33 +136,36 @@ class ApiData {
     $('#prevBtn').on('click', () => this.handlePageChange(-1));
     $('#nextBtn').on('click', () => this.handlePageChange(1));
     $(window).on('resize', debounce(this.handleResize, 350));
-    
    
   }
 
   private handlePageChange(delta: number) {
     const totalPages = Math.ceil(this.totalItems / this.pageSize);
     const newPage = this.currentPage + delta;
-    
     if (newPage >= 1 && newPage <= totalPages) {
       this.currentPage = newPage;
       this.fetchRecords().then(this.displayRecords);
       this.updatePageInfo();
+    
     }
   }
 
   private handleResize = () => {
     const newWindowHeight = Math.floor($(window).innerHeight() as number);
     const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;
-
     if (newGridSize >= 0) {
       this.pageSize = newGridSize;
+      // console.log(newGridSize);
+      this.updatePageInfo();
       this.fetchRecords().then(this.displayRecords);
       this.adjustGridHeight();
+    }else if (newGridSize > this.maxGridHeight){
+      
     }
+
+   
   };
 
- 
 
   private displayRecords = () => {
     const gridTemplate = new GridTemplate(this.columnNames, this.data);
@@ -170,15 +173,17 @@ class ApiData {
     this.updatePageInfo();
     
   };
+  
 
    updatePageInfo() {
     const totalPages = Math.ceil(this.totalItems / this.pageSize);
     const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
     const from = (this.currentPage - 1) * this.pageSize;
-    const to = (this.currentPage)*this.pageSize
+    const to = (this.currentPage)*(this.pageSize)
     $('#pageInfo').text(pageInfo);
     $('.records').text(`Showing records ${from} to ${to}`);
   }
+  
 }
 
 class GridTemplate {
@@ -194,11 +199,10 @@ class GridTemplate {
     this.dataRecords = dataRecords;
   }
 
-  displayRecords(): void {
+ displayRecords(): void {
     const gridElement = document.getElementById('grid');
     if (gridElement) {
       gridElement.innerHTML = '';
-
       const table = document.createElement('table');
       const thead = document.createElement('thead');
       const headerRow = document.createElement('tr');
@@ -228,8 +232,7 @@ class GridTemplate {
  
 }
 
-const PAGE_SIZE = 35;
-const gridRatio = 0.46;
+const gridRatio = 0.45;
 const rowHeight = 16;
 
 function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
@@ -249,26 +252,40 @@ function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 $(document).ready(() => {
   const windowHeight = Math.floor($(window).innerHeight() as number);
   const initialGridSize = Math.floor((windowHeight * gridRatio) / rowHeight) - 1;
-  const apidata = new ApiData(initialGridSize);
+  const apidata = new ApiData(initialGridSize); 
+  
   $('#searchBtn').on('click', () => {
-    const to = parseInt($('#toInput').val() as string);
+    const from = parseInt($('#fromInput').val() as string);
+    const pageSize = apidata.pageSize;
+    const maxRange = apidata.totalItems - 1;
 
-    if (!isNaN(to)) {  
-      const from = Math.max(0, to - apidata.pageSize + 1); 
-      apidata.searchRecords(from, to);
-      // const totalPages = Math.ceil(apidata.totalItems / apidata.pageSize);
-      // apidata.currentPage = Math.ceil(to / apidata.pageSize);
-      // apidata.currentPage = Math.min(apidata.currentPage, totalPages);
-      // apidata.updatePageInfo();
+    if (!isNaN(from) && from >= 0 && from <= maxRange) {
+        let to = Math.min(from + pageSize - 1, maxRange);
+        let adjustedFrom = from;
+        if (adjustedFrom + pageSize > maxRange) {
+            adjustedFrom = Math.max(0, maxRange - pageSize);
+            to = maxRange;  
+        }
+      apidata.searchRecords(adjustedFrom, to);
+    
+       
+    }else if (from < 0 || from > maxRange) {
+      alert('please enter values in the range (0-999999)');
+      return;
+    }else if (isNaN(from)){
+      alert('Please enter a numerical value ')
+    }else{
+      console.error('error')
     }
-    $('#toInput').val('');
-  });
+    
+    $('#fromInput').val('') ;
+  
+});
 
 
   apidata.initialize();
   const overlay = $('<div id="overlay"></div>');
   $('body').append(overlay);
 });
-
 
 
