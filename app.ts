@@ -117,7 +117,6 @@ async function updateRecordsPerPage() {
   const nextPage = Math.ceil(totalRecordCount / recordsPerPage);
   // Adjust currentPage if it exceeds the total number of pages
   currentPage = Math.min(currentPage, nextPage);
-
   // Update the display
   await displayPageData((currentPage - 1) * recordsPerPage, recordsPerPage);
   $("#currentPageNumber").text(`Page ${currentPage} out of ${totalPages}`);
@@ -125,7 +124,6 @@ async function updateRecordsPerPage() {
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
-    // Calculate the new recordsPerPage and update the table
     updateRecordsPerPage();
   }, 300);
 });
@@ -194,11 +192,20 @@ async function searchRecordByValue(searchValue: any) {
 $("#searchForm").submit(async function (e) {
   e.preventDefault();
   const searchValue = $("#searchInput").val();
-  $("#loader").show();
+  $("#tableBody tr").css("background-color", "");
   $("#searchResultsMessage").show();
   $("#tableWrapper").hide();
   await searchRecordByValue(searchValue);
+  // Set background color for the rows containing search results
+  const currentPageIndex = currentPage - 1;
+  const startIndex = currentPageIndex * recordsPerPage;
+  for (const originalIndex of searchResultIndexes) {
+    const rowIndexOnPage = originalIndex - startIndex;
+    let rowElement = $("#tableBody tr").eq(rowIndexOnPage);
+    rowElement.css("background-color", "var(--results-color)");
+  }
 });
+
 $("#prevPageButton").on("click", async () => {
   isSearchMode = false;
   searchResultDisplay = false;
