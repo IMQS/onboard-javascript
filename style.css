@@ -25,15 +25,8 @@ body {
 
 /* TYPOGRAPHY */
 
-span {
-  font-weight: 900;
+#currentPageNumber{
   color: var(--tertiary-color);
-  background: var(--results-color);
-  border-radius: 5px;
-}
-
-#searchResultsMessage {
-  text-align: center;
 }
 
 /* TYPOGRAPHY */
@@ -98,53 +91,56 @@ input::placeholder {
 
 /* LOADER STARTS */
 
-#loader,
-#searching {
-  display: none;
-  text-align: center;
-  padding: 10rem;
+#loader {
+  margin: 5rem;
 }
 
-svg {
+.loader {
+  margin: auto;
+  width: 50px;
+  height: 50px;
+  position: relative;
   display: flex;
   justify-content: center;
-  margin: auto;
-  width: 3.25em;
-  transform-origin: center;
-  animation: rotate4 2s linear infinite;
-}
-
-circle {
-  fill: none;
-  stroke: hsl(214, 97%, 59%);
-  stroke-width: 2;
-  stroke-dasharray: 1, 200;
-  stroke-dashoffset: 0;
-  stroke-linecap: round;
-  animation: dash4 1.5s ease-in-out infinite;
-}
-
-@keyframes rotate4 {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes dash4 {
+ }
+ 
+ .loader:before, .loader:after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 100%;
+  height: 100%;
+  border-radius: 100%;
+  border: 10px solid transparent;
+  border-top-color: var(--secondary-color);
+ }
+ 
+ .loader:before {
+  z-index: 100;
+  animation: spin 1s infinite;
+ }
+ 
+ .loader:after {
+  border: 10px solid #ccc;
+ }
+ 
+ @keyframes spin {
   0% {
-    stroke-dasharray: 1, 200;
-    stroke-dashoffset: 0;
+   -webkit-transform: rotate(0deg);
+   -ms-transform: rotate(0deg);
+   -o-transform: rotate(0deg);
+   transform: rotate(0deg);
   }
-
-  50% {
-    stroke-dasharray: 90, 200;
-    stroke-dashoffset: -35px;
-  }
-
+ 
   100% {
-    stroke-dashoffset: -125px;
+   -webkit-transform: rotate(360deg);
+   -ms-transform: rotate(360deg);
+   -o-transform: rotate(360deg);
+   transform: rotate(360deg);
   }
-}
+ }
+ 
 
 /* LOADER ENDS */
 
@@ -153,7 +149,7 @@ circle {
 .table-container {
   width: 100%;
   border: 1px solid var(--tertiary-color);
-  height: auto;
+  height: 100%;
 }
 
 table {
@@ -162,7 +158,8 @@ table {
   border-collapse: collapse;
   table-layout: fixed;
   text-align: left;
-  font-size: 18px;
+  /* font-size: 18px; */
+  font-size: large;
 }
 
 body,

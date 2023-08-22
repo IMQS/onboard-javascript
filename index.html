@@ -10,19 +10,12 @@
     ></script>
   </head>
   <body>
-    <p id="searchResultsMessage"></p>
+    <!-- <p id="searchResultsMessage"></p> -->
     <div class="navigation">
       <button id="prevPageButton">Previous Page</button>
       <form id="searchForm">
         <div class="form-group">
-          <input
-            type="number"
-            id="searchInput"
-            placeholder="Search Record By ID"
-            min="1"
-            max="999999"
-            required
-          />
+          <input type="number" id="searchInput" placeholder="Search Record By ID" min="1" max="999999" required />
         </div>
         <div class="form-group">
           <button type="submit">Search</button>
@@ -30,21 +23,12 @@
       </form>
       <button id="nextPageButton">Next Page</button>
       <div id="currentPageNumber"></div>
+      <div id="currentPageNumber"></div>
 
     </div>
     <div class="table-container">
-      <div class="loaders">
-        <div id="loader">
-          Calculating
-          <svg viewBox="25 25 50 50">
-            <circle r="20" cy="50" cx="50"></circle>
-          </svg>
-        </div>
-        <div id="searching">
-          Fetching Records
-          <svg viewBox="25 25 50 50">
-            <circle r="20" cy="50" cx="50"></circle>
-          </svg>
+      <div id="loader">
+        <div class="loader">
         </div>
       </div>
       <div id="tableWrapper">
