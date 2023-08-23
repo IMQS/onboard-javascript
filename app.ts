@@ -1,9 +1,8 @@
+import { ajax, css } from "jquery";
 var firstNumber: number = 0;
-console.log
 var lastNumber: number;
-console.log
-
-
+var inputValue: number | null = null;
+var calculatedRows: number | null = null;
 
 async function fetchRecordCount(): Promise<number> {
   try {
@@ -19,9 +18,6 @@ async function fetchRecordCount(): Promise<number> {
   }
 }
 
-
-
-
 function fetchColumns(): void {
   fetch("http://localhost:2050/columns")
     .then((response: Response) => {
@@ -35,19 +31,32 @@ function fetchColumns(): void {
       }
     })
 }
-fetchColumns();
-
-
+fetchColumns()
 
 async function adjustRowsByScreenHeight(): Promise<number> {
-  $('#loader').show()
-  const tableBody = document.querySelector('.tableRecords tbody') as HTMLElement;
-  const rowHeight = 30
-  const maxRows = Math.floor(tableBody.clientHeight / rowHeight);
-  
+ 
+  let tableBody = (document.querySelector('.tableRecords tbody') as HTMLElement)?.clientHeight;
+  let rowHeight = 50;
+  let maxRows = Math.floor(tableBody / rowHeight);
   return maxRows;
 
 }
+
+let resizeTimeout: number;
+$(window).on('resize', async () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(async () => {
+     $('#loader').show()
+    calculatedRows = await adjustRowsByScreenHeight();
+   
+    if (inputValue !== null) {
+      await updateRecordsAndResize(inputValue);
+    }
+     await displayRecords()
+     $('#loader').hide();
+   
+  }, 500);
+  })
 
 async function fetchRecords(from: number, to: number): Promise<any[]> {
 
@@ -57,51 +66,30 @@ async function fetchRecords(from: number, to: number): Promise<any[]> {
   }
 
   return response.json();
-
 }
-
-
-$(window).on('resize', async (event: any) => {
-  event.preventDefault()
-  $('#page').empty();
-  // const count: number = await fetchRecordCount() - 1;
-  // const calculatedRows = await adjustRowsByScreenHeight();
-
-  // console.log(firstNumber)
-  // console.log(lastNumber)
-  // if (firstNumber < 0) {
-  //   firstNumber = 0;
-  // }
-
-  // if (lastNumber > count) {
-  //   lastNumber = count;
-  // } else {
-  //   lastNumber = firstNumber + (calculatedRows-1);
-  // }
-
-  await displayRecords();
-
-})
 
 async function displayRecords(): Promise<void> {
   try {
     $('#loader').show()
-    const calculatedRows = await adjustRowsByScreenHeight();
-    const inputValue = $('#searchInput').val() as number;
+    calculatedRows = await adjustRowsByScreenHeight();
   
-
+    
+    const inputValue = $('#searchInput').val() as number;
     if (!lastNumber) {
       lastNumber = firstNumber + (calculatedRows - 1);
     }
-    if (firstNumber < 0) {
+    if (firstNumber < 0 ) {
       firstNumber = 0;
     }
+    
     if (lastNumber >= 999999) {
       lastNumber = 999999;
+      firstNumber = lastNumber - (calculatedRows-1)
+     
     }else{
       lastNumber = firstNumber + (calculatedRows - 1);
-    }
-
+    } 
+    console.log(firstNumber,lastNumber)
     const records = await fetchRecords(firstNumber, lastNumber);
     const tbody = $("tbody");
     tbody.empty();
@@ -110,70 +98,52 @@ async function displayRecords(): Promise<void> {
       const lastRow = $(".row:last");
       for (let i = 0; i < records[r].length; i++) {
         lastRow.append(`<td>${records[r][i]}</td>`);
-
-       
-
       } 
       if(records[r].includes(inputValue)){
-          console.log(records[r]);
-          lastRow.css('background-color', '#DDC0B4'); 
-        
-        }
+      
+      lastRow.css('background-color', '#DDC0B4'); 
+      
+      }
       tbody.append(lastRow);
-
-    }
-  
     $('#page').empty();
     $('#page').append(`Showing record: ${firstNumber} - ${lastNumber}`);
     $('#loader').hide()
-
+    }
   } catch (error) {
     console.error("Error displaying records:", error);
   }
 }
 displayRecords()
 
-
 async function updateRecordsAndResize(inputValue: number) {
   const count: number = await fetchRecordCount() - 1;
-
-  if (isNaN(inputValue) || inputValue > count) {
-    alert(`${inputValue} is not a number within the range`);
+  if (inputValue < 0 || inputValue > count) {
+    $('.modal').css('display','block')
+    $('.modal-content').append(`<p>${inputValue} is not a number within the range.Please try a different number</p>`)
     $('#searchInput').val('');
     return;
   }
-
-  // Calculate a range of numbers around the inputValue
-  const range = await adjustRowsByScreenHeight(); // Adjust this value to control the range size
-  firstNumber = Math.max(0, inputValue - Math.floor(range / inputValue));
-  console.log(firstNumber);
-
-  lastNumber = Math.min(count, firstNumber + range - 1);
-  console.log(lastNumber);
- 
- 
-
-  await adjustRowsByScreenHeight();
-
+  calculatedRows = await adjustRowsByScreenHeight(); 
+  const quarterRange = Math.floor(calculatedRows / 2);
+  firstNumber = Math.max(0, inputValue - quarterRange);
+  lastNumber = Math.min(count, firstNumber + (calculatedRows - 1));
   await displayRecords();
 }
 
+$('#closeModalBtn').on("click", () => {
+  $('.modal').css('display','none')
+});
 
 $('.btnSearch').on('click', async (event: any) => {
   event.preventDefault();
-  const inputValue = $('#searchInput').val() as number;
-  console.log(inputValue)
-
-
+  inputValue = $('#searchInput').val() as number;
   await updateRecordsAndResize(inputValue);
 });
 
-
 async function rightArrow(): Promise<void> {
+  $('#searchInput').val('');
   const lastRow = document.querySelector("#recordsTable tbody .row:last-child");
   let count: number = await fetchRecordCount() - 1;
-
-
   if (lastRow) {
     const cells = lastRow.querySelectorAll("td");
     const lastRecord: string[] = [];
@@ -181,35 +151,26 @@ async function rightArrow(): Promise<void> {
       lastRecord.push(cell.textContent || "");
     });
     const lastID = parseFloat(lastRecord[0]);
-    console.log(lastID);
-
     if (0 <= lastID && lastID <= (count)) {
+      
       const tbody = $("tbody");
       tbody.empty();
-
       firstNumber = lastID + 1;
-
-      const calculatedRows = await adjustRowsByScreenHeight();
-
+      calculatedRows = await adjustRowsByScreenHeight();
       lastNumber = firstNumber + (calculatedRows - 1)
-
-      await adjustRowsByScreenHeight();
       await displayRecords();
-
+    }else{
+      $('.arrow-right').css('display','none')
     }
-
+   
+    
   }
 }
 
-
-
 async function leftArrow(): Promise<void> {
-
+  $('#searchInput').val('');
   let count: number = await fetchRecordCount() - 1;
-
-
   const firstRow = document.querySelector("#recordsTable tbody .row:first-child");
-
   if (firstRow) {
     const cells = firstRow.querySelectorAll("td");
     const firstRecord: string[] = [];
@@ -217,29 +178,18 @@ async function leftArrow(): Promise<void> {
       firstRecord.push(cell.textContent || "");
     });
     const firstID = parseFloat(firstRecord[0]);
-    console.log(firstID)
-
-
     const tbody = $("tbody");
     tbody.empty();
-
     const calculatedRows = await adjustRowsByScreenHeight();
-    console.log(calculatedRows);
-
-    firstNumber = firstID - (calculatedRows + 1)
-    console.log(firstRecord);
-
-
-    lastNumber = firstNumber + (calculatedRows)
-    console.log(lastNumber);
-
-    await adjustRowsByScreenHeight();
-
+    lastNumber = firstID - 1;
+    firstNumber = lastNumber - (calculatedRows-1)
     await displayRecords();
-  }
-
-
+    
 }
+}
+
+
+
 
 
 
