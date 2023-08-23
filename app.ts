@@ -68,6 +68,12 @@ async function showRecords(fromID: number, toID: number): Promise<void> {
   }
   isFunctionRunning = true;
   let inputNumber: string = $('.search-input').val() as string
+  const screenHeight = $(window).height();
+  const maxRecords = Math.floor(parseInt(screenHeight as any) / 68);
+  let condition = Math.ceil(999999 / maxRecords) + 1
+  if((condition - 1) == currentPage){
+    fromID = (condition - 2) * maxRecords + 1
+  }
   if(inputNumber == "") {
     currentFromID = fromID
   } 
@@ -101,10 +107,8 @@ async function showRecords(fromID: number, toID: number): Promise<void> {
       }
     });
     console.log(currentToID)
-    const screenHeight = $(window).height();
-    const maxRecords = Math.floor(parseInt(screenHeight as any) / 60);
-    let condition = Math.ceil(999999 / maxRecords)
-    if(condition > fromID && condition < toID){
+
+    if(condition >= fromID && condition <= toID){
       $(".next").css({ display: "none" });
     }
     
@@ -118,18 +122,23 @@ async function showRecords(fromID: number, toID: number): Promise<void> {
 // The following function handles all the functionality of the pagination and the pages. Including what records should be shown in the table.
 async function pageNumbers(start: number, end: number): Promise<void> {
   try {
-    console.log(currentToID)
     $('.pagination').empty();
     let count: number = await getRecordCount();
     let stringCount = count.toLocaleString().replace(/,/g, " ");
     const screenHeight = $(window).height();
-    let maxRecords = Math.floor(parseInt(screenHeight as any) / 60);
-    let condition = Math.floor(999999 / maxRecords)
+    let maxRecords = Math.floor(parseInt(screenHeight as any) / 68);
+    let condition = Math.floor(999999 / maxRecords) + 1;
     console.log('start: ',start,'end: ', end, 'condition: ', condition, 'maxRecords: ', maxRecords )
     if(condition <= end && condition >= start) {
-      end = condition
+      if(999999 % maxRecords === 0){
+        console.log(condition - 1)
+        end = (condition - 1)
+      } else end = condition
       $(".next").css({ display: "none" });
     } else $(".next").css({ display: "block" });
+    if(start < 1) {
+      start = 1
+    }
     firstPage = start;
     lastPage = end;
     for (let i = start; i <= end; i++) {
@@ -144,12 +153,15 @@ async function pageNumbers(start: number, end: number): Promise<void> {
 
     // Adding a click event on the  pagination pages to display the appropriate number of records for that specific page number.
     $(".pagination-item").on("click", async function dynamicPagination(): Promise<Array<number>>{
+      $('.search-input').val('')
       currentPage = parseInt($(this).attr("id") as any);
       const screenHeight = $(window).height();
-      const maxRecords = Math.floor(parseInt(screenHeight as any) / 60);
+      const maxRecords = Math.floor(parseInt(screenHeight as any) / 68);
       let pageNumber: any = $(this).attr("id");
       let fromID = Math.ceil(pageNumber * maxRecords - (maxRecords - 1) )
       let toID = fromID + (maxRecords - 1)
+
+      
       if(fromID > count || toID > count) {
         toID = count - 1 ;
         fromID = toID - maxRecords
@@ -175,11 +187,12 @@ async function pageNumbers(start: number, end: number): Promise<void> {
         $(this).addClass('active')
       } 
     });
-
+    
   } catch (error) {
     console.error(error);
     throw error;
   }
+  isFunctionRunning = false
 }
 
 
@@ -191,9 +204,10 @@ async function pageNumbers(start: number, end: number): Promise<void> {
       }
       isFunctionRunning = true
       console.log('start: ', firstPage, 'end:', lastPage)
-      lastPage = lastPage + 10;
-      firstPage = lastPage - 9;
+      firstPage = lastPage + 1;
+      lastPage = firstPage + 9;
       $(".pagination").empty();
+      console.log(firstPage, lastPage)
       await pageNumbers(firstPage, lastPage);
       isFunctionRunning = false
     });
@@ -205,11 +219,12 @@ async function pageNumbers(start: number, end: number): Promise<void> {
       }
       isFunctionRunning = true
       console.log('start: ', firstPage, 'end:', lastPage)
-      firstPage = firstPage - 9;
-      lastPage = firstPage + 10;
+      lastPage = firstPage - 1;
+      firstPage = lastPage - 9;
+      console.log(firstPage, lastPage)
       $(".pagination").empty();
       await pageNumbers(firstPage, lastPage);
-      isFunctionRunning = false
+      // isFunctionRunning = false
     });
 
 // In this function wil do the extract the number entered in the search. Then it would take that and calculate the range which should be displayed for the user to click on. 
@@ -223,7 +238,7 @@ async function resultsRange(event: any) {
   let inputNumberInt = parseInt(inputNumber);
   if(inputNumber !== '') {
     const screenHeight = $(window).height();
-    const maxRecords = Math.floor(parseInt(screenHeight as any) / 60);
+    const maxRecords = Math.floor(parseInt(screenHeight as any) / 68);
     let end:number = Math.ceil(inputNumberInt / maxRecords) * maxRecords;
     if(end > 1000000) {
       end = 999999
@@ -273,8 +288,8 @@ async function resultsSelect() {
   isFunctionRunning = false;
   console.log(startID, endID)
   const screenHeight = $(window).height();
-  const maxRecords = Math.floor(parseInt(screenHeight as any) / 60);
-  currentPage = Math.floor(endID / maxRecords)
+  const maxRecords = Math.floor(parseInt(screenHeight as any) / 68);
+  currentPage = Math.ceil(endID / maxRecords)
   let pageEnd = Math.ceil(currentPage / 10) * 10;
   let pageStart = pageEnd - 9
   
@@ -296,8 +311,11 @@ async function resultsSelect() {
 
 // When adjusting the height and on different screen sizes. This function would responsible for calculating how much records should be displayed based on the height of the window itself. 
 async function adjustDisplayedRecords(): Promise<number> {
-  const screenHeight = $(window).height();
-  const maxRecords = Math.floor(parseInt(screenHeight as any) / 60);
+  let screenHeight = $(window).height() as number;
+  if(screenHeight < 68) {
+    screenHeight = 68
+  }
+  let maxRecords = Math.floor(parseInt(screenHeight as any) / 68);
   
   let inputNumber = $('.search-input').val() as string
   let length = inputNumber.length as number;
@@ -307,7 +325,7 @@ async function adjustDisplayedRecords(): Promise<number> {
     console.log(currentFromID, currentToID)
     currentToID = currentFromID + (maxRecords - 1);
     let newCurrentPage = Math.ceil(currentFromID / maxRecords)
-    console.log(newCurrentPage)
+    console.log(newCurrentPage, currentPage)
     currentPage = newCurrentPage
   } else {
     if(length > 0) {
@@ -317,21 +335,20 @@ async function adjustDisplayedRecords(): Promise<number> {
       }
       currentToID = newCurrentPage * maxRecords;
       console.log('newCurrentPage: ' + newCurrentPage, ' ')
-      console.log(newCurrentPage)
+      console.log(currentPage, newCurrentPage)
       currentPage = newCurrentPage
       currentFromID = (currentPage - 1) * maxRecords + 1;
-      
     }
   }
   console.log(currentFromID, currentToID)
-    $("tbody").empty();
-    await showRecords(currentFromID, currentToID);
-    let pageEnd = Math.ceil(Math.floor(currentToID / maxRecords) / 10) * 10;
-    let pageStart = pageEnd - 9
-    firstPage = pageStart;
-    lastPage = pageEnd
-    await pageNumbers(pageStart, pageEnd);
-    console.log(currentFromID, currentToID)
+  let pageEnd = Math.ceil(Math.floor(currentToID / maxRecords) / 10) * 10;
+  let pageStart = pageEnd - 9
+  firstPage = pageStart;
+  lastPage = pageEnd
+  console.log(currentFromID, currentToID)
+  $("tbody").empty();
+  await showRecords(currentFromID, currentToID);
+  await pageNumbers(pageStart, pageEnd);
     
   return maxRecords;
 }
