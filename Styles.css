@@ -34,7 +34,6 @@ td {
     align-content: center;
     width: 350px;   
 }
-
 .grid-controls {
     display: flex;
     align-items: center;
@@ -45,8 +44,6 @@ td {
     position: sticky;
     bottom: 0;
   }
-
- 
 #pageInfo{
     font-weight: 350;
     background-color: #333333;
@@ -75,10 +72,7 @@ td {
   z-index: 1000;
   display: none;
 }
-.highlighted-row{
-  background-color:#464e53;
-  color: black;
-}
+
 
 
 
