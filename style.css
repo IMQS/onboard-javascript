@@ -9,6 +9,8 @@
 body {
   overflow: hidden;
   background: var(--shadow-color);
+  background-attachment: fixed;
+  height: 100vh;
 }
 
 /* Colors */
@@ -24,15 +26,12 @@ body {
 /* Colors */
 
 /* TYPOGRAPHY */
-
-#currentPageNumber{
+#currentPageNumber {
   color: var(--tertiary-color);
 }
-
 /* TYPOGRAPHY */
 
 /* BUTTON STARTS */
-
 button {
   cursor: pointer;
   padding: 15px;
@@ -44,11 +43,9 @@ button {
   border-radius: 0;
   box-shadow: inset 20px 20px 60px #232323, inset -20px -20px 60px #2f2f2f;
 }
-
 /* BUTTON ENDS */
 
 /* LIST STYLING STARTS */
-
 .navigation {
   display: flex;
   justify-content: center;
@@ -57,21 +54,17 @@ button {
   gap: 5px;
   width: 100%;
 }
-
 /* LIST STYLING ENDS */
 
 /* FORM STARTS */
-
 form {
   display: flex;
   justify-content: center;
   gap: 5px;
 }
-
 .form-group {
   display: flex;
 }
-
 input {
   margin-top: 20px;
   padding: 10px;
@@ -82,19 +75,15 @@ input {
   border-radius: 0;
   box-shadow: inset 20px 20px 60px #c1c1c1, inset -20px -20px 60px #ffffff;
 }
-
 input::placeholder {
   color: var(--tertiary-color);
 }
-
 /* FORM ENDS */
 
 /* LOADER STARTS */
-
 #loader {
   margin: 5rem;
 }
-
 .loader {
   margin: auto;
   width: 50px;
@@ -102,9 +91,9 @@ input::placeholder {
   position: relative;
   display: flex;
   justify-content: center;
- }
- 
- .loader:before, .loader:after {
+}
+.loader:before,
+.loader:after {
   content: "";
   position: absolute;
   top: -10px;
@@ -114,90 +103,76 @@ input::placeholder {
   border-radius: 100%;
   border: 10px solid transparent;
   border-top-color: var(--secondary-color);
- }
- 
- .loader:before {
+}
+.loader:before {
   z-index: 100;
   animation: spin 1s infinite;
- }
- 
- .loader:after {
+}
+.loader:after {
   border: 10px solid #ccc;
- }
- 
- @keyframes spin {
+}
+@keyframes spin {
   0% {
-   -webkit-transform: rotate(0deg);
-   -ms-transform: rotate(0deg);
-   -o-transform: rotate(0deg);
-   transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
   }
- 
   100% {
-   -webkit-transform: rotate(360deg);
-   -ms-transform: rotate(360deg);
-   -o-transform: rotate(360deg);
-   transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
   }
- }
- 
-
+}
 /* LOADER ENDS */
 
 /* TABLE STARTS */
-
 .table-container {
   width: 100%;
   border: 1px solid var(--tertiary-color);
-  height: 100%;
+  position: fixed;
 }
-
 table {
-  width: 100%;
-  height: auto;
+  flex-grow: 1;
+  width: 100%; 
   border-collapse: collapse;
-  table-layout: fixed;
-  text-align: left;
+  table-layout: fixed; 
+  padding: 1rem;
   /* font-size: 18px; */
   font-size: large;
 }
-
 body,
 thead,
 tbody {
   background: var(--shadow-color);
   box-shadow: inset 20px 20px 60px #c1c1c1, inset -20px -20px 60px #ffffff;
 }
-
 table,
 th {
   color: var(--tertiary-color);
-  font-weight: 800;
+  font-weight: 700;
   background: var(--shadow-color);
   box-shadow: inset 20px 20px 60px #c1c1c1, inset -20px -20px 60px #ffffff;
 }
-
 th {
   border-right: 2px solid var(--tertiary-color);
   border-bottom: 2px solid var(--tertiary-color);
   padding: 10px;
 }
-
 th:hover {
   color: var(--primary-color);
   background: var(--secondary-color);
   box-shadow: none !important;
   border: none !important;
 }
-
 td {
   border-right: 1px solid var(--secondary-color);
-  border-bottom: 1px solid var(--secondary-color);
+  /* border-bottom: 1px solid var(--secondary-color); */
   font-weight: 300;
   color: var(--tertiary-color);
-  padding: 3.5px;
+  padding: 14px;
 }
-
 td:nth-child(1) {
   font-weight: 500;
 }
@@ -205,13 +180,11 @@ td:nth-child(1) {
 /* TABLE ENDS */
 
 /* MEDIA QUERY */
-
 @media (max-width: 576px) {
   button,
   input {
     padding: 5px;
   }
-
   .navigation,
   form {
     display: flex;
@@ -222,12 +195,10 @@ td:nth-child(1) {
   table {
     font-size: 11px;
   }
-
   th,
   td {
     padding: 2px;
   }
-
   th {
     position: relative;
     top: 0;
@@ -236,20 +207,16 @@ td:nth-child(1) {
     background: #e3e3e3;
     border-right: var(--tertiary-color);
   }
-
   td {
     border-right: 1px solid var(--secondary-color);
     border-bottom: 1px solid var(--secondary-color);
   }
-
   td:nth-child(1) {
     font-weight: 500;
   }
-
   .table-container {
     overflow-x: auto;
     margin-top: 30px;
   }
 }
-
 /* MEDIA QUERY */
