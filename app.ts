@@ -8,6 +8,7 @@ interface GridData {
   }
   // Class to manage data fetching and grid operations
   class ApiData {
+ // Properties to manage data and settings
   pageSize: number;
   currentPage: number = 1;
   data: GridData[] = [];
@@ -59,15 +60,13 @@ interface GridData {
   throw error;
   }
   }
-  //get records from API
+  //get records from API for fetch an search functionality 
   async fetchAndProcessRecords(from: number = this.firstVal, to: number =this.lastVal) {
   try {
   $('#spinner').show()
   $('#grid').hide()
   const response = await this.fetchData(`http://localhost:2050/records?from=${from}&to=${to}`);
   const res = JSON.parse(response);
-  
-  
   const processedData = res.map((record: any) => {
   const obj: GridData = {};
   for (let j = 0; j < this.columnNames.length && j < record.length; j++) {
@@ -76,8 +75,6 @@ interface GridData {
   obj[columnName] = columnValue;
   }
   return obj;
-  
-  
   });
   $('#spinner').hide();
   $('#grid').show()
@@ -111,18 +108,18 @@ interface GridData {
   async searchRecords(searchValue: number) {
     try {
       const maxRange = this.totalItems - 1; // Maximum allowed Value
-
       if (searchValue >= 0 && searchValue <= maxRange) {
         const from = searchValue;
         const to = Math.min(from + this.pageSize, maxRange);
         const processedData = await this.fetchAndProcessRecords(from, to);
         this.data = processedData;
-        this.currentPage = Math.floor(from / this.pageSize) 
+        this.currentPage = Math.floor(from / this.pageSize) +1
         this.firstVal = from; // Set firstVal to searched value
         this.lastVal = from + this.pageSize ; // Calculate lastVal based on pageSize
         this.displayRecords();
         this.updatePageInfo();
-      } else {
+      } 
+      else {
         alert('Please enter values in the range (0-999999)');
       }
     } catch (error) {
@@ -139,8 +136,7 @@ interface GridData {
   gridElement.style.overflow = 'none';
   }
   }
-  
-  
+
   private async fetchData(url: string): Promise<any> {
   try {
   $('#overlay').show();
@@ -168,6 +164,11 @@ interface GridData {
     const newFirstVal = this.firstVal + delta * this.pageSize;
     if (newFirstVal >= 0 && newFirstVal <= this.totalItems - 1) {
       this.firstVal = newFirstVal;
+      this.lastVal = this.firstVal + this.pageSize - 1;
+      this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
+      this.fetchRecords();
+    }else if (newFirstVal <= this.pageSize){
+      this.firstVal = 0
       this.lastVal = this.firstVal + this.pageSize - 1;
       this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
       this.fetchRecords();
@@ -218,15 +219,15 @@ interface GridData {
   updatePageInfo() {
     const totalPages = Math.floor(this.totalItems / this.pageSize);
     const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
+    const maxRange = this.totalItems - 1;
     const from = this.firstVal;
-    this.lastVal = from + this.pageSize;
-    const to = this.lastVal;  
+    let to = Math.min(from  + this.pageSize , maxRange);
     $('#pageInfo').text(`${pageInfo}`);
     $('.records').text(`Showing records ${from} to ${to}`);
   }
   
 }
-  
+// Class to manage the grid template and display records
   class GridTemplate {
 
 
@@ -244,7 +245,7 @@ interface GridData {
   this.dataRecords = dataRecords;
   }
   
-  //dispplay records in a grid in table format 
+  // Display records in a grid in table format 
   displayRecords(): void {
   const gridElement = document.getElementById('grid');
   if (gridElement) {
@@ -258,9 +259,8 @@ interface GridData {
   headerRow.appendChild(th);
   });
   thead.appendChild(headerRow);
-  table.appendChild(thead);
-  
-  
+  table.appendChild(thead); 
+  // Create table body
   const tbody = document.createElement('tbody');
   this.dataRecords.forEach((row) => {
   const tr = document.createElement('tr');
@@ -272,15 +272,16 @@ interface GridData {
   tbody.appendChild(tr);
   });
   table.appendChild(tbody);
+ // Append the table to the grid element
   gridElement.appendChild(table);
   }
   }
   }
   
-  
-  const gridRatio = 0.45;
+  // Constants for grid calculation
+  const gridRatio = 0.45;// represents the ratio of the grid's height to the window's height. 
   const rowHeight = 16; 
-  
+  // Debounce utility function to limit function execution frequency
   function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
   let timeout: number;
   
@@ -298,6 +299,7 @@ interface GridData {
   }
   // Wait for the document to be ready
   $(document).ready(() => {
+    // Initialization and setup code
   const windowHeight = Math.floor($(window).innerHeight() as number);
   const initialGridSize = Math.floor((windowHeight * gridRatio) / rowHeight) - 1;
   const apidata = new ApiData(initialGridSize);
