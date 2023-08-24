@@ -30,7 +30,7 @@ thead{
   
 td {
     padding: 2px;
-    
+    border: 1px solid #333333;
     align-content: center;
     width: 350px;   
 }
@@ -75,7 +75,10 @@ td {
   z-index: 1000;
   display: none;
 }
-
+.highlighted-row{
+  background-color:#464e53;
+  color: black;
+}
 
 
 
