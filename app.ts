@@ -64,6 +64,7 @@ async function displayPageData(fromRecord: number, recordsToDisplay: number) {
       totalRecordCount - fromRecord,
       recordsToDisplay
     );
+
     let response = await fetch(
       `${IMQS}/records?from=${fromRecord}&to=${
         fromRecord + maxRecordsToDisplay - 1
@@ -71,14 +72,70 @@ async function displayPageData(fromRecord: number, recordsToDisplay: number) {
     );
     let data = await response.json();
     let tableData = "";
-    // Update the value of the first record dynamically
-    const firstRecordValue = parseInt(data[0][0]);
-    const firstRecordIndex = fromRecord;
-    if (currentPage * recordsPerPage > totalRecordCount) {
-      recordsToDisplay = totalRecordCount - fromRecord;
+    if (searchResultDisplay) {
+      // If a search result is being displayed, adjust fromRecord accordingly
+      const searchIndex = searchResultIndexes[0];
+      const searchPage = Math.ceil((searchIndex + 1) / recordsPerPage);
+      const newFromRecord = (searchPage - 1) * recordsPerPage;
+      const newToRecord = newFromRecord + recordsPerPage - 1;
+      const actualFromRecord = Math.min(newFromRecord + 1, totalRecordCount);
+      const actualToRecord = Math.min(newToRecord + 1, totalRecordCount);
+      console.log(
+        `Displaying search result from ${actualFromRecord} to ${actualToRecord}`
+      );
+      // Display the new data
+      fromRecord = newFromRecord;
+      recordsToDisplay = recordsPerPage;
+      searchResultIndexes.forEach((searchIndex: any) => {
+        const rowIndex = searchIndex % recordsPerPage;
+        const rowElement = $("#tableBody tr").eq(rowIndex);
+        rowElement.css("background-color", "yellow");
+      });
+      searchResultDisplay = false;
     }
-    currentValueOfFirstRecord = firstRecordValue;
-    currentFirstRecordIndex = firstRecordIndex;
+    // Special handling for the last page when resizing
+     // Special handling for the last page when resizing
+     if (
+      currentPage === nextPage &&
+      (fromRecord === totalRecordCount - recordsPerPage ||
+        fromRecord === totalRecordCount - maxRecordsToDisplay)
+    ) {
+      if (currentPage - 1 === nextPage - 1) {
+        // Special handling for the second-to-last page
+        if (totalRecordCount % recordsPerPage !== 0) {
+          // When the total record count is not a multiple of recordsPerPage
+          fromRecord = Math.max(totalRecordCount - recordsPerPage, 999984);
+        } else {
+          // When the total record count is a multiple of recordsPerPage
+          fromRecord = totalRecordCount - recordsPerPage;
+        }
+        recordsToDisplay = recordsPerPage;
+      } else {
+        // Default last page for the current screen size
+        fromRecord = (currentPage - 1) * recordsPerPage;
+        recordsToDisplay = totalRecordCount % recordsPerPage || recordsPerPage;
+      }
+    }
+
+    // Special handling when the calculated fromRecord exceeds 999999
+    if (fromRecord > 999999) {
+      const overflowPage = Math.ceil((fromRecord + 1) / recordsPerPage);
+      currentPage = overflowPage;
+      fromRecord = (overflowPage - 1) * recordsPerPage;
+      recordsToDisplay = totalRecordCount % recordsPerPage || recordsPerPage;
+    }
+
+    // Update the value of the first record dynamically, but only if not in search mode
+    if (!isSearchMode) {
+      const firstRecordValue = parseInt(data[0][0]);
+      const firstRecordIndex = fromRecord;
+      if (currentPage * recordsPerPage > totalRecordCount) {
+        recordsToDisplay = totalRecordCount - fromRecord;
+      }
+      currentValueOfFirstRecord = firstRecordValue;
+      currentFirstRecordIndex = firstRecordIndex;
+    }
+
     data.forEach((record: any[]) => {
       tableData += "<tr>";
       record.forEach((value: string) => {
@@ -86,6 +143,7 @@ async function displayPageData(fromRecord: number, recordsToDisplay: number) {
       });
       tableData += "</tr>";
     });
+
     $("#tableBody").html(tableData);
   } catch (error) {
     console.log("ERROR:", error);
@@ -118,7 +176,6 @@ async function searchRecordByValue(searchValue: any) {
     await fetchTotalRecordCount();
     let targetPage = Math.ceil((searchValue + 1) / recordsPerPage);
     targetPage = Math.min(targetPage, totalPages);
-    // Fetch records for the target page
     const fromRecord = Math.max((targetPage - 1) * recordsPerPage, 0);
     const toRecord = Math.min(
       fromRecord + recordsPerPage - 1,
@@ -129,7 +186,6 @@ async function searchRecordByValue(searchValue: any) {
     );
     const records = await response.json();
     let foundIndex = -1;
-    // Check if the search value exists within the fetched records
     for (let recordIndex = 0; recordIndex < records.length; recordIndex++) {
       const record = records[recordIndex];
       const idValue = parseInt(record[0]);
@@ -139,8 +195,11 @@ async function searchRecordByValue(searchValue: any) {
       }
     }
     if (foundIndex !== -1) {
-      currentPage = targetPage; // If the search result corresponds to the first record on the current page
-      if (currentPage === targetPage && foundIndex === currentFirstRecordIndex) {
+      currentPage = targetPage;
+      if (
+        currentPage === targetPage &&
+        foundIndex === currentFirstRecordIndex
+      ) {
         await displayPageData(currentFirstRecordIndex, recordsPerPage);
       } else {
         await displayPageData(fromRecord, recordsPerPage);
@@ -205,7 +264,19 @@ $("#nextPageButton").on("click", async () => {
     currentFirstRecordIndex += recordsPerPage;
   }
 
+  // Check if the current displayed records include values from 999984 and higher
+  const displayedRecordsIncludeHighValues = currentFirstRecordIndex >= 999984;
+
+  // Go to default last page for the current screen size if the condition is met
+  if (displayedRecordsIncludeHighValues) {
+    const nextPage = Math.ceil(totalRecordCount / recordsPerPage);
+    currentPage = nextPage;
+    currentFirstRecordIndex = (currentPage - 1) * recordsPerPage;
+  }
+
   let fromRecord = currentFirstRecordIndex;
   await displayPageData(fromRecord, recordsPerPage);
   $("#currentPageNumber").text(`Page ${currentPage}`);
 });
+
+
