@@ -292,7 +292,6 @@ interface GridData {
   $('#searchBtn').on('click', () => {
   const from = parseInt($('#fromInput').val() as string);
   const pageSize = apidata.pageSize;
-  console.log(pageSize);
   const maxRange = apidata.totalItems - 1;
   if (!isNaN(from) && from >= 0 && from <= maxRange) {
   let to = Math.min(from + pageSize , maxRange);
