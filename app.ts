@@ -18,14 +18,10 @@ interface GridData {
   firstVal : number = 0;
   lastVal!: number;
  
-  
-  
   constructor(pageSize: number) {
   this.pageSize = pageSize;
   
   }
- 
-  
   // Initialize method to set up the grid
   async initialize() {
   try {
@@ -113,7 +109,7 @@ interface GridData {
         const to = Math.min(from + this.pageSize, maxRange);
         const processedData = await this.fetchAndProcessRecords(from, to);
         this.data = processedData;
-        this.currentPage = Math.floor(from / this.pageSize) +1
+        this.currentPage = Math.ceil(from / this.pageSize) +1
         this.firstVal = from; // Set firstVal to searched value
         this.lastVal = from + this.pageSize ; // Calculate lastVal based on pageSize
         this.displayRecords();
@@ -181,16 +177,12 @@ interface GridData {
     const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;
      
     if (newGridSize >= 0) {
-      const oldPageSize = this.pageSize;
       const newPageSize = newGridSize;
-      const newPageNumber = Math.max(1, Math.floor(this.firstVal / oldPageSize) + 1); // +1 to ensure  newPageNumber is at least 1
       let newFirstValueIndex = this.firstVal;
-      // Adjust firstVal for the first page and the last page
+      // Adjust firstVal for the last page
       if ( newFirstValueIndex + newPageSize > this.totalItems) {
-        newFirstValueIndex = Math.max(0, this.totalItems - newPageSize);
-      }else if(newPageNumber === 1){
-        newFirstValueIndex=  0
-      }
+        newFirstValueIndex = Math.max( this.totalItems - newPageSize);
+        }
       // Update firstVal, lastVal, and page size
       this.pageSize = newPageSize;
       this.firstVal = newFirstValueIndex;
@@ -264,17 +256,15 @@ interface GridData {
   }
   
   // Constants for grid calculation
-  const gridRatio = 0.45;// represents the ratio of the grid's height to the window's height. 
+  const gridRatio = 9/20;// represents the ratio of the grid's height to the window's height. 
   const rowHeight = 16; 
   // Debounce utility function to limit function execution frequency
   function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
   let timeout: number;
-  
-  
+
   return (...args: Parameters<F>): Promise<ReturnType<F>> => {
   clearTimeout(timeout);
-  
-  
+
   return new Promise((resolve) => {
   timeout = setTimeout(() => {
   resolve(func(...args));
