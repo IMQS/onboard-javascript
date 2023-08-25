@@ -14,7 +14,6 @@ body {
 }
 
 /* Colors */
-
 :root {
   --primary-color: white;
   --secondary-color: #292929;
@@ -22,7 +21,6 @@ body {
   --results-color: yellow;
   --shadow-color: #e3e3e3;
 }
-
 /* Colors */
 
 /* TYPOGRAPHY */
@@ -140,7 +138,7 @@ table {
   table-layout: fixed; 
   padding: 1rem;
   /* font-size: 18px; */
-  font-size: large;
+  font-size: normal;
 }
 body,
 thead,
