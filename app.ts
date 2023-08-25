@@ -8,7 +8,7 @@ interface GridData {
   }
   // Class to manage data fetching and grid operations
   class ApiData {
- // Properties to manage data and settings
+  // Properties to manage data and settings
   pageSize: number;
   currentPage: number = 1;
   data: GridData[] = [];
@@ -149,7 +149,7 @@ interface GridData {
   } catch (error) {
   throw error;
   }
-  }
+}
   
   
   private setupControls() {
@@ -179,28 +179,22 @@ interface GridData {
   private handleResize = () => {
     const newWindowHeight = Math.floor($(window).innerHeight() as number);
     const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;
-  
+     
     if (newGridSize >= 0) {
       const oldPageSize = this.pageSize;
-      const totalPages = Math.floor(this.totalItems / oldPageSize);
       const newPageSize = newGridSize;
-  
-      const newPageNumber = Math.max(1, Math.floor(this.firstVal / oldPageSize) + 1); // Ensure newPageNumber is at least 1
-  
+      const newPageNumber = Math.max(1, Math.floor(this.firstVal / oldPageSize) + 1); // +1 to ensure  newPageNumber is at least 1
       let newFirstValueIndex = this.firstVal;
-  
       // Adjust firstVal for the first page and the last page
       if ( newFirstValueIndex + newPageSize > this.totalItems) {
         newFirstValueIndex = Math.max(0, this.totalItems - newPageSize);
       }else if(newPageNumber === 1){
         newFirstValueIndex=  0
       }
-  
       // Update firstVal, lastVal, and page size
       this.pageSize = newPageSize;
       this.firstVal = newFirstValueIndex;
       this.lastVal = newFirstValueIndex + newPageSize - 1;
-  
       // Fetch records, update page info, and adjust grid height
       this.fetchRecords();
       this.updatePageInfo();
@@ -214,8 +208,8 @@ interface GridData {
   gridTemplate.displayRecords();
   this.updatePageInfo();
   };
-  
-  
+
+  // Update the page information and records display based on the current state of the grid.
   updatePageInfo() {
     const totalPages = Math.floor(this.totalItems / this.pageSize);
     const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
@@ -224,27 +218,18 @@ interface GridData {
     let to = Math.min(from  + this.pageSize , maxRange);
     $('#pageInfo').text(`${pageInfo}`);
     $('.records').text(`Showing records ${from} to ${to}`);
-  }
-  
+  }  
 }
 // Class to manage the grid template and display records
   class GridTemplate {
-
-
   private columnNames: ColumnName[] = [];
   private dataRecords: GridData[] = [];
-  
-  
+  // Initializes the column names and data records that will be used to display records in the grid.
   constructor(columnNames: ColumnName[], dataRecords: GridData[]) {
   this.columnNames = columnNames;
   this.dataRecords = dataRecords;
   }
-  
-  
-  setDataRecords(dataRecords: GridData[]): void {
-  this.dataRecords = dataRecords;
-  }
-  
+
   // Display records in a grid in table format 
   displayRecords(): void {
   const gridElement = document.getElementById('grid');
@@ -325,11 +310,12 @@ interface GridData {
   }else{
   console.error('error')
   }
-  
+  //empty search input after searching 
   $('#fromInput').val('') ;
   });
   // Initialize the grid
   apidata.initialize();
+  //overlay when the page is still getting ready
   const overlay = $('<div id="overlay"></div>');
   $('body').append(overlay);
   });
