@@ -56,7 +56,7 @@ class ApiData {
 			throw error;
 		}
 	}
-	//get records from API for fetch an search functionality 
+	//get records from API for fetch and search functionality 
 	async fetchAndProcessRecords(from: number = this.firstVal, to: number = this.lastVal) {
 		try {
 			$('#spinner').show()
@@ -80,8 +80,6 @@ class ApiData {
 			throw error;
 		}
 	}
-
-
 	async fetchRecords() {
 		const maxRange = this.totalItems - 1;
 		const from = this.firstVal;
@@ -99,8 +97,6 @@ class ApiData {
 			alert('failed to fetch records ');
 		}
 	}
-
-
 	async searchRecords(searchValue: number) {
 		try {
 			const maxRange = this.totalItems - 1; // Maximum allowed Value
@@ -132,7 +128,6 @@ class ApiData {
 			gridElement.style.overflow = 'none';
 		}
 	}
-
 	private async fetchData(url: string): Promise<any> {
 		try {
 			$('#overlay').show();
@@ -146,16 +141,11 @@ class ApiData {
 			throw error;
 		}
 	}
-
-
 	private setupControls() {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
 		$(window).on('resize', debounce(this.handleResize, 350));
 	}
-
-
-
 	private handlePageChange(delta: number) {
 		const newFirstVal = this.firstVal + delta * this.pageSize;
 		if (newFirstVal >= 0 && newFirstVal <= this.totalItems - 1) {
@@ -170,8 +160,6 @@ class ApiData {
 			this.fetchRecords();
 		}
 	}
-
-
 	private handleResize = () => {
 		const newWindowHeight = Math.floor($(window).innerHeight() as number);
 		const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;
@@ -193,14 +181,11 @@ class ApiData {
 			this.adjustGridHeight();
 		}
 	}
-
-
 	private displayRecords = () => {
 		const gridTemplate = new GridTemplate(this.columnNames, this.data);
 		gridTemplate.displayRecords();
 		this.updatePageInfo();
 	};
-
 	// Update the page information and records display based on the current state of the grid.
 	updatePageInfo() {
 		const totalPages = Math.floor(this.totalItems / this.pageSize);
@@ -254,7 +239,6 @@ class GridTemplate {
 		}
 	}
 }
-
 // Constants for grid calculation
 const gridRatio = 9 / 20;// represents the ratio of the grid's height to the window's height. 
 const rowHeight = 16;
