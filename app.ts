@@ -221,7 +221,6 @@ class GridTemplate {
 		this.columnNames = columnNames;
 		this.dataRecords = dataRecords;
 	}
-
 	// Display records in a grid in table format 
 	displayRecords(): void {
 		const gridElement = document.getElementById('grid');
