@@ -1,4 +1,4 @@
-/* body with overflow hidden for no scrolling  */
+
 body,
 html {
   margin: 0;
@@ -46,7 +46,8 @@ td {
   position: sticky;
   bottom: 0;
 }
-#pageInfo , .records {
+#pageInfo ,
+.records {
   font-weight: 450;
   background-color: #333333;
 }
