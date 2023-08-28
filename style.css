@@ -23,12 +23,6 @@ body {
 }
 /* Colors */
 
-/* TYPOGRAPHY */
-#currentPageNumber {
-  color: var(--tertiary-color);
-}
-/* TYPOGRAPHY */
-
 /* BUTTON STARTS */
 button {
   cursor: pointer;
