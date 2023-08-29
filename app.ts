@@ -21,7 +21,7 @@ class ApiData {
 		this.pageSize = pageSize;
 	};
 	// Initialize method to set up the grid
-	async initialize() {
+	async initialize(): Promise<void> {
 		try {
 			this.adjustGridHeight();
 			await this.recordCount();
@@ -36,7 +36,7 @@ class ApiData {
 	async recordCount(): Promise<void> {
 		try {
 			const response = await this.fetchData('http://localhost:2050/recordCount');
-			this.totalItems = response;
+			this.totalItems = typeof response === 'number' ? response : parseInt(response as string, 10);
 		} catch (error) {
 			throw new Error('Failed to fetch record count.');
 		}
@@ -45,7 +45,7 @@ class ApiData {
 	async fetchColumns(): Promise<void> {
 		try {
 			const response = await this.fetchData('http://localhost:2050/columns');
-			const res = JSON.parse(response);
+			const res = JSON.parse(response as string);
 			this.columnNames = res.map((columnName: any) => ({ name: columnName }));
 			this.data = new Array<GridData>(this.columnNames.length);
 		} catch (error) {
@@ -58,7 +58,7 @@ class ApiData {
 			$('#spinner').show()
 			$('#grid').hide();
 			const response = await this.fetchData(`http://localhost:2050/records?from=${from}&to=${to}`);
-			const res = JSON.parse(response);
+			const res = JSON.parse(response as string);
 			const processedData = res.map((record: any) => {
 				const obj: GridData = {};
 				let columnIndex = 0;
@@ -140,7 +140,7 @@ class ApiData {
 		$('.records').text(`Showing records ${from} to ${to}`);
 	};
 	// use Ajax for data fetching
-	private async fetchData(url: string): Promise<any> {
+	private async fetchData(url: string): Promise<number | string> {
 		try {
 			$('#overlay').show();
 			const response = await $.ajax({
