@@ -28,7 +28,7 @@ interface GridData {
 		} catch (error) {
 			console.error('Error during initialization:', error);
 		}
-	}
+	};
 	// Method to fetch total record count from the server
 	async recordCount(): Promise<void> {
 		try {
@@ -37,7 +37,7 @@ interface GridData {
 		} catch (error) {
 			throw new Error('Failed to fetch record count.');
 		}
-	}
+	};
 	//fectch column names
 	async fetchColumns(): Promise<void> {
 		try {
@@ -48,7 +48,7 @@ interface GridData {
 		} catch (error) {
 			throw new Error('Failed to fetch columns.');
 		}
-	}
+	};
 	//get records from API for fetch an search functionality 
 	async fetchAndProcessRecords(from: number = this.firstVal, to: number): Promise<GridData[]> {
 		try {
@@ -75,7 +75,7 @@ interface GridData {
 		} catch (error) {
 			throw new Error('Failed to fetch records');
 		}
-	}
+	};
 	//fetch records from api
 	async fetchRecords(): Promise<void> {
 		const maxRange = this.totalItems - 1;
@@ -93,7 +93,7 @@ interface GridData {
 		} catch (error) {
 			throw new Error('Failed to fetch records')
 		}
-	}
+	};
 	//funtion to search through records using fromID
 	async searchRecords(searchValue: number): Promise<void> {
 		try {
@@ -114,7 +114,7 @@ interface GridData {
 		} catch (error) {
 			throw new Error('Failed to search value');
 		}
-	}
+	};
 	//chnge grid height according to screen size
 	adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
@@ -125,7 +125,7 @@ interface GridData {
 			gridElement.style.height = `${this.maxGridHeight}px`;
 			gridElement.style.overflow = 'none';
 		}
-	}
+	};
 	// use Ajax for data fetching
 	private async fetchData(url: string): Promise<any> {
 		try {
@@ -139,12 +139,12 @@ interface GridData {
 		} catch (error) {
 			throw error;
 		}
-	}
+	};
 	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
 		$(window).on('resize', debounce(this.handleResize, 350));
-	}
+	};
 	private handlePageChange(delta: number): void {
 		const newFirstVal = this.firstVal + delta * this.pageSize;
 		if (newFirstVal >= 0 && newFirstVal <= this.totalItems - 1) {
@@ -158,7 +158,7 @@ interface GridData {
 			this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
 			this.fetchRecords();
 		}
-	}
+	};
 	private handleResize = (): void => {
 		const newWindowHeight = Math.floor($(window).innerHeight() as number);
 		const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;
@@ -179,7 +179,7 @@ interface GridData {
 			this.updatePageInfo();
 			this.adjustGridHeight();
 		}
-	}
+	};
 	private displayRecords = (): void => {
 		const gridTemplate = new GridTemplate(this.columnNames, this.data);
 		gridTemplate.displayRecords();
@@ -194,7 +194,7 @@ interface GridData {
 		let to = Math.min(from + this.pageSize, maxRange);
 		$('#pageInfo').text(`${pageInfo}`);
 		$('.records').text(`Showing records ${from} to ${to}`);
-	}
+	};
 }
 class GridTemplate {
 	private columnNames: ColumnName[] = [];
@@ -203,7 +203,7 @@ class GridTemplate {
 	constructor(columnNames: ColumnName[], dataRecords: GridData[]) {
 		this.columnNames = columnNames;
 		this.dataRecords = dataRecords;
-	}
+	};
 	// Display records in a grid in table format 
 	displayRecords(): void {
 		const gridElement = document.getElementById('grid');
@@ -234,10 +234,10 @@ class GridTemplate {
 			// Append the table to the grid element
 			gridElement.appendChild(table);
 		}
-	}
+	};
 }
 // Debounce utility function to limit function execution frequency
-export function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
+function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 	let timeout: number;
 
 	return (...args: Parameters<F>): Promise<ReturnType<F>> => {
@@ -249,7 +249,7 @@ export function debounce<F extends (...args: any) => any>(func: F, waitFor: numb
 			}, waitFor);
 		});
 	};
-}
+};
 // Constants for grid calculation
 const gridRatio = 9 / 20;// represents the ratio of the grid's height to the window's height. 
 const rowHeight = 16;
@@ -279,7 +279,7 @@ $(document).ready(() => {
 			alert('Please enter a numerical value ')
 		} else {
 			console.error('error')
-		}
+		};
 		//empty search input after searching 
 		$('#fromInput').val('');
 	});
