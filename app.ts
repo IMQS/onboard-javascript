@@ -170,7 +170,7 @@ class ApiData {
 			this.lastVal = this.firstVal + this.pageSize - 1;
 			this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
 			this.fetchRecords();
-		}
+		};
 	};
 	private handleResize = (): void => {
 		const newWindowHeight = Math.floor($(window).innerHeight() as number);
