@@ -4,8 +4,8 @@
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
 	<link rel="stylesheet" href="style.css">
+	<script src="app.js"></script>
 </head>
-
 <body>
 	<div id="loader" ></div>
 	<h1 class="heading">OnBoard-Javascript</h1>
@@ -15,40 +15,24 @@
             <p></p>
         </div>
     </div>
-
 	<div class="search-container">
 		<form id="searchForm">
 			<input type="number" id="searchInput" placeholder="Search.." name="search" autocomplete="off">
 			<button class="btnSearch" type="submit">Submit</button>	
 		  </form>
 	</div>
-
 	<div class="showRecords">
 		<button onclick="rightArrow()" class="arrow-right"></button>
 		<div id="page"></div>
 		<button onclick="leftArrow()" class="arrow-left"></button>
 		</div>
-	
-	
-
-	
-
-
-  
 	<table id="recordsTable">
 		<thead>
 		  <tr class="head">
 		  </tr>
 		</thead>
-		
 		<tbody>
-			
 		</tbody>
 	</table>
- 
-	  
-	<script src="app.js"></script>
 </body>
-
 </html>
-
