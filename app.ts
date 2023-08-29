@@ -27,9 +27,10 @@ interface GridData {
 			this.setupControls();
 		} catch (error) {
 			console.error('Error during initialization:', error);
-		}}
+		}
+	}
 	// Method to fetch total record count from the server
-	async recordCount(): Promise<void>  {
+	async recordCount(): Promise<void> {
 		try {
 			const response = await this.fetchData('http://localhost:2050/recordCount');
 			this.totalItems = response;
@@ -38,7 +39,7 @@ interface GridData {
 		}
 	}
 	//fectch column names
-	async fetchColumns() : Promise<void>{
+	async fetchColumns(): Promise<void> {
 		try {
 			const response = await this.fetchData('http://localhost:2050/columns');
 			const res = JSON.parse(response);
@@ -46,9 +47,10 @@ interface GridData {
 			this.data = new Array<GridData>(this.columnNames.length);
 		} catch (error) {
 			throw new Error('Failed to fetch columns.');
-		}}
+		}
+	}
 	//get records from API for fetch an search functionality 
-	async fetchAndProcessRecords(from: number = this.firstVal, to: number) :  Promise<GridData[]> {
+	async fetchAndProcessRecords(from: number = this.firstVal, to: number): Promise<GridData[]> {
 		try {
 			$('#spinner').show()
 			$('#grid').hide();
@@ -72,7 +74,8 @@ interface GridData {
 			return processedData;
 		} catch (error) {
 			throw new Error('Failed to fetch records');
-		}}
+		}
+	}
 	async fetchRecords(): Promise<void> {
 		const maxRange = this.totalItems - 1;
 		const from = this.firstVal;
@@ -120,7 +123,7 @@ interface GridData {
 			gridElement.style.overflow = 'none';
 		}
 	}
-	private async fetchData(url: string):Promise<any> {
+	private async fetchData(url: string): Promise<any> {
 		try {
 			$('#overlay').show();
 			const response = await $.ajax({
@@ -131,8 +134,9 @@ interface GridData {
 			return response;
 		} catch (error) {
 			throw error;
-		}}
-	private setupControls(): void{
+		}
+	}
+	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
 		$(window).on('resize', debounce(this.handleResize, 350));
@@ -151,7 +155,7 @@ interface GridData {
 			this.fetchRecords();
 		}
 	}
-	private handleResize = (): void  => {
+	private handleResize = (): void => {
 		const newWindowHeight = Math.floor($(window).innerHeight() as number);
 		const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;
 
@@ -172,7 +176,7 @@ interface GridData {
 			this.adjustGridHeight();
 		}
 	}
-	private displayRecords = () : void  => {
+	private displayRecords = (): void => {
 		const gridTemplate = new GridTemplate(this.columnNames, this.data);
 		gridTemplate.displayRecords();
 		this.updatePageInfo();
