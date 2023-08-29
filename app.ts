@@ -1,26 +1,21 @@
-// Interface to define the structure of grid data
-interface GridData {
-	[key: string]: any;
-}
-// Interface to define column names
 interface ColumnName {
 	name: string;
 }
-// Class to manage data fetching and grid operations
-class ApiData {
+interface GridData {
+	[key: string]: any;
+}class ApiData {
 	// Properties to manage data and settings
 	pageSize: number;
-	currentPage: number = 1;
+	currentPage = 1;
 	data: GridData[] = [];
-	totalItems: number = 0;
+	totalItems = 0;
 	columnNames: ColumnName[] = [];
-	maxGridHeight: number = 0;
-	firstVal: number = 0;
-	lastVal!: number;
+	maxGridHeight = 0;
+	firstVal = 0;
+	lastVal: number | undefined;
 
 	constructor(pageSize: number) {
 		this.pageSize = pageSize;
-
 	}
 	// Initialize method to set up the grid
 	async initialize() {
@@ -35,54 +30,51 @@ class ApiData {
 		}
 	}
 	// Method to fetch total record count from the server
-	async recordCount() {
+	async recordCount(): Promise<void>  {
 		try {
 			const response = await this.fetchData('http://localhost:2050/recordCount');
 			this.totalItems = response;
 		} catch (error) {
-			console.error('Failed to fetch record count', error);
-			throw error;
+			throw new Error('Failed to fetch record count');
 		}
 	}
 	//fectch column names
-	async fetchColumns() {
+	async fetchColumns() : Promise<void>{
 		try {
 			const response = await this.fetchData('http://localhost:2050/columns');
 			const res = JSON.parse(response);
 			this.columnNames = res.map((columnName: any) => ({ name: columnName }));
 			this.data = new Array<GridData>(this.columnNames.length);
 		} catch (error) {
-			console.error('Failed to fetch columns', error);
-			throw error;
-		}
-	}
+			throw new Error('Failed to fetch record count');
+		}}
 	//get records from API for fetch an search functionality 
-	async fetchAndProcessRecords(from: number = this.firstVal, to: number = this.lastVal) {
+	async fetchAndProcessRecords(from: number = this.firstVal, to: number) :  Promise<GridData[]> {
 		try {
 			$('#spinner').show()
-			$('#grid').hide()
+			$('#grid').hide();
 			const response = await this.fetchData(`http://localhost:2050/records?from=${from}&to=${to}`);
 			const res = JSON.parse(response);
 			const processedData = res.map((record: any) => {
 				const obj: GridData = {};
-				for (let j = 0; j < this.columnNames.length && j < record.length; j++) {
-					const columnName = this.columnNames[j].name;
-					const columnValue = record[j];
-					obj[columnName] = columnValue;
+				let columnIndex = 0;
+				for (const column of this.columnNames) {
+					if (columnIndex < record.length) {
+						const columnName = column.name;
+						const columnValue = record[columnIndex];
+						obj[columnName] = columnValue;
+					}
+					columnIndex++;
 				}
 				return obj;
 			});
 			$('#spinner').hide();
-			$('#grid').show()
+			$('#grid').show();
 			return processedData;
 		} catch (error) {
-			console.error('Failed to fetch records', error);
-			throw error;
-		}
-	}
-
-
-	async fetchRecords() {
+			throw new Error('Failed to fetch records');
+		}}
+	async fetchRecords(): Promise<void> {
 		const maxRange = this.totalItems - 1;
 		const from = this.firstVal;
 		let to = Math.min(from + this.pageSize, maxRange);
@@ -99,9 +91,7 @@ class ApiData {
 			alert('failed to fetch records ');
 		}
 	}
-
-
-	async searchRecords(searchValue: number) {
+	async searchRecords(searchValue: number): Promise<void> {
 		try {
 			const maxRange = this.totalItems - 1; // Maximum allowed Value
 			if (searchValue >= 0 && searchValue <= maxRange) {
@@ -114,15 +104,13 @@ class ApiData {
 				this.lastVal = from + this.pageSize; // Calculate lastVal based on pageSize
 				this.displayRecords();
 				this.updatePageInfo();
-			}
-			else {
+			} else {
 				alert('Please enter values in the range (0-999999)');
 			}
 		} catch (error) {
-			alert('Failed to fetch records');
-		}
-	}
-	adjustGridHeight() {
+			throw new Error('Failed to search value');
+		}}
+	adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
 		const pageCntrl = $('.grid-controls').innerHeight();
 		const screenHeight = $(window).innerHeight();
@@ -130,9 +118,7 @@ class ApiData {
 			this.maxGridHeight = screenHeight - pageCntrl;
 			gridElement.style.height = `${this.maxGridHeight}px`;
 			gridElement.style.overflow = 'none';
-		}
-	}
-
+		}}
 	private async fetchData(url: string): Promise<any> {
 		try {
 			$('#overlay').show();
@@ -144,19 +130,13 @@ class ApiData {
 			return response;
 		} catch (error) {
 			throw error;
-		}
-	}
-
-
-	private setupControls() {
+		}}
+	private setupControls(): void{
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
 		$(window).on('resize', debounce(this.handleResize, 350));
 	}
-
-
-
-	private handlePageChange(delta: number) {
+	private handlePageChange(delta: number): void {
 		const newFirstVal = this.firstVal + delta * this.pageSize;
 		if (newFirstVal >= 0 && newFirstVal <= this.totalItems - 1) {
 			this.firstVal = newFirstVal;
@@ -170,9 +150,7 @@ class ApiData {
 			this.fetchRecords();
 		}
 	}
-
-
-	private handleResize = () => {
+	private handleResize = (): void  => {
 		const newWindowHeight = Math.floor($(window).innerHeight() as number);
 		const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;
 
@@ -193,16 +171,13 @@ class ApiData {
 			this.adjustGridHeight();
 		}
 	}
-
-
-	private displayRecords = () => {
+	private displayRecords = () : void  => {
 		const gridTemplate = new GridTemplate(this.columnNames, this.data);
 		gridTemplate.displayRecords();
 		this.updatePageInfo();
 	};
-
 	// Update the page information and records display based on the current state of the grid.
-	updatePageInfo() {
+	updatePageInfo(): void {
 		const totalPages = Math.floor(this.totalItems / this.pageSize);
 		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
 		const maxRange = this.totalItems - 1;
@@ -212,7 +187,6 @@ class ApiData {
 		$('.records').text(`Showing records ${from} to ${to}`);
 	}
 }
-// Class to manage the grid template and display records
 class GridTemplate {
 	private columnNames: ColumnName[] = [];
 	private dataRecords: GridData[] = [];
@@ -253,12 +227,8 @@ class GridTemplate {
 		}
 	}
 }
-
-// Constants for grid calculation
-const gridRatio = 9 / 20;// represents the ratio of the grid's height to the window's height. 
-const rowHeight = 16;
 // Debounce utility function to limit function execution frequency
-function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
+export function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 	let timeout: number;
 
 	return (...args: Parameters<F>): Promise<ReturnType<F>> => {
@@ -271,6 +241,9 @@ function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 		});
 	};
 }
+// Constants for grid calculation
+const gridRatio = 9 / 20;// represents the ratio of the grid's height to the window's height. 
+const rowHeight = 16;
 // Wait for the document to be ready
 $(document).ready(() => {
 	// Initialization and setup code
