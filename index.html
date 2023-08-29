@@ -4,7 +4,7 @@
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
 	<link rel="stylesheet" href="style.css">
-	<script src="app.js"></script>
+	<script src="app.js" defer></script>
 </head>
 <body>
 	<div id="loader" ></div>
@@ -12,13 +12,13 @@
 	<div id="modal" class="modal">
         <div class="modal-content">
             <span id="closeModalBtn" class="close">&times;</span>
-            <p></p>
+            <p class="content"></p>
         </div>
     </div>
 	<div class="search-container">
 		<form id="searchForm">
 			<input type="number" id="searchInput" placeholder="Search.." name="search" autocomplete="off">
-			<button class="btnSearch" type="submit">Submit</button>	
+			<button id="btnSearch" class="btnSearch" type="submit">Submit</button>	
 		  </form>
 	</div>
 	<div class="showRecords">

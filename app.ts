@@ -132,25 +132,30 @@ async function updateRecordsAndResize(inputValue: number) {
 	let count = await fetchRecordCount() - 1;
 	if (inputValue < 0 || inputValue > count) { // check if the search input 
 		$('.modal').css('display', 'block') //opens modal if search input is not within range
-		$('.modal-content').append(`<p>${inputValue} is not a number within the range.Please try a different number</p>`)
+		$('.content').append(`<p>${inputValue} is not a number within the range.Please try a different number</p>`)
 		$('#searchInput').val(''); // empties search bar
 		return;
 	}
 	let calculatedRows = adjustRowsByScreenHeight();
-	const quarterRange = Math.floor(calculatedRows / 2); // divides the calculated max rows in half 
-	firstNumber = Math.max(0, inputValue - quarterRange);
+	const halfRange = Math.floor(calculatedRows / 2); // divides the calculated max rows in half 
+	firstNumber = Math.max(0, inputValue - halfRange);
 	lastNumber = Math.min(count, firstNumber + (calculatedRows - 1));
 	await displayRecords();
 };
 
 $('#closeModalBtn').on("click", () => {
+	$('.content').empty()
 	$('.modal').css('display', 'none') // closes modal
 });
 
-$('.btnSearch').on('click', async (event: any) => {
+$('#btnSearch').on("click", async (event) => {
 	event.preventDefault();
-	let inputValue = $('#searchInput').val() as number;
-	await updateRecordsAndResize(inputValue); // calls to calculate the range once button is clicked
+	try {
+		let inputValue = $('#searchInput').val() as number;
+		await updateRecordsAndResize(inputValue); // calls to calculate the range once button is clicked
+	} catch (error) {
+		console.error('An error occurred:', error);
+	}
 });
 
 async function rightArrow(): Promise<void> {
