@@ -76,6 +76,7 @@ interface GridData {
 			throw new Error('Failed to fetch records');
 		}
 	}
+	//fetch records from api
 	async fetchRecords(): Promise<void> {
 		const maxRange = this.totalItems - 1;
 		const from = this.firstVal;
@@ -93,6 +94,7 @@ interface GridData {
 			throw new Error('Failed to fetch records')
 		}
 	}
+	//funtion to search through records using fromID
 	async searchRecords(searchValue: number): Promise<void> {
 		try {
 			const maxRange = this.totalItems - 1; // Maximum allowed Value
@@ -113,6 +115,7 @@ interface GridData {
 			throw new Error('Failed to search value');
 		}
 	}
+	//chnge grid height according to screen size
 	adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
 		const pageCntrl = $('.grid-controls').innerHeight();
@@ -123,6 +126,7 @@ interface GridData {
 			gridElement.style.overflow = 'none';
 		}
 	}
+	// use Ajax for data fetching
 	private async fetchData(url: string): Promise<any> {
 		try {
 			$('#overlay').show();
