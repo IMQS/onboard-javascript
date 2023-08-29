@@ -1,18 +1,25 @@
-const api: string = "http://localhost:2050/";
+const globals = globalInitializer();
 let isFunctionRunning = false;
-let currentPage = 1;
-let firstPage = 1
-let lastPage = firstPage + 9
-let currentFromID = 1;
-let currentToID = 20;
-let difference = 0
+
+// The following would handle all the variable properties that is being changed a lot
+function globalInitializer() {
+	return {
+		api: "http://localhost:2050/",
+		currentPage: 1,
+		firstPage: 1,
+		lastPage: 10,
+		currentFromID: 1,
+		currentToID: 20,
+		difference: 0,
+	}
+}
 
 // This function  will handle retrieving the records from the api
 async function getRecords(fromID: number, toID: number): Promise<string[][]> {
 	try {
-		const response = await fetch(`${api}records?from=${fromID}&to=${toID}`);
+		const response = await fetch(`${globals.api}records?from=${fromID}&to=${toID}`);
 		const data = await response.text();
-		const records: string[][] = JSON.parse(data)
+		const records = JSON.parse(data)
 		return records;
 	} catch (error) {
 		throw error;
@@ -22,11 +29,10 @@ async function getRecords(fromID: number, toID: number): Promise<string[][]> {
 // This function  will handle retrieving the columns from the api
 async function getColumns(): Promise<string[]> {
 	try {
-		const response = await fetch(`${api}columns`);
+		const response = await fetch(`${globals.api}columns`);
 		const data = await response.text()
-		const columns: string[] = JSON.parse(data);
+		const columns = JSON.parse(data);
 		return columns;
-
 	} catch (error) {
 		throw error;
 	}
@@ -35,11 +41,10 @@ async function getColumns(): Promise<string[]> {
 // This function  will handle retrieving the record count from the api
 async function getRecordCount(): Promise<number> {
 	try {
-		const response = await fetch(`${api}recordCount`);
+		const response = await fetch(`${globals.api}recordCount`);
 		const data = await response.text();
-		const count: number = JSON.parse(data);
+		const count = JSON.parse(data);
 		return count;
-
 	} catch (error) {
 		throw error;
 	}
@@ -53,7 +58,6 @@ async function showColumns(): Promise<void> {
 		for (let i = 0; i < columns.length; i++) {
 			$("thead").append(`<th>${columns[i]}</th>`);
 		}
-
 	} catch (error) {
 		throw error;
 	}
@@ -64,21 +68,21 @@ async function showRecords(fromID: number, toID: number): Promise<void> {
 	if (isFunctionRunning) {
 		return;
 	}
+	isFunctionRunning = true;
 	try {
-		let count: number = (await getRecordCount()) - 1;
-		isFunctionRunning = true;
-		let inputNumber: string = input();
-		const maxRecords: number = recordsPerPage();
+		let count = (await getRecordCount()) - 1;
+		let inputNumber = input();
+		const maxRecords = recordsPerPage();
 		let condition = Math.ceil(count / maxRecords) + 1
-		if ((condition - 1) == currentPage) {
+		if ((condition - 1) == globals.currentPage) {
 			fromID = (condition - 2) * maxRecords + 1
 		}
 		$("tbody").empty();
 		loader()
-		currentToID = toID
+		globals.currentToID = toID
 		if (toID > count) {
 			toID = count
-		} else if (currentPage == 1) {
+		} else if (globals.currentPage == 1) {
 			fromID = 1
 		}
 		let records = await getRecords(fromID, toID);
@@ -93,7 +97,7 @@ async function showRecords(fromID: number, toID: number): Promise<void> {
 		}
 
 		$("span").each(function () {
-			const lowercasedID: string = $(this).text() as string;
+			const lowercasedID = $(this).text();
 			if (lowercasedID == inputNumber) {
 				$(this).css({ "background-color": "#FFFF00", "color": "black  " });
 			} else {
@@ -104,7 +108,6 @@ async function showRecords(fromID: number, toID: number): Promise<void> {
 		if (condition >= fromID && condition <= toID) {
 			$(".next").css({ display: "none" });
 		}
-
 	} catch (error) {
 		throw error;
 	}
@@ -115,12 +118,12 @@ async function showRecords(fromID: number, toID: number): Promise<void> {
 async function pageNumbers(start: number, end: number): Promise<void> {
 	try {
 		$('.pagination').empty();
-		let count: number = (await getRecordCount()) - 1;
+		let count = (await getRecordCount()) - 1;
 		let stringCount = count.toLocaleString().replace(/,/g, " ");
 		let maxRecords = recordsPerPage();
 		let condition = Math.floor(count / maxRecords) + 1;
 		if (condition <= end && condition >= start) {
-			if (count % maxRecords === 0) {
+			if (999999 % maxRecords === 0) {
 				end = (condition - 1)
 			} else end = condition
 			$(".next").css({ display: "none" });
@@ -130,30 +133,34 @@ async function pageNumbers(start: number, end: number): Promise<void> {
 		if (start < 1) {
 			start = 1
 		}
-		firstPage = start;
-		lastPage = end;
+		globals.firstPage = start;
+		globals.lastPage = end
 		for (let i = start; i <= end; i++) {
 			$(".pagination").append(
 				`<a id="${i}" class="pagination-item">${i}</a>`
 			);
 		}
-		if (firstPage === 1) {
+		if (globals.firstPage === 1) {
 			$(".prev").css({ display: "none" });
 		} else {
 			$(".prev").css({ display: "block" });
 		}
 
 		// Adding a click event on the  pagination pages to display the appropriate number of records for that specific page number.
-		$(".pagination-item").on("click", async function dynamicPagination(): Promise<Array<number>> {
-			$('.search-input').val('')
-			currentPage = parseInt($(this).attr("id") as any);
-			const maxRecords = recordsPerPage();
-			let fromID = Math.ceil(currentPage * maxRecords - (maxRecords - 1));
-			if (difference > 0 && difference < maxRecords) {
-				fromID = fromID + difference
+		$(".pagination-item").on("click", async function dynamicPagination() {
+			if (isFunctionRunning) {
+				return;
 			}
-			if (currentPage === 1) {
-				currentFromID = 1
+			isFunctionRunning = true;
+			$('.search-input').val('')
+			globals.currentPage = parseInt($(this).attr("id") as any);
+			const maxRecords = recordsPerPage();
+			let fromID = Math.ceil(globals.currentPage * maxRecords - (maxRecords - 1));
+			if (globals.difference > 0 && globals.difference < maxRecords) {
+				fromID = fromID + globals.difference
+			}
+			if (globals.currentPage === 1) {
+				globals.currentFromID = 1
 			}
 			let toID = fromID + (maxRecords - 1)
 
@@ -161,12 +168,13 @@ async function pageNumbers(start: number, end: number): Promise<void> {
 			if (fromID > count + 1 || toID > count + 1) {
 				toID = count;
 				fromID = toID - maxRecords
-				currentFromID = fromID
+				globals.currentFromID = fromID
 			}
-			currentFromID = fromID
+			globals.currentFromID = fromID
 			$(".pagination-item").removeClass("active");
 			$(this).addClass("active");
-			showRecords(fromID, toID);
+			isFunctionRunning = false
+			await showRecords(fromID, toID);
 			$(".results").empty();
 			$(".results").append(
 				`Displaying ID's ${fromID} - ${toID} out of ${stringCount}`
@@ -176,7 +184,7 @@ async function pageNumbers(start: number, end: number): Promise<void> {
 
 		$(".pagination-item").each(function () {
 			let elementID = $(this).attr('id') as string;
-			let currentPageString: string = currentPage.toString();
+			let currentPageString = globals.currentPage.toString();
 			if (elementID == currentPageString) {
 				$(this).addClass('active')
 			}
@@ -186,34 +194,33 @@ async function pageNumbers(start: number, end: number): Promise<void> {
 		throw error;
 	}
 	isFunctionRunning = false
+
+	// Adding a click event to the next button of the pagination.
+	$(".next").on("click", async function () {
+		if (isFunctionRunning) {
+			return;
+		}
+		isFunctionRunning = true
+		globals.firstPage = globals.lastPage + 1;
+		globals.lastPage = globals.firstPage + 9;
+		$(".pagination").empty();
+		await pageNumbers(globals.firstPage, globals.lastPage);
+		isFunctionRunning = false
+	});
+
+	// Adding a if statement in the case that pagination start with the page number 1. In the else statement a click event is added for the next button of the pagination.
+	$(".prev").on("click", async function () {
+		if (isFunctionRunning) {
+			return;
+		}
+		isFunctionRunning = true
+		globals.lastPage = globals.firstPage - 1;
+		globals.firstPage = globals.lastPage - 9;
+		$(".pagination").empty();
+		await pageNumbers(globals.firstPage, globals.lastPage);
+		isFunctionRunning = false
+	});
 }
-
-
-// Adding a click event to the next button of the pagination.
-$(".next").on("click", async function () {
-	if (isFunctionRunning) {
-		return;
-	}
-	isFunctionRunning = true
-	firstPage = lastPage + 1;
-	lastPage = firstPage + 9;
-	$(".pagination").empty();
-	await pageNumbers(firstPage, lastPage);
-	isFunctionRunning = false
-});
-
-// Adding a if statement in the case that pagination start with the page number 1. In the else statement a click event is added for the next button of the pagination.
-$(".prev").on("click", async function () {
-	if (isFunctionRunning) {
-		return;
-	}
-	isFunctionRunning = true
-	lastPage = firstPage - 1;
-	firstPage = lastPage - 9;
-	$(".pagination").empty();
-	await pageNumbers(firstPage, lastPage);
-	isFunctionRunning = false
-});
 
 // In this function wil do the extract the number entered in the search. Then it would take that and calculate the range which should be displayed for the user to click on. 
 async function resultsRange(event: any) {
@@ -223,17 +230,17 @@ async function resultsRange(event: any) {
 	isFunctionRunning = true;
 	event.preventDefault();
 	let count = await getRecordCount() - 1;
-	let inputNumber: string = input();
+	let inputNumber = input();
 	let inputNumberInt = parseInt(inputNumber);
 	if (inputNumber !== '') {
 		const maxRecords = recordsPerPage();
-		let end: number = Math.ceil(inputNumberInt / maxRecords) * maxRecords;
+		let end = Math.ceil(inputNumberInt / maxRecords) * maxRecords;
 		if (end > (count + 1)) {
 			end = count
-			currentToID = end
+			globals.currentToID = end
 		}
-		let start: number = (end - (maxRecords - 1));
-		currentPage = Math.floor(end / maxRecords);
+		let start = (end - (maxRecords - 1));
+		globals.currentPage = Math.floor(end / maxRecords);
 		if (inputNumberInt < 1000000 && inputNumberInt > 0) {
 			if (end === 1000000) {
 				end = end - 1;
@@ -259,7 +266,6 @@ async function resultsRange(event: any) {
 
 	isFunctionRunning = false;
 }
-$(".search-input").on("keyup", resultsRange);
 
 // After the range has been returned to the user. The user can click on it and that will show the range of records on the table. 
 async function resultsSelect() {
@@ -267,7 +273,7 @@ async function resultsSelect() {
 		return;
 	}
 	isFunctionRunning = true;
-	let count: number = await getRecordCount() - 1;
+	let count = await getRecordCount() - 1;
 	let idRange = $('.results-select').text();
 	let rangeArray = null
 	rangeArray = idRange.split('-');
@@ -275,15 +281,15 @@ async function resultsSelect() {
 	let startID = parseInt(rangeArray[0])
 	let endID = parseInt(rangeArray[1])
 	let maxRecords = recordsPerPage();
-	currentPage = Math.ceil(endID / maxRecords)
-	let pageEnd = Math.ceil(currentPage / 10) * 10;
+	globals.currentPage = Math.ceil(endID / maxRecords)
+	let pageEnd = Math.ceil(globals.currentPage / 10) * 10;
 	let pageStart = pageEnd - 9
 
 	if (endID == count) {
-		startID = ((currentPage - 1) * maxRecords) + 1;
+		startID = ((globals.currentPage - 1) * maxRecords) + 1;
 		endID = count
-		firstPage = pageStart;
-		lastPage = pageEnd
+		globals.firstPage = pageStart;
+		globals.lastPage = pageEnd
 	}
 
 	await pageNumbers(pageStart, pageEnd)
@@ -299,7 +305,7 @@ async function adjustDisplayedRecords(): Promise<number> {
 		if (screenHeight < 68) {
 			screenHeight = 68
 		}
-		let count: number = await getRecordCount() - 1;
+		let count = await getRecordCount() - 1;
 		let maxRecords = Math.floor(parseInt(screenHeight as any) / 68);
 
 		let inputNumber = input();
@@ -307,31 +313,31 @@ async function adjustDisplayedRecords(): Promise<number> {
 		let inputNumberInt = parseInt(inputNumber)
 
 		if (inputNumber == '') {
-			let newCurrentPage = Math.ceil(currentFromID / maxRecords);
+			let newCurrentPage = Math.ceil(globals.currentFromID / maxRecords);
 			if (newCurrentPage === 1) {
-				currentFromID = 1
+				globals.currentFromID = 1
 			}
-			currentToID = currentFromID + (maxRecords - 1);
-			currentPage = newCurrentPage;
-			let originalID = (Math.floor(maxRecords * currentPage) - (maxRecords - 1))
-			difference = currentFromID - originalID
+			globals.currentToID = globals.currentFromID + (maxRecords - 1);
+			globals.currentPage = newCurrentPage;
+			let originalID = (Math.floor(maxRecords * globals.currentPage) - (maxRecords - 1))
+			globals.difference = globals.currentFromID - originalID
 		} else {
 			if (length > 0) {
 				let newCurrentPage = Math.ceil(inputNumberInt / maxRecords)
-				if (currentToID > count) {
-					currentToID = count
+				if (globals.currentToID > count) {
+					globals.currentToID = count
 				}
-				currentToID = newCurrentPage * maxRecords;
-				currentPage = newCurrentPage
-				currentFromID = (currentPage - 1) * maxRecords + 1;
+				globals.currentToID = newCurrentPage * maxRecords;
+				globals.currentPage = newCurrentPage
+				globals.currentFromID = (globals.currentPage - 1) * maxRecords + 1;
 			}
 		}
-		let pageEnd = Math.ceil(Math.floor(currentToID / maxRecords) / 10) * 10;
+		let pageEnd = Math.ceil(Math.floor(globals.currentToID / maxRecords) / 10) * 10;
 		let pageStart = pageEnd - 9;
-		firstPage = pageStart;
-		lastPage = pageEnd;
+		globals.firstPage = pageStart;
+		globals.lastPage = pageEnd;
 		$("tbody").empty();
-		await showRecords(currentFromID, currentToID);
+		await showRecords(globals.currentFromID, globals.currentToID);
 		await pageNumbers(pageStart, pageEnd);
 		return maxRecords;
 	} catch (error) {
@@ -339,13 +345,13 @@ async function adjustDisplayedRecords(): Promise<number> {
 	}
 }
 
+// Calls the function to resize with a timeout added for precision
 let resizeTimer: ReturnType<typeof setTimeout>;
-
 function resize() {
 	clearTimeout(resizeTimer);
 	resizeTimer = setTimeout(async () => {
 		await adjustDisplayedRecords();
-	}, 800);
+	}, 250);
 }
 
 // Just a loader to display when the table is empty and records is being fetched. 
@@ -358,19 +364,23 @@ function loader() {
 	}
 }
 
+// Calculate how many records should be displayed on the screen height
 function recordsPerPage(): number {
 	const screenHeight = $(window).height();
 	const maxRecords = Math.floor(parseInt(screenHeight as any) / 68);
 	return maxRecords;
 }
 
+// Retrieve the input value while a value is in the search bar
 function input(): string {
-	let inputNumber: string = $('.search-input').val() as string;
-	return inputNumber; 99
+	let inputNumber = $('.search-input').val() as string;
+	return inputNumber;
 }
 
+// First function that runs when the  web app is started
 window.onload = () => {
 	showColumns();
+	$(".search-input").on("keyup", resultsRange);
 	adjustDisplayedRecords();
 	$(window).on('resize', resize);
 };
