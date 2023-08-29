@@ -126,12 +126,11 @@ class ApiData {
 		if (gridElement && pageCntrl !== undefined && screenHeight !== undefined) {
 			this.maxGridHeight = screenHeight - pageCntrl;
 			gridElement.style.height = `${this.maxGridHeight}px`;
-			gridElement.style.overflow = 'none';
 		}
 	};
 	// Update the page information and records display based on the current state of the grid.
 	updatePageInfo(): void {
-		const totalPages = Math.floor(this.totalItems / this.pageSize);
+		const totalPages = Math.ceil(this.totalItems / this.pageSize);
 		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
 		const maxRange = this.totalItems - 1;
 		const from = this.firstVal;
@@ -175,7 +174,7 @@ class ApiData {
 	private handleResize = (): void => {
 		const newWindowHeight = Math.floor($(window).innerHeight() as number);
 		const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;
-
+		// Check if the new grid size is non-negative
 		if (newGridSize >= 0) {
 			const newPageSize = newGridSize;
 			let newFirstValueIndex = this.firstVal;
