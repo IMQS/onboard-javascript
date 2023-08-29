@@ -1,9 +1,12 @@
+// Interface to define the structure of grid data
 interface ColumnName {
 	name: string;
 }
+// Interface to define column names
 interface GridData {
 	[key: string]: any;
-}class ApiData {
+}
+class ApiData {
 	// Properties to manage data and settings
 	pageSize: number;
 	currentPage = 1;
@@ -126,6 +129,16 @@ interface GridData {
 			gridElement.style.overflow = 'none';
 		}
 	};
+	// Update the page information and records display based on the current state of the grid.
+	updatePageInfo(): void {
+		const totalPages = Math.floor(this.totalItems / this.pageSize);
+		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
+		const maxRange = this.totalItems - 1;
+		const from = this.firstVal;
+		let to = Math.min(from + this.pageSize, maxRange);
+		$('#pageInfo').text(`${pageInfo}`);
+		$('.records').text(`Showing records ${from} to ${to}`);
+	};
 	// use Ajax for data fetching
 	private async fetchData(url: string): Promise<any> {
 		try {
@@ -185,17 +198,8 @@ interface GridData {
 		gridTemplate.displayRecords();
 		this.updatePageInfo();
 	};
-	// Update the page information and records display based on the current state of the grid.
-	updatePageInfo(): void {
-		const totalPages = Math.floor(this.totalItems / this.pageSize);
-		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
-		const maxRange = this.totalItems - 1;
-		const from = this.firstVal;
-		let to = Math.min(from + this.pageSize, maxRange);
-		$('#pageInfo').text(`${pageInfo}`);
-		$('.records').text(`Showing records ${from} to ${to}`);
-	};
 }
+// Class to manage the grid template and display records
 class GridTemplate {
 	private columnNames: ColumnName[] = [];
 	private dataRecords: GridData[] = [];
@@ -270,7 +274,7 @@ $(document).ready(() => {
 			if (adjustedFrom + pageSize > maxRange) {
 				adjustedFrom = Math.max(0, maxRange - pageSize);
 				to = maxRange;
-			}
+			};
 			apidata.searchRecords(adjustedFrom);
 		} else if (from < 0 || from > maxRange) {
 			alert('please enter values in the range (0-999999)');
