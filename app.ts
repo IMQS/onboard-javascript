@@ -27,15 +27,14 @@ interface GridData {
 			this.setupControls();
 		} catch (error) {
 			console.error('Error during initialization:', error);
-		}
-	}
+		}}
 	// Method to fetch total record count from the server
 	async recordCount(): Promise<void>  {
 		try {
 			const response = await this.fetchData('http://localhost:2050/recordCount');
 			this.totalItems = response;
 		} catch (error) {
-			throw new Error('Failed to fetch record count');
+			throw new Error('Failed to fetch record count.');
 		}
 	}
 	//fectch column names
@@ -46,7 +45,7 @@ interface GridData {
 			this.columnNames = res.map((columnName: any) => ({ name: columnName }));
 			this.data = new Array<GridData>(this.columnNames.length);
 		} catch (error) {
-			throw new Error('Failed to fetch record count');
+			throw new Error('Failed to fetch columns.');
 		}}
 	//get records from API for fetch an search functionality 
 	async fetchAndProcessRecords(from: number = this.firstVal, to: number) :  Promise<GridData[]> {
@@ -88,7 +87,7 @@ interface GridData {
 			this.displayRecords();
 			this.updatePageInfo();
 		} catch (error) {
-			alert('failed to fetch records ');
+			throw new Error('Failed to fetch records')
 		}
 	}
 	async searchRecords(searchValue: number): Promise<void> {
@@ -109,7 +108,8 @@ interface GridData {
 			}
 		} catch (error) {
 			throw new Error('Failed to search value');
-		}}
+		}
+	}
 	adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
 		const pageCntrl = $('.grid-controls').innerHeight();
@@ -118,7 +118,8 @@ interface GridData {
 			this.maxGridHeight = screenHeight - pageCntrl;
 			gridElement.style.height = `${this.maxGridHeight}px`;
 			gridElement.style.overflow = 'none';
-		}}
+		}
+	}
 	private async fetchData(url: string): Promise<any> {
 		try {
 			$('#overlay').show();
