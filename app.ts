@@ -16,7 +16,7 @@ interface GridData {
 
 	constructor(pageSize: number) {
 		this.pageSize = pageSize;
-	}
+	};
 	// Initialize method to set up the grid
 	async initialize() {
 		try {
@@ -80,7 +80,7 @@ interface GridData {
 		if (to >= maxRange) {
 			this.currentPage = Math.floor(maxRange / this.pageSize) + 1; // Set currentPage to the last page
 			to = maxRange;
-		}
+		};
 		try {
 			const processedData = await this.fetchAndProcessRecords(from, to);
 			this.data = processedData;
@@ -120,7 +120,7 @@ interface GridData {
 			gridElement.style.overflow = 'none';
 		}
 	}
-	private async fetchData(url: string): Promise<any> {
+	private async fetchData(url: string):Promise<any> {
 		try {
 			$('#overlay').show();
 			const response = await $.ajax({
