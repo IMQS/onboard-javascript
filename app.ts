@@ -1,27 +1,47 @@
-window.onload = () => { $("footer").text("Hello Riaan Theron!!"); 
+// *** Development Setup ***//
+// go run main.go
+// npm run build
+// npm run watch
 
-$.ajax({
-    url: '/columns',
-    method: 'GET',
-    success: function(data) {
-      const columnNames = JSON.parse(data);
-      const tableHeader = $('<thead></thead>');
-      //console.log('Success:', data);
+window.onload = () => {
+   $("footer").text("Hello Who is wathching!!"); 
+   fetchTotalRecords();
+   fetchColumns();
 
-      columnNames.forEach(function(columnName: string) {
-        const th = $('<th></th>').text(columnName);
-        tableHeader.append(th);
-      });
+  };
 
-      // Append the table header to your table using the correct selector
-      $('#myTable thead').replaceWith(tableHeader);
-    },
-    error: function(xhr, status, error) {
-      console.error('Error fetching column names:', error);
-    }
-  });
+async function fetchTotalRecords() {
+  // Fetch data from API
+  const response = await fetch("http://localhost:2050/recordCount");
 
-  // Fetch and display data, and implement navigation controls in the following steps...
+  // Check for successful response
+  if (response.ok) {
+    // Parse the text content from the response body
+    const data = await response.text();
+
+    // Log the data to the console
+    console.log(`Total records: ${data}`);
+  } else {
+    // Log an error message if the request was not successful
+    console.log(`Fetch failed: ${response.status} ${response.statusText}`);
+  }
 };
 
+async function fetchColumns() {
+  // Fetch data from API
+  const response = await fetch("http://localhost:2050/columns");
 
+  // Check for successful response
+  if (response.ok) {
+    // Parse the text content from the response body
+    const data = await response.json();
+
+    // Log the data to the console
+    console.log(`Columns: ${data}`);
+  } else {
+    // Log an error message if the request was not successful
+    console.log(`Fetch failed: ${response.status} ${response.statusText}`);
+  }
+
+
+}
