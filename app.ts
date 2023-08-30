@@ -6,8 +6,6 @@ interface ColumnName {
 interface GridData {
 	[key: string]: any;
 }
-
-
 // Debounce utility function to limit function execution frequency
 function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 	let timeout: number;
