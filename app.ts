@@ -19,7 +19,13 @@ window.onload = () => {
 		$('.content').empty()
 		$('.modal').css('display', 'none') // closes modal
 	});
-}
+	$('.arrow-right').on('click', () => {
+		rightArrow();
+	});	
+	$('.arrow-left').on('click', () => {
+		leftArrow();
+	});
+};
 
 async function fetchRecordCount(): Promise<number> {
 	try {
