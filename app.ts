@@ -27,7 +27,7 @@ const rowHeight = 16;
 $(document).ready(() => {
 	// Initialization and setup code
 	const windowHeight = Math.floor($(window).innerHeight() as number);
-	const initialGridSize = Math.floor((windowHeight * gridRatio) / rowHeight) - 1;
+	const initialGridSize = Math.floor((windowHeight * gridRatio) / rowHeight);
 	const apidata = new ApiData(initialGridSize);
 	// Set up search button click handler
 	$('#searchBtn').on('click', () => {
@@ -38,7 +38,6 @@ $(document).ready(() => {
 			let to = Math.min(from + pageSize, maxRange);
 			let adjustedFrom = from;
 			if (adjustedFrom + pageSize > maxRange) {
-				adjustedFrom = Math.max(0, maxRange - pageSize);
 				to = maxRange;
 			};
 			apidata.searchRecords(adjustedFrom);
@@ -46,9 +45,9 @@ $(document).ready(() => {
 			alert('please enter values in the range (0-999999)');
 			return;
 		} else if (isNaN(from)) {
-			alert('Please enter a numerical value ')
+			alert('Please enter a numerical value ');
 		} else {
-			console.error('error')
+			console.error('error');
 		};
 		//empty search input after searching 
 		$('#fromInput').val('');
