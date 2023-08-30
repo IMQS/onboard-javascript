@@ -4,7 +4,7 @@
 // npm run watch
 
 window.onload = () => {
-   $("footer").text("Hello Who is wathching!!"); 
+   $("footer").text("Hello Who is watching ??"); 
    fetchTotalRecords();
    fetchColumns();
 
@@ -42,6 +42,4 @@ async function fetchColumns() {
     // Log an error message if the request was not successful
     console.log(`Fetch failed: ${response.status} ${response.statusText}`);
   }
-
-
 }
