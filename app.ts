@@ -14,7 +14,6 @@ function globalInitializer() {
 	};
 };
 
-
 // This function  will handle retrieving the records from the api
 async function getRecords(fromID: number, toID: number): Promise<string[][]> {
 	try {
@@ -226,16 +225,23 @@ async function pageNumbers(start: number, end: number): Promise<void> {
 	});
 }
 
+$('.search-input').on('keydown', function (event) {
+	if (event.key === 'e' || event.key === 'E' || event.key === '.') {
+		event.preventDefault();
+	}
+});
+
 // In this function wil do the extract the number entered in the search. Then it would take that and calculate the range which should be displayed for the user to click on. 
-async function resultsRange(event: any) {
+$(".search-input").on("input", async function (this: HTMLInputElement, event: any) {
 	if (isFunctionRunning) {
 		return;
 	}
 	isFunctionRunning = true;
 	event.preventDefault();
 	let count = await getRecordCount() - 1;
+	// $(this).val($(this).val()!.replace(/[eE]/g, ''));
 	let inputNumber = input();
-	let inputNumberInt = parseInt(inputNumber);
+	let inputNumberInt: any = parseInt(inputNumber);
 	if (inputNumber !== '') {
 		const maxRecords = recordsPerPage();
 		let end = Math.ceil(inputNumberInt / maxRecords) * maxRecords;
@@ -248,35 +254,35 @@ async function resultsRange(event: any) {
 		if (inputNumberInt < 1000000 && inputNumberInt > 0) {
 			if (end === 1000000) {
 				end = end - 1;
-			} else null
+			} else null;
 			$('.results-box').remove();
 			$('.search-container').append(`
-                                    <div class="results-box">
-                                      <p class="results-select">${start} - ${end}</p>
-                                    </div>
-                                    `);
+				<div class="results-box">
+					<p class="results-select">${start} - ${end}</p>
+				</div>`);
 			$('.results-box').on('click', resultsSelect);
 		} else {
 			$('.results-box').remove();
 			$('.search-container').append(`
-                                    <div class="results-box">
-                                      <p class="message">Can't search negative values or records larger than 999 999 !!!</p>
-                                    </div>
-                                    `);
+				<div class="results-box">
+					<p class="message">Invalid Input!</p>
+				</div>`);
 		};
 	} else {
 		$('.results-box').remove();
 	};
 
 	isFunctionRunning = false;
-}
+})
+
 
 // After the range has been returned to the user. The user can click on it and that will show the range of records on the table. 
-async function resultsSelect() {
+async function resultsSelect(event: any) {
 	if (isFunctionRunning) {
 		return;
 	};
 	isFunctionRunning = true;
+	console.log(event.key)
 	let count = await getRecordCount() - 1;
 	let idRange = $('.results-select').text();
 	let rangeArray = null;
@@ -301,6 +307,8 @@ async function resultsSelect() {
 	isFunctionRunning = false;;
 
 }
+
+
 
 // When adjusting the height and on different screen sizes. This function would responsible for calculating how much records should be displayed based on the height of the window itself. 
 async function adjustDisplayedRecords(): Promise<number> {
@@ -383,7 +391,6 @@ function input(): string {
 // First function that runs when the  web app is started
 window.onload = () => {
 	showColumns();
-	$(".search-input").on("keyup", resultsRange);
 	adjustDisplayedRecords();
 	$(window).on('resize', resize);
 };
