@@ -8,12 +8,8 @@ window.onload = () => {
 	displayRecords();
 	$('#btnSearch').on("click", async (event) => {
 		event.preventDefault();
-		try {
-			let inputValue = $('#searchInput').val() as number;
-			await updateRecordsAndResize(inputValue); // calls to calculate the range once button is clicked
-		} catch (error) {
-			throw new Error('An error occurred')
-		}
+		let inputValue = $('#searchInput').val() as number;
+		await updateRecordsAndResize(inputValue); // calls to calculate the range once button is clicked
 	});
 	$('#closeModalBtn').on("click", () => {
 		$('.content').empty()
@@ -21,9 +17,20 @@ window.onload = () => {
 	});
 	$('.arrow-right').on('click', () => {
 		rightArrow();
-	});	
+	});
 	$('.arrow-left').on('click', () => {
 		leftArrow();
+	});
+	$('#searchInput').on('keydown', (event) => {
+		if (event.key === 'e' || event.key === 'E') {
+			event.preventDefault();
+		};
+	});
+	$('#searchInput').on('input', (event) => {
+		const inputValue = $('#searchInput').val() as string;
+		if (inputValue.includes('.')) {
+			$('#searchInput').val(inputValue.replace('.', ' '));
+		};
 	});
 };
 
@@ -58,7 +65,7 @@ async function createTable() {
 		const columns = await fetchColumns();
 		for (const col of columns) {
 			$(".head").append(`<th>${col}</th>`);
-		}
+		};
 	} catch (error) {
 		throw new Error('Error creating table');
 	};
@@ -98,7 +105,7 @@ async function fetchRecords(from: number, to: number): Promise<any[]> {
 		return response.json();
 	} catch (error) {
 		throw new Error('Error fetching records from server');
-	}
+	};
 };
 
 async function displayRecords(): Promise<void> {
@@ -114,7 +121,7 @@ async function displayRecords(): Promise<void> {
 			lastNumber = firstNumber + (calculatedRows - 1);
 		} else {
 			lastNumber = firstNumber + (calculatedRows - 1);
-		}
+		};
 		let records;
 		if (lastNumber <= count && lastNumber >= 0) {
 			records = await fetchRecords(firstNumber, lastNumber);
@@ -143,7 +150,7 @@ async function displayRecords(): Promise<void> {
 			$("tbody").append(lastRow);
 		}
 	} catch (error) {
-		throw new Error('Error displaying records')
+		throw new Error('Error displaying records');
 	};
 };
 
@@ -154,7 +161,7 @@ async function updateRecordsAndResize(inputValue: number) {
 		$('.content').append(`<p>${inputValue} is not a number within the range.Please try a different number</p>`);
 		$('#searchInput').val(''); // empties search bar
 		return;
-	}
+	};
 	let calculatedRows = adjustRowsByScreenHeight();
 	const halfRange = Math.floor(calculatedRows / 2); // divides the calculated max rows in half 
 	firstNumber = Math.max(0, inputValue - halfRange);
@@ -163,6 +170,7 @@ async function updateRecordsAndResize(inputValue: number) {
 };
 
 async function rightArrow(): Promise<void> {
+	$('.arrow-right').css('display', 'none')
 	$('#searchInput').val('');
 	const lastRow = document.querySelector("#recordsTable tbody .row:last-child"); // retrieves the last row
 	let count = await fetchRecordCount() - 1;
@@ -171,7 +179,7 @@ async function rightArrow(): Promise<void> {
 		const lastRecord = [];
 		for (const cell of Array.from(cells)) {
 			lastRecord.push(cell.textContent || "");
-		}
+		};
 		const lastID = parseFloat(lastRecord[0]); // determines te value in the last row
 		if (0 <= lastID && lastID <= (count)) { // checks if the last value is within range
 			const tbody = $("tbody");
@@ -180,11 +188,13 @@ async function rightArrow(): Promise<void> {
 			let calculatedRows = adjustRowsByScreenHeight();
 			lastNumber = firstNumber + (calculatedRows - 1);// calculates the first number of the page
 			await displayRecords(); // display the new records
+			$('.arrow-right').css('display', 'inline-block')
 		};
 	};
 };
 
 async function leftArrow(): Promise<void> {
+	$('.arrow-left').css('display', 'none')
 	$('#searchInput').val('');
 	let count = await fetchRecordCount() - 1;
 	const firstRow = document.querySelector("#recordsTable tbody .row:first-child"); // retrieves the first row
@@ -193,7 +203,7 @@ async function leftArrow(): Promise<void> {
 		const firstRecord = [];
 		for (const cell of Array.from(cells)) {
 			firstRecord.push(cell.textContent || "");
-		}
+		};
 		const firstID = parseFloat(firstRecord[0]); // determines te value in the first row
 		if (0 <= firstID && firstID <= (count)) { // checks if the first value is within range
 			const tbody = $("tbody");
@@ -202,6 +212,7 @@ async function leftArrow(): Promise<void> {
 			lastNumber = firstID - 1; // calculates the last number of the page
 			firstNumber = lastNumber - (calculatedRows - 1); // uses the last number to calculate
 			await displayRecords();
+			$('.arrow-left').css('display', 'inline-block')
 		};
 	};
 };
