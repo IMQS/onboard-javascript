@@ -5,24 +5,19 @@ window.onload = async function () {
 	$("#searchForm").submit(async function (e) {
 		e.preventDefault();
 		const searchValue = $("#searchInput").val();
-	
 		$("#tableBody tr").css("background-color", "");
 		$("#tableWrapper").hide();
 		$("#loader").show();
-	
 		if (resizeTimeout) {
 			clearTimeout(resizeTimeout);
 		}
 		searchedIndex = null;
 		await searchMethod(searchValue);
-	
 		if (searchedIndex !== null) {
 			currentPage = Math.ceil((searchedIndex + 1) / recordsPerPage);
 			currentFirstRecordIndex = Math.max(searchedIndex - recordsPerPage + 1, 0);
 		}
-	
 		await updatePages(true);
-	
 		$("#loader").hide();
 		$("#tableWrapper").show();
 	});
@@ -118,7 +113,7 @@ async function displayColumns() {
     } catch (error) {
         console.error("ERROR:", error);
     }
-}
+};
 async function displayData(fromRecord: number, recordsToDisplay: number) {
 	const nextPage = Math.ceil(totalRecordCount / recordsPerPage);
 	let isSearchMode = false;
@@ -249,7 +244,6 @@ async function adjustedResize() {
     const estimatedRowHeight = estimatedRowHeightFactor * 50;
     recordsPerPage = Math.floor(screenHeight / estimatedRowHeight) - 1;
     recordsPerPage = Math.max(recordsPerPage - 2, 1);
-
     const lastRecordsIndex = totalRecordCount - 16;
     if (currentValueOfFirstRecord >= lastRecordsIndex && currentValueOfFirstRecord <= totalRecordCount) {
         const lastPageFirstRecordIndex = Math.max(lastRecordsIndex - recordsPerPage + 1, 0);
@@ -262,14 +256,12 @@ async function adjustedResize() {
         currentPage = lastPage;
         currentFirstRecordIndex = (lastPage - 1) * recordsPerPage;
     }
-
     if (searchedIndex !== null) {
         const searchPage = Math.ceil((searchedIndex + 1) / recordsPerPage);
         const searchPageIndex = searchedIndex % recordsPerPage;
         searchedIndex = (searchPage - 1) * recordsPerPage + searchPageIndex;
         await searchMethod(currentValueOfFirstRecord);
     }
-
     let fromRecord = currentFirstRecordIndex;
     await displayData(fromRecord, recordsPerPage);
 }
