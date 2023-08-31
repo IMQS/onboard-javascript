@@ -1,5 +1,5 @@
 // Global variables
-const IMQS: string = "http://localhost:2050";
+const IMQS = "http://localhost:2050";
 let totalRecordCount: number;
 let totalPages: number;
 let currentValueOfFirstRecord = 1;
@@ -8,6 +8,8 @@ let currentPage: number;
 let recordsPerPage: number;
 let searchedIndex: number | null = null;
 let resizeTimeout: number;
+
+
 async function totalRecords(): Promise<void> {
 	try {
 		let recordCountResponse = await fetch(`${IMQS}/recordCount`);
@@ -15,7 +17,7 @@ async function totalRecords(): Promise<void> {
 		let recordCount = parseInt(recordCountText);
 		totalRecordCount = recordCount;
 	} catch (error) {
-		console.error("Error fetching total record count:", error);
+		throw (error)
 	};
 };
 async function displayColumns() {
@@ -32,11 +34,10 @@ async function displayColumns() {
 		totalPages = Math.ceil(totalRecordCount / recordsPerPage);
 		await updatePages();
 	} catch (error) {
-		console.error("ERROR:", error);
-	}
+		throw (error)
+	};
 };
 async function displayData(fromRecord: number, recordsDisplayed: number) {
-	const nextPage = Math.ceil(totalRecordCount / recordsPerPage);
 	let isSearchMode = false;
 	let searchResultIndexes: number[] = [];
 	try {
@@ -52,8 +53,21 @@ async function displayData(fromRecord: number, recordsDisplayed: number) {
 		let dataText = await response.text();
 		let data = JSON.parse(dataText);
 		let tableData = "";
-		const searchIndexOnPage = searchResultIndexes[0] - fromRecord;
+		if (currentFirstRecordIndex <= 1) {
+			$("#prevPageButton").hide();
+		} else {
+			$("#prevPageButton").show();
+		};
+		const lastRecordOnPage = currentFirstRecordIndex + recordsPerPage - 1;
+		if ((lastRecordOnPage === totalRecordCount - 1 || searchedIndex !== null) && lastRecordOnPage === totalRecordCount - 1) {
+			$("#nextPageButton").hide();
+		} else {
+			$("#nextPageButton").show();
+		};
+		let isSearchMode = false;
+		let searchResultIndexes: number[] = [];
 		let searchResultDisplay = false;
+		const searchIndexOnPage = searchResultIndexes[0] - fromRecord;
 		if (searchResultDisplay) {
 			const searchIndex = searchResultIndexes[0];
 			const searchPage = Math.ceil((searchIndex + 1) / recordsPerPage);
@@ -91,7 +105,7 @@ async function displayData(fromRecord: number, recordsDisplayed: number) {
 		});
 		$("#tableBody").html(tableData);
 	} catch (error) {
-		(error);
+		throw (error)
 	};
 };
 async function updatePages(isNavigation = false) {
@@ -154,7 +168,7 @@ async function searchMethod(searchValue: any) {
 			searchedIndex = null;
 		};
 	} catch (error) {
-		console.error("Error searching for record:", error);
+		throw (error);
 	} finally {
 		$("#loader").hide();
 		$("#tableWrapper").show();
@@ -202,20 +216,21 @@ window.onload = async function () {
 		$("#loader").show();
 		if (resizeTimeout) {
 			clearTimeout(resizeTimeout);
-		}
+		};
 		searchedIndex = null;
 		await searchMethod(searchValue);
 		if (searchedIndex !== null) {
 			currentPage = Math.ceil((searchedIndex + 1) / recordsPerPage);
 			currentFirstRecordIndex = Math.max(searchedIndex - recordsPerPage + 1, 0);
-		}
+		};
 		await updatePages(true);
 		$("#loader").hide();
 		$("#tableWrapper").show();
 	});
 	$("#searchInput").on("keydown", function (e) {
-		if (e.key === "e" || e.key === "E") {
-			e.preventDefault(); 
+		if (e.key === "e" || e.key === "E" || e.key === "."
+			|| e.key === "+" || e.key === "-") {
+			e.preventDefault();
 		}
 	});
 	$("#prevPageButton").on("click", async () => {
@@ -232,7 +247,23 @@ window.onload = async function () {
 			currentFirstRecordIndex -= recordsPerPage;
 		}
 		let fromRecord = currentFirstRecordIndex;
+		$("#nextPageButton").hide();
+		$("#prevPageButton").hide();
+		$("#tableWrapper").hide();
+		$("#loader").show();
 		await displayData(fromRecord, recordsPerPage);
+		setTimeout(() => {
+			$("#loader").hide();
+			$("#tableWrapper").show();
+			if (currentPage === totalPages) {
+				$("#nextPageButton").hide();
+			} else if (currentPage > 1) {
+				$("#prevPageButton").show();
+			}
+			if (currentPage > 1) {
+				$("#prevPageButton").show();
+			};
+		}, 1000);
 	});
 	$("#nextPageButton").on("click", async () => {
 		searchedIndex = null;
@@ -249,7 +280,21 @@ window.onload = async function () {
 			currentFirstRecordIndex = (currentPage - 1) * recordsPerPage;
 		}
 		let fromRecord = currentFirstRecordIndex;
+		$("#nextPageButton").hide();
+		$("#prevPageButton").hide();
+		$("#tableWrapper").hide();
+		$("#loader").show();
 		await displayData(fromRecord, recordsPerPage);
+		setTimeout(() => {
+			$("#loader").hide();
+			$("#tableWrapper").show();
+			$("#prevPageButton").show();
+			if (currentFirstRecordIndex === (totalRecordCount - 16)) {
+				$("#nextPageButton").hide();
+			} else if (currentPage < totalPages) {
+				$("#nextPageButton").show();
+			};
+		}, 1000);
 	});
 };
 window.addEventListener("resize", async () => {
@@ -260,6 +305,6 @@ window.addEventListener("resize", async () => {
 			currentPage = lastPage;
 			currentFirstRecordIndex = (lastPage - 1) * recordsPerPage;
 			await displayData(currentFirstRecordIndex, recordsPerPage);
-		}
+		};
 	}, 500);
 });
