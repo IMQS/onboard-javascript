@@ -43,7 +43,8 @@ async function getRecordCount(): Promise<number> {
 	try {
 		const response = await fetch(`${globals.api}recordCount`);
 		const data = await response.text();
-		const count = JSON.parse(data);
+		let count = JSON.parse(data);
+		count = count - 1;
 		return count;
 	} catch (error) {
 		throw error;
@@ -71,19 +72,17 @@ async function showRecords(fromID: number, toID: number): Promise<void> {
 	}
 	isFunctionRunning = true;
 	try {
-		let count = (await getRecordCount()) - 1;
+		let count = (await getRecordCount());
 		let inputNumber = input();
 		const maxRecords = recordsPerPage();
-		let condition = Math.ceil(count / maxRecords) + 1
-		if ((condition - 1) == globals.currentPage) {
-			fromID = (condition - 2) * maxRecords + 1;
-		}
+		let condition = Math.ceil(count / maxRecords)
 		$("tbody").empty();
 		loader();
 		globals.currentToID = toID;
-		if (toID > count) {
+		if (toID >= count) {
 			toID = count;
-		} else if (globals.currentPage == 1) {
+			fromID = toID - (maxRecords - 1);
+		} else if (globals.currentPage === 1) {
 			fromID = 1;
 		}
 		let records = await getRecords(fromID, toID);
@@ -119,7 +118,7 @@ async function showRecords(fromID: number, toID: number): Promise<void> {
 async function pageNumbers(start: number, end: number): Promise<void> {
 	try {
 		$('.pagination').empty();
-		let count = (await getRecordCount()) - 1;
+		let count = (await getRecordCount());
 		let stringCount = count.toLocaleString().replace(/,/g, " ");
 		let maxRecords = recordsPerPage();
 		let condition = Math.floor(count / maxRecords) + 1;
@@ -178,10 +177,10 @@ async function pageNumbers(start: number, end: number): Promise<void> {
 			$(this).addClass("active");
 			isFunctionRunning = false;
 			await showRecords(fromID, toID);
-			$(".results").empty();
-			$(".results").append(
-				`Displaying ID's ${fromID} - ${toID} out of ${stringCount}`
-			);
+			// $(".results").empty();
+			// $(".results").append(
+			// 	`Displaying ID's ${fromID} - ${toID} out of ${stringCount}`
+			// );
 			return [fromID, toID];
 		});
 
@@ -225,9 +224,13 @@ async function pageNumbers(start: number, end: number): Promise<void> {
 	});
 }
 
-$('.search-input').on('keydown', function (event) {
-	if (event.key === 'e' || event.key === 'E' || event.key === '.') {
-		event.preventDefault();
+$('.search-input').on('keydown', function (e) {
+	if (e.key === 'e'|| e.key ===  'E'|| e.key ===  '.' || e.key ===  '+' || e.key ===  '*'|| e.key ===  '-'){
+		e.preventDefault();
+	}
+	if (e.key === 'Enter') {
+		$('.results-box').trigger('click')
+		e.key
 	}
 });
 
@@ -238,8 +241,7 @@ $(".search-input").on("input", async function (this: HTMLInputElement, event: an
 	}
 	isFunctionRunning = true;
 	event.preventDefault();
-	let count = await getRecordCount() - 1;
-	// $(this).val($(this).val()!.replace(/[eE]/g, ''));
+	let count = await getRecordCount();
 	let inputNumber = input();
 	let inputNumberInt: any = parseInt(inputNumber);
 	if (inputNumber !== '') {
@@ -275,7 +277,6 @@ $(".search-input").on("input", async function (this: HTMLInputElement, event: an
 	isFunctionRunning = false;
 })
 
-
 // After the range has been returned to the user. The user can click on it and that will show the range of records on the table. 
 async function resultsSelect(event: any) {
 	if (isFunctionRunning) {
@@ -283,7 +284,7 @@ async function resultsSelect(event: any) {
 	};
 	isFunctionRunning = true;
 	console.log(event.key)
-	let count = await getRecordCount() - 1;
+	let count = await getRecordCount();
 	let idRange = $('.results-select').text();
 	let rangeArray = null;
 	rangeArray = idRange.split('-');
@@ -295,7 +296,7 @@ async function resultsSelect(event: any) {
 	let pageEnd = Math.ceil(globals.currentPage / 10) * 10;
 	let pageStart = pageEnd - 9;
 
-	if (endID == count) {
+	if (endID === count) {
 		startID = ((globals.currentPage - 1) * maxRecords) + 1;
 		endID = count;
 		globals.firstPage = pageStart;
@@ -317,13 +318,13 @@ async function adjustDisplayedRecords(): Promise<number> {
 		if (screenHeight < 68) {
 			screenHeight = 68;
 		};
-		let count = await getRecordCount() - 1;
+		let count = await getRecordCount();
 		let maxRecords = Math.floor(parseInt(screenHeight as any) / 68);
 		let inputNumber = input();
 		let length = inputNumber.length as number;
 		let inputNumberInt = parseInt(inputNumber);
 
-		if (inputNumber == '') {
+		if (inputNumber === '') {
 			let newCurrentPage = Math.ceil(globals.currentFromID / maxRecords);
 			if (newCurrentPage === 1) {
 				globals.currentFromID = 1;
@@ -368,7 +369,7 @@ function resize() {
 // Just a loader to display when the table is empty and records is being fetched. 
 function loader() {
 	let content = $('tbody').text();
-	if (content == '') {
+	if (content === '') {
 		$('.results').append('<div class="loader"></div>');
 	} else {
 		$('.loader').css({ 'display': 'none' })
