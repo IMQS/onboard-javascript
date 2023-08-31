@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
@@ -8,24 +9,25 @@
 	<script src="ApiData.js"></script>
 	<script src="GridTemp.js"></script>
 </head>
+
 <body>
-	
-	<div class="grid-container">	
-    <div id="spinner" style="display: none; z-index: 10002;">
-	<img src="spinner.gif" alt="Loading..." />
-    </div>
-		<div id="grid">
+
+	<div class="spinner-container">
+		<div id="spinner" style="display: none; z-index: 20004;">
+			<img src="spinner.gif" alt="Loading..." />
 		</div>
+		<div id="grid"></div>
+	</div>
+	<div class="grid-controls">
+		<div class="records"></div>
+		<button id="prevBtn" class="btn">Prev</button>
+		<span id="pageInfo"></span>
+		<button id="nextBtn" class="btn">Next</button>
+		<div class="search-container">
+			<input type="text" id="fromInput" placeholder="Search ID...">
+			<button id="searchBtn" class="btn">Search</button>
 		</div>
-		<div class="grid-controls">
-			<div class="records"></div>
-			<button id="prevBtn" class="btn">Prev</button>
-			<span id="pageInfo" ></span>
-			<button id="nextBtn" class="btn">Next</button>
-			<div class="search-container">
-				<input type="text" id="fromInput" placeholder="Search ID...">
-				<button id="searchBtn"  class="btn">Search</button>
-			  </div>  
-		</div>	
+	</div>
 </body>
+
 </html>

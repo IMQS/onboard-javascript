@@ -1,78 +1,86 @@
-
 body,
 html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-  font-family: system-ui;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	overflow: hidden;
+	font-family: system-ui;
 }
-.grid-container {
-  text-align: center;
+
+#overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(231, 238, 238, 0.815);
+	z-index: 900;
+	display: none;
 }
+
+.spinner-container {
+	text-align: center;
+}
+
 #grid {
-  border: 1px solid #333333;
-  text-align: center;
-  background-color: #d4e1e7;
+	border: 1px solid #333333;
+	text-align: center;
+	background-color: #d4e1e7;
 }
+
 /* table */
 table {
-  height: 100%;
-  border-collapse: collapse;
+	height: 100%;
+	border-collapse: collapse;
 }
+
 tr {
-  border: 1px solid #333333;
+	border: 1px solid #333333;
 }
+
 thead {
-  background-color: #333333;
-  font-weight: 450;
-  color: white;
- 
+	background-color: #333333;
+	font-weight: 450;
+	color: white;
+
 }
 
 td {
-  padding: 2px;
-  border: 1px solid #333333;
-  align-content: center;
-  width: 350px;
+	padding: 2px;
+	border: 1px solid #333333;
+	align-content: center;
+	width: 350px;
 }
+
 .grid-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  color: white;
-  background-color: #333333;
-  position: sticky;
-  bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	color: white;
+	background-color: #333333;
+	position: sticky;
+	bottom: 0;
 }
-#pageInfo ,
+
+#pageInfo,
 .records {
-  font-weight: 450;
-  background-color: #333333;
+	font-weight: 450;
+	background-color: #333333;
+}
+
+#fromInput {
+	padding: 5px 10px;
+	margin: 0 5px;
+	background-color: #232425;
+	color: white;
 }
 
 /* button */
 .btn {
-  cursor: pointer;
-  padding: 5px 10px;
-  margin: 0 5px;
-  color: white;
-  background-color: #5a5f61;
-}
-#fromInput {
-  padding: 5px 10px;
-  margin: 0 5px;
-  background-color: #232425;
-  color: white;
-}
-#overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(231, 238, 238, 0.699);
-  z-index: 1000;
-  display: none;
+	cursor: pointer;
+	padding: 5px 10px;
+	margin: 0 5px;
+	color: white;
+	background-color: #5a5f61;
 }

@@ -77,7 +77,8 @@ class ApiData {
 		const from = this.firstVal;
 		let to = Math.min(from + this.pageSize, maxRange);
 		if (to >= maxRange) {
-			this.currentPage = Math.floor(maxRange / this.pageSize) + 1; // Set currentPage to the last page
+			// Set currentPage to the last page
+			this.currentPage = Math.floor(maxRange / this.pageSize) + 1;
 			to = maxRange;
 		};
 		try {
@@ -87,20 +88,23 @@ class ApiData {
 			this.updatePageInfo();
 		} catch (error) {
 			throw new Error('Failed to fetch records')
-		}
+		};
 	};
 	//funtion to search through records using fromID
 	async searchRecords(searchValue: number): Promise<void> {
 		try {
-			const maxRange = this.totalItems - 1; // Maximum allowed Value
+			// Maximum allowed Value
+			const maxRange = this.totalItems - 1;
 			if (searchValue >= 0 && searchValue <= maxRange) {
 				const from = searchValue;
 				const to = Math.min(from + this.pageSize, maxRange);
 				const processedData = await this.fetchAndProcessRecords(from, to);
 				this.data = processedData;
 				this.currentPage = Math.ceil(from / this.pageSize) + 1
-				this.firstVal = from; // Set firstVal to searched value
-				this.lastVal = from + this.pageSize; // Calculate lastVal based on pageSize
+				// Set firstVal to searched value
+				this.firstVal = from;
+				// Calculate lastVal based on pageSize
+				this.lastVal = from + this.pageSize;
 				this.displayRecords();
 				this.updatePageInfo();
 			} else {
@@ -108,9 +112,9 @@ class ApiData {
 			}
 		} catch (error) {
 			throw new Error('Failed to search value');
-		}
+		};
 	};
-	//chnge grid height according to screen size
+	//change grid height according to screen size
 	adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
 		const pageCntrl = $('.grid-controls').innerHeight();
@@ -118,7 +122,7 @@ class ApiData {
 		if (gridElement && pageCntrl !== undefined && screenHeight !== undefined) {
 			this.maxGridHeight = screenHeight - pageCntrl;
 			gridElement.style.height = `${this.maxGridHeight}px`;
-		}
+		};
 	};
 	// Update the page information and records display based on the current state of the grid.
 	updatePageInfo(): void {
@@ -142,32 +146,31 @@ class ApiData {
 			return response;
 		} catch (error) {
 			throw error;
-		}
-	};
+		};
+	}
 	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
 		$(window).on('resize', debounce(this.handleResize, 350));
 	};
+	//self explanatory 
 	private handlePageChange(delta: number): void {
 		const newFirstVal = this.firstVal + delta * this.pageSize;
-	
+		// If moving forward and newFirstVal exceeds total items, go to the first page
 		if (delta > 0 && newFirstVal > this.totalItems - 1) {
-			// If moving forward and newFirstVal exceeds total items, go to the first page
 			this.firstVal = 0;
 		} else if (delta < 0 && newFirstVal < 0) {
 			// If moving backward and newFirstVal goes below 0, go to the last page
 			this.firstVal = Math.max(0, this.totalItems - this.pageSize);
-		}else {
+		} else {
 			this.firstVal = Math.max(0, Math.min(newFirstVal, this.totalItems - 1));
 		};
-	
 		this.lastVal = this.firstVal + this.pageSize - 1;
 		this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
 		this.fetchRecords();
 		this.updatePageInfo();
 	}
-	
+	//for resizing the page 
 	private handleResize = (): void => {
 		const newWindowHeight = Math.floor($(window).innerHeight() as number);
 		const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;
@@ -187,8 +190,9 @@ class ApiData {
 			this.fetchRecords();
 			this.updatePageInfo();
 			this.adjustGridHeight();
-		}
-	};
+		};
+	}
+
 	private displayRecords = (): void => {
 		const gridTemplate = new GridTemplate(this.columnNames, this.data);
 		gridTemplate.displayRecords();
