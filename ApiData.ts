@@ -151,18 +151,23 @@ class ApiData {
 	};
 	private handlePageChange(delta: number): void {
 		const newFirstVal = this.firstVal + delta * this.pageSize;
-		if (newFirstVal >= 0 && newFirstVal <= this.totalItems - 1) {
-			this.firstVal = newFirstVal;
-			this.lastVal = this.firstVal + this.pageSize - 1;
-			this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
-			this.fetchRecords();
-		} else if (newFirstVal <= this.pageSize) {
-			this.firstVal = 0
-			this.lastVal = this.firstVal + this.pageSize - 1;
-			this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
-			this.fetchRecords();
+	
+		if (delta > 0 && newFirstVal > this.totalItems - 1) {
+			// If moving forward and newFirstVal exceeds total items, go to the first page
+			this.firstVal = 0;
+		} else if (delta < 0 && newFirstVal < 0) {
+			// If moving backward and newFirstVal goes below 0, go to the last page
+			this.firstVal = Math.max(0, this.totalItems - this.pageSize);
+		}else {
+			this.firstVal = Math.max(0, Math.min(newFirstVal, this.totalItems - 1));
 		};
-	};
+	
+		this.lastVal = this.firstVal + this.pageSize - 1;
+		this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
+		this.fetchRecords();
+		this.updatePageInfo();
+	}
+	
 	private handleResize = (): void => {
 		const newWindowHeight = Math.floor($(window).innerHeight() as number);
 		const newGridSize = Math.floor((newWindowHeight * gridRatio) / rowHeight) - 1;

@@ -38,6 +38,7 @@ $(document).ready(() => {
 			let to = Math.min(from + pageSize, maxRange);
 			let adjustedFrom = from;
 			if (adjustedFrom + pageSize > maxRange) {
+				adjustedFrom = Math.max(0, maxRange - pageSize);
 				to = maxRange;
 			};
 			apidata.searchRecords(adjustedFrom);
@@ -45,9 +46,9 @@ $(document).ready(() => {
 			alert('please enter values in the range (0-999999)');
 			return;
 		} else if (isNaN(from)) {
-			alert('Please enter a numerical value ');
+			alert('Please enter a numerical value ')
 		} else {
-			console.error('error');
+			console.error('error')
 		};
 		//empty search input after searching 
 		$('#fromInput').val('');
