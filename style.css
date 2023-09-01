@@ -164,3 +164,6 @@ td:nth-child(1) {
   font-weight: 500;
 }
 
+.search-result {
+    background-color: var(--results-color);
+}
