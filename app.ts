@@ -2,15 +2,54 @@
 // go run main.go
 // npm run build
 // npm run watch
+let currentPage = 1;
+const recordsPerPage = 10;
+let totalRecords: number;
 
-window.onload = () => {
-   $("footer").text("Hello Who is watching ??"); 
-   //fetchTotalRecords();
+window.onload = async () => {
+   $("footer").text("Hellooooooooooo ??"); 
+   await fetchTotalRecords();
+
    //fetchColumns();
-   generateTable();
-  
+  const from = 0;
+  const to = recordsPerPage;
+  generateTable(from, to);
 
-  };
+   document.getElementById("prevBtn")?.addEventListener("click", () => {
+    currentPage--;
+    const from = (currentPage - 1) * recordsPerPage;
+    const to = from + recordsPerPage;
+    generateTable(from, to);
+    if (currentPage === 1) {
+      document.getElementById("prevBtn")?.setAttribute("disabled", "true");
+    } else {
+      document.getElementById("prevBtn")?.removeAttribute("disabled");
+      document.getElementById("nextBtn")?.removeAttribute("disabled");
+    }
+  });
+  
+  document.getElementById("nextBtn")?.addEventListener("click", () => {
+    currentPage++;
+    const from = (currentPage - 1) * recordsPerPage;
+    const to = from + recordsPerPage;
+    generateTable(from, to);
+    if (currentPage * recordsPerPage >= totalRecords) {
+      document.getElementById("nextBtn")?.setAttribute("disabled", "true");
+    } else {
+      document.getElementById("nextBtn")?.removeAttribute("disabled");
+      document.getElementById("prevBtn")?.removeAttribute("disabled");
+  }
+  });
+
+  // Filter functionality
+  const filterInput = document.getElementById("filterInput") as HTMLInputElement;
+  if (filterInput) {
+    filterInput.addEventListener("input", function() {
+      const query = this.value;
+      filterRecordsById(query);
+    });
+  }
+};
 
   async function fetchColumnData() {
     const response = await fetch("http://localhost:2050/columns");
@@ -51,37 +90,50 @@ window.onload = () => {
     return tbody;
   }
   
-  async function generateTable() {
+  async function generateTable(from: number, to: number) {
     const columnNames = await fetchColumnData();
-    const records = await fetchRowData(0, 10); // Replace with your fromID and toID
+    const records = await fetchRowData(from, to);
     const thead = generateTableHeader(columnNames);
     const tbody = generateTableRows(records);
-  
+    
+    // Clear existing data if any
     const table = document.getElementById('myTable');
+    if (table) {
+      table.innerHTML = "";
+    }
+
+    
     table?.appendChild(thead);
     table?.appendChild(tbody);
   }
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
+  async function fetchTotalRecords() {
+    const response = await fetch("http://localhost:2050/recordCount");
+    totalRecords = await response.json();
+  }
+  
+  async function filterRecordsById(query: string) {
+    if (!query) {
+      // Revert to initial state if no query
+      generateTable(0, recordsPerPage);
+      return;
+    }
+  
+    // Parse the query to get the ID we're interested in
+    const id = parseInt(query, 10);
+  
+    // Calculate which page the ID should be on
+    currentPage = Math.floor((id - 1) / recordsPerPage) + 1;
+  
+    // Calculate the 'from' and 'to' parameters for that page
+    const from = (currentPage - 1) * recordsPerPage;
+    const to = from + recordsPerPage;
+  
+    // Generate the table for that page
+    generateTable(from, to);
+  }
+  
 // async function fetchTotalRecords() {
 //   // Fetch data from API
 //   const response = await fetch("http://localhost:2050/recordCount");

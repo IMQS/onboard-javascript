@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>JS Onboard Project</title>
+	<title>Riaan JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
 	<script src="app.js"></script>
 	<link rel="stylesheet" href="stylesheet.css">
@@ -16,8 +16,11 @@
 			<!--Table headings generated here-->
 		</tbody>
 	</table>
-	<button id="prev-btn">Previous</button>
-	<button id="next-btn">Next</button>
+	<div id="pagination">
+		<button id="prevBtn" disabled>Previous</button>
+		<button id="nextBtn">Next</button>
+		<input type="text" id="filterInput" placeholder="Filter by ID">
+	</div>
 	<footer></footer>
 </body>
 </html>
