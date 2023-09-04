@@ -45,7 +45,7 @@ class ApiData {
 		}
 	};
 	//get records from API for fetch an search functionality 
-	async fetchAndProcessRecords(from: number = this.firstVal, to: number): Promise<GridData[]> {
+	async fetchAndProcessRecords(from: number, to: number): Promise<GridData[]> {
 		try {
 			$('#spinner').show()
 			$('#grid').hide();
@@ -115,7 +115,7 @@ class ApiData {
 		};
 	}
 	//change grid height according to screen size
-	adjustGridHeight(): void {
+	private adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
 		const pageCntrl = $('.grid-controls').innerHeight();
 		const screenHeight = $(window).innerHeight();
@@ -125,7 +125,7 @@ class ApiData {
 		};
 	}
 	// Update the page information and records display based on the current state of the grid.
-	updatePageInfo(): void {
+	private updatePageInfo(): void {
 		const totalPages = Math.ceil(this.totalItems / this.pageSize);
 		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
 		const maxRange = this.totalItems - 1;
