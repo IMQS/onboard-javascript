@@ -23,7 +23,7 @@ class ApiData {
 		} catch (error) {
 			console.error('Error during initialization:', error);
 		}
-	};
+	}
 	// Method to fetch total record count from the server
 	async recordCount(): Promise<void> {
 		try {
@@ -32,7 +32,7 @@ class ApiData {
 		} catch (error) {
 			throw new Error('Failed to fetch record count.');
 		}
-	};
+	}
 	//fectch column names
 	async fetchColumns(): Promise<void> {
 		try {
@@ -70,7 +70,7 @@ class ApiData {
 		} catch (error) {
 			throw new Error('Failed to fetch records');
 		}
-	};
+	}
 	//fetch records from api
 	async fetchRecords(): Promise<void> {
 		const maxRange = this.totalItems - 1;
@@ -89,7 +89,7 @@ class ApiData {
 		} catch (error) {
 			throw new Error('Failed to fetch records')
 		};
-	};
+	}
 	//funtion to search through records using fromID
 	async searchRecords(searchValue: number): Promise<void> {
 		try {
@@ -113,7 +113,7 @@ class ApiData {
 		} catch (error) {
 			throw new Error('Failed to search value');
 		};
-	};
+	}
 	//change grid height according to screen size
 	adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
@@ -123,7 +123,7 @@ class ApiData {
 			this.maxGridHeight = screenHeight - pageCntrl;
 			gridElement.style.height = `${this.maxGridHeight}px`;
 		};
-	};
+	}
 	// Update the page information and records display based on the current state of the grid.
 	updatePageInfo(): void {
 		const totalPages = Math.ceil(this.totalItems / this.pageSize);
@@ -133,7 +133,7 @@ class ApiData {
 		let to = Math.min(from + this.pageSize, maxRange);
 		$('#pageInfo').text(`${pageInfo}`);
 		$('.records').text(`Showing records ${from} to ${to}`);
-	};
+	}
 	// use Ajax for data fetching
 	private async fetchData(url: string): Promise<number | string> {
 		try {
@@ -152,7 +152,7 @@ class ApiData {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
 		$(window).on('resize', debounce(this.handleResize, 350));
-	};
+	}
 	//self explanatory 
 	private handlePageChange(delta: number): void {
 		const newFirstVal = this.firstVal + delta * this.pageSize;
@@ -197,5 +197,5 @@ class ApiData {
 		const gridTemplate = new GridTemplate(this.columnNames, this.data);
 		gridTemplate.displayRecords();
 		this.updatePageInfo();
-	};
+	}
 }

@@ -40,7 +40,7 @@ $(document).ready(() => {
 			if (adjustedFrom + pageSize > maxRange) {
 				adjustedFrom = Math.max(0, maxRange - pageSize);
 				to = maxRange;
-			};
+			}
 			apidata.searchRecords(adjustedFrom);
 		} else if (from < 0 || from > maxRange) {
 			alert('please enter values in the range (0-999999)');
