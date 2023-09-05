@@ -17,13 +17,13 @@ function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 /**  Constants for grid calculation
  * GRID_RATIO represents the ratio of the grid's height to the window's height.
 */
-const GRID_RATIO = 9 / 20; 
+const GRID_RATIO = 9 / 20;
 const ROW_HEIGHT = 16;
 
 /**  Wait for the document to be ready*/
 $(document).ready(() => {
 	// Initialization and setup code
-	const windowHeight = Math.floor(<number>($(window).innerHeight() ));
+	const windowHeight = Math.floor(<number>($(window).innerHeight()));
 	const initialGridSize = Math.floor((windowHeight * GRID_RATIO) / ROW_HEIGHT);
 	const apidata = new ApiData(initialGridSize);
 	// Set up search button click handler
@@ -53,10 +53,10 @@ $(document).ready(() => {
 	});
 	// Initialize the grid
 	apidata.initialize()
-	.catch((error) => {
-		console.error('Error during initialization:', error);
-		alert(error);
-	  });
+		.catch((error) => {
+			console.error('Error during initialization:', error);
+			alert(error);
+		});
 	//overlay when the page is still getting ready
 	const overlay = $('<div id="overlay"></div>');
 	$('body').append(overlay);

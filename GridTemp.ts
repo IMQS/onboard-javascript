@@ -2,14 +2,14 @@
 class GridTemplate {
 	private columnNames: ColumnName[] = [];
 	private dataRecords: GridData[] = [];
-	
+
 	/** Initializes the column names and data records that will be used to display records in the grid. */
 	constructor(columnNames: ColumnName[], dataRecords: GridData[]) {
 		this.columnNames = columnNames;
 		this.dataRecords = dataRecords;
 	}
 
-	/*Display records in a grid in table format*/ 
+	/*Display records in a grid in table format*/
 	displayRecords(): void {
 
 		const gridElement = document.getElementById('grid');

@@ -147,7 +147,7 @@ class ApiData {
 		};
 	}
 
-	/** Update the page information and records display based on the current state of the grid.*/ 
+	/** Update the page information and records display based on the current state of the grid.*/
 	private updatePageInfo(): void {
 		const totalPages = Math.ceil(this.totalItems / this.pageSize);
 		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
@@ -158,7 +158,7 @@ class ApiData {
 		$('.records').text(`Showing records ${from} to ${to}`);
 	}
 
-	// use Ajax for data fetching
+	/**  use Ajax for data fetching*/
 	private async fetchData(url: string): Promise<number | string> {
 		try {
 			$('#overlay').show();
