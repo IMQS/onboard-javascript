@@ -7,7 +7,7 @@ interface ColumnName {
 interface GridData {
 	[key: string]: any;
 }
-
+/** class to manage data and */
 class ApiData {
 	// Properties to manage data and settings
 	pageSize: number;
@@ -136,7 +136,7 @@ class ApiData {
 	}
 
 
-	//change grid height according to screen size
+	/**change grid height according to screen size*/
 	private adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
 		const pageCntrl = $('.grid-controls').innerHeight();
@@ -147,7 +147,7 @@ class ApiData {
 		};
 	}
 
-	// Update the page information and records display based on the current state of the grid.
+	/** Update the page information and records display based on the current state of the grid.*/ 
 	private updatePageInfo(): void {
 		const totalPages = Math.ceil(this.totalItems / this.pageSize);
 		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
