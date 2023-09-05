@@ -14,7 +14,7 @@ class GlobalVariables {
 			})
 			.catch((err) => {
 				throw 'Error fetching the record count: ' + err;
-			});
+			})
 	}
 
 	async fetchColumns(): Promise<string[]> {
@@ -38,12 +38,12 @@ class GlobalVariables {
 				return res.json();
 			}).catch(err => {
 				throw 'Error fetching records from server ' + err;
-			});
+			})
 	}
 }
 
 const globalVars = new GlobalVariables();
-let recordCount: number;
+let recordCount:number;
 
 globalVars.fetchRecordCount()
 	.then((count) => {
@@ -66,7 +66,7 @@ async function createTable() {
 		})
 }
 
-function adjustRowsByScreenHeight() {
+const adjustRowsByScreenHeight = ():number => {
 	const screenHeight = window.innerHeight;
 	const availableHeight = screenHeight - 105; // subtracts the space used from the screeen
 	let rowHeight = 35;
