@@ -13,11 +13,13 @@ function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 		});
 	};
 }
+
 /**  Constants for grid calculation
  * GRID_RATIO represents the ratio of the grid's height to the window's height.
 */
 const GRID_RATIO = 9 / 20; 
 const ROW_HEIGHT = 16;
+
 /**  Wait for the document to be ready*/
 $(document).ready(() => {
 	// Initialization and setup code
@@ -26,7 +28,7 @@ $(document).ready(() => {
 	const apidata = new ApiData(initialGridSize);
 	// Set up search button click handler
 	$('#searchBtn').on('click', () => {
-		
+
 		const from = parseInt(<string>($('#fromInput').val()));
 		const pageSize = apidata.pageSize;
 		const maxRange = apidata.totalItems - 1;

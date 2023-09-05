@@ -1,8 +1,9 @@
-// Class to manage the grid template and display records
+/**  Class to manage the grid template and display records*/
 class GridTemplate {
 	private columnNames: ColumnName[] = [];
 	private dataRecords: GridData[] = [];
 	// Initializes the column names and data records that will be used to display records in the grid.
+	
 	constructor(columnNames: ColumnName[], dataRecords: GridData[]) {
 		this.columnNames = columnNames;
 		this.dataRecords = dataRecords;
