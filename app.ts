@@ -2,24 +2,54 @@
 // go run main.go
 // npm run build
 // npm run watch
+const ROW_HEIGHT = 30;
 let currentPage = 1;
-const recordsPerPage = 10;
+let recordsPerPage = 25;
 let totalRecords: number;
+let lastFilteredId: string | null = null;
+
+
+function calculateRecordsPerPage() {
+    // Change this based on your row's actual height
+  recordsPerPage = Math.floor(window.innerHeight / ROW_HEIGHT);
+}
+
 
 window.onload = async () => {
    $("footer").text("Hellooooooooooo ??"); 
+
+   calculateRecordsPerPage();
+
    await fetchTotalRecords();
+
+  // Re-generate the table when the window is resized
+  window.addEventListener("resize", async () => {
+    calculateRecordsPerPage();
+    if (lastFilteredId) {
+      const id = parseInt(lastFilteredId, 10);
+      filterRecordsById(id.toString());
+    } else {
+      const from = (currentPage - 1) * recordsPerPage;
+      const to = from + recordsPerPage;
+      generateTable(from, to, null);
+    }
+  });
+  
 
    //fetchColumns();
   const from = 0;
   const to = recordsPerPage;
-  generateTable(from, to);
+  generateTable(from, to, null);
+  centerHighlightedRow(); // add this line
+;
 
    document.getElementById("prevBtn")?.addEventListener("click", () => {
+    lastFilteredId = null;
     currentPage--;
     const from = (currentPage - 1) * recordsPerPage;
     const to = from + recordsPerPage;
-    generateTable(from, to);
+    generateTable(from, to, null);
+;
     if (currentPage === 1) {
       document.getElementById("prevBtn")?.setAttribute("disabled", "true");
     } else {
@@ -29,10 +59,12 @@ window.onload = async () => {
   });
   
   document.getElementById("nextBtn")?.addEventListener("click", () => {
+    lastFilteredId = null;
     currentPage++;
     const from = (currentPage - 1) * recordsPerPage;
     const to = from + recordsPerPage;
-    generateTable(from, to);
+    generateTable(from, to, null);
+;
     if (currentPage * recordsPerPage >= totalRecords) {
       document.getElementById("nextBtn")?.setAttribute("disabled", "true");
     } else {
@@ -49,6 +81,7 @@ window.onload = async () => {
       filterRecordsById(query);
     });
   }
+
 };
 
   async function fetchColumnData() {
@@ -76,10 +109,20 @@ window.onload = async () => {
     return records;
   }
   
-  function generateTableRows(records: any[][]) {
+  function generateTableRows(records: any[][], highlightId: string | null) {
     const tbody = document.createElement('tbody');
-    records.forEach((record) => {
+    records.forEach((record, index) => {
       const tr = document.createElement('tr');
+      tr.id = `row-${record[0]}`;  // Assuming the ID is the first cell in each record
+      
+      // Highlight the row if it matches the filtered ID
+      if (highlightId && highlightId === record[0].toString()) {
+        tr.classList.add("highlighted-green");
+        console.log(`Row with ID ${record[0]} should be highlighted.`);
+        console.log("Class List:", tr.classList);
+
+      }
+      
       record.forEach((cell) => {
         const td = document.createElement('td');
         td.textContent = cell;
@@ -90,11 +133,15 @@ window.onload = async () => {
     return tbody;
   }
   
-  async function generateTable(from: number, to: number) {
+  async function generateTable(from: number, to: number, highlightId: string | null) {
     const columnNames = await fetchColumnData();
     const records = await fetchRowData(from, to);
+
+    if (to > totalRecords) {
+      to = totalRecords;
+    }
     const thead = generateTableHeader(columnNames);
-    const tbody = generateTableRows(records);
+    const tbody = generateTableRows(records, highlightId);  // Passing highlightId here
     
     // Clear existing data if any
     const table = document.getElementById('myTable');
@@ -105,6 +152,7 @@ window.onload = async () => {
     
     table?.appendChild(thead);
     table?.appendChild(tbody);
+    centerHighlightedRow();
   }
   
   
@@ -114,25 +162,44 @@ window.onload = async () => {
   }
   
   async function filterRecordsById(query: string) {
+    lastFilteredId = query;
     if (!query) {
       // Revert to initial state if no query
-      generateTable(0, recordsPerPage);
+      generateTable(0, recordsPerPage, null);
       return;
     }
   
-    // Parse the query to get the ID we're interested in
-    const id = parseInt(query, 10);
-  
-    // Calculate which page the ID should be on
-    currentPage = Math.floor((id - 1) / recordsPerPage) + 1;
-  
-    // Calculate the 'from' and 'to' parameters for that page
-    const from = (currentPage - 1) * recordsPerPage;
-    const to = from + recordsPerPage;
-  
-    // Generate the table for that page
-    generateTable(from, to);
+    let id = parseInt(query, 10);
+
+    
+    // Assuming your IDs start from 0 and are sequential
+    let from = Math.max(0, id - Math.floor(recordsPerPage / 2));
+    let to = from + recordsPerPage;
+
+    to = Math.min(to, totalRecords - 1);
+
+    if (to === totalRecords - 1) {
+      from = to - recordsPerPage + 1;
+    }
+    console.log(`Fetching records from ${from} to ${to} with highlight on ${id}`);
+
+    await generateTable(from, to, id.toString());
+    centerHighlightedRow();
   }
+  
+  function centerHighlightedRow() {
+    const highlightedRow = document.querySelector(".highlighted");
+    const mainContainer = document.getElementById("main-container"); // Add this line
+  
+    if (highlightedRow && mainContainer) {
+      const containerHeight = mainContainer.clientHeight;
+      const rowTop = highlightedRow.getBoundingClientRect().top;
+      const rowHeight = highlightedRow.clientHeight;
+      const scrollPosition = rowTop + mainContainer.scrollTop - (containerHeight / 2) + (rowHeight / 2);
+      mainContainer.scrollTop = scrollPosition;
+    }
+  }
+  
   
 // async function fetchTotalRecords() {
 //   // Fetch data from API
