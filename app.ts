@@ -3,8 +3,9 @@ class GlobalVariables {
 	firstNumber = 0;
 	lastNumber = 0;
 	backend = "http://localhost:2050";
-
-	async fetchRecordCount(): Promise<number> {
+	resizeTimeout = 0;
+    //fetches the number of records from localhost
+	fetchRecordCount(): Promise<number> {
 		return fetch(`${this.backend}/recordCount`)
 			.then((res) => {
 				if (!res.ok) {
@@ -16,8 +17,8 @@ class GlobalVariables {
 				throw 'Error fetching the record count: ' + err;
 			})
 	}
-
-	async fetchColumns(): Promise<string[]> {
+    //fetches columns from localhost
+	fetchColumns(): Promise<string[]> {
 		return fetch(`${this.backend}/columns`)
 			.then(res => {
 				if (!res.ok) {
@@ -28,8 +29,8 @@ class GlobalVariables {
 				throw 'Error fetching columns' + err;
 			})
 	}
-
-	async fetchRecords(from: number, to: number): Promise<any[]> {
+    //fetches records from localhost
+	fetchRecords(from: number, to: number): Promise<any[]> {
 		return fetch(`${this.backend}/records?from=${from}&to=${to}`)
 			.then(res => {
 				if (!res.ok) {
@@ -43,18 +44,19 @@ class GlobalVariables {
 }
 
 const globalVars = new GlobalVariables();
-let recordCount:number;
+let recordCount: number;
 
 globalVars.fetchRecordCount()
 	.then((count) => {
-		recordCount = count - 1; // Assign the fetched count to the global variable
+		// Assign the fetched count to the variable
+		recordCount = count - 1; 
 		displayRecords(recordCount);
 	})
 	.catch(err => {
 		throw 'Error fetching record count' + err;
 	})
-
-async function createTable() {
+//Initializes the table head
+function createTable() {
 	return globalVars.fetchColumns()
 		.then(columns => {
 			for (const col of columns) {
@@ -65,10 +67,12 @@ async function createTable() {
 			throw 'Error creating table' + err;
 		})
 }
-
-const adjustRowsByScreenHeight = ():number => {
+//calculates the number of rows that can fit the screen
+const adjustRowsByScreenHeight = (): number => {
+	//retrieves screen height
 	const screenHeight = window.innerHeight;
-	const availableHeight = screenHeight - 105; // subtracts the space used from the screeen
+	//subtracts the space used from the screeen
+	const availableHeight = screenHeight - 105; 
 	let rowHeight = 35;
 	if (availableHeight <= 0) {
 		return 0;
@@ -77,24 +81,25 @@ const adjustRowsByScreenHeight = ():number => {
 		return maxRows;
 	}
 }
-
-$(window).on('resize', async () => {
-	let resizeTimeout: number;
-	resizeTimeout = setTimeout(async () => {
-		$('#loader').show();
+//calls to re-display records when screen is adjusted
+$(window).on('resize', () => {
+	clearTimeout(globalVars.resizeTimeout);
+	globalVars.resizeTimeout = setTimeout(async () => {
 		await displayRecords(recordCount);
-		let inputValue = $('#searchInput').val(); // priotizes the search input value if available
+		// priotizes the search input value if available
+		let inputValue = $('#searchInput').val(); 
 		if (inputValue !== '') {
 			await updateRecordsAndResize(Number(inputValue));
 		}
-		$('#loader').hide();
-	}, 500)
+	}, 250)
+	
 })
-
+//display records from first to last number
 async function displayRecords(recordCount: number): Promise<void> {
 	$('#loader').show();
 	let calculatedRows = adjustRowsByScreenHeight();
 	const inputValue = $('#searchInput').val() as number;
+	const tbody = $("tbody");
 	if (calculatedRows === 0) {
 		globalVars.lastNumber = globalVars.firstNumber;
 	} else if (globalVars.firstNumber < 0) {
@@ -121,23 +126,25 @@ async function displayRecords(recordCount: number): Promise<void> {
 					$('#page').empty();
 					$('#page').append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
 					$('#loader').hide();
-					const tbody = $("tbody");
 					tbody.empty();
 					for (const record of records) {
-						$("tbody").append(`<tr class="row"></tr>`); // creates row for each record
+						// creates row for each record
+						$("tbody").append(`<tr class="row"></tr>`);
 						const lastRow = $(".row:last");
 						for (const value of record) {
-							lastRow.append(`<td>${value}</td>`); // assign each record to their column in a specified row
+							// assign each record to their column in a specified row
+							lastRow.append(`<td>${value}</td>`); 
 						}
 						if (record.includes(inputValue)) {
-							lastRow.css('background-color', '#DDC0B4'); // highlights the searched row
+							// highlights the searched row
+							lastRow.css('background-color', '#DDC0B4'); 
 						}
 						$("tbody").append(lastRow);
 					}
 				})
 				.catch((err) => {
 					throw 'Error fetching records' + err;
-				});
+				})
 		} else {
 			globalVars.firstNumber = recordCount - (calculatedRows - 1);
 			globalVars.lastNumber = recordCount;
@@ -147,16 +154,18 @@ async function displayRecords(recordCount: number): Promise<void> {
 					$('#page').empty();
 					$('#page').append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
 					$('#loader').hide();
-					const tbody = $("tbody");
 					tbody.empty();
 					for (const record of records) {
-						$("tbody").append(`<tr class="row"></tr>`); // creates row for each record
+						// creates row for each record
+						$("tbody").append(`<tr class="row"></tr>`); 
 						const lastRow = $(".row:last");
 						for (const value of record) {
-							lastRow.append(`<td>${value}</td>`); // assign each record to their column in a specified row
+							//assign each record to their column in a specified row
+							lastRow.append(`<td>${value}</td>`); 
 						}
 						if (record.includes(inputValue)) {
-							lastRow.css('background-color', '#DDC0B4'); // highlights the searched row
+							//highlights the searched row
+							lastRow.css('background-color', '#DDC0B4'); 
 						}
 						$("tbody").append(lastRow);
 						$('#loader').hide();
@@ -172,14 +181,18 @@ async function displayRecords(recordCount: number): Promise<void> {
 }
 
 async function updateRecordsAndResize(inputValue: number) {
-	if (inputValue < 0 || inputValue > recordCount) { // check if the search input 
-		$('.modal').css('display', 'block');//opens modal if search input is not within range
+	//check if the search input 
+	if (inputValue < 0 || inputValue > recordCount) { 
+		//opens modal if search input is not within range
+		$('.modal').css('display', 'block');
 		$('.content').append(`<p>${inputValue} is not a number within the range. Please try a different number</p>`);
-		$('#searchInput').val(''); // empties search bar
+		//empties search bar
+		$('#searchInput').val(''); 
 		return
 	}
 	let calculatedRows = adjustRowsByScreenHeight();
-	const halfRange = Math.floor(calculatedRows / 2); // divides the calculated max rows in half 
+	//divides the calculated max rows in half 
+	const halfRange = Math.floor(calculatedRows / 2); 
 	globalVars.firstNumber = Math.max(0, inputValue - halfRange);
 	globalVars.lastNumber = Math.min(recordCount, globalVars.firstNumber + (calculatedRows - 1));
 	await displayRecords(recordCount);
@@ -188,21 +201,29 @@ async function updateRecordsAndResize(inputValue: number) {
 async function rightArrow(): Promise<void> {
 	$('#page').empty();
 	$('#searchInput').val('');
-	const lastRow = document.querySelector("#recordsTable tbody .row:last-child"); // retrieves the last row
-	if (lastRow) { // checks if the last row exists
+	//retrieves the last row
+	const lastRow = document.querySelector("#recordsTable tbody .row:last-child"); 
+	// checks if the last row exists
+	if (lastRow) { 
 		const cells = lastRow.querySelectorAll("td");
 		const lastRecord = [];
 		for (const cell of Array.from(cells)) {
 			lastRecord.push(cell.textContent || "");
 		}
-		const lastID = parseFloat(lastRecord[0]); // determines te value in the last row
-		if (0 <= lastID && lastID <= (recordCount)) { // checks if the last value is within range
+        //determines te value in the last row
+		const lastID = parseFloat(lastRecord[0]); 
+		// checks if the last value is within range
+		if (0 <= lastID && lastID <= (recordCount)) { 
 			const tbody = $("tbody");
-			tbody.empty(); // empties the table
-			globalVars.firstNumber = lastID + 1; // calculates the first number of the page
+			//empties the table
+			tbody.empty(); 
+			//calculates the first number of the page
+			globalVars.firstNumber = lastID + 1; 
 			let calculatedRows = adjustRowsByScreenHeight();
-			globalVars.lastNumber = globalVars.firstNumber + (calculatedRows - 1);// calculates the first number of the page
-			await displayRecords(recordCount); // display the new records
+			// calculates the last number of the page
+			globalVars.lastNumber = globalVars.firstNumber + (calculatedRows - 1);
+			//display the new records
+			await displayRecords(recordCount); 
 		}
 	}
 }
@@ -210,20 +231,27 @@ async function rightArrow(): Promise<void> {
 async function leftArrow(): Promise<void> {
 	$('#page').empty();
 	$('#searchInput').val('');
-	const firstRow = document.querySelector("#recordsTable tbody .row:first-child"); // retrieves the first row
-	if (firstRow) { // checks if the first row exists
+	//retrieves the first row
+	const firstRow = document.querySelector("#recordsTable tbody .row:first-child"); 
+	//checks if the first row exists
+	if (firstRow) { 
 		const cells = firstRow.querySelectorAll("td");
 		const firstRecord = [];
 		for (const cell of Array.from(cells)) {
 			firstRecord.push(cell.textContent || "");
-		};
-		const firstID = parseFloat(firstRecord[0]); // determines te value in the first row
-		if (0 <= firstID && firstID <= (recordCount)) { // checks if the first value is within range
+		}
+		//determines te value in the first row
+		const firstID = parseFloat(firstRecord[0]); 
+		//checks if the first value is within range
+		if (0 <= firstID && firstID <= (recordCount)) { 
 			const tbody = $("tbody");
-			tbody.empty(); // empties the table
+			//empties the table
+			tbody.empty(); 
 			const calculatedRows = adjustRowsByScreenHeight();
-			globalVars.lastNumber = firstID - 1; // calculates the last number of the page
-			globalVars.firstNumber = globalVars.lastNumber - (calculatedRows - 1); // uses the last number to calculate
+			//calculates the last number of the page
+			globalVars.lastNumber = firstID - 1; 
+			//uses the last number to calculate first number
+			globalVars.firstNumber = globalVars.lastNumber - (calculatedRows - 1); 
 			await displayRecords(recordCount);
 		}
 	}
@@ -236,11 +264,13 @@ window.onload = () => {
 		event.preventDefault();
 		let inputValue = $('#searchInput').val() as number;
 		$('#page').empty();
-		await updateRecordsAndResize(inputValue); // calls to calculate the range once button is clicked
+		//calls to calculate the range once button is clicked
+		await updateRecordsAndResize(inputValue); 
 	})
 	$('#closeModalBtn').on("click", () => {
 		$('.content').empty();
-		$('.modal').css('display', 'none'); // closes modal
+		//closes modal
+		$('.modal').css('display', 'none'); 
 	})
 	$('.arrow-right').on('click', () => {
 		rightArrow();
