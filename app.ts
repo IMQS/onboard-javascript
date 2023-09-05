@@ -2,6 +2,10 @@
 // go run main.go
 // npm run build
 // npm run watch
+// *** Development Setup ***//
+
+
+// *** Global Variables ***//
 const ROW_HEIGHT = 30;
 let currentPage = 1;
 let recordsPerPage = 25;
@@ -9,14 +13,9 @@ let totalRecords: number;
 let lastFilteredId: string | null = null;
 
 
-function calculateRecordsPerPage() {
-    // Change this based on your row's actual height
-  recordsPerPage = Math.floor(window.innerHeight / ROW_HEIGHT);
-}
 
 
 window.onload = async () => {
-   $("footer").text("Hellooooooooooo ??"); 
 
    calculateRecordsPerPage();
 
@@ -81,16 +80,21 @@ window.onload = async () => {
       filterRecordsById(query);
     });
   }
-
 };
 
+  // *** Function ***//
+  function calculateRecordsPerPage() {
+    recordsPerPage = Math.floor(window.innerHeight / ROW_HEIGHT);
+  }
+
+  // *** Function ***//
   async function fetchColumnData() {
     const response = await fetch("http://localhost:2050/columns");
     const columnNames = await response.json();
     return columnNames;
   }
   
-
+  // *** Function ***//
   function generateTableHeader(columnNames: string[]) {
     const thead = document.createElement('thead');
     const tr = document.createElement('tr');
@@ -102,13 +106,15 @@ window.onload = async () => {
     thead.appendChild(tr);
     return thead;
   }
-  
+
+  // *** Function ***//
   async function fetchRowData(from: number, to: number) {
     const response = await fetch(`http://localhost:2050/records?from=${from}&to=${to}`);
     const records = await response.json();
     return records;
   }
   
+  // *** Function ***//
   function generateTableRows(records: any[][], highlightId: string | null) {
     const tbody = document.createElement('tbody');
     records.forEach((record, index) => {
@@ -118,11 +124,7 @@ window.onload = async () => {
       // Highlight the row if it matches the filtered ID
       if (highlightId && highlightId === record[0].toString()) {
         tr.classList.add("highlighted-green");
-        console.log(`Row with ID ${record[0]} should be highlighted.`);
-        console.log("Class List:", tr.classList);
-
       }
-      
       record.forEach((cell) => {
         const td = document.createElement('td');
         td.textContent = cell;
@@ -132,7 +134,8 @@ window.onload = async () => {
     });
     return tbody;
   }
-  
+
+  // *** Function ***//
   async function generateTable(from: number, to: number, highlightId: string | null) {
     const columnNames = await fetchColumnData();
     const records = await fetchRowData(from, to);
@@ -148,19 +151,18 @@ window.onload = async () => {
     if (table) {
       table.innerHTML = "";
     }
-
-    
     table?.appendChild(thead);
     table?.appendChild(tbody);
     centerHighlightedRow();
   }
   
-  
+  // *** Function ***//
   async function fetchTotalRecords() {
     const response = await fetch("http://localhost:2050/recordCount");
     totalRecords = await response.json();
   }
-  
+
+  // *** Function ***//
   async function filterRecordsById(query: string) {
     lastFilteredId = query;
     if (!query) {
@@ -168,10 +170,8 @@ window.onload = async () => {
       generateTable(0, recordsPerPage, null);
       return;
     }
-  
     let id = parseInt(query, 10);
 
-    
     // Assuming your IDs start from 0 and are sequential
     let from = Math.max(0, id - Math.floor(recordsPerPage / 2));
     let to = from + recordsPerPage;
@@ -186,7 +186,8 @@ window.onload = async () => {
     await generateTable(from, to, id.toString());
     centerHighlightedRow();
   }
-  
+
+  // *** Function ***//
   function centerHighlightedRow() {
     const highlightedRow = document.querySelector(".highlighted");
     const mainContainer = document.getElementById("main-container"); // Add this line
@@ -201,36 +202,3 @@ window.onload = async () => {
   }
   
   
-// async function fetchTotalRecords() {
-//   // Fetch data from API
-//   const response = await fetch("http://localhost:2050/recordCount");
-
-//   // Check for successful response
-//   if (response.ok) {
-//     // Parse the text content from the response body
-//     const data = await response.text();
-
-//     // Log the data to the console
-//     console.log(`Total records: ${data}`);
-//   } else {
-//     // Log an error message if the request was not successful
-//     console.log(`Fetch failed: ${response.status} ${response.statusText}`);
-//   }
-// };
-
-// async function fetchColumns() {
-//   // Fetch data from API
-//   const response = await fetch("http://localhost:2050/columns");
-
-//   // Check for successful response
-//   if (response.ok) {
-//     // Parse the text content from the response body
-//     const data = await response.json();
-
-//     // Log the data to the console
-//     console.log(`Columns: ${data}`);
-//   } else {
-//     // Log an error message if the request was not successful
-//     console.log(`Fetch failed: ${response.status} ${response.statusText}`);
-//   }
-// }
