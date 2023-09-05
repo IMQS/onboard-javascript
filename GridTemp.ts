@@ -6,9 +6,10 @@ class GridTemplate {
 	constructor(columnNames: ColumnName[], dataRecords: GridData[]) {
 		this.columnNames = columnNames;
 		this.dataRecords = dataRecords;
-	};
+	}
 	// Display records in a grid in table format 
 	displayRecords(): void {
+
 		const gridElement = document.getElementById('grid');
 		if (gridElement) {
 			gridElement.innerHTML = '';
@@ -37,5 +38,5 @@ class GridTemplate {
 			// Append the table to the grid element
 			gridElement.appendChild(table);
 		}
-	};
+	}
 }

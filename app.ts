@@ -1,12 +1,5 @@
-// Interface to define the structure of grid data
-interface ColumnName {
-	name: string;
-}
-// Interface to define column names
-interface GridData {
-	[key: string]: any;
-}
-// Debounce utility function to limit function execution frequency
+
+/**  Debounce utility function to limit function execution frequency*/
 function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 	let timeout: number;
 
@@ -19,19 +12,22 @@ function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 			}, waitFor);
 		});
 	};
-};
-// Constants for grid calculation
-const gridRatio = 9 / 20;// represents the ratio of the grid's height to the window's height. 
-const rowHeight = 16;
-// Wait for the document to be ready
+}
+/**  Constants for grid calculation
+ * GRID_RATIO represents the ratio of the grid's height to the window's height.
+*/
+const GRID_RATIO = 9 / 20; 
+const ROW_HEIGHT = 16;
+/**  Wait for the document to be ready*/
 $(document).ready(() => {
 	// Initialization and setup code
-	const windowHeight = Math.floor($(window).innerHeight() as number);
-	const initialGridSize = Math.floor((windowHeight * gridRatio) / rowHeight);
+	const windowHeight = Math.floor(<number>($(window).innerHeight() ));
+	const initialGridSize = Math.floor((windowHeight * GRID_RATIO) / ROW_HEIGHT);
 	const apidata = new ApiData(initialGridSize);
 	// Set up search button click handler
 	$('#searchBtn').on('click', () => {
-		const from = parseInt($('#fromInput').val() as string);
+		
+		const from = parseInt(<string>($('#fromInput').val()));
 		const pageSize = apidata.pageSize;
 		const maxRange = apidata.totalItems - 1;
 		if (!isNaN(from) && from >= 0 && from <= maxRange) {
@@ -46,15 +42,19 @@ $(document).ready(() => {
 			alert('please enter values in the range (0-999999)');
 			return;
 		} else if (isNaN(from)) {
-			alert('Please enter a numerical value ')
+			alert('Please enter a numerical value ');
 		} else {
-			console.error('error')
-		};
+			console.error('error');
+		}
 		//empty search input after searching 
 		$('#fromInput').val('');
 	});
 	// Initialize the grid
-	apidata.initialize();
+	apidata.initialize()
+	.catch((error) => {
+		console.error('Error during initialization:', error);
+		alert(error);
+	  });
 	//overlay when the page is still getting ready
 	const overlay = $('<div id="overlay"></div>');
 	$('body').append(overlay);
