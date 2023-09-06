@@ -1,12 +1,4 @@
-/**Interface to define the structure of grid data*/
-interface ColumnName {
-	name: string;
-}
 
-/**Interface to define column names*/
-interface GridData {
-	[key: string]: any;
-}
 
 /** class to manage data and */
 class ApiData {
@@ -186,7 +178,7 @@ class ApiData {
 			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * this.pageSize, this.totalItems - 1));
 		}
 
-		this.lastVal = this.firstVal + this.pageSize - 1;
+		this.lastVal = this.firstVal + this.pageSize ;
 		this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
 		this.fetchRecords();
 		this.updatePageInfo();
