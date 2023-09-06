@@ -11,6 +11,7 @@ let currentPage = 1;
 let recordsPerPage = 25;
 let totalRecords: number;
 let lastFilteredId: string | null = null;
+let cachedColumnNames: string[] | null = null;
 
 
 
@@ -22,7 +23,7 @@ window.onload = async () => {
    await fetchTotalRecords();
 
   // Re-generate the table when the window is resized
-  window.addEventListener("resize", async () => {
+  window.addEventListener("resize", debounce(async () => {
     calculateRecordsPerPage();
     if (lastFilteredId) {
       const id = parseInt(lastFilteredId, 10);
@@ -32,7 +33,7 @@ window.onload = async () => {
       const to = from + recordsPerPage;
       generateTable(from, to, null);
     }
-  });
+  }, 200));
   
 
    //fetchColumns();
@@ -40,15 +41,18 @@ window.onload = async () => {
   const to = recordsPerPage;
   generateTable(from, to, null);
   centerHighlightedRow(); // add this line
-;
 
-   document.getElementById("prevBtn")?.addEventListener("click", () => {
+
+document.getElementById("prevBtn")?.addEventListener("click", () => {
+  const filterInput = document.getElementById("filterInput") as HTMLInputElement;
+  if (!filterInput.value) {
     lastFilteredId = null;
-    currentPage--;
-    const from = (currentPage - 1) * recordsPerPage;
-    const to = from + recordsPerPage;
-    generateTable(from, to, null);
-;
+  }
+  currentPage--;
+  const from = (currentPage - 1) * recordsPerPage;
+  const to = from + recordsPerPage;
+  generateTable(from, to, lastFilteredId);
+
     if (currentPage === 1) {
       document.getElementById("prevBtn")?.setAttribute("disabled", "true");
     } else {
@@ -58,19 +62,17 @@ window.onload = async () => {
   });
   
   document.getElementById("nextBtn")?.addEventListener("click", () => {
-    lastFilteredId = null;
+    const filterInput = document.getElementById("filterInput") as HTMLInputElement;
+    if (!filterInput.value) {
+      lastFilteredId = null;
+    }
     currentPage++;
     const from = (currentPage - 1) * recordsPerPage;
     const to = from + recordsPerPage;
-    generateTable(from, to, null);
-;
-    if (currentPage * recordsPerPage >= totalRecords) {
-      document.getElementById("nextBtn")?.setAttribute("disabled", "true");
-    } else {
-      document.getElementById("nextBtn")?.removeAttribute("disabled");
-      document.getElementById("prevBtn")?.removeAttribute("disabled");
-  }
+    generateTable(from, to, lastFilteredId);
+    document.getElementById("prevBtn")?.removeAttribute("disabled");
   });
+  
 
   // Filter functionality
   const filterInput = document.getElementById("filterInput") as HTMLInputElement;
@@ -81,6 +83,19 @@ window.onload = async () => {
     });
   }
 };
+  // Debounce function
+// Debounce function
+  function debounce(func: Function, wait: number) {
+    let timeout: ReturnType<typeof setTimeout>;
+    return function executedFunction(...args: any[]) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+}
 
   // *** Function ***//
   function calculateRecordsPerPage() {
@@ -88,11 +103,18 @@ window.onload = async () => {
   }
 
   // *** Function ***//
+  
+
   async function fetchColumnData() {
+    if (cachedColumnNames !== null) {
+      return cachedColumnNames;
+    }
     const response = await fetch("http://localhost:2050/columns");
     const columnNames = await response.json();
+    cachedColumnNames = columnNames;  // Store in cache
     return columnNames;
   }
+  
   
   // *** Function ***//
   function generateTableHeader(columnNames: string[]) {
@@ -139,7 +161,7 @@ window.onload = async () => {
   async function generateTable(from: number, to: number, highlightId: string | null) {
     const columnNames = await fetchColumnData();
     const records = await fetchRowData(from, to);
-
+    console.log(totalRecords);
     if (to > totalRecords) {
       to = totalRecords;
     }
@@ -154,6 +176,13 @@ window.onload = async () => {
     table?.appendChild(thead);
     table?.appendChild(tbody);
     centerHighlightedRow();
+
+    // Disable or Enable the Next button based on the last record
+    if (to >= totalRecords - 1) {
+      document.getElementById("nextBtn")?.setAttribute("disabled", "true");
+    } else {
+      document.getElementById("nextBtn")?.removeAttribute("disabled");
+    }
   }
   
   // *** Function ***//
