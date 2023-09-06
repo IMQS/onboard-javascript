@@ -7,6 +7,7 @@ interface ColumnName {
 interface GridData {
 	[key: string]: any;
 }
+
 /** class to manage data and */
 class ApiData {
 	// Properties to manage data and settings
@@ -34,7 +35,7 @@ class ApiData {
 	}
 
 	/**Method to fetch total record count from the server */
-	async recordCount(): Promise<void> {
+	recordCount(): Promise<void> {
 		return this.fetchData('http://localhost:2050/recordCount')
 			.then((response: any) => {
 				const totalItems = response;
@@ -46,7 +47,7 @@ class ApiData {
 	}
 
 	/**fectch column names*/
-	async fetchColumns(): Promise<void> {
+	fetchColumns(): Promise<void> {
 		return this.fetchData('http://localhost:2050/columns')
 			.then((response: any) => {
 				const res = JSON.parse(response);
@@ -59,7 +60,7 @@ class ApiData {
 	}
 
 	/**get records from API for fetch an search functionality*/
-	async fetchAndProcessRecords(from: number, to: number): Promise<GridData[]> {
+	fetchAndProcessRecords(from: number, to: number): Promise<GridData[]> {
 		$('#spinner').show();
 		$('#grid').hide();
 
@@ -83,7 +84,7 @@ class ApiData {
 	}
 
 	/**fetch records from api*/
-	async fetchRecords(): Promise<void> {
+	fetchRecords(): Promise<void> {
 		const maxRange = this.totalItems - 1;
 		const from = this.firstVal;
 		let to = Math.min(from + this.pageSize, maxRange);
@@ -107,7 +108,7 @@ class ApiData {
 
 
 	/**funtion to search through records using fromID*/
-	async searchRecords(searchValue: number): Promise<void> {
+	searchRecords(searchValue: number): Promise<void> {
 		// Maximum allowed Value
 		const maxRange = this.totalItems - 1;
 
@@ -160,19 +161,14 @@ class ApiData {
 
 	/**  use Ajax for data fetching*/
 	private async fetchData(url: string): Promise<number | string> {
-		try {
-			$('#overlay').show();
-			const response = await $.ajax({
-				url,
-				method: 'GET',
-			});
-			$('#overlay').hide();
-			return response;
-		} catch (error) {
-			throw error;
-		};
-	}
-
+		$('#overlay').show();
+		const response = await $.ajax({
+		  url,
+		  method: 'GET',
+		});
+		$('#overlay').hide();
+		return response;
+	  }
 	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
@@ -214,7 +210,6 @@ class ApiData {
 			this.adjustGridHeight();
 		}
 	}
-
 
 	private displayRecords = (): void => {
 		const gridTemplate = new GridTemplate(this.columnNames, this.data);
