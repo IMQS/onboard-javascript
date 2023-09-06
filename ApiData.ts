@@ -136,6 +136,16 @@ class ApiData {
 		}
 	}
 
+	/**  use Ajax for data fetching*/
+	private async fetchData(url: string): Promise<number | string> {
+		$('#overlay').show();
+		const response = await $.ajax({
+		  url,
+		  method: 'GET',
+		});
+		$('#overlay').hide();
+		return response;
+	}
 
 	/**change grid height according to screen size*/
 	private adjustGridHeight(): void {
@@ -159,16 +169,7 @@ class ApiData {
 		$('.records').text(`Showing records ${from} to ${to}`);
 	}
 
-	/**  use Ajax for data fetching*/
-	private async fetchData(url: string): Promise<number | string> {
-		$('#overlay').show();
-		const response = await $.ajax({
-		  url,
-		  method: 'GET',
-		});
-		$('#overlay').hide();
-		return response;
-	  }
+	
 	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
