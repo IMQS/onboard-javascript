@@ -13,10 +13,9 @@
 #main-container {
   
   margin: 0 auto;
-  padding: 20px;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
 }
 
 html, body {
@@ -25,13 +24,17 @@ html, body {
 }
 /* Apply background color and text color to the table headers */
 th {
-    border: 1px solid hsl(180, 43%, 82%);
-    background-color: #f7f7f7
+  text-align: center;
+  font-size: 16px;
+  border: 1px solid hsl(180, 43%, 82%);
+  background-color: #f7f7f7
   }
   
   /* Apply background color and text color to table data cells */
   td {
-    border: 1px solid hsl(180, 44%, 86%);
+  font-size: 16px;
+  border: 1px solid hsl(180, 44%, 86%);
+  text-align: center;
   }
   
   /* Style the table itself for gridlines */
@@ -51,7 +54,10 @@ th {
   .highlighted-green td {
     background-color: #007AFF !important;
   }
-
+  .pagination-1 {
+    text-align: center;
+    padding-top: 20px;
+  }
   button {
     padding: 10px 20px;
     border: none;
