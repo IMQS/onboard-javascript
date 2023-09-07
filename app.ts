@@ -15,7 +15,6 @@ function globalInitializer() {
 	};
 }
 
-
 // This function will loop through and display the appropriate columns in the correct order.
 function showColumns(): Promise<void> {
 	$(".head-row").empty();
@@ -84,7 +83,7 @@ function showRecords(fromID: number, toID: number): Promise<void> {
 }
 
 // The following function handles all the functionality of the pagination and the pages. Including what records should be shown in the table.
-async function pageNumbers(start: number, end: number): Promise<void> {
+function pageNumbers(start: number, end: number): Promise<void> {
 	return apiManager.getRecordCount()
 		.then((count) => {
 			$('.pagination').empty();
@@ -121,7 +120,7 @@ async function pageNumbers(start: number, end: number): Promise<void> {
 		})
 		.then((count) => {
 			// Adding a click event on the  pagination pages to display the appropriate number of records for that specific page number.
-			$(".pagination-item").on("click", async function dynamicPagination() {
+			$(".pagination-item").on("click", function dynamicPagination() {
 				if (isFunctionRunning) {
 					return;
 				}
@@ -146,8 +145,10 @@ async function pageNumbers(start: number, end: number): Promise<void> {
 				$(".pagination-item").removeClass("active");
 				$(this).addClass("active");
 				isFunctionRunning = false;
-				await showRecords(fromID, toID);
-				return [fromID, toID];
+				return showRecords(fromID, toID)
+				.catch((error) => {
+					throw error;
+				})
 			});
 		})
 		.then(() => {
@@ -242,7 +243,6 @@ $(".search-input").on("input", function (this: HTMLInputElement, event: any) {
 			} else {
 				$('.results-box').remove();
 			}
-
 			isFunctionRunning = false;
 		})
 		.catch((error) => {
@@ -352,8 +352,8 @@ function adjustDisplayedRecords() {
 let resizeTimer: ReturnType<typeof setTimeout>;
 function resize() {
 	clearTimeout(resizeTimer);
-	resizeTimer = setTimeout(async () => {
-		await adjustDisplayedRecords();
+	resizeTimer = setTimeout(() => {
+		adjustDisplayedRecords();
 	}, 250);
 }
 
