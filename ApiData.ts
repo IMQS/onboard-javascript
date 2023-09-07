@@ -1,6 +1,4 @@
-
-
-/** class to manage data and */
+/** class to manage data and setting on the grid */
 class ApiData {
 	// Properties to manage data and settings
 	pageSize: number;
@@ -97,7 +95,6 @@ class ApiData {
 				throw ('Failed to fetch records');
 			});
 	}
-
 
 	/**funtion to search through records using fromID*/
 	searchRecords(searchValue: number): Promise<void> {
