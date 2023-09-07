@@ -58,10 +58,10 @@ function fetchRecords(fromRecord: number, toRecord: number): Promise<any> {
 
 // Calculate the number of records that can fit on the screen.
 function screenCalculations(screenHeight: number): number {
-    const estimatedRowHeightFactor = 1;
-    const estimatedRowHeight = estimatedRowHeightFactor * 50;
-    const recordsPerPage = Math.floor(screenHeight / estimatedRowHeight) - 1;
-    return Math.max(recordsPerPage - 2, 1);
+	const estimatedRowHeightFactor = 1;
+	const estimatedRowHeight = estimatedRowHeightFactor * 50;
+	const recordsPerPage = Math.floor(screenHeight / estimatedRowHeight) - 1;
+	return Math.max(recordsPerPage - 2, 1);
 }
 
 // Handles the input for the search
@@ -89,7 +89,7 @@ async function displayData(fromRecord: number, recordsDisplayed: number) {
 	$("#tableWrapper").hide();
 	let isSearchMode = state.searchedIndex !== null;
 	const searchIndexOnPage = isSearchMode ? state.searchedIndex! - fromRecord : 0;
-	fromRecord = Math.max(fromRecord, 0);
+	fromRecord = Math.max(fromRecord, 1);
 	const recordCount = await totalRecords();
 	const maximumRecords = Math.min(recordCount - fromRecord, recordsDisplayed);
 	const toRecord = fromRecord + maximumRecords - 1;
@@ -123,73 +123,78 @@ async function displayData(fromRecord: number, recordsDisplayed: number) {
 
 // Search for records by a given value and display them on the page.
 async function searchMethod(searchValue: any) {
-    searchValue = Math.min(searchValue, (await totalRecords()) - 1);
-    let targetPage = Math.ceil((searchValue + 1) / state.recordsPerPage);
-    targetPage = Math.min(targetPage, totalPages);
-    const lastRecordIndex = (await totalRecords()) - 1;
-    const searchIndex = Math.min(searchValue, lastRecordIndex);
-    const searchPage = Math.ceil((searchIndex + 1) / state.recordsPerPage);
-    const fromRecord = Math.max(searchIndex - (state.recordsPerPage - 1), 0);
-    const toRecord = Math.min(fromRecord + state.recordsPerPage - 1, lastRecordIndex);
-    return fetchRecords(fromRecord, toRecord)
-        .then((records) => {
-            let foundIndex = -1;
-            let recordIndex = 0;
-            for (const record of records) {
-                const idValue = parseInt(record[0]);
-                if (idValue === searchValue) {
-                    foundIndex = fromRecord + recordIndex;
-                    break;
-                }
-                recordIndex++;
-            }
-			
-            if (foundIndex !== -1) {
-                state.searchedIndex = foundIndex;
-                currentPage = searchPage;
-                state.currentFirstRecordIndex = (searchPage - 1) * state.recordsPerPage;
-                return displayData(state.currentFirstRecordIndex, state.recordsPerPage);
-            } else {
-                state.searchedIndex = null;
-            }
-            return Promise.resolve();
-        })
-        .then(() => {
-            $("#loader").hide();
-            $("#tableWrapper").show();
-            if (searchPage === totalPages) {
-                $("#nextPageButton").hide();
-            } else {
-                $("#nextPageButton").show();
-            }
-        }).catch((error) => {
-            throw error;
-        });
+	searchValue = Math.min(searchValue, (await totalRecords()) - 1);
+	let targetPage = Math.ceil((searchValue + 1) / state.recordsPerPage);
+	targetPage = Math.min(targetPage, totalPages);
+	const lastRecordIndex = (await totalRecords()) - 1;
+	const searchIndex = Math.min(searchValue, lastRecordIndex);
+	const searchPage = Math.ceil((searchIndex + 1) / state.recordsPerPage);
+	const fromRecord = Math.max(searchIndex - (state.recordsPerPage - 1), 0);
+	const toRecord = Math.min(fromRecord + state.recordsPerPage - 1, lastRecordIndex);
+	return fetchRecords(fromRecord, toRecord)
+		.then((records) => {
+			let foundIndex = -1;
+			let recordIndex = 0;
+			for (const record of records) {
+				const idValue = parseInt(record[0]);
+				if (idValue === searchValue) {
+					foundIndex = fromRecord + recordIndex;
+					break;
+				}
+				recordIndex++;
+			}
+			if (foundIndex !== -1) {
+				state.searchedIndex = foundIndex;
+				currentPage = searchPage;
+				state.currentFirstRecordIndex = (searchPage - 1) * state.recordsPerPage;
+				return displayData(state.currentFirstRecordIndex, state.recordsPerPage);
+			} else {
+				state.searchedIndex = null;
+			}
+			return Promise.resolve();
+		})
+		.then(() => {
+			$("#loader").hide();
+			$("#tableWrapper").show();
+			$("#prevPageButton").show();
+			if (searchPage === totalPages) {
+				$("#nextPageButton").hide();
+			} else {
+				$("#nextPageButton").show();
+			}
+		}).catch((error) => {
+			throw error;
+		});
 }
 
 // Update the screen layout and display records based on the current screen/window size
 async function updateScreen() {
-    const newScreenHeight = window.innerHeight;
-    totalRecords();
-    state.recordsPerPage = screenCalculations(newScreenHeight);
-    $("#loader").show();
-    $("#tableWrapper").hide();
-    if (state.searchedIndex !== null) {
-        const searchPage = Math.ceil((state.searchedIndex + 1) / state.recordsPerPage);
-        const searchPageIndex = state.searchedIndex % state.recordsPerPage;
-        state.searchedIndex = (searchPage - 1) * state.recordsPerPage + searchPageIndex;
-        displayData(Math.max(state.searchedIndex - state.recordsPerPage + 1, 0), state.recordsPerPage);
-    } else {
-        const previousFirstRecordIndex = state.currentFirstRecordIndex;
-        currentPage = Math.ceil((state.currentFirstRecordIndex + 1) / state.recordsPerPage);
-        displayData(state.currentFirstRecordIndex, state.recordsPerPage);
-    }
-    $("#loader").hide();
-    $("#tableWrapper").show();
+	const newScreenHeight = window.innerHeight;
+	totalRecords();
+	state.recordsPerPage = screenCalculations(newScreenHeight);
+	$("#loader").show();
+	$("#tableWrapper").hide();
+	if (state.searchedIndex !== null) {
+		const searchPage = Math.ceil((state.searchedIndex + 1) / state.recordsPerPage);
+		const searchPageIndex = state.searchedIndex % state.recordsPerPage;
+		state.searchedIndex = (searchPage - 1) * state.recordsPerPage + searchPageIndex;
+		displayData(Math.max(state.searchedIndex - state.recordsPerPage + 1, 0), state.recordsPerPage);
+	} else {
+		const previousFirstRecordIndex = state.currentFirstRecordIndex;
+		currentPage = Math.ceil((state.currentFirstRecordIndex + 1) / state.recordsPerPage);
+		displayData(state.currentFirstRecordIndex, state.recordsPerPage);
+	}
+	$("#loader").hide();
+	$("#tableWrapper").show();
 	if (currentPage === totalPages) {
 		$("#nextPageButton").hide();
 	} else {
 		$("#nextPageButton").show();
+	}
+	if (state.currentFirstRecordIndex <= 1) {
+		$("#prevPageButton").hide();
+	} else {
+		$("#prevPageButton").show();
 	}
 }
 
@@ -247,34 +252,37 @@ window.onload = async function () {
 		}
 		$("#prevPageButton").addClass("hidden");
 		state.searchedIndex = null;
-		const lastRecordOnFirstPage = state.recordsPerPage;
-		const shouldGoToDefaultFirstPage =
-			state.currentValueOfFirstRecord > 1 &&
-			state.currentValueOfFirstRecord <= lastRecordOnFirstPage;
-		const isFirst16RecordsDisplayed = state.currentValueOfFirstRecord <= 16;
-		if (shouldGoToDefaultFirstPage || isFirst16RecordsDisplayed) {
+		const firstRecordOfCurrentPage = (currentPage - 1) * state.recordsPerPage;
+		if (firstRecordOfCurrentPage <= 16) {
 			currentPage = 1;
-			state.currentFirstRecordIndex = 0;
-		} else if (currentPage > 1) {
+			state.currentFirstRecordIndex = 1;
+		} else {
 			currentPage--;
 			state.currentFirstRecordIndex -= state.recordsPerPage;
 		}
 		const fromRecord = state.currentFirstRecordIndex;
-		$("#nextPageButton").show();
+		$("#nextPageButton").hide();
+		$("#prevPageButton").hide();
 		$("#tableWrapper").hide();
 		$("#loader").show();
-		displayData(fromRecord, state.recordsPerPage);
-		setTimeout(() => {
-			$("#prevPageButton").removeClass("hidden");
-			$("#loader").hide();
-			$("#tableWrapper").show();
-			if (currentPage === totalPages) {
-				$("#nextPageButton").hide();
-			} else {
-				$("#nextPageButton").show();
-			}
-		}, 100);
-	})
+		displayData(fromRecord, state.recordsPerPage)
+			.then(() => {
+				setTimeout(() => {
+					$("#nextPageButton").show();
+					$("#prevPageButton").show();
+					$("#prevPageButton").removeClass("hidden");
+					$("#loader").hide();
+					$("#tableWrapper").show();
+					if (state.currentFirstRecordIndex <= 1) {
+						$("#prevPageButton").hide();
+					} else if (currentPage < totalPages) {
+						$("#nextPageButton").show();
+					}
+				}, 100);
+			}).catch((error) => {
+				throw error;
+			});
+	});
 
 	$("#nextPageButton").on("click", async () => {
 		if ($("#nextPageButton").hasClass("hidden")) {
@@ -284,34 +292,32 @@ window.onload = async function () {
 		state.searchedIndex = null;
 		const totalRecCount = await totalRecords();
 		const remainingRecords = totalRecCount - (currentPage * state.recordsPerPage);
-		if (remainingRecords > 0 && remainingRecords <= state.recordsPerPage) {
-			const lastPageFirstRecordIndex = Math.max(totalRecCount - state.recordsPerPage, 0);
-			currentPage = totalPages;
-			state.currentFirstRecordIndex = lastPageFirstRecordIndex;
-		} else if (currentPage * state.recordsPerPage < totalRecCount) {
+		if (remainingRecords > 0 && currentPage < totalPages) {
 			currentPage++;
 			state.currentFirstRecordIndex += state.recordsPerPage;
+		} else {
+			currentPage = totalPages;
 		}
 		let fromRecord = state.currentFirstRecordIndex;
-		$("#nextPageButton").show();
+		$("#nextPageButton").hide();
 		$("#prevPageButton").hide();
 		$("#tableWrapper").hide();
 		$("#loader").show();
 		displayData(fromRecord, state.recordsPerPage)
 			.then(() => {
 				setTimeout(() => {
+					$("#nextPageButton").show();
+					$("#prevPageButton").show();
 					$("#nextPageButton").removeClass("hidden");
 					$("#loader").hide();
 					$("#tableWrapper").show();
-					$("#prevPageButton").show();
-					if (state.currentFirstRecordIndex === (totalRecCount - state.recordsPerPage)) {
+					if (state.currentFirstRecordIndex >= totalRecCount) {
 						$("#nextPageButton").hide();
-					} else if (currentPage < totalPages) {
-						$("#nextPageButton").show();
 					}
 				}, 100);
 			}).catch((error) => {
 				throw error;
 			});
-	})
+	});
+
 }
