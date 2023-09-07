@@ -22,8 +22,7 @@ const ROW_HEIGHT = 16;
 /**  Wait for the document to be ready*/
 $(document).ready(() => {
 	// Initialization and setup code
-	const windowHeight = Math.floor(<number>($(window).innerHeight()));
-	const initialGridSize = Math.floor((windowHeight * GRID_RATIO) / ROW_HEIGHT) ;
+	const initialGridSize = Math.floor((<number>($(window).innerHeight()) * GRID_RATIO) / ROW_HEIGHT) ;
 	const apidata = new ApiData(initialGridSize);
 	// Set up search button click handler
 	$('#searchBtn').on('click', () => {

@@ -1,4 +1,6 @@
-/** class to manage data and settings on the table */
+
+
+/** class to manage data and */
 class ApiData {
 	// Properties to manage data and settings
 	pageSize: number;
@@ -96,6 +98,7 @@ class ApiData {
 			});
 	}
 
+
 	/**funtion to search through records using fromID*/
 	searchRecords(searchValue: number): Promise<void> {
 		// Maximum allowed Value
@@ -158,6 +161,7 @@ class ApiData {
 		$('.records').text(`Showing records ${from} to ${to}`);
 	}
 
+	
 	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
