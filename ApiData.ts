@@ -1,6 +1,4 @@
-
-
-/** class to manage data and */
+/** class to manage data and settings on the table */
 class ApiData {
 	// Properties to manage data and settings
 	pageSize: number;
@@ -115,7 +113,7 @@ class ApiData {
 					// Set firstVal to searched value
 					this.firstVal = from;
 					// Calculate lastVal based on pageSize
-					this.lastVal = from + this.pageSize;
+					this.lastVal = from + this.pageSize - 1;
 					this.displayRecords();
 					this.updatePageInfo();
 				})
@@ -185,7 +183,7 @@ class ApiData {
 	}
 
 	private handleResize = (): void => {
-		const newGridSize = Math.floor((Math.floor(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT) - 1;
+		const newGridSize = Math.floor((Math.floor(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT);
 
 		// Check if the new grid size is non-negative
 		if (newGridSize >= 0) {

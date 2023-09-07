@@ -1,4 +1,3 @@
-
 /**  Debounce utility function to limit function execution frequency*/
 function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 	let timeout: number;
@@ -17,14 +16,14 @@ function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 /**  Constants for grid calculation
  * GRID_RATIO represents the ratio of the grid's height to the window's height.
 */
-const GRID_RATIO = 9 / 20;
+const GRID_RATIO = 9/20 ;
 const ROW_HEIGHT = 16;
 
 /**  Wait for the document to be ready*/
 $(document).ready(() => {
 	// Initialization and setup code
 	const windowHeight = Math.floor(<number>($(window).innerHeight()));
-	const initialGridSize = Math.floor((windowHeight * GRID_RATIO) / ROW_HEIGHT);
+	const initialGridSize = Math.floor((windowHeight * GRID_RATIO) / ROW_HEIGHT) ;
 	const apidata = new ApiData(initialGridSize);
 	// Set up search button click handler
 	$('#searchBtn').on('click', () => {
