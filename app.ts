@@ -101,7 +101,6 @@ $(window).on('resize', () => {
 			await updateRecordsAndResize(Number(inputValue));
 		}
 	}, 250)
-
 })
 //display records from first to last number
 async function displayRecords(recordCount: number): Promise<void> {
@@ -124,16 +123,17 @@ async function displayRecords(recordCount: number): Promise<void> {
 	}
 	if (globalVars.lastNumber >= recordCount) {
 		$('.arrow-right').hide();
+		
 	} else {
 		$('.arrow-right').show();
 	}
+	// $('#page').empty().append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
 	if (!isNaN(globalVars.firstNumber) && !isNaN(globalVars.lastNumber) && !isNaN(recordCount) && !isNaN(calculatedRows)) {
 		if (globalVars.lastNumber <= recordCount && globalVars.lastNumber >= 0) {
 			return globalVars
 				.fetchRecords(globalVars.firstNumber, globalVars.lastNumber)
 				.then((records) => {
-					$('#page').empty();
-					$('#page').append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
+					$('#page').empty().append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
 					$('#loader').hide();
 					tbody.empty();
 					for (const record of records) {
@@ -160,8 +160,7 @@ async function displayRecords(recordCount: number): Promise<void> {
 			return globalVars
 				.fetchRecords(globalVars.firstNumber, recordCount)
 				.then((records) => {
-					$('#page').empty();
-					$('#page').append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
+					$('#page').empty().append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
 					$('#loader').hide();
 					tbody.empty();
 					for (const record of records) {
@@ -195,6 +194,7 @@ async function updateRecordsAndResize(inputValue: number) {
 		//opens modal if search input is not within range
 		$('.modal').css('display', 'block');
 		$('.content').append(`<p>${inputValue} is not a number within the range. Please try a different number</p>`);
+		$('#page').empty().append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
 		//empties search bar
 		$('#searchInput').val('');
 		return
