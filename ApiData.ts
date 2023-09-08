@@ -1,4 +1,4 @@
-/** class to manage data and setting on the grid */
+/** class to manage data and settings on the grid */
 class ApiData {
 	// Properties to manage data and settings
 	pageSize: number;
@@ -49,7 +49,7 @@ class ApiData {
 			});
 	}
 
-	/**get records from API for fetch an search functionality*/
+	/**get records from API for fetch and search functionality*/
 	fetchAndProcessRecords(from: number, to: number): Promise<GridData[]> {
 		$('#spinner').show();
 		$('#grid').hide();
