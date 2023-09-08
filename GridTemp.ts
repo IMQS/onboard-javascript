@@ -1,4 +1,4 @@
-/**  Class to manage the grid template and display records*/
+/** Class to manage the grid template and display records */
 class GridTemplate {
 	private columnNames: ColumnName[] = [];
 	private dataRecords: GridData[] = [];
@@ -9,7 +9,7 @@ class GridTemplate {
 		this.dataRecords = dataRecords;
 	}
 
-	/*Display records in a grid in table format*/
+	/** Display records in a grid in table format */
 	displayRecords(): void {
 
 		const gridElement = document.getElementById('grid');

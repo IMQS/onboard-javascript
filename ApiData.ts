@@ -1,3 +1,24 @@
+/** Debounce utility function to limit function execution frequency */
+function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
+	let timeout: number;
+
+	return (...args: Parameters<F>): Promise<ReturnType<F>> => {
+		clearTimeout(timeout);
+
+		return new Promise((resolve) => {
+			timeout = setTimeout(() => {
+				resolve(func(...args));
+			}, waitFor);
+		});
+	};
+}
+
+/** Constants for grid calculation
+ * GRID_RATIO represents the ratio of the grid's height to the window's height.
+*/
+const GRID_RATIO = 9/20;
+const ROW_HEIGHT = 16;
+
 /** class to manage data and settings on the grid */
 class ApiData {
 	// Properties to manage data and settings
@@ -15,28 +36,27 @@ class ApiData {
 	}
 
 	/** Initialize method to set up the grid */
-	async initialize(): Promise<void> {
-		Promise.resolve()
-			.then(() => this.adjustGridHeight())
-			.then(() => this.recordCount())
+	initialize(): Promise<void> {
+		this.adjustGridHeight();
+			return this.recordCount()
+			.then(() => this.fetchColumns())
 			.then(() => this.fetchColumns())
 			.then(() => this.fetchRecords())
 			.then(() => this.setupControls())
 	}
-
-	/**Method to fetch total record count from the server */
+	/** Fetch total record count from the server */
 	recordCount(): Promise<void> {
 		return this.fetchData('http://localhost:2050/recordCount')
 			.then((response: any) => {
 				const totalItems = response;
-				this.totalItems = totalItems;
+				this.totalItems = totalItems ;
 			})
 			.catch(() => {
 				throw ('Failed to fetch record count.');
 			});
 	}
 
-	/**fectch column names*/
+	/** fectch column names */
 	fetchColumns(): Promise<void> {
 		return this.fetchData('http://localhost:2050/columns')
 			.then((response: any) => {
@@ -49,7 +69,7 @@ class ApiData {
 			});
 	}
 
-	/**get records from API for fetch and search functionality*/
+	/** get records from API for fetch and search functionality */
 	fetchAndProcessRecords(from: number, to: number): Promise<GridData[]> {
 		$('#spinner').show();
 		$('#grid').hide();
@@ -73,7 +93,7 @@ class ApiData {
 			});
 	}
 
-	/**fetch records from api*/
+	/** fetch records from api */
 	fetchRecords(): Promise<void> {
 		const maxRange = this.totalItems - 1;
 		const from = this.firstVal;
@@ -86,7 +106,7 @@ class ApiData {
 		}
 
 		return this.fetchAndProcessRecords(from, to)
-			.then((processedData) => {
+			.then(processedData => {
 				this.data = processedData;
 				this.displayRecords();
 				this.updatePageInfo();
@@ -96,7 +116,7 @@ class ApiData {
 			});
 	}
 
-	/**funtion to search through records using fromID*/
+	/** search through records using fromID */
 	searchRecords(searchValue: number): Promise<void> {
 		// Maximum allowed Value
 		const maxRange = this.totalItems - 1;
@@ -120,7 +140,7 @@ class ApiData {
 					throw ('Failed to search value');
 				});
 		} else {
-			alert('Please enter values in the range (0-999999)');
+			alert(`Please enter values in the range (0-${this.totalItems-1})`);
 			return Promise.resolve();
 		}
 	}
@@ -166,38 +186,44 @@ class ApiData {
 	}
 
 	private handlePageChange(delta: number): void {
+		let prevBtn = $('#prevBtn');
 
-		if (delta > 0 && this.firstVal + delta * this.pageSize > this.totalItems - 1) {
+		// from last page go to first page  
+		if (delta > 0 && this.firstVal + delta * this.pageSize > this.totalItems - 1){
 			this.firstVal = 0;
-		} else if (delta < 0 && this.firstVal + delta * this.pageSize < 0) {
-			this.firstVal = Math.max(0, this.totalItems - this.pageSize);
+			prevBtn.attr("disabled", null); 
+		}else if (delta < 0 && this.firstVal + delta * this.pageSize < 0) {
+			this.firstVal = 0;
+			prevBtn.attr("disabled","disabled"); 
 		} else {
 			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * this.pageSize, this.totalItems - 1));
+			prevBtn.attr("disabled", null ); 
 		}
 
-		this.lastVal = this.firstVal + this.pageSize ;
+		this.lastVal = this.firstVal + this.pageSize;
 		this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
 		this.fetchRecords();
 		this.updatePageInfo();
 	}
 
 	private handleResize = (): void => {
-		const newGridSize = Math.floor((Math.floor(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT);
+		const newGridSize = Math.floor((Math.floor(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT) - 1;
 
 		// Check if the new grid size is non-negative
 		if (newGridSize >= 0) {
 			// Adjust firstVal for the last page
-			if (this.firstVal + newGridSize > this.totalItems) {
-				this.firstVal = Math.max(this.totalItems - newGridSize);
+			if (this.firstVal + newGridSize > this.totalItems - 1) {
+				this.firstVal = Math.min(this.totalItems - newGridSize);
 			}
 
 			this.pageSize = newGridSize;
 			this.lastVal = this.firstVal + newGridSize - 1;
 
-			// Fetch records, update page info, and adjust grid height
+			// adjust grid height,Fetch records,and update page info 
+			this.adjustGridHeight();
 			this.fetchRecords();
 			this.updatePageInfo();
-			this.adjustGridHeight();
+		
 		}
 	}
 
