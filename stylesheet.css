@@ -1,7 +1,8 @@
 /* Set the background color for the entire page */
-/* Apple-like Heading */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
 #main-heading {
-  font-family: 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: 'Orbitron', sans-serif;
   font-size: 2.5em;
   font-weight: bold;
   text-align: center;
@@ -11,73 +12,88 @@
 }
 
 #main-container {
-  
   margin: 0 auto;
   background-color: #fff;
-  border-radius: 10px;
-  
 }
 
 html, body {
   font-family: 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: #333;
+  margin-bottom: 0;
 }
+
 /* Apply background color and text color to the table headers */
 th {
+  font-family: 'Orbitron', sans-serif;
   text-align: center;
   font-size: 16px;
-  border: 1px solid hsl(180, 43%, 82%);
-  background-color: #f7f7f7
-  }
-  
-  /* Apply background color and text color to table data cells */
-  td {
-  font-size: 16px;
-  border: 1px solid hsl(180, 44%, 86%);
-  text-align: center;
-  }
-  
-  /* Style the table itself for gridlines */
-  table {
-    border-collapse: collapse; /* This makes sure the grid lines are continuous */
-  }
+  border: 1px solid #a1e3a1; 
+  background-color: #333333;  /* Semicolon added */
+  color: #4CAF50;
+}
 
-  #myTable {
-    width: 100%;
-    height: 100%;
-    border: 1px solid hsl(180, 83%, 53%); /* Apply the border color here */
-    border-radius: 12px;  /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
-    overflow: hidden;  /* Makes sure rounded corners are visible */
-    /* Additional styles */
-  }
-  .highlighted-green td {
-    background-color: #007AFF !important;
-  }
-  .pagination-1 {
-    text-align: center;
-    padding-top: 20px;
-  }
-  button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #007AFF;
-    color: #fff;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  button:disabled {
-    background-color: #ccc;
-  }
-  
-  button:hover:not(:disabled) {
-    background-color: #0056D6;
-  }
-  
-  #filterInput {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
+/* Apply background color and text color to table data cells */
+td {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  border: 1px solid #a1e3a1; 
+  text-align: center;
+  color: #333333;
+}
+
+/* Style the table itself for gridlines */
+table {
+  border-collapse: collapse;
+}
+
+#myTable {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #a1e3a1; 
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.highlighted-green td {
+  background-color: #333333 !important;
+  color: #4CAF50 !important;  /* Added this line to make the text color green */
+}
+
+
+.pagination-1 {
+  text-align: center;
+  padding-top: 25px;
+  padding-bottom: 20px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #1e1e1e;  /* Dark Grey almost Black */
+  color: #00FF00;  /* Bright green like old school terminals */
+  border-radius: 5px;
+  font-family: 'Orbitron', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:disabled {
+  background-color: #555;  /* Mid-grey for disabled buttons */
+  color: #ccc;  /* light grey text */
+}
+
+button:hover:not(:disabled) {
+  background-color: #333;  /* Slightly lighter dark grey */
+}
+
+#filterInput {
+  padding: 10px;
+  border: 1px solid #00FF00;  /* Bright green border */
+  border-radius: 5px;
+  font-family: 'Orbitron', sans-serif;
+  color: #00FF00;  /* Bright green text */
+  background-color: #1e1e1e;  /* Dark background */
+}
+

@@ -8,7 +8,7 @@
 
 
 // *** Global Variables ***//
-const ROW_HEIGHT = 23;
+const ROW_HEIGHT = 21;
 let currentPage = 1;
 let recordsPerPage = 25;
 let totalRecords: number;
@@ -82,35 +82,39 @@ window.onload = async () => {
   // Filter functionality
   let errorTimeout: number | null = null;
 
-const filterInput = document.getElementById("filterInput") as HTMLInputElement;
-const errorMessage = document.getElementById("errorMessage");
+  const filterInput = document.getElementById("filterInput") as HTMLInputElement;
+  const errorMessage = document.getElementById("errorMessage");
 
-if (filterInput && errorMessage) {
-  filterInput.addEventListener("input", function() {
-    const query = this.value.trim();
-    
-    // Clear any existing timeout and error message
-    if (errorTimeout !== null) {
-      clearTimeout(errorTimeout);
-    }
-    errorMessage.textContent = "";
+  if (filterInput && errorMessage) {
+    filterInput.addEventListener("input", async function() { // Added async here to call await later
+      const query = this.value.trim();
 
-    if (query === "") {
-      // If input is empty, just return
-      return;
-    }
+      // Clear any existing timeout and error message
+      if (errorTimeout !== null) {
+        clearTimeout(errorTimeout);
+      }
+      errorMessage.textContent = "";
 
-    const isValidNumber = /^[0-9]+$/.test(query) && parseInt(query, 10) <= 999999;
+      if (query === "") {
+        // If input is empty, remove the highlight and revert the table
+        lastFilteredId = null;
+        await generateTable(0, recordsPerPage, null); // Added await here, assuming generateTable is an async function
+        document.getElementById("prevBtn")?.setAttribute("disabled", "true");
+        return;
+      }
 
-    if (isValidNumber) {
-      filterRecordsById(query);
-    } else {
-      // Set up the delayed message
-      errorTimeout = setTimeout(() => {
-        errorMessage.textContent = "Invalid input. Please enter a number between 0 and 999999.";
-      }, 500);
-    }
-  });
+      const isValidNumber = /^[0-9]+$/.test(query) && parseInt(query, 10) <= 999999;
+
+      if (isValidNumber) {
+        lastFilteredId = query;
+        filterRecordsById(query);
+      } else {
+        // Set up the delayed message
+        errorTimeout = setTimeout(() => {
+          errorMessage.textContent = "Invalid input. Please enter a number between 0 and 999999.";
+        }, 500);
+      }
+    });
   }
 };
 
@@ -146,9 +150,10 @@ function generateInitialTable() {
   function calculateRecordsPerPage() {
     const headingHeight = document.getElementById('main-heading')?.offsetHeight || 0; 
     const paginationHeight = document.getElementById('pagination')?.offsetHeight || 0;  
-
-    const availableHeight = window.innerHeight - headingHeight - paginationHeight - 15;
-
+    console.log(paginationHeight);
+    console.log(headingHeight);
+    const availableHeight = window.innerHeight - headingHeight - paginationHeight - 10;
+    console.log(availableHeight);
     recordsPerPage = Math.floor(availableHeight / ROW_HEIGHT);
   }
 
@@ -187,13 +192,37 @@ function generateInitialTable() {
 
   // Fetch a subset of row data from the server
   async function fetchRowData(from: number, to: number) {
+    // Make sure 'to' doesn't exceed the maximum allowed record number
+    to = Math.min(to, 999999);
+    
+    // Make sure 'to' is not negative
+    if (to < 0) {
+      to = 0;
+    }
+    
+    // Make sure 'from' is not greater than 'to'
+    if (from > to) {
+      from = to;
+    }
+  
+    // Ensure 'from' is not negative
+    if (from < 0) {
+      from = 0;
+    }
+  
     const response = await fetch(`http://localhost:2050/records?from=${from}&to=${to}`);
+    
+    if (!response.ok) {
+      console.error(`Fetch failed: ${response.status} ${response.statusText}`);
+      return [];
+    }
+    
     const records = await response.json();
     return records;
   }
   
-
-
+  
+  
 
   // Generate the body of the table
   function generateTableRows(records: any[][], highlightId: string | null) {
@@ -237,6 +266,8 @@ function generateInitialTable() {
     }
     table?.appendChild(thead);
     table?.appendChild(tbody);
+
+    setColumnWidths();
     if (lastFilteredId) {
       centerHighlightedRow();
     }
@@ -248,7 +279,25 @@ function generateInitialTable() {
     }
   }
   
-
+  function setColumnWidths(): void {
+    // Assuming your table has an id of "myTable"
+    const table = document.getElementById("myTable");
+    
+    if (table) {
+      // Count the number of columns in your table
+      const headerCells = table.querySelectorAll("th");
+      const numCols = headerCells.length;
+  
+      // Calculate the width for each column
+      const colWidth = 100 / numCols;
+  
+      // Set the width
+      headerCells.forEach((headerCell: Element) => {
+        (headerCell as HTMLElement).style.width = `${colWidth}%`;
+      });
+    }
+  }
+  
 
 
   // Fetch the total number of records
@@ -273,6 +322,8 @@ function generateInitialTable() {
     // Assuming your IDs start from 0 and are sequential
     let from = Math.max(0, id - Math.floor(recordsPerPage / 2));
     let to = from + recordsPerPage;
+
+    
     // Update current page based on filtered ID
     currentPage = Math.ceil((id + 1) / recordsPerPage);
     // Enable or Disable the Previous button based on the current page
