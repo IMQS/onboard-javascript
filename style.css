@@ -18,8 +18,8 @@ body {
   --primary-color: white;
   --secondary-color: #292929;
   --tertiary-color: black;
-  --results-color: yellow;
   --shadow-color: #e3e3e3;
+  --selected-color: #0d6efd;
 }
 
 /* BUTTON STARTS */
@@ -155,11 +155,16 @@ th:hover {
 }
 td {
   border-right: 1px solid var(--secondary-color);
-  /* border-bottom: 1px solid var(--secondary-color); */
   font-weight: 300;
-  color: var(--tertiary-color);
   padding: 14px;
 }
+tr:hover {
+	cursor: pointer;
+	color: var(--primary-color) !important;
+	background: var(--selected-color);
+	box-shadow: none !important;
+	border: 1px solid var(--secondary-color);
+  }
 td:nth-child(1) {
   font-weight: 500;
 }

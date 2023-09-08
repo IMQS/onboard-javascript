@@ -8,7 +8,7 @@ const state = {
 	recordsPerPage: 16,
 	searchedIndex: null as number | null,
 	isButtonDisabled: false
-};
+}
 
 // Fetch the total number of records from the server.
 function totalRecords(): Promise<number> {
@@ -19,7 +19,7 @@ function totalRecords(): Promise<number> {
 			return recordCount;
 		}).catch((error) => {
 			throw error;
-		});
+		})
 }
 
 // Fetch column names and creates them as table headings
@@ -40,7 +40,7 @@ function fetchColumns() {
 			updateScreen();
 		}).catch((error) => {
 			throw error;
-		});
+		})
 }
 
 // Fetch a range of records from the server based on specified indices.
@@ -53,7 +53,7 @@ function fetchRecords(fromRecord: number, toRecord: number): Promise<any> {
 		.then((dataText) => JSON.parse(dataText))
 		.catch((error) => {
 			throw error;
-		});
+		})
 }
 
 // Calculate the number of records that can fit on the screen.
@@ -70,7 +70,7 @@ function inputHandling(): Promise<void> {
 		.then((totalRecCount) => {
 			const searchInput = document.getElementById("searchInput") as HTMLInputElement;
 			searchInput.max = (totalRecCount - 1).toString();
-		});
+		})
 }
 
 function debounce(func: any, delay: number) {
@@ -80,7 +80,7 @@ function debounce(func: any, delay: number) {
 		timeoutId = setTimeout(() => {
 			func(...args);
 		}, delay);
-	};
+	}
 }
 
 // Display records on the page based on the specified range.
@@ -164,7 +164,7 @@ async function searchMethod(searchValue: any) {
 			}
 		}).catch((error) => {
 			throw error;
-		});
+		})
 }
 
 // Update the screen layout and display records based on the current screen/window size
@@ -222,7 +222,7 @@ window.onload = async function () {
 			}).catch((error) => {
 				throw (error);
 			});
-	}, 50));
+	}, 150))
 
 	$("#searchInput").on("keydown", function (e) {
 		if (e.key === "e" || e.key === "E" || e.key === "."
@@ -278,11 +278,11 @@ window.onload = async function () {
 					} else if (currentPage < totalPages) {
 						$("#nextPageButton").show();
 					}
-				}, 100);
+				}, 150);
 			}).catch((error) => {
 				throw error;
 			});
-	});
+	})
 
 	$("#nextPageButton").on("click", async () => {
 		if ($("#nextPageButton").hasClass("hidden")) {
@@ -314,7 +314,7 @@ window.onload = async function () {
 					if (state.currentFirstRecordIndex >= totalRecCount) {
 						$("#nextPageButton").hide();
 					}
-				}, 100);
+				}, 150);
 			}).catch((error) => {
 				throw error;
 			});
