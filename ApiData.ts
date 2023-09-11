@@ -244,7 +244,6 @@ class ApiData {
 					console.error("Error fetching records while resizing:", error);
 					alert('Error occured while resizing!');
 				});
-
 		}
 	}
 
