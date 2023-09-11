@@ -1,4 +1,3 @@
-
 /** Wait for the document to be ready */
 $(document).ready(() => {
 	// Initialization and setup code

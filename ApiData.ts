@@ -14,14 +14,14 @@ function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 }
 
 /** Constants for grid calculation
- * GRID_RATIO represents the ratio of the grid's height to the window's height.
+* GRID_RATIO represents the ratio of the grid's height to the window's height.
 */
 const GRID_RATIO = 9 / 20;
 const ROW_HEIGHT = 16;
 
-/** class to manage data and settings on the grid */
+/** manage data and settings on the grid */
 class ApiData {
-	// Properties to manage data and settings
+
 	pageSize: number;
 	currentPage: number = 1;
 	data: GridData[] = [];
@@ -42,7 +42,7 @@ class ApiData {
 			.then(() => this.fetchColumns())
 			.then(() => this.fetchColumns())
 			.then(() => this.fetchRecords())
-			.then(() => this.setupControls())
+			.then(() => this.setupControls());
 	}
 	/** Fetch total record count from the server */
 	recordCount(): Promise<void> {
@@ -194,7 +194,7 @@ class ApiData {
 		let nextBtn = $('#nextBtn');
 
 		if (delta > 0 && this.firstVal + delta * this.pageSize > this.totalItems - 1) {
-			this.firstVal = this.lastVal - this.pageSize;
+			this.firstVal = this.lastVal - delta * this.pageSize;
 			prevBtn.attr("disabled", null);
 			nextBtn.attr("disabled", "disabled");
 		} else if (delta < 0 && this.firstVal + delta * this.pageSize < 0) {
@@ -209,9 +209,17 @@ class ApiData {
 
 		this.lastVal = this.firstVal + delta * this.pageSize;
 		this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
-		this.fetchRecords();
-		this.updatePageInfo();
+
+		this.fetchRecords()
+			.then(() => {
+				this.updatePageInfo();
+			})
+			.catch((error) => {
+				console.error("Error fetching records while changing page :", error);
+				alert('Error occured while changing page!');
+			});
 	}
+
 
 	private handleResize = (): void => {
 		const newGridSize = Math.floor((Math.floor(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT) - 1;
@@ -226,10 +234,16 @@ class ApiData {
 			this.pageSize = newGridSize;
 			this.lastVal = this.firstVal + newGridSize;
 
-			// adjust grid height,Fetch records,and update page info 
 			this.adjustGridHeight();
-			this.fetchRecords();
-			this.updatePageInfo();
+
+			this.fetchRecords()
+				.then(() => {
+					this.updatePageInfo();
+				})
+				.catch((error) => {
+					console.error("Error fetching records while resizing:", error);
+					alert('Error occured while resizing!');
+				});
 
 		}
 	}
