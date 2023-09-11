@@ -16,7 +16,7 @@ function debounce<F extends (...args: any) => any>(func: F, waitFor: number) {
 /** Constants for grid calculation
  * GRID_RATIO represents the ratio of the grid's height to the window's height.
 */
-const GRID_RATIO = 9/20;
+const GRID_RATIO = 9 / 20;
 const ROW_HEIGHT = 16;
 
 /** class to manage data and settings on the grid */
@@ -38,7 +38,7 @@ class ApiData {
 	/** Initialize method to set up the grid */
 	initialize(): Promise<void> {
 		this.adjustGridHeight();
-			return this.recordCount()
+		return this.recordCount()
 			.then(() => this.fetchColumns())
 			.then(() => this.fetchColumns())
 			.then(() => this.fetchRecords())
@@ -49,7 +49,7 @@ class ApiData {
 		return this.fetchData('http://localhost:2050/recordCount')
 			.then((response: any) => {
 				const totalItems = response;
-				this.totalItems = totalItems ;
+				this.totalItems = totalItems;
 			})
 			.catch(() => {
 				throw ('Failed to fetch record count.');
@@ -96,13 +96,17 @@ class ApiData {
 	/** fetch records from api */
 	fetchRecords(): Promise<void> {
 		const maxRange = this.totalItems - 1;
-		const from = this.firstVal;
+		let from = this.firstVal;
 		let to = Math.min(from + this.pageSize, maxRange);
 
 		if (to >= maxRange) {
-			// Set currentPage to the last page
-			this.currentPage = Math.floor(maxRange / this.pageSize) + 1;
+			const lastPage = Math.floor(maxRange / this.pageSize) + 1;
+
+			this.currentPage = lastPage;
+
 			to = maxRange;
+			from = (lastPage - 1) * this.pageSize + 1;
+			this.firstVal = from;
 		}
 
 		return this.fetchAndProcessRecords(from, to)
@@ -140,23 +144,23 @@ class ApiData {
 					throw ('Failed to search value');
 				});
 		} else {
-			alert(`Please enter values in the range (0-${this.totalItems-1})`);
+			alert(`Please enter values in the range (0-${this.totalItems - 1})`);
 			return Promise.resolve();
 		}
 	}
 
-	/**  use Ajax for data fetching*/
+	/** use Ajax for data fetching */
 	private async fetchData(url: string): Promise<number | string> {
 		$('#overlay').show();
 		const response = await $.ajax({
-		  url,
-		  method: 'GET',
+			url,
+			method: 'GET',
 		});
 		$('#overlay').hide();
 		return response;
 	}
 
-	/**change grid height according to screen size*/
+	/** Change grid height according to screen size */
 	private adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
 		const pageCntrl = $('.grid-controls').innerHeight();
@@ -167,7 +171,7 @@ class ApiData {
 		};
 	}
 
-	/** Update the page information and records display based on the current state of the grid.*/
+	/** Update the page information and records display based on the current state of the grid. */
 	private updatePageInfo(): void {
 		const totalPages = Math.ceil(this.totalItems / this.pageSize);
 		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
@@ -178,7 +182,7 @@ class ApiData {
 		$('.records').text(`Showing records ${from} to ${to}`);
 	}
 
-	
+
 	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
@@ -187,20 +191,23 @@ class ApiData {
 
 	private handlePageChange(delta: number): void {
 		let prevBtn = $('#prevBtn');
+		let nextBtn = $('#nextBtn');
 
-		// from last page go to first page  
-		if (delta > 0 && this.firstVal + delta * this.pageSize > this.totalItems - 1){
+		if (delta > 0 && this.firstVal + delta * this.pageSize > this.totalItems - 1) {
+			this.firstVal = this.lastVal - this.pageSize;
+			prevBtn.attr("disabled", null);
+			nextBtn.attr("disabled", "disabled");
+		} else if (delta < 0 && this.firstVal + delta * this.pageSize < 0) {
 			this.firstVal = 0;
-			prevBtn.attr("disabled", null); 
-		}else if (delta < 0 && this.firstVal + delta * this.pageSize < 0) {
-			this.firstVal = 0;
-			prevBtn.attr("disabled","disabled"); 
+			prevBtn.attr("disabled", "disabled");
+			nextBtn.attr("disabled", null);
 		} else {
 			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * this.pageSize, this.totalItems - 1));
-			prevBtn.attr("disabled", null ); 
+			prevBtn.attr("disabled", null);
+			nextBtn.attr("disabled", null);
 		}
 
-		this.lastVal = this.firstVal + this.pageSize;
+		this.lastVal = this.firstVal + delta * this.pageSize;
 		this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
 		this.fetchRecords();
 		this.updatePageInfo();
@@ -213,17 +220,17 @@ class ApiData {
 		if (newGridSize >= 0) {
 			// Adjust firstVal for the last page
 			if (this.firstVal + newGridSize > this.totalItems - 1) {
-				this.firstVal = Math.min(this.totalItems - newGridSize);
+				this.firstVal = Math.min((this.totalItems - 1) - newGridSize);
 			}
 
 			this.pageSize = newGridSize;
-			this.lastVal = this.firstVal + newGridSize - 1;
+			this.lastVal = this.firstVal + newGridSize;
 
 			// adjust grid height,Fetch records,and update page info 
 			this.adjustGridHeight();
 			this.fetchRecords();
 			this.updatePageInfo();
-		
+
 		}
 	}
 

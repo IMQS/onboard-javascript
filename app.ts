@@ -1,5 +1,5 @@
 
-/** Wait for the document to be ready*/
+/** Wait for the document to be ready */
 $(document).ready(() => {
 	// Initialization and setup code
 	const initialGridSize = Math.floor((<number>($(window).innerHeight()) * GRID_RATIO) / ROW_HEIGHT) ;
@@ -19,9 +19,10 @@ $(document).ready(() => {
 			alert(`please enter values in the range (0-${maxRange})`);
 			return;
 		} else if (isNaN(from)) {
-			alert('Please enter a numerical value ');
+			alert('Please enter a numerical value.');
 		} else {
 			console.error('error');
+			alert('An error has occured')
 		}
 		//empty search input after searching 
 		$('#fromInput').val('');
