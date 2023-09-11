@@ -1,86 +1,73 @@
 import { ajax, css } from "jquery";
-class GlobalVariables {
-	firstNumber = 0;
-	lastNumber = 0;
-	backend = "http://localhost:2050";
-	resizeTimeout = 0;
-	//fetches the number of records from localhost
+
+class Myclass {
+	firstNumber: number = 0;
+	lastNumber: number = 0;
+	backend: string = "http://localhost:2050";
+	resizeTimeout: number = 0;
+
+	/** fetches the number of records from backend */
 	fetchRecordCount(): Promise<number> {
 		return fetch(`${this.backend}/recordCount`)
-			.then((res) => {
+			.then(res => {
 				if (!res.ok) {
 					throw 'Failed to fetch record count';
 				}
-				return res.text();
+				return res.json();
 			})
-			.then((data) => {
-				return JSON.parse(data);
-			})
-			.catch((err) => {
+			.catch(err => {
 				throw 'Error fetching the record count: ' + err;
-			})
+			});
 	}
-	//fetches columns from localhost
+
+	/** fetches columns from backend */
 	fetchColumns(): Promise<string[]> {
 		return fetch(`${this.backend}/columns`)
 			.then(res => {
 				if (!res.ok) {
 					throw 'Failed to fetch columns';
 				}
-				return res.text();
+				return res.json();
 			})
-			.then((data) => {
-				return JSON.parse(data);
-			}).catch(err => {
+			.catch(err => {
 				throw 'Error fetching columns' + err;
-			})
+			});
 	}
-	//fetches records from localhost
+
+	/** fetches records from backend */
 	fetchRecords(from: number, to: number): Promise<any[]> {
 		return fetch(`${this.backend}/records?from=${from}&to=${to}`)
 			.then(res => {
 				if (!res.ok) {
 					throw "Sorry, there's a problem with the network";
 				}
-				return res.text();
+				return res.json();
 			})
-			.then((data) => {
-				return JSON.parse(data);
-			}).catch(err => {
+			.catch(err => {
 				throw 'Error fetching records from server ' + err;
-			})
+			});
 	}
 }
 
-const globalVars = new GlobalVariables();
-let recordCount: number;
+const myClass = new Myclass();
 
-globalVars.fetchRecordCount()
-	.then((count) => {
-		// Assign the fetched count to the variable
-		recordCount = count - 1;
-		displayRecords(recordCount);
-	})
-	.catch(err => {
-		throw 'Error fetching record count' + err;
-	})
-//Initializes the table head
-function createTable() {
-	return globalVars.fetchColumns()
+/** Initializes the table head */
+function createTable():Promise<string[]> {
+	return myClass.fetchColumns()
 		.then(columns => {
 			for (const col of columns) {
 				$(".head").append(`<th>${col}</th>`);
 			}
+			return columns
 		})
 		.catch(err => {
 			throw 'Error creating table' + err;
-		})
+		});
 }
-//calculates the number of rows that can fit the screen
-const adjustRowsByScreenHeight = (): number => {
-	//retrieves screen height
+
+/** calculates the number of rows that can fit the screen */
+const calculatingRows = (): number => {
 	const screenHeight = window.innerHeight;
-	//subtracts the space used from the screeen
 	const availableHeight = screenHeight - 105;
 	let rowHeight = 35;
 	if (availableHeight <= 0) {
@@ -89,213 +76,190 @@ const adjustRowsByScreenHeight = (): number => {
 		let maxRows = Math.floor(availableHeight / rowHeight);
 		return maxRows;
 	}
+};
+
+/** calls to re-display records when screen is adjusted */
+function handleResize(recordCount: number) {
+	$(window).on('resize', () => {
+		clearTimeout(myClass.resizeTimeout);
+		myClass.resizeTimeout = setTimeout(async () => {
+			displayRecords(recordCount)
+			let inputValue = $('#searchInput').val();
+			if (inputValue !== '') {
+				await searchRecordsAndResize(recordCount);
+			}
+		}, 250);
+	});
 }
-//calls to re-display records when screen is adjusted
-$(window).on('resize', () => {
-	clearTimeout(globalVars.resizeTimeout);
-	globalVars.resizeTimeout = setTimeout(async () => {
-		await displayRecords(recordCount);
-		// priotizes the search input value if available
-		let inputValue = $('#searchInput').val();
-		if (inputValue !== '') {
-			await updateRecordsAndResize(Number(inputValue));
-		}
-	}, 250)
-})
-//display records from first to last number
+
+/** display records that fit the screen */
 async function displayRecords(recordCount: number): Promise<void> {
 	$('#loader').show();
-	let calculatedRows = adjustRowsByScreenHeight();
 	const inputValue = $('#searchInput').val() as number;
-	const tbody = $("tbody");
-	if (calculatedRows === 0) {
-		globalVars.lastNumber = globalVars.firstNumber;
-	} else if (globalVars.firstNumber < 0) {
-		globalVars.firstNumber = 0;
-		globalVars.lastNumber = globalVars.firstNumber + (calculatedRows - 1);
+	const calculatedRows = calculatingRows();
+	const { firstNumber, lastNumber } = calculateFirstAndLastNumbers(calculatedRows, recordCount);
+	updateArrowVisibility(firstNumber, lastNumber, recordCount);
+	const records = await fetchAndDisplayRecords(firstNumber, lastNumber, inputValue);
+	$('#page').empty().append(`Showing record: ${firstNumber} - ${lastNumber}`);
+	$('#loader').hide();
+}
+
+function calculateFirstAndLastNumbers(calculatedRows: number, recordCount: number) {
+	let firstNumber, lastNumber;
+	 if (myClass.firstNumber < 0 || myClass.firstNumber > recordCount) {
+		firstNumber = 0;
 	} else {
-		globalVars.lastNumber = globalVars.firstNumber + (calculatedRows - 1);
+		firstNumber = myClass.firstNumber;
 	}
-	if (globalVars.firstNumber === 0) {
+	lastNumber = firstNumber + calculatedRows - 1;
+	if (lastNumber >= recordCount) {
+		lastNumber = recordCount;
+		firstNumber = lastNumber - (calculatedRows - 1)
+	}
+	return { firstNumber, lastNumber };
+}
+
+function updateArrowVisibility(firstNumber: number, lastNumber: number, recordCount: number) {
+	if (firstNumber === 0) {
 		$('.arrow-left').hide();
 	} else {
 		$('.arrow-left').show();
 	}
-	if (globalVars.lastNumber >= recordCount) {
+
+	if (lastNumber >= recordCount) {
 		$('.arrow-right').hide();
-		
 	} else {
 		$('.arrow-right').show();
 	}
-	// $('#page').empty().append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
-	if (!isNaN(globalVars.firstNumber) && !isNaN(globalVars.lastNumber) && !isNaN(recordCount) && !isNaN(calculatedRows)) {
-		if (globalVars.lastNumber <= recordCount && globalVars.lastNumber >= 0) {
-			return globalVars
-				.fetchRecords(globalVars.firstNumber, globalVars.lastNumber)
-				.then((records) => {
-					$('#page').empty().append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
-					$('#loader').hide();
-					tbody.empty();
-					for (const record of records) {
-						// creates row for each record
-						$("tbody").append(`<tr class="row"></tr>`);
-						const lastRow = $(".row:last");
-						for (const value of record) {
-							// assign each record to their column in a specified row
-							lastRow.append(`<td>${value}</td>`);
-						}
-						if (record.includes(inputValue)) {
-							// highlights the searched row
-							lastRow.css('background-color', '#DDC0B4');
-						}
-						$("tbody").append(lastRow);
-					}
-				})
-				.catch((err) => {
-					throw 'Error fetching records' + err;
-				})
-		} else {
-			globalVars.firstNumber = recordCount - (calculatedRows - 1);
-			globalVars.lastNumber = recordCount;
-			return globalVars
-				.fetchRecords(globalVars.firstNumber, recordCount)
-				.then((records) => {
-					$('#page').empty().append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
-					$('#loader').hide();
-					tbody.empty();
-					for (const record of records) {
-						// creates row for each record
-						$("tbody").append(`<tr class="row"></tr>`);
-						const lastRow = $(".row:last");
-						for (const value of record) {
-							//assign each record to their column in a specified row
-							lastRow.append(`<td>${value}</td>`);
-						}
-						if (record.includes(inputValue)) {
-							//highlights the searched row
-							lastRow.css('background-color', '#DDC0B4');
-						}
-						$("tbody").append(lastRow);
-						$('#loader').hide();
-					}
-				})
-				.catch((err) => {
-					throw 'Error fetching records' + err;
-				})
-		}
-	} else {
-		throw new Error("Invalid numeric values detected.");
-	}
 }
 
-async function updateRecordsAndResize(inputValue: number) {
-	//check if the search input 
+async function fetchAndDisplayRecords(firstNumber: number, lastNumber: number, inputValue: number) {
+	const records = await myClass.fetchRecords(firstNumber, lastNumber);
+	const tbody = $("tbody");
+	tbody.empty();
+	for (const record of records) {
+		/** creates row for each record*/ 
+		$("tbody").append(`<tr class="row"></tr>`);
+		const lastRow = $(".row:last");
+		for (const value of record) {
+			/** assign each record to their column in a specified row */
+			lastRow.append(`<td>${value}</td>`);
+		}
+		if (record.includes(inputValue)) {
+			/** highlights the searched row */
+			lastRow.css('background-color', '#DDC0B4');
+		}
+		$("tbody").append(lastRow);
+	}
+	return records;
+}
+
+/** recalculates the record range that includes inputValue */
+async function searchRecordsAndResize(recordCount: number): Promise<void> {
+	let inputValue = $('#searchInput').val() as number;
 	if (inputValue < 0 || inputValue > recordCount) {
-		//opens modal if search input is not within range
 		$('.modal').css('display', 'block');
 		$('.content').append(`<p>${inputValue} is not a number within the range. Please try a different number</p>`);
-		$('#page').empty().append(`Showing record: ${globalVars.firstNumber} - ${globalVars.lastNumber}`);
-		//empties search bar
+		$('#page').empty().append(`Showing record: ${myClass.firstNumber} - ${myClass.lastNumber}`);
 		$('#searchInput').val('');
-		return
 	}
-	let calculatedRows = adjustRowsByScreenHeight();
-	//divides the calculated max rows in half 
+	let calculatedRows = calculatingRows();
+	/** divides the calculated max rows in half*/
 	const halfRange = Math.floor(calculatedRows / 2);
-	globalVars.firstNumber = Math.max(0, inputValue - halfRange);
-	globalVars.lastNumber = Math.min(recordCount, globalVars.firstNumber + (calculatedRows - 1));
+	myClass.firstNumber = Math.max(0, inputValue - halfRange);
+	myClass.lastNumber = Math.min(recordCount, myClass.firstNumber + (calculatedRows - 1));
 	await displayRecords(recordCount);
 }
 
-async function rightArrow(): Promise<void> {
+/** Navigates to the next set of records */
+async function rightArrow(recordCount: number): Promise<void> {
 	$('#page').empty();
 	$('#searchInput').val('');
-	//retrieves the last row
+	/** retrieves the last row */
 	const lastRow = document.querySelector("#recordsTable tbody .row:last-child");
-	// checks if the last row exists
+	/** checks if the last row exists */
 	if (lastRow) {
 		const cells = lastRow.querySelectorAll("td");
 		const lastRecord = [];
 		for (const cell of Array.from(cells)) {
 			lastRecord.push(cell.textContent || "");
 		}
-		//determines te value in the last row
+		/** determines te value in the last row */
 		const lastID = parseFloat(lastRecord[0]);
-		// checks if the last value is within range
+		/** checks if the last value is within range */
 		if (0 <= lastID && lastID <= (recordCount)) {
 			const tbody = $("tbody");
-			//empties the table
 			tbody.empty();
-			//calculates the first number of the page
-			globalVars.firstNumber = lastID + 1;
-			let calculatedRows = adjustRowsByScreenHeight();
-			// calculates the last number of the page
-			globalVars.lastNumber = globalVars.firstNumber + (calculatedRows - 1);
-			//display the new records
+			/** calculates the first number of the page */
+			myClass.firstNumber = lastID + 1;
+			let calculatedRows = calculatingRows();
+			/** calculates the last number of the page */
+			myClass.lastNumber = myClass.firstNumber + (calculatedRows - 1);
 			await displayRecords(recordCount);
 		}
 	}
 }
 
-async function leftArrow(): Promise<void> {
+async function leftArrow(recordCount: number): Promise<void> {
 	$('#page').empty();
 	$('#searchInput').val('');
-	//retrieves the first row
+	/** retrieves the first row */
 	const firstRow = document.querySelector("#recordsTable tbody .row:first-child");
-	//checks if the first row exists
 	if (firstRow) {
 		const cells = firstRow.querySelectorAll("td");
 		const firstRecord = [];
 		for (const cell of Array.from(cells)) {
 			firstRecord.push(cell.textContent || "");
 		}
-		//determines te value in the first row
+		/** determines te value in the first row */
 		const firstID = parseFloat(firstRecord[0]);
-		//checks if the first value is within range
 		if (0 <= firstID && firstID <= (recordCount)) {
 			const tbody = $("tbody");
-			//empties the table
 			tbody.empty();
-			const calculatedRows = adjustRowsByScreenHeight();
-			//calculates the last number of the page
-			globalVars.lastNumber = firstID - 1;
-			//uses the last number to calculate first number
-			globalVars.firstNumber = globalVars.lastNumber - (calculatedRows - 1);
+			const calculatedRows = calculatingRows();
+			myClass.lastNumber = firstID - 1;
+			myClass.firstNumber = myClass.lastNumber - (calculatedRows - 1);
 			await displayRecords(recordCount);
 		}
 	}
 }
 
 window.onload = () => {
+	myClass.fetchRecordCount()
+		.then(count => {
+			let recordCount: number = count - 1;
+			displayRecords(recordCount);
+			handleResize(recordCount)
+			searchRecordsAndResize(recordCount)
+			$('#btnSearch').on("click", (event) => {
+				event.preventDefault();
+				$('#page').empty();
+				searchRecordsAndResize(recordCount);
+			});
+			$('.arrow-right').on('click', () => {
+				rightArrow(recordCount);
+			});
+			$('.arrow-left').on('click', () => {
+				leftArrow(recordCount);
+			});
+		})
+		.catch(err => {
+			throw new Error('Error fetching record count' + err);
+		});
 	createTable();
-	displayRecords(recordCount);
-	$('#btnSearch').on("click", async (event) => {
-		event.preventDefault();
-		let inputValue = $('#searchInput').val() as number;
-		$('#page').empty();
-		//calls to calculate the range once button is clicked
-		await updateRecordsAndResize(inputValue);
-	})
 	$('#closeModalBtn').on("click", () => {
 		$('.content').empty();
-		//closes modal
 		$('.modal').css('display', 'none');
-	})
-	$('.arrow-right').on('click', () => {
-		rightArrow();
-	})
-	$('.arrow-left').on('click', () => {
-		leftArrow();
-	})
+	});
 	$('#searchInput').on('keydown', (event) => {
 		if (event.key === 'e' || event.key === 'E') {
 			event.preventDefault();
 		}
-	})
+	});
 	$('#searchInput').on('input', (event) => {
 		const inputValue = $('#searchInput').val() as string;
 		if (inputValue.includes('.')) {
 			$('#searchInput').val(inputValue.replace('.', ''));
 		}
-	})
+	});
 }
