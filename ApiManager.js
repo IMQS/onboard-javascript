@@ -31,4 +31,4 @@ var ApiManager = /** @class */ (function () {
     };
     return ApiManager;
 }());
-//# sourceMappingURL=apiManager.js.map
+//# sourceMappingURL=ApiManager.js.map

@@ -1,7 +1,21 @@
-import { ApiManager } from "./apiManager.js";
 const globals = globalInitializer();
 const apiManager = new ApiManager("http://localhost:2050/");
 let isFunctionRunning = false;
+
+// class DataHandler {
+// 	constructor() {
+// 		this.initialize = {
+// 			currentPage: 1,
+// 			firstPage: 1,
+// 			lastPage: 10,
+// 			currentFromID: 1,
+// 			currentToID: 20,
+// 			difference: 0,
+// 		};
+// 		this.apiManager = new ApiManager("http://localhost:2050/");
+// 		this.isFunctionRunning = false
+// 	}
+// }
 
 // The following would handle all the variable properties that is being changed a lot
 function globalInitializer() {
@@ -146,9 +160,9 @@ function pageNumbers(start: number, end: number): Promise<void> {
 				$(this).addClass("active");
 				isFunctionRunning = false;
 				return showRecords(fromID, toID)
-				.catch((error) => {
-					throw error;
-				})
+					.catch((error) => {
+						throw error;
+					})
 			});
 		})
 		.then(() => {
@@ -167,28 +181,18 @@ function pageNumbers(start: number, end: number): Promise<void> {
 
 // Adding a click event to the next button of the pagination.
 $(".next").on("click", function () {
-	if (isFunctionRunning) {
-		return;
-	}
-	isFunctionRunning = true;
 	globals.firstPage = globals.lastPage + 1;
 	globals.lastPage = globals.firstPage + 9;
 	$(".pagination").empty();
 	pageNumbers(globals.firstPage, globals.lastPage);
-	isFunctionRunning = false;
 });
 
 // Adding a if statement in the case that pagination start with the page number 1. In the else statement a click event is added for the next button of the pagination.
 $(".prev").on("click", function () {
-	if (isFunctionRunning) {
-		return;
-	}
-	isFunctionRunning = true;
 	globals.lastPage = globals.firstPage - 1;
 	globals.firstPage = globals.lastPage - 9;
 	$(".pagination").empty();
 	pageNumbers(globals.firstPage, globals.lastPage);
-	isFunctionRunning = false;
 });
 
 // Event listener to prevent some characters to be entered in the input
@@ -203,10 +207,6 @@ $('.search-input').on('keydown', function (e) {
 
 // In this function wil do the extract the number entered in the search. Then it would take that and calculate the range which should be displayed for the user to click on. 
 $(".search-input").on("input", function (this: HTMLInputElement, event: any) {
-	if (isFunctionRunning) {
-		return;
-	}
-	isFunctionRunning = true;
 	event.preventDefault();
 	return apiManager.getRecordCount()
 		.then((count) => {
@@ -243,7 +243,6 @@ $(".search-input").on("input", function (this: HTMLInputElement, event: any) {
 			} else {
 				$('.results-box').remove();
 			}
-			isFunctionRunning = false;
 		})
 		.catch((error) => {
 			throw error;
@@ -252,10 +251,7 @@ $(".search-input").on("input", function (this: HTMLInputElement, event: any) {
 
 // After the range has been returned to the user. The user can click on it and that will show the range of records on the table. 
 function resultsSelect(event: any) {
-	if (isFunctionRunning) {
-		return;
-	}
-	isFunctionRunning = true;
+	$('.results-select').prop('disabled', true)
 	let startID: number;
 	let endID: number;
 	let pageEnd: number;
@@ -284,6 +280,9 @@ function resultsSelect(event: any) {
 		})
 		.then(() => {
 			return showRecords(startID, endID);
+		})
+		.then(() => {
+			$('.results-select').prop('disabled', false)
 		})
 		.catch((error) => {
 			throw error;

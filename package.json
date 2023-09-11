@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "This is a JavaScript project for all new developers to complete before venturing into our web frontend codebase.",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "typescript": "^3.8.3"
+  },
   "devDependencies": {
-    "@types/jquery": "^3.5.17",
-    "typescript": "^3.9.2"
+    "@types/jquery": "^3.5.17"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
