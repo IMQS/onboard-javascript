@@ -13,21 +13,16 @@ const state = {
 // Fetch the total number of records from the server.
 function totalRecords(): Promise<number> {
 	return fetch(`${state.IMQS}/recordCount`)
-		.then((recordCountResponse) => recordCountResponse.text())
-		.then((recordCountText) => {
-			const recordCount = JSON.parse(recordCountText);
-			return recordCount;
-		}).catch((error) => {
+		.then((recordCountResponse) => recordCountResponse.json())
+		.catch((error) => {
 			throw error;
-		})
+		});
 }
 
 // Fetch column names and creates them as table headings
-function fetchColumns() {
+function fetchColumns(): Promise<void> {
 	return fetch(`${state.IMQS}/columns`)
-		.then((columnsResponse) => {
-			return columnsResponse.json();
-		})
+		.then((columnsResponse) => columnsResponse.json())
 		.then(async (columns) => {
 			const tableHeaderRow = $("#tableHeaderRow");
 			for (const columnName of columns) {
@@ -38,9 +33,10 @@ function fetchColumns() {
 			const recordCount = await totalRecords();
 			totalPages = Math.ceil(recordCount / state.recordsPerPage);
 			updateScreen();
-		}).catch((error) => {
-			throw error;
 		})
+		.catch((error) => {
+			throw error;
+		});
 }
 
 // Fetch a range of records from the server based on specified indices.
@@ -49,11 +45,10 @@ function fetchRecords(fromRecord: number, toRecord: number): Promise<any> {
 		fromRecord = toRecord
 	}
 	return fetch(`${state.IMQS}/records?from=${fromRecord}&to=${toRecord}`)
-		.then((response) => response.text())
-		.then((dataText) => JSON.parse(dataText))
+		.then((response) => response.json())
 		.catch((error) => {
 			throw error;
-		})
+		});
 }
 
 // Calculate the number of records that can fit on the screen.
@@ -70,7 +65,7 @@ function inputHandling(): Promise<void> {
 		.then((totalRecCount) => {
 			const searchInput = document.getElementById("searchInput") as HTMLInputElement;
 			searchInput.max = (totalRecCount - 1).toString();
-		})
+		});
 }
 
 function debounce(func: any, delay: number) {
@@ -80,7 +75,7 @@ function debounce(func: any, delay: number) {
 		timeoutId = setTimeout(() => {
 			func(...args);
 		}, delay);
-	}
+	};
 }
 
 // Display records on the page based on the specified range.
@@ -89,7 +84,7 @@ async function displayData(fromRecord: number, recordsDisplayed: number) {
 	$("#tableWrapper").hide();
 	let isSearchMode = state.searchedIndex !== null;
 	const searchIndexOnPage = isSearchMode ? state.searchedIndex! - fromRecord : 0;
-	fromRecord = Math.max(fromRecord, 1);
+	fromRecord = Math.max(fromRecord, 0);
 	const recordCount = await totalRecords();
 	const maximumRecords = Math.min(recordCount - fromRecord, recordsDisplayed);
 	const toRecord = fromRecord + maximumRecords - 1;
@@ -122,11 +117,12 @@ async function displayData(fromRecord: number, recordsDisplayed: number) {
 }
 
 // Search for records by a given value and display them on the page.
-async function searchMethod(searchValue: any) {
-	searchValue = Math.min(searchValue, (await totalRecords()) - 1);
+async function searchMethod(searchValue: any): Promise<void> {
+	const totalRecCount = await totalRecords();
+	searchValue = Math.min(searchValue, totalRecCount - 1);
 	let targetPage = Math.ceil((searchValue + 1) / state.recordsPerPage);
 	targetPage = Math.min(targetPage, totalPages);
-	const lastRecordIndex = (await totalRecords()) - 1;
+	const lastRecordIndex = totalRecCount - 1;
 	const searchIndex = Math.min(searchValue, lastRecordIndex);
 	const searchPage = Math.ceil((searchIndex + 1) / state.recordsPerPage);
 	const fromRecord = Math.max(searchIndex - (state.recordsPerPage - 1), 0);
@@ -162,13 +158,15 @@ async function searchMethod(searchValue: any) {
 			} else {
 				$("#nextPageButton").show();
 			}
-		}).catch((error) => {
-			throw error;
 		})
+		.catch((error) => {
+			throw error;
+		});
 }
 
+
 // Update the screen layout and display records based on the current screen/window size
-async function updateScreen() {
+async function updateScreen(): Promise<void> {
 	const newScreenHeight = window.innerHeight;
 	totalRecords();
 	state.recordsPerPage = screenCalculations(newScreenHeight);
@@ -219,32 +217,35 @@ window.onload = async function () {
 			.then(() => {
 				$("#loader").hide();
 				$("#tableWrapper").show();
-			}).catch((error) => {
+			})
+			.catch((error) => {
 				throw (error);
 			});
-	}, 150))
+	}, 250))
 
-	$("#searchInput").on("keydown", function (e) {
+	$("#searchInput").on("keydown", (e) => {
 		if (e.key === "e" || e.key === "E" || e.key === "."
 			|| e.key === "+" || e.key === "-") {
 			e.preventDefault();
 		}
-	})
+	});
 
-	$("#searchForm").submit(async function (e) {
+	$("#searchForm").submit(async (e) => {
 		e.preventDefault();
 		const searchValue = $("#searchInput").val();
 		$("#tableWrapper").hide();
 		$("#loader").show();
 		state.searchedIndex = null;
-		await searchMethod(searchValue);
-		if (state.searchedIndex !== null) {
-			currentPage = Math.ceil((state.searchedIndex + 1) / state.recordsPerPage);
-			state.currentFirstRecordIndex = Math.max(state.searchedIndex - state.recordsPerPage + 1, 0);
-		};
+		searchMethod(searchValue)
+			.then(() => {
+				if (state.searchedIndex !== null) {
+					currentPage = Math.ceil((state.searchedIndex + 1) / state.recordsPerPage);
+					state.currentFirstRecordIndex = Math.max(state.searchedIndex - state.recordsPerPage + 1, 0);
+				};
+			})
 		$("#loader").hide();
 		$("#tableWrapper").show();
-	})
+	});
 
 	$("#prevPageButton").on("click", async () => {
 		if ($("#prevPageButton").hasClass("hidden")) {
@@ -278,11 +279,12 @@ window.onload = async function () {
 					} else if (currentPage < totalPages) {
 						$("#nextPageButton").show();
 					}
-				}, 150);
-			}).catch((error) => {
+				}, 250);
+			})
+			.catch((error) => {
 				throw error;
 			});
-	})
+	});
 
 	$("#nextPageButton").on("click", async () => {
 		if ($("#nextPageButton").hasClass("hidden")) {
@@ -314,8 +316,9 @@ window.onload = async function () {
 					if (state.currentFirstRecordIndex >= totalRecCount) {
 						$("#nextPageButton").hide();
 					}
-				}, 150);
-			}).catch((error) => {
+				}, 250);
+			})
+			.catch((error) => {
 				throw error;
 			});
 	});
