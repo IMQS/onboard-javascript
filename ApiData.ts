@@ -53,8 +53,9 @@ class ApiData {
 				const totalItems = response;
 				this.totalItems = totalItems;
 			})
-			.catch(() => {
-				throw ('Failed to fetch record count.');
+			.catch(error => {
+				console.error('Failed to fetch record count:', error);
+				alert('Failed to fetch record count.');
 			});
 	}
 
@@ -114,8 +115,9 @@ class ApiData {
 				this.displayRecords();
 				this.updatePageInfo();
 			})
-			.catch(() => {
-				throw ('Failed to fetch records');
+			.catch((error) => {
+				console.error ('Failed to fetch records:',error);
+				alert('Error occured while fetching records!');
 			});
 	}
 
@@ -223,7 +225,7 @@ class ApiData {
 			.then(() => {
 				this.updatePageInfo();
 			})
-			.catch((error) => {
+			.catch(error => {
 				console.error("Error fetching records while changing page :", error);
 				alert('Error occured while changing page!');
 			});
@@ -249,7 +251,7 @@ class ApiData {
 				.then(() => {
 					this.updatePageInfo();
 				})
-				.catch((error) => {
+				.catch(error => {
 					console.error("Error fetching records while resizing:", error);
 					alert('Error occured while resizing!');
 				});
