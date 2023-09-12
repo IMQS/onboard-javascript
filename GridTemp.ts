@@ -1,4 +1,4 @@
-/** Class to manage the grid template and display records */
+/** manage the grid template and display records */
 class GridTemplate {
 	private columnNames: ColumnName[] = [];
 	private dataRecords: GridData[] = [];
