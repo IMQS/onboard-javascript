@@ -186,7 +186,6 @@ class ApiData {
 		$('.records').text(`Showing records ${from} to ${to}`);
 	}
 
-
 	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
@@ -197,7 +196,7 @@ class ApiData {
 		let prevBtn = $('#prevBtn');
 		let nextBtn = $('#nextBtn');
 
-		// Check if delta is positive and the next page exceeds the MaxRange.
+		// Check if delta is positive and disable the next page if firstval + pageSize exceeds the MaxRange.
 		if (delta > 0 && this.firstVal + delta * this.pageSize > this.maxRange) {
 
 			this.firstVal = this.lastVal - this.pageSize;
@@ -205,7 +204,7 @@ class ApiData {
 			nextBtn.attr("disabled", "disabled");
 		} else if (delta < 0 && this.firstVal + delta * this.pageSize < 0) {
 
-			// If delta is negative then reset firstVal to 0 and disabled prev button 
+			// If delta is negative then reset firstVal to 0 and disable prev button 
 			this.firstVal = 0;
 			prevBtn.attr("disabled", "disabled");
 			nextBtn.attr("disabled", null);
@@ -229,7 +228,6 @@ class ApiData {
 				alert('Error occured while changing page!');
 			});
 	}
-
 
 	private handleResize = (): void => {
 		const newGridSize = Math.floor((Math.floor(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT) - 1;
@@ -262,6 +260,5 @@ class ApiData {
 		const gridTemplate = new GridTemplate(this.columnNames, this.data);
 		gridTemplate.displayRecords();
 		this.updatePageInfo();
-
 	}
 }
