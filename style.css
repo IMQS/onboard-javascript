@@ -1,3 +1,12 @@
+/* Colors */
+:root {
+	--primary-color: white;
+	--secondary-color: #292929;
+	--tertiary-color: black;
+	--shadow-color: #e3e3e3;
+	--selected-color: #0d6efd;
+  }
+  
 * {
   padding: 0;
   margin: 0;
@@ -11,15 +20,6 @@ body {
   background: var(--shadow-color);
   background-attachment: fixed;
   height: 100vh;
-}
-
-/* Colors */
-:root {
-  --primary-color: white;
-  --secondary-color: #292929;
-  --tertiary-color: black;
-  --shadow-color: #e3e3e3;
-  --selected-color: #0d6efd;
 }
 
 /* BUTTON STARTS */

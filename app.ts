@@ -1,10 +1,9 @@
-let totalPages: number;
-let currentPage: number;
-
 const state = {
 	IMQS: "http://localhost:2050",
 	currentValueOfFirstRecord: 1,
-	currentFirstRecordIndex: 1,
+	currentFirstRecordIndex: 0,
+	currentPage: 1,
+	totalPages: 1,
 	recordsPerPage: 16,
 	searchedIndex: null as number | null,
 	isButtonDisabled: false
@@ -13,26 +12,34 @@ const state = {
 // Fetch the total number of records from the server.
 function totalRecords(): Promise<number> {
 	return fetch(`${state.IMQS}/recordCount`)
-		.then((recordCountResponse) => recordCountResponse.json())
+		.then((recordCountResponse) => {
+			if (!recordCountResponse.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return recordCountResponse.json();
+		})
 		.catch((error) => {
 			throw error;
 		});
 }
 
-// Fetch column names and creates them as table headings
-function fetchColumns(): Promise<void> {
+// Fetch column names and create them as table headings
+function fetchColumns(): Promise<string[]> {
 	return fetch(`${state.IMQS}/columns`)
-		.then((columnsResponse) => columnsResponse.json())
-		.then(async (columns) => {
+		.then((columnsResponse) => {
+			if (!columnsResponse.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return columnsResponse.json();
+		})
+		.then((columns: string[]) => {
 			const tableHeaderRow = $("#tableHeaderRow");
 			for (const columnName of columns) {
 				const th = document.createElement("th");
 				th.textContent = columnName;
 				tableHeaderRow.append(th);
 			}
-			const recordCount = await totalRecords();
-			totalPages = Math.ceil(recordCount / state.recordsPerPage);
-			updateScreen();
+			return columns;
 		})
 		.catch((error) => {
 			throw error;
@@ -42,28 +49,36 @@ function fetchColumns(): Promise<void> {
 // Fetch a range of records from the server based on specified indices.
 function fetchRecords(fromRecord: number, toRecord: number): Promise<any> {
 	if (fromRecord > toRecord) {
-		fromRecord = toRecord
+		throw new Error('Invalid arguments: fromRecord cannot be greater than toRecord');
 	}
 	return fetch(`${state.IMQS}/records?from=${fromRecord}&to=${toRecord}`)
-		.then((response) => response.json())
+		.then((response) => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return response.json();
+		})
 		.catch((error) => {
 			throw error;
 		});
 }
 
 // Calculate the number of records that can fit on the screen.
-function screenCalculations(screenHeight: number): number {
+function windowAdjustments(screenHeight: number): number {
 	const estimatedRowHeightFactor = 1;
 	const estimatedRowHeight = estimatedRowHeightFactor * 50;
-	const recordsPerPage = Math.floor(screenHeight / estimatedRowHeight) - 1;
-	return Math.max(recordsPerPage - 2, 1);
+	const availableScreenHeight = screenHeight - 150;
+	const recordsPerPage = Math.floor(availableScreenHeight / estimatedRowHeight);
+	// Ensure a minimum of 1 record per page.
+	return Math.max(recordsPerPage, 1);
 }
 
 // Handles the input for the search
 function inputHandling(): Promise<void> {
 	return totalRecords()
-		.then((totalRecCount) => {
+		.then(totalRecCount => {
 			const searchInput = document.getElementById("searchInput") as HTMLInputElement;
+			searchInput.min = "0";
 			searchInput.max = (totalRecCount - 1).toString();
 		});
 }
@@ -79,37 +94,31 @@ function debounce(func: any, delay: number) {
 }
 
 // Display records on the page based on the specified range.
-async function displayData(fromRecord: number, recordsDisplayed: number) {
+async function displayData(fromRecord: number, recordsDisplayed: number): Promise<any> {
 	$("#loader").show();
 	$("#tableWrapper").hide();
-	let isSearchMode = state.searchedIndex !== null;
-	const searchIndexOnPage = isSearchMode ? state.searchedIndex! - fromRecord : 0;
-	fromRecord = Math.max(fromRecord, 0);
+	const adjustedFromRecord = Math.max(fromRecord, 0);
 	const recordCount = await totalRecords();
-	const maximumRecords = Math.min(recordCount - fromRecord, recordsDisplayed);
-	const toRecord = fromRecord + maximumRecords - 1;
-	const data = await fetchRecords(fromRecord, toRecord);
+	state.totalPages = Math.ceil(recordCount / state.recordsPerPage);
+	if (state.currentPage * state.recordsPerPage > recordCount) {
+		throw new Error('Requested records exceed the total record count');
+	}
+	const maximumRecords = Math.min(recordCount - adjustedFromRecord, recordsDisplayed);
+	const toRecord = adjustedFromRecord + maximumRecords - 1;
+	const data = await fetchRecords(adjustedFromRecord, toRecord);
 	let tableData = "";
-	if (isSearchMode) {
-		if (currentPage * state.recordsPerPage > recordCount) {
-			recordsDisplayed = recordCount - fromRecord;
-		}
+	if (data && data.length > 0) {
 		state.currentValueOfFirstRecord = parseInt(data[0][0]);
-		state.currentFirstRecordIndex = fromRecord;
-		if (recordsDisplayed >= 16) {
-			currentPage = totalPages;
-			state.currentFirstRecordIndex = (totalPages - 1) * state.recordsPerPage;
+		state.currentFirstRecordIndex = adjustedFromRecord;
+		for (const record of data) {
+			tableData += "<tr>";
+			for (const value of record) {
+				tableData += `<td>${value}</td>`;
+			}
+			tableData += "</tr>";
 		}
 	} else {
-		fromRecord = Math.max(
-			fromRecord + searchIndexOnPage - (recordsDisplayed - 1), 0);
-	}
-	for (const record of data) {
-		tableData += "<tr>";
-		for (const value of record) {
-			tableData += `<td>${value}</td>`;
-		}
-		tableData += "</tr>";
+		throw new Error('No valid records found');
 	}
 	$("#tableBody").html(tableData);
 	$("#loader").hide();
@@ -117,32 +126,28 @@ async function displayData(fromRecord: number, recordsDisplayed: number) {
 }
 
 // Search for records by a given value and display them on the page.
-async function searchMethod(searchValue: any): Promise<void> {
+async function searchMethod(searchValue: number): Promise<void> {
 	const totalRecCount = await totalRecords();
 	searchValue = Math.min(searchValue, totalRecCount - 1);
-	let targetPage = Math.ceil((searchValue + 1) / state.recordsPerPage);
-	targetPage = Math.min(targetPage, totalPages);
 	const lastRecordIndex = totalRecCount - 1;
 	const searchIndex = Math.min(searchValue, lastRecordIndex);
-	const searchPage = Math.ceil((searchIndex + 1) / state.recordsPerPage);
+	const targetPage = Math.ceil((searchIndex + 1) / state.recordsPerPage);
 	const fromRecord = Math.max(searchIndex - (state.recordsPerPage - 1), 0);
 	const toRecord = Math.min(fromRecord + state.recordsPerPage - 1, lastRecordIndex);
 	return fetchRecords(fromRecord, toRecord)
 		.then((records) => {
 			let foundIndex = -1;
-			let recordIndex = 0;
-			for (const record of records) {
-				const idValue = parseInt(record[0]);
+			for (let recordIndex = 0; recordIndex < records.length; recordIndex++) {
+				const idValue = parseInt(records[recordIndex][0]);
 				if (idValue === searchValue) {
 					foundIndex = fromRecord + recordIndex;
 					break;
 				}
-				recordIndex++;
 			}
 			if (foundIndex !== -1) {
 				state.searchedIndex = foundIndex;
-				currentPage = searchPage;
-				state.currentFirstRecordIndex = (searchPage - 1) * state.recordsPerPage;
+				state.currentPage = targetPage;
+				state.currentFirstRecordIndex = (targetPage - 1) * state.recordsPerPage;
 				return displayData(state.currentFirstRecordIndex, state.recordsPerPage);
 			} else {
 				state.searchedIndex = null;
@@ -153,7 +158,7 @@ async function searchMethod(searchValue: any): Promise<void> {
 			$("#loader").hide();
 			$("#tableWrapper").show();
 			$("#prevPageButton").show();
-			if (searchPage === totalPages) {
+			if (targetPage === state.totalPages) {
 				$("#nextPageButton").hide();
 			} else {
 				$("#nextPageButton").show();
@@ -164,64 +169,64 @@ async function searchMethod(searchValue: any): Promise<void> {
 		});
 }
 
-
 // Update the screen layout and display records based on the current screen/window size
 async function updateScreen(): Promise<void> {
 	const newScreenHeight = window.innerHeight;
-	totalRecords();
-	state.recordsPerPage = screenCalculations(newScreenHeight);
+	state.recordsPerPage = windowAdjustments(newScreenHeight);
 	$("#loader").show();
 	$("#tableWrapper").hide();
 	if (state.searchedIndex !== null) {
-		const searchPage = Math.ceil((state.searchedIndex + 1) / state.recordsPerPage);
 		const searchPageIndex = state.searchedIndex % state.recordsPerPage;
-		state.searchedIndex = (searchPage - 1) * state.recordsPerPage + searchPageIndex;
-		displayData(Math.max(state.searchedIndex - state.recordsPerPage + 1, 0), state.recordsPerPage);
+		const firstRecordOfCurrentPage = (state.currentPage - 1) * state.recordsPerPage;
+		if (searchPageIndex >= firstRecordOfCurrentPage && searchPageIndex < firstRecordOfCurrentPage + state.recordsPerPage) {
+			displayData(firstRecordOfCurrentPage, state.recordsPerPage);
+		} else {
+			state.currentPage = Math.ceil((state.searchedIndex + 1) / state.recordsPerPage);
+			state.currentFirstRecordIndex = Math.max(state.searchedIndex - state.recordsPerPage + 1, 0);
+			displayData(state.currentFirstRecordIndex, state.recordsPerPage);
+		}
 	} else {
 		const previousFirstRecordIndex = state.currentFirstRecordIndex;
-		currentPage = Math.ceil((state.currentFirstRecordIndex + 1) / state.recordsPerPage);
+		state.currentPage = Math.ceil((state.currentFirstRecordIndex + 1) / state.recordsPerPage);
+		displayData(state.currentFirstRecordIndex, state.recordsPerPage);
+	}
+	const totalRecCount = await totalRecords();
+	if (state.currentPage * state.recordsPerPage > totalRecCount - 1) {
+		// Go to the last page if necessary
+		const lastPage = Math.ceil(totalRecCount / state.recordsPerPage);
+		state.currentPage = lastPage;
+		state.currentFirstRecordIndex = (lastPage - 1) * state.recordsPerPage;
 		displayData(state.currentFirstRecordIndex, state.recordsPerPage);
 	}
 	$("#loader").hide();
 	$("#tableWrapper").show();
-	if (currentPage === totalPages) {
+	if (state.currentPage === state.totalPages) {
 		$("#nextPageButton").hide();
 	} else {
 		$("#nextPageButton").show();
 	}
-	if (state.currentFirstRecordIndex <= 1) {
+	if (state.currentFirstRecordIndex <= 0) {
 		$("#prevPageButton").hide();
 	} else {
 		$("#prevPageButton").show();
 	}
 }
 
-window.onload = async function () {
+window.onload = () => {
 	$("#loader").hide();
 	updateScreen();
 	fetchColumns();
 	inputHandling();
-	$(window).on("resize", debounce(async () => {
-		$("#tableWrapper").hide();
-		$("#loader").show();
+	$(window).on("resize", debounce(() => {
 		updateScreen()
-			.then(async () => {
-				const totalRecCount = await totalRecords();
-				if (currentPage * state.recordsPerPage > totalRecCount - 1) {
-					const lastPage = Math.ceil(totalRecCount / state.recordsPerPage);
-					currentPage = lastPage;
-					state.currentFirstRecordIndex = (lastPage - 1) * state.recordsPerPage;
-					return displayData(state.currentFirstRecordIndex, state.recordsPerPage);
-				}
-			})
 			.then(() => {
 				$("#loader").hide();
 				$("#tableWrapper").show();
 			})
-			.catch((error) => {
-				throw (error);
+			.catch(error => {
+				throw error('Error trying to resize the page:');
 			});
-	}, 250))
+	}, 250));
 
 	$("#searchInput").on("keydown", (e) => {
 		if (e.key === "e" || e.key === "E" || e.key === "."
@@ -230,19 +235,23 @@ window.onload = async function () {
 		}
 	});
 
-	$("#searchForm").submit(async (e) => {
+	$("#searchForm").submit((e) => {
 		e.preventDefault();
-		const searchValue = $("#searchInput").val();
+		const searchInput = document.getElementById("searchInput") as HTMLInputElement;
+		const searchValue = Number(searchInput.value);
 		$("#tableWrapper").hide();
 		$("#loader").show();
 		state.searchedIndex = null;
 		searchMethod(searchValue)
 			.then(() => {
 				if (state.searchedIndex !== null) {
-					currentPage = Math.ceil((state.searchedIndex + 1) / state.recordsPerPage);
+					state.currentPage = Math.ceil((state.searchedIndex + 1) / state.recordsPerPage);
 					state.currentFirstRecordIndex = Math.max(state.searchedIndex - state.recordsPerPage + 1, 0);
 				};
 			})
+			.catch(error => {
+				throw error('Error with searching function');
+			});
 		$("#loader").hide();
 		$("#tableWrapper").show();
 	});
@@ -251,14 +260,17 @@ window.onload = async function () {
 		if ($("#prevPageButton").hasClass("hidden")) {
 			return;
 		}
+		if (state.currentPage <= 1) {
+			throw new Error("Already on the first page");
+		}
 		$("#prevPageButton").addClass("hidden");
 		state.searchedIndex = null;
-		const firstRecordOfCurrentPage = (currentPage - 1) * state.recordsPerPage;
-		if (firstRecordOfCurrentPage <= 16) {
-			currentPage = 1;
-			state.currentFirstRecordIndex = 1;
+		const firstRecordOfCurrentPage = (state.currentPage - 1) * state.recordsPerPage;
+		if (firstRecordOfCurrentPage <= state.recordsPerPage) {
+			state.currentPage = 1;
+			state.currentFirstRecordIndex = 0;
 		} else {
-			currentPage--;
+			state.currentPage--;
 			state.currentFirstRecordIndex -= state.recordsPerPage;
 		}
 		const fromRecord = state.currentFirstRecordIndex;
@@ -268,20 +280,18 @@ window.onload = async function () {
 		$("#loader").show();
 		displayData(fromRecord, state.recordsPerPage)
 			.then(() => {
-				setTimeout(() => {
+				$("#nextPageButton").show();
+				$("#prevPageButton").show();
+				$("#prevPageButton").removeClass("hidden");
+				$("#loader").hide();
+				$("#tableWrapper").show();
+				if (state.currentFirstRecordIndex <= 0) {
+					$("#prevPageButton").hide();
+				} else if (state.currentPage < state.totalPages) {
 					$("#nextPageButton").show();
-					$("#prevPageButton").show();
-					$("#prevPageButton").removeClass("hidden");
-					$("#loader").hide();
-					$("#tableWrapper").show();
-					if (state.currentFirstRecordIndex <= 1) {
-						$("#prevPageButton").hide();
-					} else if (currentPage < totalPages) {
-						$("#nextPageButton").show();
-					}
-				}, 250);
+				}
 			})
-			.catch((error) => {
+			.catch(error => {
 				throw error;
 			});
 	});
@@ -290,15 +300,17 @@ window.onload = async function () {
 		if ($("#nextPageButton").hasClass("hidden")) {
 			return;
 		}
+		if (state.currentPage >= state.totalPages) {
+			throw new Error("Already on the last page");
+		}
 		$("#nextPageButton").addClass("hidden");
 		state.searchedIndex = null;
 		const totalRecCount = await totalRecords();
-		const remainingRecords = totalRecCount - (currentPage * state.recordsPerPage);
-		if (remainingRecords > 0 && currentPage < totalPages) {
-			currentPage++;
+		if (state.currentPage < state.totalPages) {
+			state.currentPage++;
 			state.currentFirstRecordIndex += state.recordsPerPage;
 		} else {
-			currentPage = totalPages;
+			state.currentPage = state.totalPages;
 		}
 		let fromRecord = state.currentFirstRecordIndex;
 		$("#nextPageButton").hide();
@@ -307,20 +319,17 @@ window.onload = async function () {
 		$("#loader").show();
 		displayData(fromRecord, state.recordsPerPage)
 			.then(() => {
-				setTimeout(() => {
-					$("#nextPageButton").show();
-					$("#prevPageButton").show();
-					$("#nextPageButton").removeClass("hidden");
-					$("#loader").hide();
-					$("#tableWrapper").show();
-					if (state.currentFirstRecordIndex >= totalRecCount) {
-						$("#nextPageButton").hide();
-					}
-				}, 250);
+				$("#nextPageButton").show();
+				$("#prevPageButton").show();
+				$("#nextPageButton").removeClass("hidden");
+				$("#loader").hide();
+				$("#tableWrapper").show();
+				if (state.currentFirstRecordIndex >= totalRecCount) {
+					$("#nextPageButton").hide();
+				}
 			})
-			.catch((error) => {
+			.catch(error => {
 				throw error;
 			});
 	});
-
 }
