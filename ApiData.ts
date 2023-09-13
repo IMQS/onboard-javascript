@@ -231,7 +231,7 @@ class ApiData {
 			});
 	}
 
-	private handleResize = (): void => {
+	private handleResize(): void {
 		const newGridSize = Math.floor((Math.floor(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT) - 1;
 
 		// Check if the new grid size is non-negative
@@ -257,7 +257,7 @@ class ApiData {
 		}
 	}
 
-	private displayRecords = (): void => {
+	private displayRecords():void {
 		const gridTemplate = new GridTemplate(this.columnNames, this.data);
 		gridTemplate.displayRecords();
 		this.updatePageInfo();
