@@ -35,7 +35,6 @@ class ApiData {
 	constructor(pageSize: number) {
 		this.pageSize = pageSize;
 		this.maxRange = 0;
-
 	}
 
 	/** Initialize method to set up the grid */
@@ -43,28 +42,30 @@ class ApiData {
 		this.adjustGridHeight();
 		return this.recordCount()
 			.then(() => this.fetchColumns())
-			.then(() => this.fetchRecords())
+			.then(() => this.fetchAndDisplayRecords())
 			.then(() => this.setupControls());
 	}
+
 	/** Fetch total record count from the server */
 	recordCount(): Promise<void> {
 		return this.fetchData('http://localhost:2050/recordCount')
-			.then((response: any) => {
-				const totalItems = response;
+			.then((response: number | string) => {
+				const totalItems = <number>response;
 				this.totalItems = totalItems;
 			})
 			.catch(error => {
 				console.error('Failed to fetch record count:', error);
 				alert('Failed to fetch record count.');
+				throw new Error('Failed to fetch record count.');
 			});
 	}
 
-	/** fectch column names */
+
 	fetchColumns(): Promise<void> {
 		return this.fetchData('http://localhost:2050/columns')
-			.then((response: any) => {
-				const res = JSON.parse(response);
-				this.columnNames = res.map((columnName: any) => ({ name: columnName }));
+			.then((response:number|string) => {
+				const res = JSON.parse(<string>(response));
+				this.columnNames = res.map((columnName: string) => ({ name: columnName }));
 				this.data = new Array<GridData>(this.columnNames.length);
 			})
 			.catch(() => {
@@ -78,9 +79,9 @@ class ApiData {
 		$('#grid').hide();
 
 		return this.fetchData(`http://localhost:2050/records?from=${from}&to=${to}`)
-			.then((response: any) => {
-				const res = JSON.parse(response);
-				const processedData = res.map((record: any) => {
+			.then((response:number|string) => {
+				const res = JSON.parse(<string>(response));
+				const processedData = res.map((record: string) => {
 					const obj: GridData = {};
 					for (let j = 0; j < this.columnNames.length && j < record.length; j++) {
 						obj[this.columnNames[j].name] = record[j];
@@ -96,8 +97,8 @@ class ApiData {
 			});
 	}
 
-	/** fetch records from api */
-	fetchRecords(): Promise<void> {
+	/** Fetch records from the API, process them, display them, and update page info. */
+	fetchAndDisplayRecords(): Promise<void> {
 		this.maxRange = this.totalItems - 1;
 		let from = this.firstVal;
 		let to = Math.min(from + this.pageSize, this.maxRange);
@@ -105,7 +106,7 @@ class ApiData {
 		if (to >= this.maxRange) {
 			const lastPage = Math.floor(this.maxRange / this.pageSize) + 1;
 			this.currentPage = lastPage;
-			from = Math.min(this.maxRange - this.pageSize);
+			from = this.maxRange - this.pageSize;
 			to = this.maxRange;
 		}
 
@@ -115,7 +116,7 @@ class ApiData {
 				this.displayRecords();
 				this.updatePageInfo();
 			})
-			.catch((error) => {
+			.catch(error => {
 				console.error ('Failed to fetch records:',error);
 				alert('Error occured while fetching records!');
 			});
@@ -135,7 +136,7 @@ class ApiData {
 			}
 
 			return this.fetchAndProcessRecords(from, from + pageSize)
-				.then((processedData) => {
+				.then(processedData => {
 					this.data = processedData;
 					this.currentPage = Math.ceil(from / this.pageSize) + 1;
 					// Set firstVal to searched value
@@ -144,7 +145,7 @@ class ApiData {
 					this.lastVal = from + this.pageSize - 1;
 					this.displayRecords();
 					this.updatePageInfo();
-					//empty search input after searching 
+					// empty search input after searching 
 					$('#fromInput').val('');
 				})
 				.catch(() => {
@@ -215,13 +216,12 @@ class ApiData {
 			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * this.pageSize, this.maxRange));
 			prevBtn.attr("disabled", null);
 			nextBtn.attr("disabled", null);
-
 		}
 
 		this.lastVal = this.firstVal + delta * this.pageSize;
 		this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
 
-		this.fetchRecords()
+		this.fetchAndDisplayRecords()
 			.then(() => {
 				this.updatePageInfo();
 			})
@@ -239,7 +239,6 @@ class ApiData {
 			// Adjust firstVal for the last page
 			if (this.firstVal + newGridSize > this.maxRange) {
 				this.firstVal = Math.min(this.maxRange - newGridSize);
-
 			}
 
 			this.pageSize = newGridSize;
@@ -247,7 +246,7 @@ class ApiData {
 
 			this.adjustGridHeight();
 
-			this.fetchRecords()
+			this.fetchAndDisplayRecords()
 				.then(() => {
 					this.updatePageInfo();
 				})
