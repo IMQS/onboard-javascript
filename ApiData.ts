@@ -191,7 +191,7 @@ class ApiData {
 	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
-		$(window).on('resize', debounce(this.handleResize, 250));
+		$(window).on('resize', debounce(this.handleResize, 100));
 	}
 
 	private handlePageChange(delta: number): void {
