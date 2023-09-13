@@ -18,7 +18,7 @@ body::-webkit-scrollbar {
 
 h1 {
 	text-align: center;
-	font-family: 'Atma', cursive;
+	font-family: monospace;
 	font-size: 2.5rem;
 	color: #4DD2C6;
 }
@@ -59,7 +59,7 @@ table {
 }
 
 th {
-	font-family: 'Atma', cursive;
+	font-family: monospace;
 	font-size: 1rem;
 	border: 0.5px solid #4DD2C6;
 	color: #4DD2C6;
@@ -92,7 +92,7 @@ thead {
 	border: 0px;
 	background-color: #ffffff36;
 	color: white;
-	font-family: 'Atma', cursive;
+	font-family: monospace;
 	letter-spacing: 2px;
 	padding-left: 10px;
 }

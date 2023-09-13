@@ -31,6 +31,7 @@ class ApiManager {
 
 	/** Retrieves the number of records there are */
 	getRecordCount(): Promise<number> {
+		let test = `${this.mainUrl}recordCount`
 		return this.fetchJson(`${this.mainUrl}recordCount`);
 	}
 }
