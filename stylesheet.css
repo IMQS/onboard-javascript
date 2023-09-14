@@ -14,12 +14,14 @@
 #main-container {
   margin: 0 auto;
   background-color: #fff;
+  
 }
 
 html, body {
   font-family: 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: #333;
   margin-bottom: 0;
+  overflow: hidden;
 }
 
 /* Apply background color and text color to the table headers */
@@ -44,6 +46,7 @@ td {
 /* Style the table itself for gridlines */
 table {
   border-collapse: collapse;
+ 
 }
 
 #myTable {
@@ -52,7 +55,7 @@ table {
   border: 1px solid #a1e3a1; 
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+ 
 }
 
 .highlighted-green td {
