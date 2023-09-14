@@ -67,11 +67,12 @@ class InitializeApp {
 			})
 			.then((columns: string[]) => {
 				const tableHeaderRow = $("#tableHeaderRow");
+
 				for (const columnName of columns) {
-					const th = document.createElement("th");
-					th.textContent = columnName;
+					const th = $("<th>").text(columnName);
 					tableHeaderRow.append(th);
 				}
+
 				return columns;
 			})
 			.catch(error => {
@@ -79,6 +80,7 @@ class InitializeApp {
 				return [];
 			});
 	}
+
 
 	/** Fetch records within a specified range */
 	fetchRecords(fromRecord: number, toRecord: number): Promise<string[]> {
@@ -208,7 +210,7 @@ class InitializeApp {
 						return this.displayData(firstRecordOfCurrentPage, this.recordsPerPage);
 					} else {
 						this.currentPage = Math.ceil((this.searchedIndex + 1) / this.recordsPerPage);
-						this.currentFirstRecordIndex = Math.max(this.searchedIndex - this.recordsPerPage, 0);
+						this.currentFirstRecordIndex = Math.max(this.searchedIndex - this.recordsPerPage + 1, 0);
 						return this.displayData(this.currentFirstRecordIndex, this.recordsPerPage);
 					}
 				} else {
@@ -277,8 +279,8 @@ class InitializeApp {
 		/** Handle form submission for searching */
 		$("#searchForm").submit((e) => {
 			e.preventDefault();
-			const searchInput = document.getElementById("searchInput") as HTMLInputElement;
-			const searchValue = Number(searchInput.value);
+			const searchInputValue = $("#searchInput").val() as string;
+			const searchValue = Number(searchInputValue);
 			$("#tableWrapper").hide();
 			$("#loader").show();
 			this.searchedIndex = null;
