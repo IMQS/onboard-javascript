@@ -203,18 +203,15 @@ class ApiData {
 
 		// Check if delta(change in page number) is positive and disable the next page if firstval + pageSize exceeds the MaxRange.
 		if (delta > 0 && this.firstVal + delta * this.pageSize > this.maxRange) {
-
 			this.firstVal = this.lastVal - this.pageSize;
 			prevBtn.attr("disabled", null);
 			nextBtn.attr("disabled", "disabled");
 		} else if (delta < 0 && this.firstVal + delta * this.pageSize < 0) {
-
 			// If delta is negative then reset firstVal to 0 and disable prev button 
 			this.firstVal = 0;
 			prevBtn.attr("disabled", "disabled");
 			nextBtn.attr("disabled", null);
 		} else {
-
 			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * this.pageSize, this.maxRange));
 			prevBtn.attr("disabled", null);
 			nextBtn.attr("disabled", null);
