@@ -63,7 +63,7 @@ class ApiData {
 
 	fetchColumns(): Promise<void> {
 		return this.fetchData('http://localhost:2050/columns')
-			.then((response:number|string) => {
+			.then((response: number | string) => {
 				const res = JSON.parse(<string>(response));
 				this.columnNames = res.map((columnName: string) => ({ name: columnName }));
 				this.data = new Array<GridData>(this.columnNames.length);
@@ -79,7 +79,7 @@ class ApiData {
 		$('#grid').hide();
 
 		return this.fetchData(`http://localhost:2050/records?from=${from}&to=${to}`)
-			.then((response:number|string) => {
+			.then((response: number | string) => {
 				const res = JSON.parse(<string>(response));
 				const processedData = res.map((record: string) => {
 					const obj: GridData = {};
@@ -117,7 +117,7 @@ class ApiData {
 				this.updatePageInfo();
 			})
 			.catch(error => {
-				console.error ('Failed to fetch records:',error);
+				console.error('Failed to fetch records:', error);
 				alert('Error occured while fetching records!');
 			});
 	}
@@ -231,7 +231,7 @@ class ApiData {
 			});
 	}
 
-	private handleResize(){
+	private handleResize() {
 		const newGridSize = Math.floor((Math.floor(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT) - 1;
 
 		// Check if the new grid size is non-negative
