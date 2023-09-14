@@ -177,7 +177,7 @@ class ApiData {
 		if (gridElement && pageCntrl !== undefined && screenHeight !== undefined) {
 			this.maxGridHeight = screenHeight - pageCntrl;
 			gridElement.style.height = `${this.maxGridHeight}px`;
-		};
+		}
 	}
 
 	/** Update the page information and records display based on the current state of the grid. */
