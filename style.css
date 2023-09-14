@@ -238,6 +238,11 @@ a {
 	font-size: 1.4rem;
 }
 
+.highlight {
+	background-color: #FFFF00 !important; 
+	color: black !important;
+}
+
 @keyframes rot {
 	100% {
 		transform: rotate(360deg);
