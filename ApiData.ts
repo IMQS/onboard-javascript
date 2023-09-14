@@ -60,7 +60,7 @@ class ApiData {
 			});
 	}
 
-	/** Use the fetchData() func to make an HTTP request to the API endpoint and process the data returned*/
+	/** Use the fetchData() func to make an HTTP request to the API endpoint and process the data */
 	fetchColumns(): Promise<void> {
 		return this.fetchData('http://localhost:2050/columns')
 			.then((response: number | string) => {
@@ -237,7 +237,7 @@ class ApiData {
 		if (newGridSize >= 0) {
 			// Adjust firstVal for the last page
 			if (this.firstVal + newGridSize > this.maxRange) {
-				this.firstVal = Math.min(this.maxRange - newGridSize);
+				this.firstVal = this.maxRange - newGridSize;
 			}
 
 			this.pageSize = newGridSize;
