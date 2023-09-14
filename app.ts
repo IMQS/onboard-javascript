@@ -67,12 +67,10 @@ class InitializeApp {
 			})
 			.then((columns: string[]) => {
 				const tableHeaderRow = $("#tableHeaderRow");
-
 				for (const columnName of columns) {
 					const th = $("<th>").text(columnName);
 					tableHeaderRow.append(th);
 				}
-
 				return columns;
 			})
 			.catch(error => {
