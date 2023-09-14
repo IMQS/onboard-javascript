@@ -46,7 +46,7 @@ class ApiData {
 			.then(() => this.setupControls());
 	}
 
-	/** Fetch total record count from the server */
+	/** Fetch total record count from the server,fetches data from an API and populates class properties */
 	recordCount(): Promise<void> {
 		return this.fetchData('http://localhost:2050/recordCount')
 			.then((response: number | string) => {
@@ -60,12 +60,13 @@ class ApiData {
 			});
 	}
 
-
+	/** fetchColumns that returns a Promise */
 	fetchColumns(): Promise<void> {
 		return this.fetchData('http://localhost:2050/columns')
 			.then((response: number | string) => {
 				const res = JSON.parse(<string>(response));
 				this.columnNames = res.map((columnName: string) => ({ name: columnName }));
+				// Initialize the 'data' property as an empty array of GridData objects
 				this.data = new Array<GridData>(this.columnNames.length);
 			})
 			.catch(() => {
@@ -97,7 +98,7 @@ class ApiData {
 			});
 	}
 
-	/** Fetch records from the API, process them, display them, and update page info. */
+	/** Fetches records using fetchAndProcessRecords(), processes them, displays them, and updates page information. */
 	fetchAndDisplayRecords(): Promise<void> {
 		this.maxRange = this.totalItems - 1;
 		let from = this.firstVal;
@@ -192,14 +193,15 @@ class ApiData {
 	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
-		$(window).on('resize', debounce(this.handleResize, 100));
+		$(window).on('resize', debounce(this.handleResize.bind(this), 100));
 	}
 
+	/** Handles page navigation by updating the firstVal, lastVal, current page, and enabling/disabling previous and next buttons as needed. */
 	private handlePageChange(delta: number): void {
 		let prevBtn = $('#prevBtn');
 		let nextBtn = $('#nextBtn');
 
-		// Check if delta is positive and disable the next page if firstval + pageSize exceeds the MaxRange.
+		// Check if delta(change in page number) is positive and disable the next page if firstval + pageSize exceeds the MaxRange.
 		if (delta > 0 && this.firstVal + delta * this.pageSize > this.maxRange) {
 
 			this.firstVal = this.lastVal - this.pageSize;
@@ -231,7 +233,7 @@ class ApiData {
 			});
 	}
 
-	private handleResize() {
+	private handleResize(): void {
 		const newGridSize = Math.floor((Math.floor(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT) - 1;
 
 		// Check if the new grid size is non-negative
