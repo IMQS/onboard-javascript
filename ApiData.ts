@@ -60,7 +60,7 @@ class ApiData {
 			});
 	}
 
-	/** fetchColumns that returns a Promise */
+	/** Use the fetchData() func to make an HTTP request to the API endpoint and process the data returned*/
 	fetchColumns(): Promise<void> {
 		return this.fetchData('http://localhost:2050/columns')
 			.then((response: number | string) => {
@@ -74,7 +74,7 @@ class ApiData {
 			});
 	}
 
-	/** get records from API for fetch and search functionality */
+	/** Get records from API for fetch and search functionality */
 	fetchAndProcessRecords(from: number, to: number): Promise<GridData[]> {
 		$('#spinner').show();
 		$('#grid').hide();
