@@ -137,7 +137,6 @@ class RecordManager {
 	/** recalculates the record range that includes inputValue fromm user */
 	searchRecordsAndResize() {
 		let inputValue = <number>($('#searchInput').val());
-		console.log(inputValue, this.recordCount);
 		if (inputValue < 0 || inputValue > this.recordCount) {
 			$('.modal').css('display', 'block');
 			$('.content').append(`<p>${inputValue} is not a number within the range. Please try a different number</p>`);
