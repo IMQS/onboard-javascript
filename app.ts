@@ -105,13 +105,13 @@ class InitializeApp {
 		this.totalRecords()
 			.then(recordCount => {
 				this.totalPages = Math.ceil(recordCount / this.recordsPerPage);
-				/**  Ensure that the current page is not greater than the total pages */
+				//  Ensure that the current page is not greater than the total pages 
 				if (this.currentPage > this.totalPages) {
 					this.currentPage = this.totalPages;
 					this.currentFirstRecordIndex = Math.max(0, (this.currentPage - 1) * this.recordsPerPage);
 				}
 				const maxToRecord = Math.min(adjustedFromRecord + recordsDisplayed - 1, recordCount - 1);
-				/**  Check if the calculated range exceeds the total records */
+				//  Check if the calculated range exceeds the total records 
 				if (maxToRecord < adjustedFromRecord) {
 					throw new Error('No valid records found');
 				}
@@ -221,7 +221,7 @@ class InitializeApp {
 			})
 			.then(totalRecCount => {
 				if (this.currentPage * this.recordsPerPage > totalRecCount - 1) {
-					/**  Go to the last page if necessary */
+					//  Go to the last page if necessary 
 					const lastPage = Math.ceil(totalRecCount / this.recordsPerPage);
 					this.currentPage = lastPage;
 					this.currentFirstRecordIndex = (lastPage - 1) * this.recordsPerPage;
@@ -248,7 +248,7 @@ class InitializeApp {
 		const estimatedRowHeight = estimatedRowHeightFactor * 50;
 		const availableScreenHeight = screenHeight - 140;
 		const recordsPerPage = Math.floor(availableScreenHeight / estimatedRowHeight);
-		/** This ensures that will at least be 1 record on display */
+		// This ensures that will at least be 1 record on display 
 		return Math.max(recordsPerPage, 1);
 	}
 
