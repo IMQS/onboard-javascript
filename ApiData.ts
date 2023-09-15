@@ -193,7 +193,7 @@ class ApiData {
 	private setupControls(): void {
 		$('#prevBtn').on('click', () => this.handlePageChange(-1));
 		$('#nextBtn').on('click', () => this.handlePageChange(1));
-		$(window).on('resize', debounce(this.handleResize.bind(this), 100));
+		$(window).on('resize', debounce(() => { this.handleResize(); }, 100));
 	}
 
 	/** Handles page navigation by updating the firstVal, lastVal, current page, and enabling/disabling previous and next buttons as needed. */
