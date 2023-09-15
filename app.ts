@@ -47,8 +47,8 @@ class InitializeApp {
 				}
 				return recordCountResponse.json();
 			})
-			.then((recordCountData) => {
-				return recordCountData as number;
+			.then((recordCountData: number) => {
+				return recordCountData;
 			})
 			.catch((error) => {
 				throw error;
@@ -78,7 +78,6 @@ class InitializeApp {
 				return [];
 			});
 	}
-
 
 	/** Fetch records within a specified range */
 	fetchRecords(fromRecord: number, toRecord: number): Promise<string[]> {
@@ -277,7 +276,7 @@ class InitializeApp {
 		/** Handle form submission for searching */
 		$("#searchForm").submit((e) => {
 			e.preventDefault();
-			const searchInputValue = $("#searchInput").val() as string;
+			const searchInputValue = <string> $("#searchInput").val() ;
 			const searchValue = Number(searchInputValue);
 			$("#tableWrapper").hide();
 			$("#loader").show();
