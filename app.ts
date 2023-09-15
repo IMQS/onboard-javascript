@@ -1,230 +1,253 @@
 import { ajax, css } from "jquery";
 
-const myClass = new Myclass();
+class RecordManager {
+	firstNumber: number;
+	lastNumber: number;
+	recordCount: number;
 
-/** Initializes the table head */
-function createTable(): Promise<string[]> {
-	return myClass.fetchColumns()
-		.then(columns => {
-			for (const col of columns) {
-				$(".head").append(`<th>${col}</th>`);
-			}
-			return columns;
-		})
-		.catch(err => {
-			throw 'Error creating table' + err;
-		});
-}
-
-/** calculates the number of rows that can fit the screen */
-const calculatingRows = (): number => {
-	const screenHeight = window.innerHeight;
-	const availableHeight = screenHeight - 105;
-	let rowHeight = 35;
-	if (availableHeight <= 0) {
-		return 0;
-	} else {
-		let maxRows = Math.floor(availableHeight / rowHeight);
-		return maxRows;
+	constructor() {
+		this.firstNumber = 0;
+		this.lastNumber = 0;
+		this.recordCount = 0;
+		this.initialize();
 	}
-};
 
-/** calls to re-display records when screen is adjusted */
-function handleResize(recordCount: number) {
-	$(window).on('resize', () => {
-		clearTimeout(myClass.resizeTimeout);
-		myClass.resizeTimeout = setTimeout(() => {
-			displayRecords(recordCount)
-				.then(() => {
-					let inputValue = $('#searchInput').val();
-					if (inputValue !== '') {
-						return searchRecordsAndResize(recordCount);
-					}
-				})
-				.catch(err => {
-					throw new Error('Error occured while resizing' + err);
-				});
-		}, 250);
-	});
-}
+	initialize() {
+		this.createTableHeader();
+		dataManager.fetchRecordCount()
+			.then(count => {
+				this.recordCount = count - 1;
+				this.updateAndDisplayRecords();
+				this.recordEventHandlers();
+				this.handleResize();
+			})
+			.catch(err => {
+				alert('Error fetching and displaying the table records, reload the page');
+				throw err;
+			});
+	}
 
-/** display records that fit the screen */
-function displayRecords(recordCount: number): Promise<any[]> {
-	$('#loader').show();
-	const inputValue = $('#searchInput').val() as number;
-	const calculatedRows = calculatingRows();
-	const { firstNumber, lastNumber } = calculateFirstAndLastNumbers(calculatedRows, recordCount);
-	updateArrowVisibility(firstNumber, lastNumber, recordCount);
-	return fetchAndDisplayRecords(firstNumber, lastNumber, inputValue)
-		.then(records => {
-			$('#page').empty().append(`Showing record: ${firstNumber} - ${lastNumber}`);
+	/** Initializes the table head */
+	createTableHeader() {
+		return dataManager.fetchColumns()
+			.then(columns => {
+				for (const col of columns) {
+					$(".head").append(`<th>${col}</th>`);
+				}
+			})
+			.catch(err => {
+				alert('Error creating table heading');
+				throw err;
+			});
+	}
+
+	/** calculates the number of rows that can fit the screen */
+	calculatingRows(): number {
+		const screenHeight = window.innerHeight;
+		const availableHeight = screenHeight - 105;
+		let rowHeight = 35;
+		if (availableHeight <= 0) {
+			return 0;
+		} else {
+			let maxRows = Math.floor(availableHeight / rowHeight);
+			return maxRows;
+		}
+	}
+
+	/** fetching records that fit the screen */
+	updateAndDisplayRecords(): Promise<void> {
+		const inputValue = <string>($('#searchInput').val());
+		let errorMessage = '';
+		if (inputValue !== '') {
+		  errorMessage = 'Failed to search, reload the page and search again';
+		  $('#loader').show();
+		  this.searchRecordsAndResize();
+		} else {
+		  errorMessage = 'Error to fetch and display records, reload the page';
+		  $('#loader').show();
+		}
+		this.calculateFirstAndLastNumbers();
+		this.updateArrowVisibility();
+		return this.fetchAndDisplayRecords()
+		  .then(() => {
 			$('#loader').hide();
-			return records;
-		}).catch(err => {
-			throw new Error('Error displaying records' + err);
-		});
-}
+		  })
+		  .catch(err => {
+			alert(errorMessage);
+			throw err;
+		  });
+	  }	  
 
-function calculateFirstAndLastNumbers(calculatedRows: number, recordCount: number) {
-	let firstNumber, lastNumber;
-	if (myClass.firstNumber < 0 || myClass.firstNumber > recordCount) {
-		firstNumber = 0;
-	} else {
-		firstNumber = myClass.firstNumber;
-	}
-	lastNumber = firstNumber + calculatedRows - 1;
-	if (lastNumber >= recordCount) {
-		lastNumber = recordCount;
-		firstNumber = lastNumber - (calculatedRows - 1);
-	}
-	return { firstNumber, lastNumber };
-}
-
-function updateArrowVisibility(firstNumber: number, lastNumber: number, recordCount: number) {
-	if (firstNumber === 0) {
-		$('.arrow-left').hide();
-	} else {
-		$('.arrow-left').show();
+	/** Calculates the firstNumber and lastNumber */
+	calculateFirstAndLastNumbers() {
+		let rowsPerPage = this.calculatingRows();
+		if (this.firstNumber < 0) {
+			this.firstNumber = 0;
+		} else {
+			this.firstNumber = this.firstNumber;
+		}
+		this.lastNumber = this.firstNumber + (rowsPerPage - 1);
+		if (this.lastNumber >= this.recordCount) {
+			this.firstNumber = this.recordCount - (rowsPerPage - 1);
+			this.lastNumber = this.recordCount;
+		}
 	}
 
-	if (lastNumber >= recordCount) {
-		$('.arrow-right').hide();
-	} else {
-		$('.arrow-right').show();
+	updateArrowVisibility() {
+		if (this.firstNumber === 0) {
+			$('.arrow-left').hide();
+		} else {
+			$('.arrow-left').show();
+		}
+		if (this.lastNumber >= this.recordCount) {
+			$('.arrow-right').hide();
+		} else {
+			$('.arrow-right').show();
+		}
 	}
-}
 
-function fetchAndDisplayRecords(firstNumber: number, lastNumber: number, inputValue: number) {
-	return myClass.fetchRecords(firstNumber, lastNumber)
-		.then(records => {
-			const tbody = $("tbody");
-			tbody.empty();
-			for (const record of records) {
-				/** creates row for each record*/
-				$("tbody").append(`<tr class="row"></tr>`);
-				const lastRow = $(".row:last");
-				for (const value of record) {
-					/** assign each record to their column in a specified row */
-					lastRow.append(`<td>${value}</td>`);
+	fetchAndDisplayRecords(): Promise<void> {
+		return dataManager.fetchRecords(this.firstNumber, this.lastNumber)
+			.then(records => {
+				const inputValue = <string>($('#searchInput').val());
+				$("#tableBody").empty();
+				for (const record of records) {
+					// creates row for each record
+					$("tbody").append(`<tr class="row"></tr>`);
+					const lastRow = $(".row:last");
+					for (const value of record) {
+						// assign each record to their column in a specified row
+						lastRow.append(`<td>${value}</td>`);
+						if (value === inputValue) {
+							// highlights the searched row 
+							lastRow.css('background-color', '#DDC0B4');
+						}
+					}
+					$("tbody").append(lastRow);
 				}
-				if (record.includes(inputValue)) {
-					/** highlights the searched row */
-					lastRow.css('background-color', '#DDC0B4');
-				}
-				$("tbody").append(lastRow);
-			}
-			return records;
-		})
-		.catch(err => {
-			throw new Error('Error fetching records' + err);
-		});
-}
+				$('#page').empty().append(`Showing record: ${this.firstNumber} - ${this.lastNumber}`);
+				$('#loader').hide();
+			})
+			.catch(err => {
+				alert('Error while displaying records, reload the page');
+				throw err;
+			});
+	}
 
-/** recalculates the record range that includes inputValue */
-function searchRecordsAndResize(recordCount: number) {
-	let inputValue = $('#searchInput').val() as number;
-	if (inputValue < 0 || inputValue > recordCount) {
-		$('.modal').css('display', 'block');
-		$('.content').append(`<p>${inputValue} is not a number within the range. Please try a different number</p>`);
-		$('#page').empty().append(`Showing record: ${myClass.firstNumber} - ${myClass.lastNumber}`);
+	/** recalculates the record range that includes inputValue fromm user */
+	searchRecordsAndResize() {
+		let inputValue = <number>($('#searchInput').val());
+		console.log(inputValue, this.recordCount);
+		if (inputValue < 0 || inputValue > this.recordCount) {
+			$('.modal').css('display', 'block');
+			$('.content').append(`<p>${inputValue} is not a number within the range. Please try a different number</p>`);
+			$('#page').empty().append(`Showing record: ${this.firstNumber} - ${this.lastNumber}`);
+			$('#searchInput').val('');
+			return;
+		}
+		let calculatedRows = this.calculatingRows();
+		// divides the calculated max rows in half
+		const halfRange = Math.floor(calculatedRows / 2);
+		this.firstNumber = Math.max(0, inputValue - halfRange);
+		this.lastNumber = Math.min(this.recordCount, this.firstNumber + (calculatedRows - 1));
+	}
+
+	/** Navigates to the next set of records */
+	rightArrow() {
 		$('#searchInput').val('');
-		return;
+		// retrieves the last row
+		const lastRow = document.querySelector("#recordsTable tbody .row:last-child");
+		// checks if the last row exists 
+		if (lastRow) {
+			const cells = lastRow.querySelectorAll("td");
+			if (cells.length > 0) {
+				// Get the value of the first cell 
+				const lastID = parseFloat(cells[0].textContent || "");
+				// checks if the last value is within range 
+				if (0 <= lastID && lastID <= this.recordCount) {
+					// calculates the first number of the page 
+					this.firstNumber = lastID + 1;
+					const calculatedRows = this.calculatingRows();
+					// calculates the last number of the page 
+					this.lastNumber = this.firstNumber + (calculatedRows - 1);
+				}
+			}
+		}
+		this.updateAndDisplayRecords();
 	}
-	let calculatedRows = calculatingRows();
-	/** divides the calculated max rows in half*/
-	const halfRange = Math.floor(calculatedRows / 2);
-	myClass.firstNumber = Math.max(0, inputValue - halfRange);
-	myClass.lastNumber = Math.min(recordCount, myClass.firstNumber + (calculatedRows - 1));
-	displayRecords(recordCount);
-}
 
-/** Navigates to the next set of records */
-function rightArrow(recordCount: number) {
-	$('#page').empty();
-	$('#searchInput').val('');
-	/** retrieves the last row */
-	const lastRow = document.querySelector("#recordsTable tbody .row:last-child");
-	/** checks if the last row exists */
-	if (lastRow) {
-		const cells = lastRow.querySelectorAll("td");
-		const lastRecord = [];
-		for (const cell of Array.from(cells)) {
-			lastRecord.push(cell.textContent || "");
+	leftArrow() {
+		$('#searchInput').val('');
+		// retrieves the first row 
+		const firstRow = document.querySelector("#recordsTable tbody .row:first-child");
+		if (firstRow) {
+			const cells = firstRow.querySelectorAll("td");
+			if (cells.length > 0) {
+				const firstID = parseFloat(cells[0].textContent || "");
+				if (0 <= firstID && firstID <= this.recordCount) {
+					const calculatedRows = this.calculatingRows();
+					this.lastNumber = firstID - 1;
+					this.firstNumber = this.lastNumber - (calculatedRows - 1);
+				}
+			}
 		}
-		/** determines te value in the last row */
-		const lastID = parseFloat(lastRecord[0]);
-		/** checks if the last value is within range */
-		if (0 <= lastID && lastID <= recordCount) {
-			$("tbody").empty();
-			/** calculates the first number of the page */
-			myClass.firstNumber = lastID + 1;
-			let calculatedRows = calculatingRows();
-			/** calculates the last number of the page */
-			myClass.lastNumber = myClass.firstNumber + (calculatedRows - 1);
-			displayRecords(recordCount);
-		}
+		this.updateAndDisplayRecords();
 	}
-}
 
-function leftArrow(recordCount: number) {
-	$('#page').empty();
-	$('#searchInput').val('');
-	/** retrieves the first row */
-	const firstRow = document.querySelector("#recordsTable tbody .row:first-child");
-	if (firstRow) {
-		const cells = firstRow.querySelectorAll("td");
-		const firstRecord = [];
-		for (const cell of Array.from(cells)) {
-			firstRecord.push(cell.textContent || "");
-		}
-		/** determines te value in the first row */
-		const firstID = parseFloat(firstRecord[0]);
-		if (0 <= firstID && firstID <= recordCount) {
-			$("tbody").empty();
-			const calculatedRows = calculatingRows();
-			myClass.lastNumber = firstID - 1;
-			myClass.firstNumber = myClass.lastNumber - (calculatedRows - 1);
-			displayRecords(recordCount);
-		}
+	/** calls to re-display records when screen is adjusted */
+	handleResize() {
+		let resizeTimeout: number;
+		$(window).on('resize', () => {
+			clearTimeout(resizeTimeout);
+			resizeTimeout = setTimeout(() => {
+				$('#loader').show();
+				this.updateAndDisplayRecords()
+					.then(() => {
+						$('#loader').hide();
+					})
+					.catch(err => {
+						alert('Error occurred while resizing, reload the page');
+						$('#loader').hide();
+						throw err;
+					});
+			}, 250);
+		});
+	}
+
+	recordEventHandlers() {
+		$('#btnSearch').on('click', (event) => {
+			event.preventDefault();
+			this.updateAndDisplayRecords();
+		});
+
+		$('.arrow-right').on('click', () => {
+			this.rightArrow();
+		});
+
+		$('.arrow-left').on('click', () => {
+			this.leftArrow();
+		});
+
+		$('#closeModalBtn').on("click", () => {
+			$('.content').empty();
+			$('.modal').css('display', 'none');
+		});
+
+		$('#searchInput').on('keydown', (event) => {
+			if (event.key === 'e' || event.key === 'E') {
+				event.preventDefault();
+			}
+		});
+
+		$('#searchInput').on('input', () => {
+			const inputValue = <string>$('#searchInput').val();
+			if (inputValue.includes('.')) {
+				$('#searchInput').val(inputValue.replace('.', ''));
+			}
+		});
 	}
 }
 
 window.onload = () => {
-	createTable();
-	myClass.fetchRecordCount()
-		.then(count => {
-			let recordCount: number = count - 1;
-			displayRecords(recordCount);
-			handleResize(recordCount);
-			searchRecordsAndResize(recordCount);
-			$('#btnSearch').on("click", (event) => {
-				event.preventDefault();
-				$('#page').empty();
-				searchRecordsAndResize(recordCount);
-			});
-			$('.arrow-right').on('click', () => {
-				rightArrow(recordCount);
-			});
-			$('.arrow-left').on('click', () => {
-				leftArrow(recordCount);
-			});
-		})
-		.catch(err => {
-			throw new Error('Error fetching record' + err);
-		});
-	$('#closeModalBtn').on("click", () => {
-		$('.content').empty();
-		$('.modal').css('display', 'none');
-	});
-	$('#searchInput').on('keydown', (event) => {
-		if (event.key === 'e' || event.key === 'E') {
-			event.preventDefault();
-		}
-	});
-	$('#searchInput').on('input', () => {
-		const inputValue = $('#searchInput').val() as string;
-		if (inputValue.includes('.')) {
-			$('#searchInput').val(inputValue.replace('.', ''));
-		}
-	});
+	new RecordManager();
 }

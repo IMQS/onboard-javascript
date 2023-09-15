@@ -1,17 +1,23 @@
-class Myclass {
-	firstNumber: number = 0;
-	lastNumber: number = 0;
-	backend: string = "http://localhost:2050";
-	resizeTimeout: number = 0;
+class dataManager {
+	// firstNumber: number = 0;
+	// lastNumber: number = 0;
+	static backend: string = "http://localhost:2050";
+	// resizeTimeout: number = 0;
 
 	/** fetches the number of records from backend */
-	fetchRecordCount(): Promise<number> {
+	static fetchRecordCount(): Promise<number> {
 		return fetch(`${this.backend}/recordCount`)
 			.then(res => {
 				if (!res.ok) {
 					throw 'Failed to fetch record count';
 				}
-				return res.json();
+				return res.json()
+			})
+			.then(totalRecords => {
+				if(typeof totalRecords !== 'number'){
+					throw new Error('Invalid response format');
+				}
+				return totalRecords;
 			})
 			.catch(err => {
 				throw 'Error fetching the record count: ' + err;
@@ -19,7 +25,7 @@ class Myclass {
 	}
 
 	/** fetches columns from backend */
-	fetchColumns(): Promise<string[]> {
+	static fetchColumns(): Promise<string[]> {
 		return fetch(`${this.backend}/columns`)
 			.then(res => {
 				if (!res.ok) {
@@ -33,7 +39,7 @@ class Myclass {
 	}
 
 	/** fetches records from backend */
-	fetchRecords(from: number, to: number): Promise<any[]> {
+	static fetchRecords(from: number, to: number): Promise<string[]> {
 		return fetch(`${this.backend}/records?from=${from}&to=${to}`)
 			.then(res => {
 				if (!res.ok) {
