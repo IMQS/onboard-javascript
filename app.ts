@@ -349,7 +349,7 @@ class DataHandler {
 			.then(() => {
 				return this.pageNumbers(pageStart, pageEnd);
 			})
-			.catch((error) => {
+			.catch(error => {
 				throw error;
 			})
 	}
