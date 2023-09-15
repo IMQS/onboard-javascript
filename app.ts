@@ -1,5 +1,3 @@
-import { error } from "jquery";
-
 class DataHandler {
 	/** It tracks if the showRecords function is running and would the value would be false if it's not. */
 	private isFunctionRunning: boolean;
@@ -47,7 +45,7 @@ class DataHandler {
 			});
 	}
 
-	// This function will loop through and display the records on the table.
+	/** Fetching the records and rendering it on the DOM in the table*/
 	showRecords(fromID: number, toID: number): Promise<void> {
 		if (this.isFunctionRunning) {
 			return Promise.resolve(undefined);
@@ -89,11 +87,13 @@ class DataHandler {
 				this.isFunctionRunning = false;
 			})
 			.catch(error => {
-				throw new Error(`Failed to retrieve the records: ${error}`);
+				alert("Something went wrong. Click on the button to refresh the page.");
+				location.reload();
+				throw error;
 			});
 	}
 
-	// The following function handles all the functionality of the pagination and the pages. Including what records should be shown in the table.
+	/** Handles pagination functionality and rendering it on the DOM.*/
 	pageNumbers(start: number, end: number): Promise<void> {
 		this.paginationStart = start;
 		this.paginationEnd = end;
@@ -102,15 +102,11 @@ class DataHandler {
 				$('.pagination').empty();
 				let stringCount = count.toLocaleString().replace(/,/g, " ");
 				let maxRecords = this.recordsPerPage();
-				/** This is the last page of all the records. It's calculated based on the amount of records showed
-				 * on the table and the count of the records.*/
+				// This is the last page of all the records. It's calculated based on the amount of records showed
+				// on the table and the count of the records.
 				let lastPage = Math.ceil((count - 1) / maxRecords);
 				if (lastPage <= this.paginationEnd && lastPage >= this.paginationStart) {
-					// if (999999 % maxRecords === 0) {
-					// 	end = (lastPage - 1);
-					// } else {
 					this.paginationEnd = lastPage;
-					// }
 					$(".next").css({ display: "none" });
 				} else {
 					$(".next").css({ display: "block" });
@@ -131,20 +127,21 @@ class DataHandler {
 				}
 			})
 			.catch(error => {
-				throw new Error(`Failed `)
-			})
+				throw error;
+			});
 	}
 
-
-	initializePagination() {
-		// Adding a click event on the pagination pages to display the appropriate number of records for that specific page number.
+	/** Handles all the functionality related to pagination. */
+	initializePagination(): void {
+		// Render the specific amount of records to the DOM based on the current page that it gets from the 
+		// element's attribute value. 
 		$(".pagination").on("click", ".pagination-item", (event) => {
 			$('.pagination-item').prop('disabled', true);
 			return this.apiManager.getRecordCount()
 				.then(count => {
 					$('.search-input').val('');
-					this.currentPage = <number>parseInt($(event.target).attr("value") as any);
-					console.log("$(this):", $(event.target))
+					let returnedId = <string>($(event.target).attr("value"));
+					this.currentPage = parseInt(returnedId);
 					const maxRecords = this.recordsPerPage();
 					let fromID = Math.ceil(this.currentPage * maxRecords - (maxRecords - 1));
 					if (this.difference > 0 && this.difference < maxRecords) {
@@ -167,17 +164,17 @@ class DataHandler {
 							$(this).addClass('active');
 						}
 					});
-
 					return this.showRecords(fromID, toID)
 						.then(() => {
 							$('.pagination-item').prop('disabled', false)
-						})
+						});
 				})
 				.catch(error => {
 					throw new Error(`Failed showing the records when clicking on page number: ${error}`);
 				});
 		})
-		// Adding a click event to the next button of the pagination.
+
+		/** Gives the next set of page numbers based on the last page on the pagination. */
 		$(".next").on("click", () => {
 			this.paginationStart = this.paginationEnd + 1;
 			this.paginationEnd = this.paginationStart + 9;
@@ -185,7 +182,7 @@ class DataHandler {
 			this.pageNumbers(this.paginationStart, this.paginationEnd);
 		});
 
-		// Adding a if statement in the case that pagination start with the page number 1. In the else statement a click event is added for the next button of the pagination.
+		/** Gives the previous set of pages numbers based on the last page in the pagination. */
 		$(".prev").on("click", () => {
 			this.paginationEnd = this.paginationStart - 1;
 			this.paginationStart = this.paginationEnd - 9;
@@ -194,8 +191,9 @@ class DataHandler {
 		});
 	}
 
-	initializeSearch() {
-		// Event listener to prevent some characters to be entered in the input
+	/** Handles all the functionality related to the search. */
+	initializeSearch(): void {
+		/** Prevents certain characters to be entered in the input field. */
 		$('.search-input').on('keydown', (e) => {
 			if (e.key === 'e' || e.key === 'E' || e.key === '.' || e.key === '+' || e.key === '*' || e.key === '-') {
 				e.preventDefault();
@@ -205,7 +203,8 @@ class DataHandler {
 			}
 		});
 
-		// In this function wil do the extract the number entered in the search. Then it would take that and calculate the range which should be displayed for the user to click on. 
+		/** Takes the number entered in the search field and calculates a range and render that 
+		 * on to the DOM. */
 		$(".search-input").on("input", (event: any) => {
 			event.preventDefault();
 			return this.apiManager.getRecordCount()
@@ -249,9 +248,10 @@ class DataHandler {
 				})
 				.catch(error => {
 					throw error;
-				})
+				});
 		});
-		// After the range has been returned to the user. The user can click on it and that will show the range of records on the table. 
+
+		/** Will take the range on the DOM and return records based on that range. */
 		$('.heading').on('click', '.results-select', (event: any) => {
 			$('.results-select').prop('disabled', true);
 			let startID: number;
@@ -264,19 +264,21 @@ class DataHandler {
 					let rangeArray = null;
 					rangeArray = idRange.split('-');
 					$('.results-box').remove();
-					/** Fritz, "Should you not sanitize endID before doing this calculation?" */
 					startID = parseInt(rangeArray[0]);
 					endID = parseInt(rangeArray[1]);
-					let maxRecords = this.recordsPerPage();
-					this.currentPage = Math.ceil(endID / maxRecords);
-					pageEnd = Math.ceil(this.currentPage / 10) * 10;
-					pageStart = pageEnd - 9;
-					if (endID >= count) {
-						/** Fritz, "And if endID is greater than count? or of a different type?" */
-						startID = ((this.currentPage - 1) * maxRecords) + 1;
-						endID = count;
-						this.paginationStart = pageStart;
-						this.paginationEnd = pageEnd;
+					if (!isNaN(endID) && Number.isInteger(endID)) {
+						let maxRecords = this.recordsPerPage();
+						this.currentPage = Math.ceil(endID / maxRecords);
+						pageEnd = Math.ceil(this.currentPage / 10) * 10;
+						pageStart = pageEnd - 9;
+						if (endID >= count) {
+							startID = ((this.currentPage - 1) * maxRecords) + 1;
+							endID = (count - 1);
+							this.paginationStart = pageStart;
+							this.paginationEnd = pageEnd;
+						}
+					} else {
+						throw new Error("Please provide a valid integer.")
 					}
 				})
 				.then(() => {
@@ -286,20 +288,16 @@ class DataHandler {
 					return this.showRecords(startID, endID);
 				})
 				.then(() => {
-					$('.results-select').prop('disabled', false)
+					$('.results-select').prop('disabled', false);
 				})
 				.catch(error => {
 					throw error;
 				});
-		})
+		});
 	}
 
-	// When adjusting the height and on different screen sizes. This function would responsible for calculating how much records should be displayed based on the height of the window itself. 
-	adjustDisplayedRecords() {
-		// if (this.isFunctionRunning) {
-		// 	return;
-		// }
-		// this.isFunctionRunning = true;
+	/** Will calculate the amount records to be shown according to the screen height. */
+	adjustDisplayedRecords(): Promise<void> {
 		let screenHeight = <number>($(window).height());
 		if (screenHeight < 68) {
 			screenHeight = 68;
@@ -327,11 +325,11 @@ class DataHandler {
 					let originalID = (Math.floor(maxRecords * this.currentPage) - (maxRecords - 1));
 					this.difference = this.currentFromID - originalID;
 				} else {
+					if (this.currentToID >= count) {
+						this.currentToID = (count - 1);
+					}
 					if (length > 0) {
 						let newCurrentPage = Math.ceil(inputNumberInt / maxRecords);
-						if (this.currentToID > count) {
-							this.currentToID = count;
-						}
 						this.currentToID = newCurrentPage * maxRecords;
 						this.currentPage = newCurrentPage;
 						this.currentFromID = (this.currentPage - 1) * maxRecords + 1;
@@ -346,32 +344,32 @@ class DataHandler {
 				this.paginationStart = pageStart;
 				this.paginationEnd = pageEnd;
 				$("#records-table-body").empty();
-				// this.isFunctionRunning = false;
 				return this.showRecords(this.currentFromID, this.currentToID);
 			})
 			.then(() => {
 				return this.pageNumbers(pageStart, pageEnd);
-			})
-			.then(() => {
-				return maxRecords;
 			})
 			.catch((error) => {
 				throw error;
 			})
 	}
 
-	// Calls the function to resize with a timeout added for precision
-	resize() {
+	/** When resizing the window. Timeout is put in place so that the function doesn't
+	 * take in every value returned when resizing. */
+	resize(): void {
 		if (this.resizeTimer !== null) {
 			clearTimeout(this.resizeTimer);
 		}
 		this.resizeTimer = setTimeout(() => {
-			this.adjustDisplayedRecords();
+			return this.adjustDisplayedRecords()
+				.catch(error => {
+					throw error;
+				});
 		}, 250);
 	}
 
-	// Just a loader to display when the table is empty and records is being fetched. 
-	loader() {
+	/** Will display when the table is empty and it's busy fetching the records. */
+	loader(): void {
 		let content = $('#records-table-body').text();
 		if (content === '') {
 			$('.results').append('<div class="loader"></div>');
@@ -380,27 +378,34 @@ class DataHandler {
 		}
 	}
 
-	// Calculate how many records should be displayed on the screen height
+	/** Calculate how many records should be displayed according to the screen height. */
 	recordsPerPage(): number {
-		const screenHeight = $(window).height();
-		const maxRecords = Math.floor(parseInt(screenHeight as any) / 68);
+		const screenHeight = <number>($(window).height());
+		const maxRecords = Math.floor(screenHeight / 68);
 		return maxRecords;
 	}
 
-	// Retrieve the input value while a value is in the search bar
+	/** Retrieve the search value from the input even when it's empty. */
 	input(): string {
-		let inputNumber = $('.search-input').val() as string;
+		let inputNumber = <string>($('.search-input').val());
 		return inputNumber;
 	}
 }
 
-// First function that runs when the  web app is started
+/** Runs when the web app is started. */
 window.onload = () => {
 	const dataHandler = new DataHandler();
-	dataHandler.showColumns();
-	dataHandler.adjustDisplayedRecords();
-	dataHandler.initializePagination();
-	dataHandler.initializeSearch();
+	dataHandler.showColumns()
+		.then(() => {
+			dataHandler.adjustDisplayedRecords()
+		})
+		.then(() => {
+			dataHandler.initializePagination();
+			dataHandler.initializeSearch();
+		})
+		.catch(error => {
+			throw new Error(`An error occurred: ${error}`);
+		});
 	$(window).on('resize', () => {
 		dataHandler.resize();
 	});
