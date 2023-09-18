@@ -2,19 +2,19 @@
 
 // ApiManager Class 
 class ApiManager {
-  totalRecordCount: number | null;
+  totalRecordCount: number;
   columnNames: string[] | null;
   // from: number = 0; 
   // to: number = 0;
 
 
   constructor() {
-    this.totalRecordCount = null;
+    this.totalRecordCount = 0;
     this.columnNames = null;
   }
 
   async fetchTotalRecordCount(): Promise<void> {
-    console.log("Function #2 - Executing fetchTotalRecordCount");
+    console.log("Function #3 - Executing fetchTotalRecordCount");
     try {
       const response = await fetch('http://localhost:2050/recordCount');
       if (!response.ok) {
@@ -29,7 +29,7 @@ class ApiManager {
   }
   
   async fetchColumnNames(): Promise<void> {
-    console.log("Function #3 - Executing fetchColumnNames");
+    console.log("Function #5 - Executing fetchColumnNames");
     try {
       const response = await fetch('http://localhost:2050/columns');
       if (!response.ok) {
@@ -43,7 +43,7 @@ class ApiManager {
   }
   
   async fetchRecords(from: number, to: number): Promise<any[][] | null> {
-    console.log(`#7 - Executing fetchRecords with from: ${from}, to: ${to}`);
+    console.log(`Function #12.1 - Executing fetchRecords with from: ${from}, to: ${to}`);
     try {
       const response = await fetch(`http://localhost:2050/records?from=${from}&to=${to}`);
       if (!response.ok) {
@@ -71,6 +71,7 @@ class StateManager {
   private apiManager: ApiManager;
   private records: any[][] | null = null;
   private columnNames: string[] | null;
+  private totalRecordCount = 0;
 
   constructor(apiManager: ApiManager) {
     this.rowHeight = 20; // Default value, can be updated later
@@ -81,30 +82,37 @@ class StateManager {
     this.from = 0; // Default values, will be overwritten in initialize()
     this.to = 0; // Default values, will be overwritten in initialize()
     this.columnNames = null;
+    this.totalRecordCount = 0;
   }
-  async initialize(): Promise<void> {
+  async initializeState(): Promise<void> {
     console.log("Function #1 - Executing initialize");
-    await this.apiManager.fetchTotalRecordCount();
+    await this.fetchAndStoreTotalRecordCount();
     await this.retrieveColumnNames();
     this.adjustWindowSize();
   }
 
   async retrieveColumnNames() {
-    console.log("Function # - Executing retrieveColumnNames");
+    console.log("Function #4 - Executing retrieveColumnNames");
     await this.apiManager.fetchColumnNames();
     if (this.apiManager.columnNames !== null) {
       this.columnNames = this.apiManager.columnNames;
     }
   }
   
+  async fetchAndStoreTotalRecordCount(): Promise<void> {
+    console.log("Function #2 - Executing fetchAndStoreTotalRecordCount");
+    await this.apiManager.fetchTotalRecordCount();
+    this.totalRecordCount = this.apiManager.totalRecordCount;
+  }
+  
   getColumnNames(): string[] | null {
-    console.log("Function #4 - Executing getColumnNames");
+    console.log("Function #10 - Executing getColumnNames");
     return this.columnNames;
   }
   
   
   getRecords(): any[][] | null {
-    console.log("Function # - Executing getRecords");
+    console.log("Function #13 - Executing getRecords");
     return this.records;
   }
   
@@ -115,7 +123,7 @@ class StateManager {
   }
 
   setFrom(value: number): void {
-    console.log("Function # - Executing setFrom");
+    console.log("Function #7 - Executing setFrom");
     this.from = value;
   }
 
@@ -125,7 +133,7 @@ class StateManager {
   }
 
   setTo(value: number): void {
-    console.log("Function # - Executing setTo");
+    console.log("Function #8 - Executing setTo");
     this.to = value;
   }
 
@@ -147,15 +155,19 @@ class StateManager {
 
   // Inside StateManager class
   adjustWindowSize(): void {
-    console.log("Function # - Executing adjustWindowSize");
+    console.log("Function #6 - Executing adjustWindowSize");
     this.availableHeight = window.innerHeight - this.headerHeight;
     this.numRows = Math.floor(this.availableHeight / this.rowHeight);
+    if (this.numRows <= 0) {
+      console.log("Window size too small, setting minimum number of rows to 1");
+      this.numRows = 1;
+    }
     this.setFrom(0);  // Assuming the first row is always 0
     this.setTo(this.numRows - 1);
   }
 
   async retrieveRecords() {
-    console.log("Function #6 - Executing retrieveRecords");
+    console.log("Function #12 - Executing retrieveRecords");
     this.records = await this.apiManager.fetchRecords(this.from, this.to);
   }
 }
@@ -174,8 +186,24 @@ class TableRenderer {
     this.stateManager = stateManager;
   }
 
-  setColumnNames(columnNames: string[]): void {
-    console.log("Function #5 - Executing setColumnNames");
+  async initialRender(stateManager: StateManager): Promise<void> {
+    console.log("Function #9 - Executing initialRender");
+    const columnNames = stateManager.getColumnNames();
+    if (columnNames !== null) {
+      this.renderColumnNames(columnNames);
+    }
+
+    await stateManager.retrieveRecords();
+    const records = stateManager.getRecords();
+
+    // Render the records if they're available
+    if (records !== null) {
+      this.renderRecords(records);
+    }
+  }
+
+  renderColumnNames(columnNames: string[]): void {
+    console.log("Function #11 - Executing renderColumnNames");
     try {
       const thead = document.querySelector('thead');
       if (thead === null) {
@@ -201,7 +229,7 @@ class TableRenderer {
     }
   }
   setColumnWidths(): void {
-    console.log("#5 - Executing setColumnWidths");
+    console.log("Function #11.1 - Executing setColumnWidths");
     // Assuming your table has an id of "myTable"
     const table = document.getElementById("myTable");
     
@@ -220,8 +248,8 @@ class TableRenderer {
     }
   }
 
-  render(records: apiRecord[] | null) {
-    console.log("#8 - Executing render");
+  renderRecords(records: apiRecord[] | null) {
+    console.log("Function #14 - Executing renderRecords");
     try {
       if (records === null) {
         throw new Error("No records to render.");
@@ -252,31 +280,31 @@ class TableRenderer {
   async adjustRows(): Promise<void> {
     console.log("Function #7 - Executing adjustRows");
     try {
-      const rowHeight = 20;
-      const headerHeight = 180;
-      const availableHeight = window.innerHeight - headerHeight;
+      // const rowHeight = 20;
+      // const headerHeight = 180;
+      // const availableHeight = window.innerHeight - headerHeight;
     
-      let numRows = Math.floor(availableHeight / rowHeight);
+      // let numRows = Math.floor(availableHeight / rowHeight);
   
       // Use StateManager to get and set 'from' and 'to'
       // this.stateManager.setFrom(0);
       // this.stateManager.setTo(numRows - 1);
   
       // Check for a minimum number of rows
-      if (numRows <= 0) {
-        console.log("Window size too small, setting minimum number of rows to 1");
-        numRows = 1;
-      }
+      // if (numRows <= 0) {
+      //   console.log("Window size too small, setting minimum number of rows to 1");
+      //   numRows = 1;
+      // }
   
       // Fetch the records using StateManager
-      await this.stateManager.retrieveRecords();
+      
   
       // Get the records from StateManager
       const records = this.stateManager.getRecords();
   
       // Render the records if they're available
       if (records !== null) {
-        this.render(records);
+        this.renderRecords(records);
       }
     } catch (error) {
       console.error(`An error occurred: ${error}`);
@@ -292,25 +320,28 @@ class WindowResizeHandler {
 
   constructor(
     private tableRenderer: TableRenderer,
-    private paginationManager: PaginationManager,
+    // private paginationManager: PaginationManager,
     private stateManager: StateManager
     ) {}
 
   // Inside WindowResizeHandler class
   handleResize() {
-    console.log("Function #8 - Executing handleResize");
+    console.log("Function ## - Executing handleResize");
 
     if (this.timeoutId !== null) {
       clearTimeout(this.timeoutId);
     }
 
-    this.timeoutId = window.setTimeout(() => {
+    this.timeoutId = window.setTimeout(async () => {
       // Delegate the logic to adjust 'from' and 'to' to StateManager
-      this.stateManager.adjustToWindowSize(window.innerHeight, 20, 180);
-      
-      // Then adjust the rows in the view
-      this.tableRenderer.adjustRows();
-
+      this.stateManager.adjustWindowSize();
+      await this.stateManager.retrieveRecords();
+      const records = this.stateManager.getRecords();
+  
+    // Render the records if they're available
+    if (records !== null) {
+      this.tableRenderer.renderRecords(records);
+    }
       this.timeoutId = null;
     }, 250);
   }
@@ -320,7 +351,6 @@ class WindowResizeHandler {
 // PaginationManager Class
 class PaginationManager {
   currentPage: number = 1;
-  tableRenderer: TableRenderer;
 
   constructor(private tableRenderer: TableRenderer, private stateManager: StateManager) {
     this.tableRenderer = tableRenderer;
@@ -372,24 +402,20 @@ window.onload = async () => {
 
   // Initialize Model
   const stateManager = new StateManager(apiManager); 
-  await stateManager.initialize();  // Don't forget to await!
-  //await stateManager.retrieveRecords(); // Fetch and set records from API Manager
-  await stateManager.retrieveColumnNames(); // Fetch and store the column names
+  await stateManager.initializeState();  // Don't forget to await!
+
 
   // Initialize View
   const tableRenderer = new TableRenderer(stateManager); 
-  const columnNames = stateManager.getColumnNames();
-  if (columnNames !== null) {
-    tableRenderer.setColumnNames(columnNames);
-  }
-  tableRenderer.adjustRows();
+  await tableRenderer.initialRender(stateManager);
+
 
   // Initialize Controllers
-  const WindowResizeHandler = new WindowResizeHandler(tableRenderer, stateManager); 
+  const windowResizeHandler = new WindowResizeHandler(tableRenderer, stateManager); 
   const paginationManager = new PaginationManager(tableRenderer, stateManager);
   
     // Attach event listeners
-    window.addEventListener('resize', () => WindowResizeHandler.handleResize());
+    window.addEventListener('resize', () => windowResizeHandler.handleResize());
     document.getElementById("prevPage")?.addEventListener("click", () => { paginationManager.decrementPage();})
     document.getElementById("nextPage")?.addEventListener("click", () => { paginationManager.incrementPage();})
     // You can also attach listeners for 'Next Page', 'Previous Page', and 'Filter by ID' here
