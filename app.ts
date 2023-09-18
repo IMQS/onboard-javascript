@@ -45,7 +45,7 @@ class RecordManager {
 	calculatingRows(): number {
 		const screenHeight = window.innerHeight;
 		const availableHeight = screenHeight - 105;
-		let rowHeight = 35;
+		const rowHeight = 35;
 		if (availableHeight <= 0) {
 			return 0;
 		} else {

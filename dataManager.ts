@@ -8,7 +8,7 @@ class dataManager {
 				if (!res.ok) {
 					throw 'Failed to fetch record count';
 				}
-				return res.json()
+				return res.json();
 			})
 			.then(totalRecords => {
 				if(typeof totalRecords !== 'number'){
