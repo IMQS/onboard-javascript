@@ -1,8 +1,5 @@
 class dataManager {
-	// firstNumber: number = 0;
-	// lastNumber: number = 0;
 	static backend: string = "http://localhost:2050";
-	// resizeTimeout: number = 0;
 
 	/** fetches the number of records from backend */
 	static fetchRecordCount(): Promise<number> {
