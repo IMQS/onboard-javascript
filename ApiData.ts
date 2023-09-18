@@ -93,8 +93,8 @@ class ApiData {
 				$('#grid').show();
 				return processedData;
 			})
-			.catch(() => {
-				throw ('Failed to fetch records');
+			.catch(error => {
+				throw new Error('Failed to fetch records: '+ error);
 			});
 	}
 
@@ -115,7 +115,7 @@ class ApiData {
 			.then(processedData => {
 				this.data = processedData;
 				this.displayRecords();
-				this.updatePageInfo();
+				
 			})
 			.catch(error => {
 				console.error('Failed to fetch records:', error);
@@ -126,7 +126,7 @@ class ApiData {
 	/** search through records using fromID */
 	searchRecords(searchValue: number): Promise<void> {
 		// Maximum allowed Value
-		const maxRange = this.maxRange
+		const maxRange = this.maxRange;
 
 		if (searchValue >= 0 && searchValue <= maxRange) {
 			let from = searchValue;
@@ -145,7 +145,6 @@ class ApiData {
 					// Calculate lastVal based on pageSize
 					this.lastVal = from + this.pageSize - 1;
 					this.displayRecords();
-					this.updatePageInfo();
 					// empty search input after searching 
 					$('#fromInput').val('');
 				})
@@ -221,9 +220,7 @@ class ApiData {
 		this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
 
 		this.fetchAndDisplayRecords()
-			.then(() => {
-				this.updatePageInfo();
-			})
+			
 			.catch(error => {
 				console.error("Error fetching records while changing page :", error);
 				alert('Error occured while changing page!');
