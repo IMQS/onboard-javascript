@@ -50,7 +50,7 @@ class ApiData {
 	recordCount(): Promise<void> {
 		return this.fetchNumData('http://localhost:2050/recordCount')
 			.then((response: number) => {
-				const totalItems = response;
+				const totalItems =response;
 				this.totalItems = totalItems;
 			})
 			.catch(error => {
@@ -63,7 +63,7 @@ class ApiData {
 	/** Use the fetchData() func to make an HTTP request to the API endpoint and process the data */
 	fetchColumns(): Promise<void> {
 		return this.fetchStrData('http://localhost:2050/columns')
-			.then((response: string) => {
+			.then((response:string) => {
 				const res = JSON.parse(response);
 				this.columnNames = res.map((columnName: string) => ({ name: columnName }));
 				// Initialize the 'data' property as an empty array of GridData objects
@@ -81,7 +81,7 @@ class ApiData {
 		$('#grid').hide();
 
 		return this.fetchStrData(`http://localhost:2050/records?from=${from}&to=${to}`)
-			.then((response: string) => {
+			.then((response:string) => {
 				const res = JSON.parse(response);
 				const processedData = res.map((record: string) => {
 					const obj: GridData = {};
@@ -117,7 +117,6 @@ class ApiData {
 			.then(processedData => {
 				this.data = processedData;
 				this.displayRecords();
-
 			})
 			.catch(error => {
 				console.error('Failed to fetch records:', error);
@@ -177,7 +176,7 @@ class ApiData {
 		});
 		return response;
 	}
-
+	
 	/** Change grid height according to screen size */
 	private adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
