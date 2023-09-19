@@ -48,9 +48,9 @@ class ApiData {
 
 	/** Fetch total record count from the server,fetches data from an API and populates class properties */
 	recordCount(): Promise<void> {
-		return this.fetchData('http://localhost:2050/recordCount')
-			.then((response: number | string) => {
-				const totalItems = <number>response;
+		return this.fetchNumData('http://localhost:2050/recordCount')
+			.then((response: number) => {
+				const totalItems = response;
 				this.totalItems = totalItems;
 			})
 			.catch(error => {
@@ -62,15 +62,16 @@ class ApiData {
 
 	/** Use the fetchData() func to make an HTTP request to the API endpoint and process the data */
 	fetchColumns(): Promise<void> {
-		return this.fetchData('http://localhost:2050/columns')
-			.then((response: number | string) => {
-				const res = JSON.parse(<string>(response));
+		return this.fetchStrData('http://localhost:2050/columns')
+			.then((response: string) => {
+				const res = JSON.parse(response);
 				this.columnNames = res.map((columnName: string) => ({ name: columnName }));
 				// Initialize the 'data' property as an empty array of GridData objects
 				this.data = new Array<GridData>(this.columnNames.length);
 			})
-			.catch(() => {
-				throw ('Failed to fetch columns.');
+			.catch(error => {
+				console.error('Failed to fetch columns:' + error);
+				throw ('Failed to fetch columns:' + error);
 			});
 	}
 
@@ -79,9 +80,9 @@ class ApiData {
 		$('#spinner').show();
 		$('#grid').hide();
 
-		return this.fetchData(`http://localhost:2050/records?from=${from}&to=${to}`)
-			.then((response: number | string) => {
-				const res = JSON.parse(<string>(response));
+		return this.fetchStrData(`http://localhost:2050/records?from=${from}&to=${to}`)
+			.then((response: string) => {
+				const res = JSON.parse(response);
 				const processedData = res.map((record: string) => {
 					const obj: GridData = {};
 					for (let j = 0; j < this.columnNames.length && j < record.length; j++) {
@@ -94,7 +95,8 @@ class ApiData {
 				return processedData;
 			})
 			.catch(error => {
-				throw new Error('Failed to fetch records: '+ error);
+				console.error('Failed to fetch records: ', error);
+				throw new Error('Failed to fetch records: ' + error);
 			});
 	}
 
@@ -115,7 +117,7 @@ class ApiData {
 			.then(processedData => {
 				this.data = processedData;
 				this.displayRecords();
-				
+
 			})
 			.catch(error => {
 				console.error('Failed to fetch records:', error);
@@ -158,13 +160,21 @@ class ApiData {
 	}
 
 	/** use Ajax for data fetching */
-	private async fetchData(url: string): Promise<number | string> {
+	private async fetchStrData(url: string): Promise<string> {
 		$('#overlay').show();
 		const response = await $.ajax({
 			url,
 			method: 'GET',
 		});
 		$('#overlay').hide();
+		return response;
+	}
+
+	private async fetchNumData(url: string): Promise<number> {
+		const response = await $.ajax({
+			url,
+			method: 'GET',
+		});
 		return response;
 	}
 
@@ -220,7 +230,6 @@ class ApiData {
 		this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
 
 		this.fetchAndDisplayRecords()
-			
 			.catch(error => {
 				console.error("Error fetching records while changing page :", error);
 				alert('Error occured while changing page!');
