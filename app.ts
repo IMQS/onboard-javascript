@@ -105,6 +105,10 @@ class StateManager {
     this.totalRecordCount = this.apiManager.totalRecordCount;
   }
   
+  getTotalRecordCount(): number {
+    return this.totalRecordCount;
+  }
+  
   getColumnNames(): string[] | null {
     console.log("Function #10 - Executing getColumnNames");
     return this.columnNames;
@@ -118,7 +122,7 @@ class StateManager {
   
 
   getFrom(): number {
-    console.log("Function # - Executing getFrom");
+    console.log("Function #18 - Executing getFrom");
     return this.from;
   }
 
@@ -128,7 +132,7 @@ class StateManager {
   }
 
   getTo(): number {
-    console.log("Function # - Executing getTo");
+    console.log("Function #19 - Executing getTo");
     return this.to;
   }
 
@@ -138,20 +142,65 @@ class StateManager {
   }
 
   goToNextPage(): void {
-    console.log("Function # - Executing goToNextPage");
+    console.log("Function #17 - Executing goToNextPage");
     const from = this.getFrom();
     const to = this.getTo();
-    this.setFrom(from + (to - from + 1));
-    this.setTo(to + (to - from + 1));
+    const stepSize = to - from + 1;
+  
+    // Calculate the new 'from' and 'to' values
+    const newFrom = from + stepSize;
+    const newTo = to + stepSize;
+  
+    // Check that 'to' does not exceed totalRecordCount
+    if (newTo >= this.totalRecordCount) {
+      this.setTo(this.totalRecordCount - 1);
+      this.setFrom(newFrom); 
+    } else {
+      this.setFrom(newFrom);
+      this.setTo(newTo);
+    }
   }
+  
 
   goToPreviousPage(): void {
-    console.log("Function # - Executing goToPreviousPage");
+    console.log("Function #22 - Executing goToPreviousPage");
     const from = this.getFrom();
     const to = this.getTo();
-    this.setFrom(from - (to - from + 1));
-    this.setTo(to - (to - from + 1));
+    const stepSize = to - from + 1;
+  
+    // Calculate the new 'from' and 'to' values
+    const newFrom = from - stepSize;
+    const newTo = to - stepSize;
+  
+    if (newFrom < 0) {
+      // Set the 'from' value to zero
+      this.setFrom(0);
+      this.setTo(newTo);
+
+    } else {
+      this.setFrom(newFrom);
+      this.setTo(newTo);
+    }
   }
+  
+  async searchByIdStateChange(id: number): Promise<void> {
+    console.log("Function #24 - Executing searchByIdStateChange");
+  
+    const newFrom = id;
+    const newTo = id + this.numRows - 1;
+  
+    // Check that 'to' does not exceed totalRecordCount
+    if (newTo >= this.totalRecordCount) {
+      this.setTo(this.totalRecordCount - 1);
+    } else {
+      this.setTo(newTo);
+    }
+  
+    this.setFrom(newFrom);
+  
+    await this.retrieveRecords();
+  }
+  
 
   // Inside StateManager class
   adjustWindowSize(): void {
@@ -162,8 +211,15 @@ class StateManager {
       console.log("Window size too small, setting minimum number of rows to 1");
       this.numRows = 1;
     }
-    this.setFrom(0);  // Assuming the first row is always 0
-    this.setTo(this.numRows - 1);
+    // Check if on the first page
+    if (this.from === 0) {
+      this.setFrom(0);  // Assuming the first row is always 0
+      this.setTo(this.numRows - 1);
+
+    } else {
+      // If not on the first page, only adjust the 'to' value
+      this.setTo(this.from + this.numRows - 1);
+    }
   }
 
   async retrieveRecords() {
@@ -326,7 +382,7 @@ class WindowResizeHandler {
 
   // Inside WindowResizeHandler class
   handleResize() {
-    console.log("Function ## - Executing handleResize");
+    console.log("Function #15 - Executing handleResize");
 
     if (this.timeoutId !== null) {
       clearTimeout(this.timeoutId);
@@ -354,40 +410,65 @@ class PaginationManager {
 
   constructor(private tableRenderer: TableRenderer, private stateManager: StateManager) {
     this.tableRenderer = tableRenderer;
+    this.stateManager = stateManager
     //this.updateButtonStates();
   }
 
-  incrementPage(): void {
-    console.log("Function # - Executing incrementPage");
-    this.currentPage += 1;
+  async incrementPage(): Promise<void> {
+    console.log("Function #16 - Executing incrementPage");
     this.stateManager.goToNextPage();
-    this.tableRenderer.adjustRows();
+    await this.stateManager.retrieveRecords();
+    const records = this.stateManager.getRecords();
+    
+    if (records !== null) {
+      this.tableRenderer.renderRecords(records);
+    }
     this.updateButtonStates();
   }
 
-  decrementPage(): void {
-    console.log("Function # - Executing decrementPage");
-    if (this.currentPage > 1) {
-      this.currentPage -= 1;
-      this.stateManager.goToPreviousPage();
-      this.tableRenderer.adjustRows();
-      this.updateButtonStates();
+  async decrementPage(): Promise<void> {
+    console.log("Function #21 - Executing decrementPage");
+    this.stateManager.goToPreviousPage();
+    await this.stateManager.retrieveRecords();
+    const records = this.stateManager.getRecords();
+    
+    if (records !== null) {
+      this.tableRenderer.renderRecords(records);
     }
+    this.updateButtonStates();
+  }
+
+  async searchById(): Promise<void> {
+    console.log("Function #23 - Executing searchById");
+    const filterInput = document.getElementById('filterInput') as HTMLInputElement;
+    const searchValue = parseInt(filterInput.value, 10);
+    await this.stateManager.searchByIdStateChange(searchValue);
+    const records = this.stateManager.getRecords();
+    
+    if (records !== null) {
+      this.tableRenderer.renderRecords(records);
+    }
+    this.updateButtonStates();
   }
 
   private updateButtonStates(): void {
-    console.log("#12 - Executing updateButtonstates")
+    console.log("Function #20 - Executing updateButtonstates");
     const prevButton = document.getElementById("prevPage") as HTMLButtonElement;
     const nextButton = document.getElementById("nextPage") as HTMLButtonElement;
-    
-    if (this.currentPage <= 1 && prevButton !== null) {
-      prevButton.disabled = true;
-    } else if (prevButton !== null) {
-      prevButton.disabled = false;
+  
+    const from = this.stateManager.getFrom(); // Use the getter to get the value of `from`
+    const to = this.stateManager.getTo(); // Use the getter to get the value of `to`
+    const totalRecordCount = this.stateManager.getTotalRecordCount(); // Use a getter to get the totalRecordCount
+  
+    if (prevButton !== null) {
+      prevButton.disabled = from === 0;
     }
-
-    // You can add logic for the "Next" button too, based on the total number of pages.
+  
+    if (nextButton !== null) {
+      nextButton.disabled = to === totalRecordCount - 1;
+    }
   }
+  
 
 }
 
@@ -418,7 +499,7 @@ window.onload = async () => {
     window.addEventListener('resize', () => windowResizeHandler.handleResize());
     document.getElementById("prevPage")?.addEventListener("click", () => { paginationManager.decrementPage();})
     document.getElementById("nextPage")?.addEventListener("click", () => { paginationManager.incrementPage();})
-    // You can also attach listeners for 'Next Page', 'Previous Page', and 'Filter by ID' here
+    document.getElementById('searchButton')?.addEventListener("click", () => { paginationManager.searchById();})
 };
 
 
