@@ -99,7 +99,6 @@ class DataHandler {
 		return this.apiManager.getRecordCount()
 			.then(count => {
 				$('.pagination').empty();
-				let stringCount = count.toLocaleString().replace(/,/g, " ");
 				let maxRecords = this.recordsPerPage();
 				// This is the last page of all the records. It's calculated based on the amount of records showed
 				// on the table and the count of the records.

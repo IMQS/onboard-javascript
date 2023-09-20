@@ -5,10 +5,6 @@
 	padding: 0;
 	box-sizing: border-box;
 }
-/* 
-html {
-	min-height: 68px !important;
-} */
 
 body {
 	background-color: #141A27;
@@ -117,7 +113,6 @@ input:focus {
 .pagination {
 	display: flex;
 	justify-content: center;
-	/* padding-top: 30px; */
 }
 
 a {
