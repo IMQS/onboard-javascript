@@ -72,6 +72,7 @@ class StateManager {
   private records: any[][] | null = null;
   private columnNames: string[] | null;
   private totalRecordCount = 0;
+  highlightedId: number | null = null;
 
   constructor(apiManager: ApiManager) {
     this.rowHeight = 20; // Default value, can be updated later
@@ -166,16 +167,17 @@ class StateManager {
     console.log("Function #22 - Executing goToPreviousPage");
     const from = this.getFrom();
     const to = this.getTo();
-    const stepSize = to - from + 1;
+    const recordsPerPage = this.numRows;
   
     // Calculate the new 'from' and 'to' values
-    const newFrom = from - stepSize;
-    const newTo = to - stepSize;
+    const newFrom = from - recordsPerPage;
+    const newTo = newFrom + recordsPerPage - 1;
+  
   
     if (newFrom < 0) {
       // Set the 'from' value to zero
       this.setFrom(0);
-      this.setTo(newTo);
+      this.setTo(recordsPerPage - 1);
 
     } else {
       this.setFrom(newFrom);
@@ -304,8 +306,9 @@ class TableRenderer {
     }
   }
 
-  renderRecords(records: apiRecord[] | null) {
+  renderRecords(records: apiRecord[] | null, highlightId: number | null = null) {
     console.log("Function #14 - Executing renderRecords");
+    highlightId = highlightId ?? this.stateManager.highlightedId; // use state if highlightId is null
     try {
       if (records === null) {
         throw new Error("No records to render.");
@@ -320,6 +323,9 @@ class TableRenderer {
       
       records.forEach((record) => {
         const row = document.createElement('tr');
+        if (highlightId !== null && record.length > 0 && parseInt(record[0].toString(), 10) === highlightId) {
+          row.classList.add('highlight');
+        }
         record.forEach((cell) => {
           const td = document.createElement('td');
           td.textContent = cell.toString();
@@ -390,6 +396,7 @@ class WindowResizeHandler {
 
     this.timeoutId = window.setTimeout(async () => {
       // Delegate the logic to adjust 'from' and 'to' to StateManager
+      
       this.stateManager.adjustWindowSize();
       await this.stateManager.retrieveRecords();
       const records = this.stateManager.getRecords();
@@ -406,12 +413,17 @@ class WindowResizeHandler {
 
 // PaginationManager Class
 class PaginationManager {
-  currentPage: number = 1;
+  // currentPage: number = 1;
 
   constructor(private tableRenderer: TableRenderer, private stateManager: StateManager) {
     this.tableRenderer = tableRenderer;
     this.stateManager = stateManager
     //this.updateButtonStates();
+  }
+
+  async navigateToHome() {
+    console.log("Function #25 - Navigating to Home");
+    window.location.reload();
   }
 
   async incrementPage(): Promise<void> {
@@ -442,14 +454,34 @@ class PaginationManager {
     console.log("Function #23 - Executing searchById");
     const filterInput = document.getElementById('filterInput') as HTMLInputElement;
     const searchValue = parseInt(filterInput.value, 10);
+    this.stateManager.highlightedId = searchValue;
     await this.stateManager.searchByIdStateChange(searchValue);
     const records = this.stateManager.getRecords();
     
     if (records !== null) {
-      this.tableRenderer.renderRecords(records);
+      this.tableRenderer.renderRecords(records, searchValue);
     }
+    
     this.updateButtonStates();
   }
+
+  setupLiveValidation(): void {
+  const filterInput = document.getElementById('filterInput') as HTMLInputElement;
+  const errorMessage = document.getElementById('errorMessage') as HTMLElement;
+
+  filterInput.addEventListener('input', () => {
+    const inputValue = filterInput.value;
+
+    if (inputValue.length === 0) {
+      errorMessage.textContent = "";
+    } else if (inputValue.length < 1 || inputValue.length > 6 || !/^\d+$/.test(inputValue)) {
+      errorMessage.textContent = "Invalid input. Please enter a number between 0 and 999 999.";
+    } else {
+      errorMessage.textContent = "";
+    }
+   });
+  }
+
 
   private updateButtonStates(): void {
     console.log("Function #20 - Executing updateButtonstates");
@@ -468,8 +500,6 @@ class PaginationManager {
       nextButton.disabled = to === totalRecordCount - 1;
     }
   }
-  
-
 }
 
 // ****************************************************** Main Script ********************************************************* /
@@ -484,7 +514,7 @@ window.onload = async () => {
   // Initialize Model
   const stateManager = new StateManager(apiManager); 
   await stateManager.initializeState();  // Don't forget to await!
-
+  
 
   // Initialize View
   const tableRenderer = new TableRenderer(stateManager); 
@@ -496,12 +526,13 @@ window.onload = async () => {
   const paginationManager = new PaginationManager(tableRenderer, stateManager);
   
     // Attach event listeners
+    paginationManager.setupLiveValidation();
     window.addEventListener('resize', () => windowResizeHandler.handleResize());
     document.getElementById("prevPage")?.addEventListener("click", () => { paginationManager.decrementPage();})
     document.getElementById("nextPage")?.addEventListener("click", () => { paginationManager.incrementPage();})
     document.getElementById('searchButton')?.addEventListener("click", () => { paginationManager.searchById();})
+    document.getElementById("main-heading")?.addEventListener("click", () => { paginationManager.navigateToHome();})
 };
-
 
 
 
