@@ -4,7 +4,7 @@ class InitializeApp {
 	currentValueOfFirstRecord: number = 0;
 	/** Index of the first record currently displayed on the page */
 	currentFirstRecordIndex: number = 0;
-	/** Current page number (changes dynamically)*/
+	/** Current page number (changes dynamically) */
 	currentPage: number = 1;
 	/** Total number of pages available (changes dynamically) */
 	totalPages: number = 1;
@@ -12,45 +12,31 @@ class InitializeApp {
 	recordsPerPage: number = 16;
 	/** Index of the record being searched for (null if not searching) */
 	searchedIndex: number | null = null;
-	/** Checks if the button is enabled/disabled*/
+	/** Checks if the button is enabled/disabled */
 	isButtonDisabled: boolean = false;
 
 	constructor() {
-		const loadApp = new Promise<void>((resolve, reject) => {
-			window.onload = () => {
-				try {
-					$("#loader").hide();
-					$(window).on("resize", this.debounce(() => {
-						this.updateScreen();
-					}, 250));
-					this.fetchColumns();
-					this.updateScreen();
-					this.eventHandlers();
-					resolve();
-				} catch (error) {
-					reject(error);
-				}
-			};
-		});
-		loadApp
-			.catch(() => {
-				throw new Error('Error during window.onload:');
-			});
+		$(window).on("resize", this.debounce(() => {
+			this.updateScreen();
+		}, 250));
+		this.fetchColumns();
+		this.updateScreen();
+		this.eventHandlers();
 	}
 
 	/** Fetch the total number of records from the server */
 	totalRecords(): Promise<number> {
 		return fetch(`${this.IMQS}/recordCount`)
-			.then((recordCountResponse) => {
+			.then(recordCountResponse => {
 				if (!recordCountResponse.ok) {
 					throw new Error('Error trying to get recordCount');
 				}
-				return recordCountResponse.json();
+				return recordCountResponse.text();
 			})
-			.then((recordCountData: number) => {
-				return recordCountData;
+			.then(recordCountData => {
+				return parseInt(recordCountData);
 			})
-			.catch((error) => {
+			.catch(error => {
 				throw error;
 			});
 	}
@@ -61,7 +47,6 @@ class InitializeApp {
 			.then(columnsResponse => {
 				if (!columnsResponse.ok) {
 					throw new Error('Error trying to fetch the columns');
-					return [];
 				}
 				return columnsResponse.json();
 			})
@@ -75,7 +60,6 @@ class InitializeApp {
 			})
 			.catch(error => {
 				throw error;
-				return [];
 			});
 	}
 
@@ -88,13 +72,9 @@ class InitializeApp {
 			.then(response => {
 				if (!response.ok) {
 					throw new Error('Network response was not ok');
-					return [];
 				}
 				return response.json();
 			})
-			.catch(() => {
-				return [];
-			});
 	}
 
 	/** Display data within the specified range */
@@ -142,53 +122,45 @@ class InitializeApp {
 	}
 
 	/** Handle the search method */
-	searchMethod(searchValue: number): void {
-		this.totalRecords()
-			.then(totalRecCount => {
-				if (searchValue < 0 || searchValue >= totalRecCount) {
-					window.alert('Record not found on this database');
-					return;
+	async searchMethod(searchValue: number): Promise<void> {
+		try {
+			const totalRecCount = await this.totalRecords();
+			if (searchValue < 0 || searchValue >= totalRecCount) {
+				window.alert('Record not found on this database');
+				return;
+			}
+			const lastRecordIndex = totalRecCount - 1;
+			const searchIndex = Math.min(searchValue, lastRecordIndex);
+			const targetPage = Math.ceil((searchIndex + 1) / this.recordsPerPage);
+			const fromRecord = Math.max(searchIndex - this.recordsPerPage, 0);
+			const toRecord = Math.min(fromRecord + this.recordsPerPage, lastRecordIndex);
+			const records = await this.fetchRecords(fromRecord, toRecord);
+			let foundIndex = -1;
+			for (let recordIndex = 0; recordIndex < records.length; recordIndex++) {
+				const idValue = parseInt(records[recordIndex][0]);
+				if (idValue === searchValue) {
+					foundIndex = fromRecord + recordIndex;
+					break;
 				}
-				const lastRecordIndex = totalRecCount - 1;
-				const searchIndex = Math.min(searchValue, lastRecordIndex);
-				const targetPage = Math.ceil((searchIndex + 1) / this.recordsPerPage);
-				const fromRecord = Math.max(searchIndex - (this.recordsPerPage), 0);
-				const toRecord = Math.min(fromRecord + this.recordsPerPage, lastRecordIndex);
-				return this.fetchRecords(fromRecord, toRecord)
-					.then((records) => {
-						let foundIndex = -1;
-						for (let recordIndex = 0; recordIndex < records.length; recordIndex++) {
-							const idValue = parseInt(records[recordIndex][0]);
-							if (idValue === searchValue) {
-								foundIndex = fromRecord + recordIndex;
-								break;
-							}
-						}
-						if (foundIndex !== -1) {
-							this.searchedIndex = foundIndex;
-							this.currentPage = targetPage;
-							this.currentFirstRecordIndex = (targetPage - 1) * this.recordsPerPage;
-							return this.displayData(this.currentFirstRecordIndex, this.recordsPerPage);
-						} else {
-							this.searchedIndex = null;
-							window.alert("Record not found");
-						}
-					})
-					.then(() => {
-						$("#prevPageButton").show();
-						if (targetPage === this.totalPages) {
-							$("#nextPageButton").hide();
-						} else {
-							$("#nextPageButton").show();
-						}
-					})
-					.catch((error) => {
-						throw error;
-					});
-			})
-			.catch((error) => {
-				throw error;
-			});
+			}
+			if (foundIndex !== -1) {
+				this.searchedIndex = foundIndex;
+				this.currentPage = targetPage;
+				this.currentFirstRecordIndex = (targetPage - 1) * this.recordsPerPage;
+				this.displayData(this.currentFirstRecordIndex, this.recordsPerPage);
+			} else {
+				this.searchedIndex = null;
+				window.alert("Record not found");
+			}
+			$("#prevPageButton").show();
+			if (targetPage === this.totalPages) {
+				$("#nextPageButton").hide();
+			} else {
+				$("#nextPageButton").show();
+			}
+		} catch {
+			throw new Error('Error while trying to display the data');
+		}
 	}
 
 	/** Update the screen layout and data display */
@@ -197,36 +169,31 @@ class InitializeApp {
 		this.recordsPerPage = this.windowAdjustments(newScreenHeight);
 		$("#loader").show();
 		$("#tableWrapper").hide();
-		const totalRecCountPromise = this.totalRecords();
-		totalRecCountPromise
-			.then(() => {
+		this.totalRecords()
+			.then(totalRecCount => {
+				let fromRecord: number;
 				if (this.searchedIndex !== null) {
 					const searchPageIndex = this.searchedIndex % this.recordsPerPage;
 					const firstRecordOfCurrentPage = (this.currentPage - 1) * this.recordsPerPage;
 					if (searchPageIndex >= firstRecordOfCurrentPage && searchPageIndex < firstRecordOfCurrentPage + this.recordsPerPage) {
-						return this.displayData(firstRecordOfCurrentPage, this.recordsPerPage);
+						fromRecord = firstRecordOfCurrentPage;
 					} else {
 						this.currentPage = Math.ceil((this.searchedIndex + 1) / this.recordsPerPage);
 						this.currentFirstRecordIndex = Math.max(this.searchedIndex - this.recordsPerPage + 1, 0);
-						return this.displayData(this.currentFirstRecordIndex, this.recordsPerPage);
+						fromRecord = this.currentFirstRecordIndex;
 					}
 				} else {
 					const previousFirstRecordIndex = this.currentFirstRecordIndex;
 					this.currentPage = Math.ceil((this.currentFirstRecordIndex + 1) / this.recordsPerPage);
-					return this.displayData(this.currentFirstRecordIndex, this.recordsPerPage);
+					fromRecord = this.currentFirstRecordIndex;
 				}
-			})
-			.then(() => {
-				return totalRecCountPromise;
-			})
-			.then(totalRecCount => {
 				if (this.currentPage * this.recordsPerPage > totalRecCount - 1) {
-					//  Go to the last page if necessary 
 					const lastPage = Math.ceil(totalRecCount / this.recordsPerPage);
 					this.currentPage = lastPage;
 					this.currentFirstRecordIndex = (lastPage - 1) * this.recordsPerPage;
-					return this.displayData(this.currentFirstRecordIndex, this.recordsPerPage);
+					fromRecord = this.currentFirstRecordIndex;
 				}
+				return this.displayData(fromRecord, this.recordsPerPage);
 			})
 			.then(() => {
 				$("#loader").hide();
@@ -238,7 +205,7 @@ class InitializeApp {
 				}
 			})
 			.catch(() => {
-				throw Error('Error updating screen:');
+				throw new Error('Error updating screen:');
 			});
 	}
 
@@ -265,7 +232,7 @@ class InitializeApp {
 
 	/** Handles the events such as pagination buttons, input handling and search form */
 	eventHandlers(): void {
-		/** Prevent certain keys in the search input */
+		/* Prevent certain keys in the search input */
 		$("#searchInput").on("keydown", (e) => {
 			if (e.key === "e" || e.key === "E" || e.key === "."
 				|| e.key === "+" || e.key === "-") {
@@ -273,20 +240,25 @@ class InitializeApp {
 			}
 		});
 
-		/** Handle form submission for searching */
+		/* Handle form submission for searching */
 		$("#searchForm").submit((e) => {
 			e.preventDefault();
-			const searchInputValue = <string> $("#searchInput").val() ;
+			const searchInputValue = <string>$("#searchInput").val();
 			const searchValue = Number(searchInputValue);
-			$("#tableWrapper").hide();
-			$("#loader").show();
 			this.searchedIndex = null;
-			this.searchMethod(searchValue);
-			$("#loader").hide();
-			$("#tableWrapper").show();
+			this.searchMethod(searchValue)
+				.then(() => {
+					$("#tableWrapper").hide();
+					$("#loader").show();
+				})
+				.catch(() => {
+					window.alert('An error occurred during search. Please try again.');
+					$("#loader").hide();
+					$("#tableWrapper").show();
+				});
 		});
 
-		/** Handle previous page button click */
+		/* Handle previous page button click */
 		$("#prevPageButton").on("click", () => {
 			if ($("#prevPageButton").hasClass("hidden")) {
 				return;
@@ -323,12 +295,12 @@ class InitializeApp {
 					fromRecord = this.currentFirstRecordIndex;
 					return this.displayData(fromRecord, this.recordsPerPage);
 				})
-				.catch((error) => {
-					throw error;
+				.catch(() => {
+					throw new Error('Error while trying go to the previous page');
 				});
 		});
 
-		/** Handle next page button click */
+		/* Handle next page button click */
 		$("#nextPageButton").on("click", () => {
 			if ($("#nextPageButton").hasClass("hidden")) {
 				return;
@@ -336,7 +308,7 @@ class InitializeApp {
 			if (this.currentPage >= this.totalPages) {
 				const errorMessage = "Already on the last page";
 				window.alert(errorMessage);
-				throw new Error(errorMessage);
+				return;
 			}
 			$("#nextPageButton").addClass("hidden");
 			this.searchedIndex = null;
@@ -345,9 +317,8 @@ class InitializeApp {
 			$("#prevPageButton").hide();
 			$("#tableWrapper").hide();
 			$("#loader").show();
-			let totalRecCount: number | void;
 			this.totalRecords()
-				.then(() => {
+				.then((totalRecCount: number) => {
 					$("#nextPageButton").removeClass("hidden");
 					$("#loader").hide();
 					$("#tableWrapper").show();
@@ -367,12 +338,14 @@ class InitializeApp {
 					fromRecord = this.currentFirstRecordIndex;
 					return this.displayData(fromRecord, this.recordsPerPage);
 				})
-				.catch((error) => {
-					throw error;
+				.catch(() => {
+					throw new Error('Error while trying go to the next page');
 				});
 		});
 	}
 }
 
-/** Initialize the app when the page loads */
-new InitializeApp();
+window.onload = () => {
+	$("#loader").hide();
+	new InitializeApp();
+};
