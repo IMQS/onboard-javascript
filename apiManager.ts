@@ -1,12 +1,13 @@
 class ApiManager {
+	
 	private mainUrl: string;
 
 	constructor(mainUrl: string) {
 		this.mainUrl = mainUrl;
 	}
 
-	private fetchJson(mainUrl: string): Promise<any> {
-		return fetch(mainUrl)
+	private fetchJson(url: string): Promise<any> {
+		return fetch(url)
 			.then(res => {
 				if (res.ok) {
 					return res.json()
@@ -31,7 +32,6 @@ class ApiManager {
 
 	/** Retrieves the number of records there are */
 	getRecordCount(): Promise<number> {
-		let test = `${this.mainUrl}recordCount`
 		return this.fetchJson(`${this.mainUrl}recordCount`);
 	}
 }

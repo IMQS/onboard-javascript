@@ -41,12 +41,12 @@ class DataHandler {
 				}
 			})
 			.catch(error => {
-				throw new Error(`Failed to retrieve columns: ${error}`)
+				throw new Error(`Failed to retrieve columns: ${error}`);
 			});
 	}
 
 	/** Fetching the records and rendering it on the DOM in the table*/
-	showRecords(fromID: number, toID: number): Promise<void> {
+	showRecords(fromID: number, toID: number): Promise<any> {
 		if (this.isFunctionRunning) {
 			return Promise.resolve(undefined);
 		}
@@ -59,15 +59,14 @@ class DataHandler {
 				const maxRecords = this.recordsPerPage();
 				$("#records-table-body").empty();
 				this.loader();
-				this.currentToID = toID
+				this.currentToID = toID;
 				this.currentFromID = fromID;
 				if (toID >= (count - 1)) {
 					this.currentToID = (count - 1);
 					this.currentFromID = this.currentToID - (maxRecords - 1);
-				}
-				else if (this.currentPage === 1) {
+				} else if (this.currentPage === 1) {
 					this.currentFromID = 0;
-				};
+				}
 				stringCount = count.toLocaleString().replace(/,/g, " ");
 				return this.apiManager.getRecords(this.currentFromID, this.currentToID);
 			})
@@ -89,7 +88,7 @@ class DataHandler {
 			.catch(error => {
 				alert("Something went wrong. Click on the button to refresh the page.");
 				location.reload();
-				throw error;
+				this.isFunctionRunning = false;
 			});
 	}
 
@@ -127,7 +126,7 @@ class DataHandler {
 				}
 			})
 			.catch(error => {
-				throw error;
+				throw new Error(`Failed rendering the pagination: ${error}`);
 			});
 	}
 
@@ -170,7 +169,7 @@ class DataHandler {
 						});
 				})
 				.catch(error => {
-					throw new Error(`Failed showing the records when clicking on page number: ${error}`);
+					throw new Error(`Failed showing the records when clicking on the page button: ${error}`);
 				});
 		})
 
@@ -210,7 +209,7 @@ class DataHandler {
 			return this.apiManager.getRecordCount()
 				.then(count => {
 					let inputNumber = this.input();
-					let inputNumberInt: any = parseInt(inputNumber);
+					let inputNumberInt = parseInt(inputNumber);
 					if (inputNumber !== '') {
 						const maxRecords = this.recordsPerPage();
 						let end = Math.ceil(inputNumberInt / maxRecords) * (maxRecords);
@@ -247,7 +246,7 @@ class DataHandler {
 					}
 				})
 				.catch(error => {
-					throw error;
+					throw new Error(`Failed when attempting to search: ${error}`);
 				});
 		});
 
@@ -278,7 +277,7 @@ class DataHandler {
 							this.paginationEnd = pageEnd;
 						}
 					} else {
-						throw new Error("Please provide a valid integer.")
+						throw new Error("Please provide a valid integer.");
 					}
 				})
 				.then(() => {
@@ -291,23 +290,20 @@ class DataHandler {
 					$('.results-select').prop('disabled', false);
 				})
 				.catch(error => {
-					throw error;
+					throw new Error(`Failed when clicking on the search range: ${error}`);
 				});
 		});
 	}
 
 	/** Will calculate the amount records to be shown according to the screen height. */
 	adjustDisplayedRecords(): Promise<void> {
-		let screenHeight = <number>($(window).height());
-		if (screenHeight < 68) {
-			screenHeight = 68;
-		}
-		let maxRecords: number;
+		let screenHeight = <number>($('#records-table-body').height());
 		let pageStart: number;
 		let pageEnd: number;
 		return this.apiManager.getRecordCount()
 			.then(count => {
-				let maxRecords = Math.floor(screenHeight / 68);
+				let maxRecords = Math.ceil(screenHeight / 68);
+				maxRecords = maxRecords - 1;
 				let inputNumber = this.input();
 				let length = inputNumber.length;
 				let inputNumberInt = parseInt(inputNumber);
@@ -317,7 +313,7 @@ class DataHandler {
 					}
 					let newCurrentPage = Math.ceil(this.currentFromID / maxRecords);
 					if (newCurrentPage === 1) {
-						newCurrentPage = 1
+						newCurrentPage = 1;
 						this.currentFromID = 0;
 					}
 					this.currentToID = this.currentFromID + maxRecords;
@@ -334,9 +330,12 @@ class DataHandler {
 						this.currentPage = newCurrentPage;
 						this.currentFromID = (this.currentPage - 1) * maxRecords + 1;
 					}
-				};
+				}
 				if (this.currentFromID === 0) {
 					pageEnd = Math.ceil(Math.floor(this.currentToID / (maxRecords - 1)) / 10) * 10;
+					if (screenHeight < 136) {
+						pageEnd = Math.ceil(Math.floor(this.currentToID / (maxRecords)) / 10) * 10;
+					}
 				} else {
 					pageEnd = Math.ceil(Math.floor(this.currentToID / (maxRecords)) / 10) * 10;
 				}
@@ -350,8 +349,8 @@ class DataHandler {
 				return this.pageNumbers(pageStart, pageEnd);
 			})
 			.catch(error => {
-				throw error;
-			})
+				throw new Error(`Failed when resizing the window: ${error}`);
+			});
 	}
 
 	/** When resizing the window. Timeout is put in place so that the function doesn't
@@ -380,8 +379,9 @@ class DataHandler {
 
 	/** Calculate how many records should be displayed according to the screen height. */
 	recordsPerPage(): number {
-		const screenHeight = <number>($(window).height());
-		const maxRecords = Math.floor(screenHeight / 68);
+		const screenHeight = <number>($('#records-table-body').height());
+		let maxRecords = Math.floor(screenHeight / 68);
+		maxRecords = maxRecords - 1;
 		return maxRecords;
 	}
 
@@ -397,14 +397,14 @@ window.onload = () => {
 	const dataHandler = new DataHandler();
 	dataHandler.showColumns()
 		.then(() => {
-			dataHandler.adjustDisplayedRecords()
+			dataHandler.adjustDisplayedRecords();
 		})
 		.then(() => {
 			dataHandler.initializePagination();
 			dataHandler.initializeSearch();
 		})
 		.catch(error => {
-			throw new Error(`An error occurred: ${error}`);
+			throw new Error(`An error occurred when loading your page: ${error}`);
 		});
 	$(window).on('resize', () => {
 		dataHandler.resize();
