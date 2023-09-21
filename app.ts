@@ -1,12 +1,9 @@
 // ****************************************************** Data ********************************************************* /
 
-// ApiManager Class 
+
 class ApiManager {
   totalRecordCount: number;
   columnNames: string[] | null;
-  // from: number = 0; 
-  // to: number = 0;
-
 
   constructor() {
     this.totalRecordCount = 0;
@@ -22,7 +19,6 @@ class ApiManager {
       }
       const data: number = await response.json();
       this.totalRecordCount = data;
-      //this.to = data;
     } catch (error) {
       console.error(`Error fetching total record count: ${error}`);
     }
@@ -75,36 +71,51 @@ class StateManager {
   highlightedId: number | null = null;
 
   constructor(apiManager: ApiManager) {
-    this.rowHeight = 20; // Default value, can be updated later
-    this.headerHeight = 180; // Default value, can be updated later
+    this.rowHeight = 20; 
+    this.headerHeight = 180; 
     this.availableHeight = 0;
     this.numRows = 0;
     this.apiManager = apiManager;
-    this.from = 0; // Default values, will be overwritten in initialize()
-    this.to = 0; // Default values, will be overwritten in initialize()
+    this.from = 0; 
+    this.to = 0; 
     this.columnNames = null;
     this.totalRecordCount = 0;
   }
   async initializeState(): Promise<void> {
     console.log("Function #1 - Executing initialize");
-    await this.fetchAndStoreTotalRecordCount();
-    await this.retrieveColumnNames();
-    this.adjustWindowSize();
-  }
-
-  async retrieveColumnNames() {
-    console.log("Function #4 - Executing retrieveColumnNames");
-    await this.apiManager.fetchColumnNames();
-    if (this.apiManager.columnNames !== null) {
-      this.columnNames = this.apiManager.columnNames;
+    try {
+      await this.fetchAndStoreTotalRecordCount();
+      await this.retrieveColumnNames();
+      this.adjustWindowSize();
+    } catch (error) {
+      console.error("Error in initializeState:", error);
     }
   }
   
+
+  async retrieveColumnNames(): Promise<void> {
+    console.log("Function #4 - Executing retrieveColumnNames");
+    try {
+        await this.apiManager.fetchColumnNames();
+
+        if (this.apiManager.columnNames !== null) {
+            this.columnNames = this.apiManager.columnNames;
+        }
+    } catch (error) {
+        console.error("Error in retrieveColumnNames:", error);
+    }
+}
+  
   async fetchAndStoreTotalRecordCount(): Promise<void> {
     console.log("Function #2 - Executing fetchAndStoreTotalRecordCount");
-    await this.apiManager.fetchTotalRecordCount();
-    this.totalRecordCount = this.apiManager.totalRecordCount;
+    try {
+      await this.apiManager.fetchTotalRecordCount();
+      this.totalRecordCount = this.apiManager.totalRecordCount;
+    } catch (error) {
+      console.error("Error in fetchAndStoreTotalRecordCount:", error);
+    }
   }
+  
   
   getTotalRecordCount(): number {
     return this.totalRecordCount;
@@ -143,122 +154,154 @@ class StateManager {
   }
 
   goToNextPage(): void {
-    console.log("Function #17 - Executing goToNextPage");
-    const from = this.getFrom();
-    const to = this.getTo();
-    const stepSize = to - from + 1;
+    try {
+      console.log("Function #17 - Executing goToNextPage");
+      const from = this.getFrom();
+      const to = this.getTo();
+      const stepSize = to - from + 1;
   
-    // Calculate the new 'from' and 'to' values
-    const newFrom = from + stepSize;
-    const newTo = to + stepSize;
+      // Calculate the new 'from' and 'to' values
+      const newFrom = from + stepSize;
+      const newTo = to + stepSize;
   
-    // Check that 'to' does not exceed totalRecordCount
-    if (newTo >= this.totalRecordCount) {
-      this.setTo(this.totalRecordCount - 1);
-      this.setFrom(newFrom); 
-    } else {
-      this.setFrom(newFrom);
-      this.setTo(newTo);
+      // Check that 'to' does not exceed totalRecordCount
+      if (newTo >= this.totalRecordCount) {
+        this.setTo(this.totalRecordCount - 1);
+        this.setFrom(newFrom); 
+      } else {
+        this.setFrom(newFrom);
+        this.setTo(newTo);
+      }
+    } catch (error) {
+      console.error(`Unexpected error in goToNextPage: ${error instanceof Error ? error.message : error}`);
     }
   }
+  
   
 
   goToPreviousPage(): void {
-    console.log("Function #22 - Executing goToPreviousPage");
-    const from = this.getFrom();
-    const to = this.getTo();
-    const recordsPerPage = this.numRows;
-  
-    // Calculate the new 'from' and 'to' values
-    const newFrom = from - recordsPerPage;
-    const newTo = newFrom + recordsPerPage - 1;
-  
-  
-    if (newFrom < 0) {
-      // Set the 'from' value to zero
-      this.setFrom(0);
-      this.setTo(recordsPerPage - 1);
-
-    } else {
-      this.setFrom(newFrom);
-      this.setTo(newTo);
+    try {
+      console.log("Function #22 - Executing goToPreviousPage");
+      const from = this.getFrom();
+      const to = this.getTo();
+      const recordsPerPage = this.numRows;
+    
+      // Calculate the new 'from' and 'to' values
+      const newFrom = from - recordsPerPage;
+      const newTo = newFrom + recordsPerPage - 1;
+    
+      if (newFrom < 0) {
+        // Set the 'from' value to zero
+        this.setFrom(0);
+        this.setTo(recordsPerPage - 1);
+      } else {
+        this.setFrom(newFrom);
+        this.setTo(newTo);
+      }
+    } catch (error) {
+      console.error(`Error in goToPreviousPage: ${error instanceof Error ? error.message : error}`);
     }
   }
+  
   
   async searchByIdStateChange(id: number): Promise<void> {
-    console.log("Function #24 - Executing searchByIdStateChange");
-  
-    const newFrom = id;
-    const newTo = id + this.numRows - 1;
-  
-    // Check that 'to' does not exceed totalRecordCount
-    if (newTo >= this.totalRecordCount) {
-      this.setTo(this.totalRecordCount - 1);
-    } else {
-      this.setTo(newTo);
-    }
-  
-    this.setFrom(newFrom);
-  
-    await this.retrieveRecords();
-  }
-  
+    try {
+        console.log("Function #24 - Executing searchByIdStateChange");
 
-  // Inside StateManager class
+        const newFrom = id;
+        const newTo = id + this.numRows - 1;
+
+        // Check that 'to' does not exceed totalRecordCount
+        if (newTo >= this.totalRecordCount) {
+            this.setTo(this.totalRecordCount - 1);
+        } else {
+            this.setTo(newTo);
+        }
+
+        this.setFrom(newFrom);
+
+        await this.retrieveRecords();
+    } catch (error) {
+        console.error(`Error in searchByIdStateChange: ${error instanceof Error ? error.message : error}`);
+    }
+}
+
+  
   adjustWindowSize(): void {
     console.log("Function #6 - Executing adjustWindowSize");
-    this.availableHeight = window.innerHeight - this.headerHeight;
-    this.numRows = Math.floor(this.availableHeight / this.rowHeight);
-    if (this.numRows <= 0) {
-      console.log("Window size too small, setting minimum number of rows to 1");
-      this.numRows = 1;
-    }
-    // Check if on the first page
-    if (this.from === 0) {
-      this.setFrom(0);  // Assuming the first row is always 0
-      this.setTo(this.numRows - 1);
 
-    } else {
-      // If not on the first page, only adjust the 'to' value
-      this.setTo(this.from + this.numRows - 1);
-    }
-  }
+    try {
+        if (typeof window === "undefined" || !window.innerHeight) {
+            throw new Error("Unable to access window dimensions");
+        }
 
-  async retrieveRecords() {
-    console.log("Function #12 - Executing retrieveRecords");
-    this.records = await this.apiManager.fetchRecords(this.from, this.to);
+        if (!this.rowHeight) {
+            throw new Error("Row height is not properly configured");
+        }
+
+        this.availableHeight = window.innerHeight - this.headerHeight;
+        this.numRows = Math.floor(this.availableHeight / this.rowHeight);
+
+        if (this.numRows <= 0) {
+            console.log("Window size too small, setting minimum number of rows to 1");
+            this.numRows = 1;
+        }
+
+        if (this.from === 0) {
+            this.setFrom(0);  // Assuming the first row is always 0
+            this.setTo(this.numRows - 1);
+        } else {
+            this.setTo(this.from + this.numRows - 1);
+        }
+    } catch (error) {
+        console.error(`Error in adjustWindowSize: ${error instanceof Error ? error.message : error}`);
+    }
+}
+
+
+async retrieveRecords(): Promise<void> {
+  console.log("Function #12 - Executing retrieveRecords");
+  try {
+      this.records = await this.apiManager.fetchRecords(this.from, this.to);
+  } catch (error) {
+      console.error(`Error retrieving records: ${error instanceof Error ? error.message : error}`);
   }
+}
+
 }
 
 // ****************************************************** View ********************************************************* /
 
 
-// TableRenderer Class
 type apiRecord = any[];
 
 class TableRenderer {
   private stateManager: StateManager;
 
-  // Constructor
   constructor(stateManager: StateManager) {
     this.stateManager = stateManager;
   }
 
   async initialRender(stateManager: StateManager): Promise<void> {
-    console.log("Function #9 - Executing initialRender");
-    const columnNames = stateManager.getColumnNames();
-    if (columnNames !== null) {
-      this.renderColumnNames(columnNames);
-    }
+    try {
+        console.log("Function #9 - Executing initialRender");
 
-    await stateManager.retrieveRecords();
-    const records = stateManager.getRecords();
+        const columnNames = stateManager.getColumnNames();
+        if (columnNames !== null) {
+            this.renderColumnNames(columnNames);
+        }
 
-    // Render the records if they're available
-    if (records !== null) {
-      this.renderRecords(records);
+        await stateManager.retrieveRecords();
+        const records = stateManager.getRecords();
+
+        if (records !== null) {
+            this.renderRecords(records);
+        }
+    } catch (error) {
+        console.error(`Error during initialRender: ${error}`);
     }
-  }
+}
+
 
   renderColumnNames(columnNames: string[]): void {
     console.log("Function #11 - Executing renderColumnNames");
@@ -276,10 +319,9 @@ class TableRenderer {
       }
       thead.appendChild(row);
 
-      // Set column widths using the provided function
       this.setColumnWidths();
     } catch (error) {
-      if (error instanceof Error) {  // Type guard
+      if (error instanceof Error) {  
         console.error(`An error occurred: ${error.message}`);
       } else {
         console.error(`An unknown error occurred: ${error}`);
@@ -288,23 +330,27 @@ class TableRenderer {
   }
   setColumnWidths(): void {
     console.log("Function #11.1 - Executing setColumnWidths");
-    // Assuming your table has an id of "myTable"
-    const table = document.getElementById("myTable");
-    
-    if (table) {
-      // Count the number of columns in your table
+  
+    try {
+      const table = document.getElementById("myTable");
+      
+      if (!table) {
+        throw new Error('Table with id "myTable" not found.');
+      }
+
       const headerCells = table.querySelectorAll("th");
       const numCols = headerCells.length;
-  
-      // Calculate the width for each column
+    
       const colWidth = 100 / numCols;
-  
-      // Set the width
+    
       headerCells.forEach((headerCell: Element) => {
         (headerCell as HTMLElement).style.width = `${colWidth}%`;
       });
+    } catch (error) {
+      console.error(`Error setting column widths: ${error}`);
     }
-  }
+}
+
 
   renderRecords(records: apiRecord[] | null, highlightId: number | null = null) {
     console.log("Function #14 - Executing renderRecords");
@@ -319,7 +365,7 @@ class TableRenderer {
         throw new Error('Table body not found.');
       }
       
-      tbody.innerHTML = ''; // Clear existing rows
+      tbody.innerHTML = ''; 
       
       records.forEach((record) => {
         const row = document.createElement('tr');
@@ -374,96 +420,139 @@ class TableRenderer {
   }
 }
 
-// ****************************************************** Controller ********************************************************* /
+// ****************************************************** Controllers ********************************************************* /
 
-// WindowResizeHandler Class
+
 class WindowResizeHandler {
-  private timeoutId: number | null = null;
+  private debouncedUpdate: Function;
 
   constructor(
     private tableRenderer: TableRenderer,
-    // private paginationManager: PaginationManager,
     private stateManager: StateManager
-    ) {}
+  ) {
+    this.debouncedUpdate = this.debounce(this.updateAfterResize.bind(this), 350);
+  }
 
-  // Inside WindowResizeHandler class
   handleResize() {
     console.log("Function #15 - Executing handleResize");
+    this.debouncedUpdate();
+  }
+  
+  debounce(func: Function, delay: number): Function {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    return (...args: any[]) => {
+        const later = () => {
+            timeout = null;
+            func(...args);
+        };
+        if (timeout !== null) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(later, delay);
+    };
+}
 
-    if (this.timeoutId !== null) {
-      clearTimeout(this.timeoutId);
-    }
-
-    this.timeoutId = window.setTimeout(async () => {
-      // Delegate the logic to adjust 'from' and 'to' to StateManager
-      
+  async updateAfterResize() {
+    try {
+      console.log("Update after resize");
       this.stateManager.adjustWindowSize();
       await this.stateManager.retrieveRecords();
       const records = this.stateManager.getRecords();
-  
-    // Render the records if they're available
-    if (records !== null) {
-      this.tableRenderer.renderRecords(records);
-    }
-      this.timeoutId = null;
-    }, 250);
-  }
 
+      if (records !== null) {
+        this.tableRenderer.renderRecords(records);
+      }
+    } catch (error) {
+      console.error(`Error in updateAfterResize: ${error instanceof Error ? error.message : error}`);
+    }
+  }
 }
 
-// PaginationManager Class
-class PaginationManager {
-  // currentPage: number = 1;
 
+
+class PaginationManager {
+ 
   constructor(private tableRenderer: TableRenderer, private stateManager: StateManager) {
     this.tableRenderer = tableRenderer;
     this.stateManager = stateManager
-    //this.updateButtonStates();
   }
 
-  async navigateToHome() {
+  navigateToHome(): void {
     console.log("Function #25 - Navigating to Home");
-    window.location.reload();
-  }
+    try {
+        window.location.reload();
+    } catch (error) {
+        console.error(`Error while navigating to home: ${error instanceof Error ? error.message : error}`);
+        alert("Failed to reload the page. Please try again.");
+    }
+}
+
 
   async incrementPage(): Promise<void> {
-    console.log("Function #16 - Executing incrementPage");
-    this.stateManager.goToNextPage();
-    await this.stateManager.retrieveRecords();
-    const records = this.stateManager.getRecords();
-    
-    if (records !== null) {
-      this.tableRenderer.renderRecords(records);
+    try {
+      console.log("Function #16 - Executing incrementPage");
+      this.stateManager.goToNextPage();
+      await this.stateManager.retrieveRecords();
+      const records = this.stateManager.getRecords();
+  
+      if (records !== null) {
+        this.tableRenderer.renderRecords(records);
+      }
+      this.updateButtonStates();
+    } catch (error) {
+      console.error(`Unexpected error in incrementPage: ${error instanceof Error ? error.message : error}`);
     }
-    this.updateButtonStates();
   }
+  
 
   async decrementPage(): Promise<void> {
-    console.log("Function #21 - Executing decrementPage");
-    this.stateManager.goToPreviousPage();
-    await this.stateManager.retrieveRecords();
-    const records = this.stateManager.getRecords();
-    
-    if (records !== null) {
-      this.tableRenderer.renderRecords(records);
+    try {
+      console.log("Function #21 - Executing decrementPage");
+      
+      this.stateManager.goToPreviousPage();
+      await this.stateManager.retrieveRecords();
+      const records = this.stateManager.getRecords();
+      
+      if (records !== null) {
+        this.tableRenderer.renderRecords(records);
+      }
+      
+      this.updateButtonStates();
+    } catch (error) {
+      console.error(`Error in decrementPage: ${error instanceof Error ? error.message : error}`);
     }
-    this.updateButtonStates();
   }
+  
 
   async searchById(): Promise<void> {
-    console.log("Function #23 - Executing searchById");
-    const filterInput = document.getElementById('filterInput') as HTMLInputElement;
-    const searchValue = parseInt(filterInput.value, 10);
-    this.stateManager.highlightedId = searchValue;
-    await this.stateManager.searchByIdStateChange(searchValue);
-    const records = this.stateManager.getRecords();
-    
-    if (records !== null) {
-      this.tableRenderer.renderRecords(records, searchValue);
+    try {
+      console.log("Function #23 - Executing searchById");
+      
+      const filterInput = document.getElementById('filterInput') as HTMLInputElement;
+      if (!filterInput) {
+        throw new Error('Filter input element not found.');
+      }
+  
+      const searchValue = parseInt(filterInput.value, 10);
+      if (isNaN(searchValue)) {
+        throw new Error('Invalid search value or none');
+      }
+  
+      this.stateManager.highlightedId = searchValue;
+      await this.stateManager.searchByIdStateChange(searchValue);
+  
+      const records = this.stateManager.getRecords();
+      
+      if (records !== null) {
+        this.tableRenderer.renderRecords(records, searchValue);
+      }
+  
+      this.updateButtonStates();
+    } catch (error) {
+      console.error(`Error in searchById function: ${error instanceof Error ? error.message : error}`);
     }
-    
-    this.updateButtonStates();
   }
+  
 
   setupLiveValidation(): void {
   const filterInput = document.getElementById('filterInput') as HTMLInputElement;
@@ -484,26 +573,33 @@ class PaginationManager {
 
 
   private updateButtonStates(): void {
-    console.log("Function #20 - Executing updateButtonstates");
-    const prevButton = document.getElementById("prevPage") as HTMLButtonElement;
-    const nextButton = document.getElementById("nextPage") as HTMLButtonElement;
-  
-    const from = this.stateManager.getFrom(); // Use the getter to get the value of `from`
-    const to = this.stateManager.getTo(); // Use the getter to get the value of `to`
-    const totalRecordCount = this.stateManager.getTotalRecordCount(); // Use a getter to get the totalRecordCount
-  
-    if (prevButton !== null) {
-      prevButton.disabled = from === 0;
-    }
-  
-    if (nextButton !== null) {
-      nextButton.disabled = to === totalRecordCount - 1;
+    try {
+      console.log("Function #20 - Executing updateButtonstates");
+      const prevButton = document.getElementById("prevPage") as HTMLButtonElement;
+      const nextButton = document.getElementById("nextPage") as HTMLButtonElement;
+    
+      const from = this.stateManager.getFrom();
+      const to = this.stateManager.getTo();
+      const totalRecordCount = this.stateManager.getTotalRecordCount();
+    
+      if (prevButton !== null) {
+        prevButton.disabled = from === 0;
+      }
+    
+      if (nextButton !== null) {
+        nextButton.disabled = to === totalRecordCount - 1;
+      }
+    } catch (error) {
+      console.error(`Unexpected error in updateButtonStates: ${error instanceof Error ? error.message : error}`);
     }
   }
+  
 }
 
+
 // ****************************************************** Main Script ********************************************************* /
-// main script
+
+
 window.onload = async () => {
   console.log("Event #1 - Executing window.onload");
 
@@ -533,8 +629,6 @@ window.onload = async () => {
     document.getElementById('searchButton')?.addEventListener("click", () => { paginationManager.searchById();})
     document.getElementById("main-heading")?.addEventListener("click", () => { paginationManager.navigateToHome();})
 };
-
-
 
 
 
