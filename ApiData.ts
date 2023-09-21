@@ -125,17 +125,14 @@ class ApiData {
 
 	/** search through records using fromID */
 	searchRecords(searchValue: number): Promise<void> {
-		// Maximum allowed Value
-		const maxRange = this.maxRange;
-
-		if (searchValue >= 0 && searchValue <= maxRange) {
+		if (searchValue >= 0 && searchValue <= this.maxRange) {
 			this.firstVal = searchValue;
 			this.currentPage = Math.ceil(searchValue / this.pageSize) + 1;
 			// empty search input after searching 
 			$('#fromInput').val('');
 			return this.fetchAndDisplayRecords();
 		} else {
-			alert(`Error while searching, please enter values in the range (0-${maxRange})`);
+			alert(`Error while searching, please enter values in the range (0-${this.maxRange})`);
 			return Promise.resolve();
 		}
 	}
