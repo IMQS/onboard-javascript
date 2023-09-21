@@ -130,25 +130,12 @@ class ApiData {
 
 		if (searchValue >= 0 && searchValue <= maxRange) {
 			this.firstVal = searchValue;
-			const pageSize = this.pageSize;
-
-			if (searchValue + pageSize > maxRange) {
-				searchValue = Math.max(0, maxRange - pageSize);
-			}
-
-			return this.fetchAndProcessRecords(searchValue, searchValue + pageSize)
-				.then(processedData => {
-					this.data = processedData;
-					this.currentPage = Math.ceil(searchValue / this.pageSize) + 1;
-					this.displayRecords();
-					// empty search input after searching 
-					$('#fromInput').val('');
-				})
-				.catch(() => {
-					throw ('Failed to search value');
-				});
+			this.currentPage = Math.ceil(searchValue / this.pageSize) + 1;
+			// empty search input after searching 
+			$('#fromInput').val('');
+			return this.fetchAndDisplayRecords();
 		} else {
-			alert(`Error while searching , please enter values in the range (0-${maxRange})`);
+			alert(`Error while searching, please enter values in the range (0-${maxRange})`);
 			return Promise.resolve();
 		}
 	}
