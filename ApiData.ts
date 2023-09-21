@@ -50,8 +50,7 @@ class ApiData {
 	recordCount(): Promise<void> {
 		return this.fetchNumData('http://localhost:2050/recordCount')
 			.then((response: number) => {
-				const totalItems =response;
-				this.totalItems = totalItems;
+				this.totalItems = response;
 			})
 			.catch(error => {
 				console.error('Failed to fetch record count:', error);
@@ -63,7 +62,7 @@ class ApiData {
 	/** Use the fetchData() func to make an HTTP request to the API endpoint and process the data */
 	fetchColumns(): Promise<void> {
 		return this.fetchStrData('http://localhost:2050/columns')
-			.then((response:string) => {
+			.then((response: string) => {
 				const res = JSON.parse(response);
 				this.columnNames = res.map((columnName: string) => ({ name: columnName }));
 				// Initialize the 'data' property as an empty array of GridData objects
@@ -81,7 +80,7 @@ class ApiData {
 		$('#grid').hide();
 
 		return this.fetchStrData(`http://localhost:2050/records?from=${from}&to=${to}`)
-			.then((response:string) => {
+			.then((response: string) => {
 				const res = JSON.parse(response);
 				const processedData = res.map((record: string) => {
 					const obj: GridData = {};
@@ -130,21 +129,17 @@ class ApiData {
 		const maxRange = this.maxRange;
 
 		if (searchValue >= 0 && searchValue <= maxRange) {
-			let from = searchValue;
+			this.firstVal = searchValue;
 			const pageSize = this.pageSize;
 
-			if (from + pageSize > maxRange) {
-				from = Math.max(0, maxRange - pageSize);
+			if (searchValue + pageSize > maxRange) {
+				searchValue = Math.max(0, maxRange - pageSize);
 			}
 
-			return this.fetchAndProcessRecords(from, from + pageSize)
+			return this.fetchAndProcessRecords(searchValue, searchValue + pageSize)
 				.then(processedData => {
 					this.data = processedData;
-					this.currentPage = Math.ceil(from / this.pageSize) + 1;
-					// Set firstVal to searched value
-					this.firstVal = from;
-					// Calculate lastVal based on pageSize
-					this.lastVal = from + this.pageSize - 1;
+					this.currentPage = Math.ceil(searchValue / this.pageSize) + 1;
 					this.displayRecords();
 					// empty search input after searching 
 					$('#fromInput').val('');
@@ -176,7 +171,7 @@ class ApiData {
 		});
 		return response;
 	}
-	
+
 	/** Change grid height according to screen size */
 	private adjustGridHeight(): void {
 		const gridElement = document.getElementById('grid');
