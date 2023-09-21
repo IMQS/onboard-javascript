@@ -114,8 +114,6 @@ class InitializeApp {
 						}
 						tableData += "</tr>";
 					}
-				} else {
-					tableData = "<tr><td>No records found.</td></tr>";
 				}
 				// Hide the "Next Page" button if maxToRecord is the last record
 				if (maxToRecord >= recordCount - 1) {
@@ -144,32 +142,28 @@ class InitializeApp {
 
 	/** Handle the search method */
 	async searchMethod(searchValue: number): Promise<void> {
-		try {
-			const totalRecCount = await this.totalRecords();
-			if (searchValue < 0 || searchValue >= totalRecCount) {
-				window.alert('Record not found on this database');
-				return;
-			}
-			const lastRecordIndex = totalRecCount - 1;
-			const targetPage = Math.ceil((searchValue + 1) / this.recordsPerPage);
-			const fromRecord = (targetPage - 1) * this.recordsPerPage;
-			const toRecord = Math.min(fromRecord + this.recordsPerPage, lastRecordIndex);
-			this.currentPage = targetPage;
-			this.searchedValue = searchValue;
-			this.currentFirstRecordIndex = fromRecord;
-			this.displayData(fromRecord, this.recordsPerPage);
-			$("#prevPageButton").show();
-		} catch {
-			throw new Error('No valid records found');
+		const totalRecCount = await this.totalRecords()
+			.catch(() => {
+				throw new Error('No valid records found');
+			});
+		if (searchValue < 0 || searchValue >= totalRecCount) {
+			window.alert('Record not found on this database');
+			return;
 		}
+		const lastRecordIndex = totalRecCount - 1;
+		const targetPage = Math.ceil((searchValue + 1) / this.recordsPerPage);
+		const fromRecord = (targetPage - 1) * this.recordsPerPage;
+		const toRecord = Math.min(fromRecord + this.recordsPerPage, lastRecordIndex);
+		this.currentPage = targetPage;
+		this.searchedValue = searchValue;
+		this.currentFirstRecordIndex = fromRecord;
+		this.displayData(fromRecord, this.recordsPerPage);
 	}
 
 	/** Update the screen layout and data display */
 	updateScreen(): void {
 		const newScreenHeight = window.innerHeight;
 		this.recordsPerPage = this.windowAdjustments(newScreenHeight);
-		$("#loader").show();
-		$("#tableWrapper").hide();
 		this.totalRecords()
 			.then(totalRecCount => {
 				let fromRecord: number;
@@ -187,11 +181,7 @@ class InitializeApp {
 					this.currentPage = lastPage;
 					fromRecord = (lastPage - 1) * this.recordsPerPage;
 				}
-				return this.displayData(fromRecord, this.recordsPerPage);
-			})
-			.then(() => {
-				$("#loader").hide();
-				$("#tableWrapper").show();
+				this.displayData(fromRecord, this.recordsPerPage);
 			})
 			.catch(() => {
 				throw new Error('Error updating screen:');
