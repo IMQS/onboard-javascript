@@ -193,9 +193,9 @@ class InitializeApp {
 		const estimatedRowHeightFactor = 1;
 		const estimatedRowHeight = estimatedRowHeightFactor * 50;
 		const availableScreenHeight = screenHeight - 140;
-		const recordsPerPage = Math.floor(availableScreenHeight / estimatedRowHeight);
+		this.recordsPerPage = Math.floor(availableScreenHeight / estimatedRowHeight);
 		// This ensures that will at least be 1 record on display 
-		return Math.max(recordsPerPage, 1);
+		return Math.max(this.recordsPerPage, 1);
 	}
 
 	/** Create a debounce function to delay function execution */
