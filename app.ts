@@ -280,7 +280,7 @@ class InitializeApp {
 						this.currentFirstRecordIndex -= this.recordsPerPage;
 					}
 					fromRecord = this.currentFirstRecordIndex;
-					return this.displayData(fromRecord, this.recordsPerPage);
+					this.displayData(fromRecord, this.recordsPerPage);
 				})
 				.catch(() => {
 					throw new Error('Error while trying go to the previous page');
@@ -324,7 +324,7 @@ class InitializeApp {
 						this.currentPage = this.totalPages;
 					}
 					fromRecord = this.currentFirstRecordIndex;
-					return this.displayData(fromRecord, this.recordsPerPage);
+					this.displayData(fromRecord, this.recordsPerPage);
 				})
 				.catch(() => {
 					throw new Error('Error while trying go to the next page');
