@@ -1,14 +1,16 @@
 // ****************************************************** Data ********************************************************* /
 
+type CityData = [number, string, number];
 
 class ApiManager {
   totalRecordCount: number;
   columnNames: string[] | null;
-
+  
   constructor() {
     this.totalRecordCount = 0;
     this.columnNames = null;
   }
+
 
   async fetchTotalRecordCount(): Promise<void> {
     console.log("Function #3 - Executing fetchTotalRecordCount");
@@ -24,6 +26,7 @@ class ApiManager {
     }
   }
   
+
   async fetchColumnNames(): Promise<void> {
     console.log("Function #5 - Executing fetchColumnNames");
     try {
@@ -38,24 +41,26 @@ class ApiManager {
     }
   }
   
-  async fetchRecords(from: number, to: number): Promise<any[][] | null> {
+
+  async fetchRecords(from: number, to: number): Promise<CityData[] | null> {
     console.log(`Function #12.1 - Executing fetchRecords with from: ${from}, to: ${to}`);
     try {
       const response = await fetch(`http://localhost:2050/records?from=${from}&to=${to}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch records: ${response.statusText}`);
       }
-      const data: any[][] = await response.json();
+      const data: CityData[] = await response.json();
       return data;
     } catch (error) {
       console.error(`Error fetching records: ${error}`);
       return null;
     }
   }
-  
 }
 
+
 // ****************************************************** Model ********************************************************* /
+
 
 class StateManager {
   private rowHeight: number;
@@ -65,9 +70,10 @@ class StateManager {
   private from: number;
   private to: number;
   private apiManager: ApiManager;
-  private records: any[][] | null = null;
+  private records: CityData[] | null = null;
   private columnNames: string[] | null;
   private totalRecordCount = 0;
+
   highlightedId: number | null = null;
 
   constructor(apiManager: ApiManager) {
@@ -81,6 +87,8 @@ class StateManager {
     this.columnNames = null;
     this.totalRecordCount = 0;
   }
+
+
   async initializeState(): Promise<void> {
     console.log("Function #1 - Executing initialize");
     try {
@@ -106,6 +114,7 @@ class StateManager {
     }
 }
   
+
   async fetchAndStoreTotalRecordCount(): Promise<void> {
     console.log("Function #2 - Executing fetchAndStoreTotalRecordCount");
     try {
@@ -116,18 +125,19 @@ class StateManager {
     }
   }
   
-  
+
   getTotalRecordCount(): number {
     return this.totalRecordCount;
   }
   
+
   getColumnNames(): string[] | null {
     console.log("Function #10 - Executing getColumnNames");
     return this.columnNames;
   }
   
   
-  getRecords(): any[][] | null {
+  getRecords(): CityData[] | null {
     console.log("Function #13 - Executing getRecords");
     return this.records;
   }
@@ -138,20 +148,24 @@ class StateManager {
     return this.from;
   }
 
+
   setFrom(value: number): void {
     console.log("Function #7 - Executing setFrom");
     this.from = value;
   }
+
 
   getTo(): number {
     console.log("Function #19 - Executing getTo");
     return this.to;
   }
 
+
   setTo(value: number): void {
     console.log("Function #8 - Executing setTo");
     this.to = value;
   }
+
 
   goToNextPage(): void {
     try {
@@ -176,7 +190,6 @@ class StateManager {
       console.error(`Unexpected error in goToNextPage: ${error instanceof Error ? error.message : error}`);
     }
   }
-  
   
 
   goToPreviousPage(): void {
@@ -211,16 +224,15 @@ class StateManager {
         const newFrom = id;
         const newTo = id + this.numRows - 1;
 
-        // Check that 'to' does not exceed totalRecordCount
+        // Checking that 'to' does not exceed totalRecordCount
         if (newTo >= this.totalRecordCount) {
             this.setTo(this.totalRecordCount - 1);
         } else {
             this.setTo(newTo);
         }
-
         this.setFrom(newFrom);
-
         await this.retrieveRecords();
+
     } catch (error) {
         console.error(`Error in searchByIdStateChange: ${error instanceof Error ? error.message : error}`);
     }
@@ -267,13 +279,10 @@ async retrieveRecords(): Promise<void> {
       console.error(`Error retrieving records: ${error instanceof Error ? error.message : error}`);
   }
 }
-
 }
 
 // ****************************************************** View ********************************************************* /
 
-
-type apiRecord = any[];
 
 class TableRenderer {
   private stateManager: StateManager;
@@ -328,9 +337,10 @@ class TableRenderer {
       }
     }
   }
+
+
   setColumnWidths(): void {
     console.log("Function #11.1 - Executing setColumnWidths");
-  
     try {
       const table = document.getElementById("myTable");
       
@@ -340,7 +350,6 @@ class TableRenderer {
 
       const headerCells = table.querySelectorAll("th");
       const numCols = headerCells.length;
-    
       const colWidth = 100 / numCols;
     
       headerCells.forEach((headerCell: Element) => {
@@ -352,7 +361,7 @@ class TableRenderer {
 }
 
 
-  renderRecords(records: apiRecord[] | null, highlightId: number | null = null) {
+  renderRecords(records: CityData[] | null, highlightId: number | null = null) {
     console.log("Function #14 - Executing renderRecords");
     highlightId = highlightId ?? this.stateManager.highlightedId; // use state if highlightId is null
     try {
@@ -383,42 +392,8 @@ class TableRenderer {
       console.error(`An error occurred: ${error}`);
     }
   }
-  
-  
-  async adjustRows(): Promise<void> {
-    console.log("Function #7 - Executing adjustRows");
-    try {
-      // const rowHeight = 20;
-      // const headerHeight = 180;
-      // const availableHeight = window.innerHeight - headerHeight;
-    
-      // let numRows = Math.floor(availableHeight / rowHeight);
-  
-      // Use StateManager to get and set 'from' and 'to'
-      // this.stateManager.setFrom(0);
-      // this.stateManager.setTo(numRows - 1);
-  
-      // Check for a minimum number of rows
-      // if (numRows <= 0) {
-      //   console.log("Window size too small, setting minimum number of rows to 1");
-      //   numRows = 1;
-      // }
-  
-      // Fetch the records using StateManager
-      
-  
-      // Get the records from StateManager
-      const records = this.stateManager.getRecords();
-  
-      // Render the records if they're available
-      if (records !== null) {
-        this.renderRecords(records);
-      }
-    } catch (error) {
-      console.error(`An error occurred: ${error}`);
-    }
-  }
 }
+
 
 // ****************************************************** Controllers ********************************************************* /
 
@@ -427,30 +402,37 @@ class WindowResizeHandler {
   private debouncedUpdate: Function;
 
   constructor(
-    private tableRenderer: TableRenderer,
-    private stateManager: StateManager
+      private tableRenderer: TableRenderer,
+      private stateManager: StateManager
   ) {
-    this.debouncedUpdate = this.debounce(this.updateAfterResize.bind(this), 350);
+      this.debouncedUpdate = this.debounce(this.updateAfterResize.bind(this), 350);
+
+      // Attach event listener here
+      this.setupEventListeners();
+  }
+
+  private setupEventListeners(): void {
+      window.addEventListener('resize', () => this.handleResize());
   }
 
   handleResize() {
-    console.log("Function #15 - Executing handleResize");
-    this.debouncedUpdate();
+      console.log("Function #15 - Executing handleResize");
+      this.debouncedUpdate();
   }
-  
+
   debounce(func: Function, delay: number): Function {
-    let timeout: ReturnType<typeof setTimeout> | null = null;
-    return (...args: any[]) => {
-        const later = () => {
-            timeout = null;
-            func(...args);
-        };
-        if (timeout !== null) {
-            clearTimeout(timeout);
-        }
-        timeout = setTimeout(later, delay);
-    };
-}
+      let timeout: ReturnType<typeof setTimeout> | null = null;
+      return (...args: any[]) => {
+          const later = () => {
+              timeout = null;
+              func(...args);
+          };
+          if (timeout !== null) {
+              clearTimeout(timeout);
+          }
+          timeout = setTimeout(later, delay);
+      };
+  }
 
   async updateAfterResize() {
     try {
@@ -469,13 +451,51 @@ class WindowResizeHandler {
 }
 
 
-
 class PaginationManager {
- 
+  private prevButton: HTMLButtonElement;
+  private nextButton: HTMLButtonElement;
+  private searchButton: HTMLButtonElement;
+  private mainHeading: HTMLElement;
+  private filterInput: HTMLInputElement;
+  private errorMessage: HTMLElement;
+
   constructor(private tableRenderer: TableRenderer, private stateManager: StateManager) {
-    this.tableRenderer = tableRenderer;
-    this.stateManager = stateManager
+      this.tableRenderer = tableRenderer;
+      this.stateManager = stateManager;
+
+      this.prevButton = document.getElementById("prevPage") as HTMLButtonElement;
+      this.nextButton = document.getElementById("nextPage") as HTMLButtonElement;
+      this.searchButton = document.getElementById('searchButton') as HTMLButtonElement;
+      this.mainHeading = document.getElementById("main-heading") as HTMLElement;
+      this.filterInput = document.getElementById('filterInput') as HTMLInputElement;
+      this.errorMessage = document.getElementById('errorMessage') as HTMLElement;
+      
+      // Attach event listeners
+      this.setupEventListeners();
   }
+
+  private setupEventListeners(): void {
+      if (this.prevButton) {
+          this.prevButton.addEventListener("click", () => this.decrementPage());
+      }
+      
+      if (this.nextButton) {
+          this.nextButton.addEventListener("click", () => this.incrementPage());
+      }
+
+      if (this.searchButton) {
+          this.searchButton.addEventListener("click", () => this.searchById());
+      }
+
+      if (this.mainHeading) {
+          this.mainHeading.addEventListener("click", () => this.navigateToHome());
+      }
+
+      if (this.filterInput && this.errorMessage) {
+          this.setupLiveValidation();
+      }
+  }
+
 
   navigateToHome(): void {
     console.log("Function #25 - Navigating to Home");
@@ -485,7 +505,7 @@ class PaginationManager {
         console.error(`Error while navigating to home: ${error instanceof Error ? error.message : error}`);
         alert("Failed to reload the page. Please try again.");
     }
-}
+  }
 
 
   async incrementPage(): Promise<void> {
@@ -526,74 +546,59 @@ class PaginationManager {
 
   async searchById(): Promise<void> {
     try {
-      console.log("Function #23 - Executing searchById");
-      
-      const filterInput = document.getElementById('filterInput') as HTMLInputElement;
-      if (!filterInput) {
-        throw new Error('Filter input element not found.');
-      }
-  
-      const searchValue = parseInt(filterInput.value, 10);
-      if (isNaN(searchValue)) {
-        throw new Error('Invalid search value or none');
-      }
-  
-      this.stateManager.highlightedId = searchValue;
-      await this.stateManager.searchByIdStateChange(searchValue);
-  
-      const records = this.stateManager.getRecords();
-      
-      if (records !== null) {
-        this.tableRenderer.renderRecords(records, searchValue);
-      }
-  
-      this.updateButtonStates();
+        console.log("Function #23 - Executing searchById");
+        
+        const searchValue = parseInt(this.filterInput.value, 10);
+        if (isNaN(searchValue)) {
+            throw new Error('Invalid search value or none');
+        }
+
+        this.stateManager.highlightedId = searchValue;
+        await this.stateManager.searchByIdStateChange(searchValue);
+
+        const records = this.stateManager.getRecords();
+        
+        if (records !== null) {
+            this.tableRenderer.renderRecords(records, searchValue);
+        }
+
+        this.updateButtonStates();
     } catch (error) {
-      console.error(`Error in searchById function: ${error instanceof Error ? error.message : error}`);
+        console.error(`Error in searchById function: ${error instanceof Error ? error.message : error}`);
     }
-  }
-  
-
-  setupLiveValidation(): void {
-  const filterInput = document.getElementById('filterInput') as HTMLInputElement;
-  const errorMessage = document.getElementById('errorMessage') as HTMLElement;
-
-  filterInput.addEventListener('input', () => {
-    const inputValue = filterInput.value;
-
-    if (inputValue.length === 0) {
-      errorMessage.textContent = "";
-    } else if (inputValue.length < 1 || inputValue.length > 6 || !/^\d+$/.test(inputValue)) {
-      errorMessage.textContent = "Invalid input. Please enter a number between 0 and 999 999.";
-    } else {
-      errorMessage.textContent = "";
-    }
-   });
-  }
+}
 
 
-  private updateButtonStates(): void {
-    try {
+setupLiveValidation(): void {
+  this.filterInput.addEventListener('input', () => {
+      const inputValue = this.filterInput.value;
+
+      if (inputValue.length === 0) {
+          this.errorMessage.textContent = "";
+      } else if (inputValue.length < 1 || inputValue.length > 6 || !/^\d+$/.test(inputValue)) {
+          this.errorMessage.textContent = "Invalid input. Please enter a number between 0 and 999 999.";
+      } else {
+          this.errorMessage.textContent = "";
+      }
+  });
+}
+
+
+private updateButtonStates(): void {
+  try {
       console.log("Function #20 - Executing updateButtonstates");
-      const prevButton = document.getElementById("prevPage") as HTMLButtonElement;
-      const nextButton = document.getElementById("nextPage") as HTMLButtonElement;
-    
+  
       const from = this.stateManager.getFrom();
       const to = this.stateManager.getTo();
       const totalRecordCount = this.stateManager.getTotalRecordCount();
-    
-      if (prevButton !== null) {
-        prevButton.disabled = from === 0;
-      }
-    
-      if (nextButton !== null) {
-        nextButton.disabled = to === totalRecordCount - 1;
-      }
-    } catch (error) {
-      console.error(`Unexpected error in updateButtonStates: ${error instanceof Error ? error.message : error}`);
-    }
-  }
   
+      this.prevButton.disabled = from === 0;
+      this.nextButton.disabled = to === totalRecordCount - 1;
+
+  } catch (error) {
+      console.error(`Unexpected error in updateButtonStates: ${error instanceof Error ? error.message : error}`);
+  }
+}
 }
 
 
@@ -605,459 +610,19 @@ window.onload = async () => {
 
   // Initialize Data
   const apiManager = new ApiManager(); 
-  
 
   // Initialize Model
   const stateManager = new StateManager(apiManager); 
-  await stateManager.initializeState();  // Don't forget to await!
-  
+  await stateManager.initializeState(); 
 
   // Initialize View
   const tableRenderer = new TableRenderer(stateManager); 
   await tableRenderer.initialRender(stateManager);
 
-
   // Initialize Controllers
   const windowResizeHandler = new WindowResizeHandler(tableRenderer, stateManager); 
-  const paginationManager = new PaginationManager(tableRenderer, stateManager);
+  const paginationManager = new PaginationManager(tableRenderer, stateManager); 
   
-    // Attach event listeners
-    paginationManager.setupLiveValidation();
-    window.addEventListener('resize', () => windowResizeHandler.handleResize());
-    document.getElementById("prevPage")?.addEventListener("click", () => { paginationManager.decrementPage();})
-    document.getElementById("nextPage")?.addEventListener("click", () => { paginationManager.incrementPage();})
-    document.getElementById('searchButton')?.addEventListener("click", () => { paginationManager.searchById();})
-    document.getElementById("main-heading")?.addEventListener("click", () => { paginationManager.navigateToHome();})
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// *** Development Setup ***//
-// go run main.go
-// npm run build
-// npm run watch
-// *** Development Setup ***//
-
-
-
-
-// *** Global Variables ***//
-// const ROW_HEIGHT = 21;
-// let currentPage = 1;
-// let recordsPerPage = 25;
-// let totalRecords: number;
-// let lastFilteredId: string | null = null;
-// let cachedColumnNames: string[] | null = null;
-// let totalPages: number;
-
-
-
-
-
-// // Initialize the page when the window loads
-// window.onload = async () => {
-//   calculateRecordsPerPage();
-//   await fetchTotalRecords();
-//   generateInitialTable();
-
-
-
-
-//   // Re-generate the table when the window is resized
-//   // Re-generate the table when the window is resized
-//   window.addEventListener("resize", debounce(async () => {
-//     // Find the first row and its ID.
-//     const firstRow = document.querySelector('#myTable tbody tr');
-//     let firstRowId = 0;
-    
-//     if (firstRow && firstRow.id) {
-//       firstRowId = parseInt(firstRow.id.split('-')[1], 10);
-//     }
-    
-//     console.log("In debounce (before recalculating):");
-//     console.log(`First row ID: ${firstRowId}`);
-//     console.log(`Current page: ${currentPage}`);
-    
-//     // Recalculate the number of records per page
-//     calculateRecordsPerPage();
-  
-//     // Recalculate currentPage based on firstRowId
-//     currentPage = Math.floor(firstRowId / recordsPerPage) + 1;
-    
-//     console.log("In debounce (after recalculating):");
-//     console.log(`First row ID should still be: ${firstRowId}`);
-//     console.log(`New current page: ${currentPage}`);
-    
-//     // Regenerate table
-//     if (lastFilteredId) {
-//       const id = parseInt(lastFilteredId, 10);
-//       filterRecordsById(id.toString());
-//     } else {
-//       generateTable(currentPage, null);  // Generate the table for the current page
-//     }
-//   }, 250));
-  
-  
-
-// // Handle Previous button click
-// document.getElementById("prevBtn")?.addEventListener("click", () => {
-//   const filterInput = document.getElementById("filterInput") as HTMLInputElement;
-//   if (!filterInput.value) {
-//     lastFilteredId = null;
-//   }
-//   currentPage--;
-//   generateTable(currentPage, lastFilteredId);
-
-//   if (currentPage === 1) {
-//     document.getElementById("prevBtn")?.setAttribute("disabled", "true");
-//   } else {
-//     document.getElementById("prevBtn")?.removeAttribute("disabled");
-//     document.getElementById("nextBtn")?.removeAttribute("disabled");
-//   }
-// });
-
-// // Handle Next button click
-// document.getElementById("nextBtn")?.addEventListener("click", () => {
-//   const filterInput = document.getElementById("filterInput") as HTMLInputElement;
-//   if (!filterInput.value) {
-//     lastFilteredId = null;
-//   }
-//   currentPage++;
-//   generateTable(currentPage, lastFilteredId);
-
-//   document.getElementById("prevBtn")?.removeAttribute("disabled");
-//   if (currentPage * recordsPerPage >= totalRecords) {
-//     document.getElementById("nextBtn")?.setAttribute("disabled", "true");
-//   }
-// });
-
-  
-
-
-
-//   // Filter functionality
-//   let errorTimeout: number | null = null;
-
-//   const filterInput = document.getElementById("filterInput") as HTMLInputElement;
-//   const errorMessage = document.getElementById("errorMessage");
-
-//   if (filterInput && errorMessage) {
-//     filterInput.addEventListener("input", async function() { // Added async here to call await later
-//       const query = this.value.trim();
-
-//       // Clear any existing timeout and error message
-//       if (errorTimeout !== null) {
-//         clearTimeout(errorTimeout);
-//       }
-//       errorMessage.textContent = "";
-
-//       if (query === "") {
-//         // If input is empty, remove the highlight and revert the table
-//         lastFilteredId = null;
-//         currentPage = 1; // Resetting to the first page
-//         await generateTable(currentPage, null, undefined); // Use currentPage which is now 1
-//         document.getElementById("prevBtn")?.setAttribute("disabled", "true");
-//         return;
-//       }
-      
-//       const isValidNumber = /^[0-9]+$/.test(query) && parseInt(query, 10) <= 999999;
-
-//       if (isValidNumber) {
-//         lastFilteredId = query;
-//         filterRecordsById(query);
-//       } else {
-//         // Set up the delayed message
-//         errorTimeout = setTimeout(() => {
-//           errorMessage.textContent = "Invalid input. Please enter a number between 0 and 999999.";
-//         }, 500);
-//       }
-//     });
-//   }
-// };
-
-
-
-
-// function generateInitialTable() {
-//   generateTable(currentPage, null);
-// }
-
-
-
-// function removeRowsFromTable(rowsToRemove: number) {
-//   const table = document.getElementById('myTable');
-//   if (table) {
-//     const tbody = table.querySelector('tbody');
-//     if (tbody) {
-//       // Remove the last 'rowsToRemove' rows from the table
-//       for (let i = 0; i < rowsToRemove; i++) {
-//         if (tbody.lastElementChild) {
-//           tbody.removeChild(tbody.lastElementChild);
-//         }
-//       }
-//     }
-//   }
-// }
-
-//   // Debounce function
-//   function debounce(func: Function, wait: number) {
-//     let timeout: ReturnType<typeof setTimeout>;
-//     return function executedFunction(...args: any[]) {
-//       const later = () => {
-//         clearTimeout(timeout);
-//         func(...args);
-//       };
-//       clearTimeout(timeout);
-//       timeout = setTimeout(later, wait);
-//     };
-// }
-
-
-
-
-//   // Calculate the number of records to display on each page based on the window height
-//   function calculateRecordsPerPage() {
-//     const headingHeight = document.getElementById('main-heading')?.offsetHeight || 0; 
-//     const paginationHeight = document.getElementById('pagination')?.offsetHeight || 0;  
-//     const availableHeight = window.innerHeight - headingHeight - paginationHeight - 10;
-//     recordsPerPage = Math.floor(availableHeight / ROW_HEIGHT);
-//     totalPages = Math.ceil(totalRecords / recordsPerPage);
-//     console.log("In calculateRecordsPerPage:");
-//     console.log(`Records per page: ${recordsPerPage}`);
-//   }
-
-
-
-
-//   // Fetch columns and cache them if they are not already cached
-//   async function fetchColumnData() {
-//     if (cachedColumnNames !== null) {
-//       return cachedColumnNames;
-//     }
-//     const response = await fetch("http://localhost:2050/columns");
-//     const columnNames = await response.json();
-//     cachedColumnNames = columnNames;  // Store in cache
-//     return columnNames;
-//   }
-  
-  
-
-
-//   // Generate the header of the table
-//   function generateTableHeader(columnNames: string[]) {
-//     const thead = document.createElement('thead');
-//     const tr = document.createElement('tr');
-//     columnNames.forEach((name) => {
-//       const th = document.createElement('th');
-//       th.textContent = name;
-//       tr.appendChild(th);
-//     });
-//     thead.appendChild(tr);
-//     return thead;
-//   }
-
-
-
-
-//   // Fetch a subset of row data from the server
-//   async function fetchRowData(from: number, to: number) {
-//     // Make sure 'to' doesn't exceed the maximum allowed record number
-//     to = Math.min(to, 999999);
-    
-//     // Make sure 'to' is not negative
-//     if (to < 0) {
-//       to = 0;
-//     }
-    
-//     // Make sure 'from' is not greater than 'to'
-//     if (from > to) {
-//       from = to;
-//     }
-  
-//     // Ensure 'from' is not negative
-//     if (from < 0) {
-//       from = 0;
-//     }
-  
-//     const response = await fetch(`http://localhost:2050/records?from=${from}&to=${to}`);
-    
-//     if (!response.ok) {
-//       console.error(`Fetch failed: ${response.status} ${response.statusText}`);
-//       return [];
-//     }
-    
-//     const records = await response.json();
-//     return records;
-//   }
-  
-  
-  
-
-//   // Generate the body of the table
-//   function generateTableRows(records: any[][], highlightId: string | null) {
-//     const tbody = document.createElement('tbody');
-//     records.forEach((record, index) => {
-//       const tr = document.createElement('tr');
-//       tr.id = `row-${record[0]}`;  // Assuming the ID is the first cell in each record
-      
-//       // Highlight the row if it matches the filtered ID
-//       if (highlightId && highlightId === record[0].toString()) {
-//         tr.classList.add("highlighted-green");
-//       }
-//       record.forEach((cell) => {
-//         const td = document.createElement('td');
-//         td.textContent = cell;
-//         tr.appendChild(td);
-//       });
-//       tbody.appendChild(tr);
-//     });
-//     return tbody;
-//   }
-
-
-
-
-//   // Generate the complete table
-//   async function generateTable(page: number, highlightId: string | null, updateMode: boolean = false) {
-//     const columnNames = await fetchColumnData();
-//     const from = (page - 1) * recordsPerPage;
-//     let to = Math.min(page * recordsPerPage, totalRecords) - 1;
-//     const records = await fetchRowData(from, to);
-  
-//     const thead = generateTableHeader(columnNames);
-//     const tbody = generateTableRows(records, highlightId);
-    
-//     // Clear existing data if any
-//     const table = document.getElementById('myTable');
-//     if (table) {
-//       if (updateMode) {
-//         const existingTbody = table.querySelector('tbody');
-//         if (existingTbody) {
-//           tbody.querySelectorAll('tr').forEach((row) => {
-//             existingTbody.appendChild(row);
-//           });
-//         }
-//       } else {
-//         table.innerHTML = "";
-//         table.appendChild(thead);
-//         table.appendChild(tbody);
-//       }
-//     }
-//     console.log("In generateTable:");
-//     console.log(`Start index: ${from}`);
-//     console.log(`End index: ${to}`);
-//     // Set column widths
-//     setColumnWidths();
-    
-//     // If there is a filtered ID, you could call some logic here
-//     if (lastFilteredId) {
-//       // centerHighlightedRow();
-//     }
-  
-//     // Disable or Enable the Next button based on the last record
-//     if (to >= totalRecords - 1) {
-//       document.getElementById("nextBtn")?.setAttribute("disabled", "true");
-//     } else {
-//       document.getElementById("nextBtn")?.removeAttribute("disabled");
-//     }
-//   }
-  
-  
-//   function setColumnWidths(): void {
-//     // Assuming your table has an id of "myTable"
-//     const table = document.getElementById("myTable");
-    
-//     if (table) {
-//       // Count the number of columns in your table
-//       const headerCells = table.querySelectorAll("th");
-//       const numCols = headerCells.length;
-  
-//       // Calculate the width for each column
-//       const colWidth = 100 / numCols;
-  
-//       // Set the width
-//       headerCells.forEach((headerCell: Element) => {
-//         (headerCell as HTMLElement).style.width = `${colWidth}%`;
-//       });
-//     }
-//   }
-  
-
-
-//   // Fetch the total number of records
-//   async function fetchTotalRecords() {
-//     const response = await fetch("http://localhost:2050/recordCount");
-//     totalRecords = await response.json();
-//     totalPages = Math.ceil(totalRecords / recordsPerPage);
-//   }
-
-
-
-
-//   // Filter records by ID and regenerate the table accordingly
-//   async function filterRecordsById(query: string) {
-//     lastFilteredId = query;
-//     if (!query) {
-//       // Revert to initial state if no query
-//       generateTable(1, null);  // Start with the first page
-//       document.getElementById("prevBtn")?.setAttribute("disabled", "true");  // Disable the Previous button here
-//       return;
-//     }
-  
-//     let id = parseInt(query, 10);
-  
-//     // Calculate the current page based on the filtered ID
-//     currentPage = Math.ceil((id + 1) / recordsPerPage);
-  
-//     // Enable or Disable the Previous button based on the current page
-//     if (currentPage > 1) {
-//       document.getElementById("prevBtn")?.removeAttribute("disabled");  // Enable the Previous button here
-//     } else {
-//       document.getElementById("prevBtn")?.setAttribute("disabled", "true");  // Disable the Previous button here
-//     }
-  
-//     console.log(`Fetching records for page ${currentPage} with highlight on ${id}`);
-//     await generateTable(currentPage, id.toString());
-//   }
-  
-  
-
-
-
-//   // Center the row that is highlighted
-//   // function centerHighlightedRow() {
-//   //   const highlightedRow = document.querySelector(".highlighted");
-//   //   const mainContainer = document.getElementById("main-container"); 
-  
-//   //   if (highlightedRow && mainContainer) {
-//   //     const containerHeight = mainContainer.clientHeight;
-//   //     const rowTop = highlightedRow.getBoundingClientRect().top;
-//   //     const rowHeight = highlightedRow.clientHeight;
-//   //     const scrollPosition = rowTop + mainContainer.scrollTop - (containerHeight / 2) + (rowHeight / 2);
-//   //     mainContainer.scrollTop = scrollPosition;
-//   //   }
-//   // }
-  
-  
