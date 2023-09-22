@@ -38,17 +38,17 @@ tr {
 	border: 1px solid #333333;
 }
 
-thead {
+th {
 	background-color: #333333;
 	font-weight: 450;
 	color: white;
 }
 
 td {
-	padding: 2px;
 	border: 1px solid #333333;
 	align-content: center;
 	width: 350px;
+
 }
 
 .grid-controls {
@@ -82,4 +82,18 @@ td {
 	margin: 0 5px;
 	color: white;
 	background-color: #5a5f61;
+}
+
+@media screen and (max-width: 8000px) {
+	td {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	td:hover {
+		overflow: visible;
+		white-space: normal;
+		text-overflow: unset;
+	}
 }

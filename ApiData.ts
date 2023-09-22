@@ -127,7 +127,7 @@ class ApiData {
 	searchRecords(searchValue: number): Promise<void> {
 		if (searchValue >= 0 && searchValue <= this.maxRange) {
 			this.firstVal = searchValue;
-			this.currentPage = Math.ceil(searchValue / this.pageSize) + 1;
+			this.currentPage = Math.ceil(this.firstVal / this.pageSize) + 1;
 			// empty search input after searching 
 			$('#fromInput').val('');
 			return this.fetchAndDisplayRecords();
@@ -189,11 +189,11 @@ class ApiData {
 		let nextBtn = $('#nextBtn');
 
 		// Check if delta(change in page number) is positive and disable the next page if firstval + pageSize exceeds the MaxRange.
-		if (delta > 0 && this.firstVal + delta * this.pageSize > this.maxRange) {
-			this.firstVal = this.lastVal - this.pageSize;
+		if (delta > 0 && this.firstVal + delta * this.pageSize > this.maxRange ) {
+			this.firstVal = this.maxRange - this.pageSize;
 			prevBtn.attr("disabled", null);
 			nextBtn.attr("disabled", "disabled");
-		} else if (delta < 0 && this.firstVal + delta * this.pageSize < 0) {
+		} else if (delta < 0 && this.firstVal + delta * this.pageSize < 0 ) {
 			// If delta is negative then reset firstVal to 0 and disable prev button 
 			this.firstVal = 0;
 			prevBtn.attr("disabled", "disabled");
