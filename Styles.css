@@ -84,7 +84,7 @@ td {
 	background-color: #5a5f61;
 }
 
-@media screen and (max-width: 8000px) {
+@media screen and (max-width: 800px) {
 	td {
 		white-space: nowrap;
 		overflow: hidden;
