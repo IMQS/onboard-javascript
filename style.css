@@ -136,7 +136,6 @@ table {
 	border-collapse: collapse;
 	table-layout: fixed;
 	padding: 1rem;
-	/* font-size: 18px; */
 	font-size: normal;
 }
 
@@ -169,9 +168,10 @@ th:hover {
 }
 
 td {
-	border-right: 1px solid var(--secondary-color);
-	font-weight: 300;
-	padding: 14px;
+    border-right: 1px solid var(--secondary-color);
+    font-weight: 300;
+    padding: 14px;
+    white-space: normal;
 }
 
 tr:hover {
@@ -184,4 +184,18 @@ tr:hover {
 
 td:nth-child(1) {
 	font-weight: 500;
+}
+
+@media screen and (max-width: 768px) {
+    td {
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+    }
+
+    td:hover {
+        overflow: visible; 
+        white-space: normal; 
+        text-overflow: unset; 
+    }
 }
