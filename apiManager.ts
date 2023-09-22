@@ -22,16 +22,16 @@ class ApiManager {
 
 	/** Retrieves records from the api */
 	getRecords(fromID: number, toID: number): Promise<string[][]> {
-		return this.fetchJson(`${this.mainUrl}records?from=${fromID}&to=${toID}`);
+		return this.fetchJson(`${this.mainUrl}/records?from=${fromID}&to=${toID}`);
 	}
 
 	/** Retrieves columns from the api */
 	getColumns(): Promise<string[]> {
-		return this.fetchJson(`${this.mainUrl}columns`);
+		return this.fetchJson(`${this.mainUrl}/columns`);
 	}
 
 	/** Retrieves the number of records there are */
 	getRecordCount(): Promise<number> {
-		return this.fetchJson(`${this.mainUrl}recordCount`);
+		return this.fetchJson(`${this.mainUrl}/recordCount`);
 	}
 }

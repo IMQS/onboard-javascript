@@ -18,10 +18,12 @@ class DataHandler {
 	private difference: number;
 	/** A timer that handles window resizing events and store the return type of setTimeout. */
 	private resizeTimer: ReturnType<typeof setTimeout> | null;
+	/** Will cache the record count and only make another api call if needed */
+	private recordCount: number;
 
 	constructor() {
 		this.isFunctionRunning = false;
-		this.apiManager = new ApiManager("http://localhost:2050/");
+		this.apiManager = new ApiManager("http://localhost:2050");
 		this.currentPage = 1;
 		this.paginationStart = 1;
 		this.paginationEnd = 10;
@@ -29,6 +31,21 @@ class DataHandler {
 		this.currentToID = 20;
 		this.difference = 0;
 		this.resizeTimer = null;
+		this.recordCount = 0;
+	}
+
+	getRecordCount(): Promise<number> {
+		if (this.recordCount !== 0) {
+			return Promise.resolve(this.recordCount);
+		}
+		return this.apiManager.getRecordCount()
+			.then(count => {
+				this.recordCount = count;
+				return this.recordCount;
+			})
+			.catch(error => {
+				throw new Error(`Failed trying to fetch the records count: ${error}`);
+			})
 	}
 
 	/** Returning columns and rendering it on the table in the dom. */
@@ -46,14 +63,14 @@ class DataHandler {
 	}
 
 	/** Fetching the records and rendering it on the DOM in the table*/
-	showRecords(fromID: number, toID: number): Promise<any> {
+	showRecords(fromID: number, toID: number): Promise<void> {
 		if (this.isFunctionRunning) {
-			return Promise.resolve(undefined);
+			return new Promise<void>(() => { });
 		}
 		this.isFunctionRunning = true;
-		let inputNumber: string;
+		let inputNumber: number;
 		let stringCount: string;
-		return this.apiManager.getRecordCount()
+		return this.getRecordCount()
 			.then(count => {
 				inputNumber = this.input();
 				const maxRecords = this.recordsPerPage();
@@ -61,7 +78,7 @@ class DataHandler {
 				this.loader();
 				this.currentToID = toID;
 				this.currentFromID = fromID;
-				if (toID >= (count - 1)) {
+				if (toID >= count) {
 					this.currentToID = (count - 1);
 					this.currentFromID = this.currentToID - (maxRecords - 1);
 				} else if (this.currentPage === 1) {
@@ -72,10 +89,11 @@ class DataHandler {
 			})
 			.then(records => {
 				$('.results').empty().append(`Displaying ID's ${this.currentFromID} - ${this.currentToID} out of ${stringCount}`);
+				let inputNumberString = inputNumber.toString();
 				for (const record of records) {
 					$("#records-table-body").append(`<tr class="body-row">`);
 					for (const value of record) {
-						let isSearchValue = value === inputNumber;
+						let isSearchValue = value === inputNumberString;
 						$(".body-row:last-child").append(
 							`<td>
 								<span class="${isSearchValue ? 'highlight' : ''}">${value}</span>
@@ -85,7 +103,7 @@ class DataHandler {
 				}
 				this.isFunctionRunning = false;
 			})
-			.catch(error => {
+			.catch(() => {
 				alert("Something went wrong. Click on the button to refresh the page.");
 				location.reload();
 				this.isFunctionRunning = false;
@@ -96,7 +114,7 @@ class DataHandler {
 	pageNumbers(start: number, end: number): Promise<void> {
 		this.paginationStart = start;
 		this.paginationEnd = end;
-		return this.apiManager.getRecordCount()
+		return this.getRecordCount()
 			.then(count => {
 				$('.pagination').empty();
 				let maxRecords = this.recordsPerPage();
@@ -109,19 +127,17 @@ class DataHandler {
 				} else {
 					$(".next").css({ display: "block" });
 				}
-				if (this.paginationStart < 1) {
+				if (this.paginationStart <= 1) {
 					this.paginationStart = 1;
+					$(".prev").css({ display: "none" });
+				} else {
+					$(".prev").css({ display: "block" });
 				}
 				for (let i = this.paginationStart; i <= this.paginationEnd; i++) {
 					let isActive = i == this.currentPage;
 					$(".pagination").append(
 						`<a id="page-${i}" value="${i}" class="pagination-item ${isActive ? 'active' : ''}">${i}</a>`
 					);
-				}
-				if (this.paginationStart === 1) {
-					$(".prev").css({ display: "none" });
-				} else {
-					$(".prev").css({ display: "block" });
 				}
 			})
 			.catch(error => {
@@ -135,7 +151,7 @@ class DataHandler {
 		// element's attribute value. 
 		$(".pagination").on("click", ".pagination-item", (event) => {
 			$('.pagination-item').prop('disabled', true);
-			return this.apiManager.getRecordCount()
+			this.getRecordCount()
 				.then(count => {
 					$('.search-input').val('');
 					let returnedId = <string>($(event.target).attr("value"));
@@ -146,8 +162,8 @@ class DataHandler {
 						fromID = fromID + this.difference;
 					}
 					let toID = fromID + (maxRecords - 1);
-					if (fromID > count + 1 || toID > count + 1) {
-						toID = count;
+					if (fromID > count || toID > count) {
+						toID = (count - 1);
 						fromID = toID - maxRecords;
 						this.currentFromID = fromID;
 					}
@@ -155,7 +171,7 @@ class DataHandler {
 					$(".pagination-item").removeClass("active");
 					$(event.target).addClass("active");
 					const self = this;
-					$(".pagination-item").each(function () {
+					$(".pagination-item").each(() => {
 						let elementID = <string>($(this).attr('value'));
 						let currentPageString = self.currentPage.toString();
 						if (elementID == currentPageString) {
@@ -176,7 +192,6 @@ class DataHandler {
 		$(".next").on("click", () => {
 			this.paginationStart = this.paginationEnd + 1;
 			this.paginationEnd = this.paginationStart + 9;
-			$(".pagination").empty();
 			this.pageNumbers(this.paginationStart, this.paginationEnd);
 		});
 
@@ -184,16 +199,16 @@ class DataHandler {
 		$(".prev").on("click", () => {
 			this.paginationEnd = this.paginationStart - 1;
 			this.paginationStart = this.paginationEnd - 9;
-			$(".pagination").empty();
 			this.pageNumbers(this.paginationStart, this.paginationEnd);
 		});
 	}
 
 	/** Handles all the functionality related to the search. */
 	initializeSearch(): void {
+		let regexPattern = /[0-9]/;
 		/** Prevents certain characters to be entered in the input field. */
 		$('.search-input').on('keydown', (e) => {
-			if (e.key === 'e' || e.key === 'E' || e.key === '.' || e.key === '+' || e.key === '*' || e.key === '-') {
+			if (!regexPattern.test(e.key) && e.key.length === 1) {
 				e.preventDefault();
 			}
 			if (e.key === 'Enter') {
@@ -203,42 +218,41 @@ class DataHandler {
 
 		/** Takes the number entered in the search field and calculates a range and render that 
 		 * on to the DOM. */
-		$(".search-input").on("input", (event: any) => {
-			event.preventDefault();
-			return this.apiManager.getRecordCount()
+		$(".search-input").on("input", (e: any) => {
+			e.preventDefault();
+			return this.getRecordCount()
 				.then(count => {
 					let inputNumber = this.input();
-					let inputNumberInt = parseInt(inputNumber);
-					if (inputNumber !== '') {
+					if (!regexPattern.test(e.key)) {
 						const maxRecords = this.recordsPerPage();
-						let end = Math.ceil(inputNumberInt / maxRecords) * (maxRecords);
+						let end = Math.ceil(inputNumber / maxRecords) * (maxRecords);
 						if (end > (count + 1)) {
 							end = count;
 							this.currentToID = end;
 						}
 						let start = (end - (maxRecords - 1));
 						if ((end - maxRecords) === 0) {
-							end = Math.ceil(inputNumberInt / maxRecords) * (maxRecords);
+							end = Math.ceil(inputNumber / maxRecords) * (maxRecords);
 							start = end - maxRecords;
 						}
 						this.currentPage = Math.floor(end / maxRecords);
-						if (inputNumberInt < 1000000 && inputNumberInt > 0) {
-							if (end === 1000000) {
+						if (inputNumber < count && inputNumber > 0) {
+							if (end === count) {
 								end = end - 1;
 							} else {
 								null;
 							}
 							$('.results-box').remove();
-							$('.search-container').append(`
-							<div class="results-box">
-								<p class="results-select">${start} - ${end}</p>
-							</div>`);
+							$('.search-container').append(
+								`<div class="results-box">
+									<p class="results-select">${start} - ${end}</p>
+								</div>`);
 						} else {
 							$('.results-box').remove();
-							$('.search-container').append(`
-							<div class="results-box">
-								<p class="message">Invalid Input!</p>
-							</div>`);
+							$('.search-container').append(
+								`<div class="results-box">
+									<p class="message">Invalid Input!</p>
+								</div>`);
 						}
 					} else {
 						$('.results-box').remove();
@@ -256,7 +270,7 @@ class DataHandler {
 			let endID: number;
 			let pageEnd: number;
 			let pageStart: number;
-			return this.apiManager.getRecordCount()
+			return this.getRecordCount()
 				.then(count => {
 					let idRange = $('.results-select').text();
 					let rangeArray = null;
@@ -299,21 +313,15 @@ class DataHandler {
 		let screenHeight = <number>($('#records-table-body').height());
 		let pageStart: number;
 		let pageEnd: number;
-		return this.apiManager.getRecordCount()
+		return this.getRecordCount()
 			.then(count => {
-				let maxRecords = Math.ceil(screenHeight / 68);
-				maxRecords = maxRecords - 1;
+				let maxRecords = this.recordsPerPage();
 				let inputNumber = this.input();
-				let length = inputNumber.length;
-				let inputNumberInt = parseInt(inputNumber);
-				if (inputNumber === '') {
-					if (this.currentFromID === 0) {
-						this.currentFromID = 0;
-					}
+				if (inputNumber === -1) {
 					let newCurrentPage = Math.ceil(this.currentFromID / maxRecords);
-					if (newCurrentPage === 1) {
-						newCurrentPage = 1;
+					if (newCurrentPage === 0) {
 						this.currentFromID = 0;
+						newCurrentPage = 1;
 					}
 					this.currentToID = this.currentFromID + maxRecords;
 					this.currentPage = newCurrentPage;
@@ -323,12 +331,10 @@ class DataHandler {
 					if (this.currentToID >= count) {
 						this.currentToID = (count - 1);
 					}
-					if (length > 0) {
-						let newCurrentPage = Math.ceil(inputNumberInt / maxRecords);
-						this.currentToID = newCurrentPage * maxRecords;
-						this.currentPage = newCurrentPage;
-						this.currentFromID = (this.currentPage - 1) * maxRecords + 1;
-					}
+					let newCurrentPage = Math.ceil(inputNumber / maxRecords);
+					this.currentToID = newCurrentPage * maxRecords;
+					this.currentPage = newCurrentPage;
+					this.currentFromID = (this.currentPage - 1) * maxRecords + 1;
 				}
 				if (this.currentFromID === 0) {
 					pageEnd = Math.ceil(Math.floor(this.currentToID / (maxRecords - 1)) / 10) * 10;
@@ -353,7 +359,7 @@ class DataHandler {
 	}
 
 	/** When resizing the window. Timeout is put in place so that the function doesn't
-	 * take in every value returned when resizing. */
+	 * take in every value returned during resizing. */
 	resize(): void {
 		if (this.resizeTimer !== null) {
 			clearTimeout(this.resizeTimer);
@@ -385,9 +391,14 @@ class DataHandler {
 	}
 
 	/** Retrieve the search value from the input even when it's empty. */
-	input(): string {
-		let inputNumber = <string>($('.search-input').val());
-		return inputNumber;
+	input(): number {
+		let inputValue = <string>($('.search-input').val());
+		let inputNumber = parseInt(inputValue);
+		if (isNaN(inputNumber) || inputNumber < 0) {
+			return -1;
+		} else {
+			return inputNumber;
+		}
 	}
 }
 
