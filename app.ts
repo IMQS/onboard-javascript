@@ -180,14 +180,14 @@ class DataHandler {
 				});
 		})
 
-		/** Gives the next set of page numbers based on the last page on the pagination. */
+		// Gives the next set of page numbers based on the last page on the pagination.
 		$(".next").on("click", () => {
 			this.paginationStart = this.paginationEnd + 1;
 			this.paginationEnd = this.paginationStart + 9;
 			this.pageNumbers(this.paginationStart, this.paginationEnd);
 		});
 
-		/** Gives the previous set of pages numbers based on the last page in the pagination. */
+		// Gives the previous set of pages numbers based on the last page in the pagination
 		$(".prev").on("click", () => {
 			this.paginationEnd = this.paginationStart - 1;
 			this.paginationStart = this.paginationEnd - 9;
@@ -198,7 +198,7 @@ class DataHandler {
 	/** Handles all the functionality related to the search. */
 	initializeSearch(): void {
 		let regexPattern = /[0-9]/;
-		/** Prevents certain characters to be entered in the input field. */
+		// Prevents certain characters to be entered in the input field.
 		$('.search-input').on('keydown', (e) => {
 			if (!regexPattern.test(e.key) && e.key.length === 1) {
 				e.preventDefault();
@@ -208,8 +208,8 @@ class DataHandler {
 			}
 		});
 
-		/** Takes the number entered in the search field and calculates a range and render that 
-		 * on to the DOM. */
+		// Takes the number entered in the search field and calculates a range and render that 
+		// on to the DOM.
 		$(".search-input").on("input", (e: any) => {
 			e.preventDefault();
 			return this.getRecordCount()
@@ -217,7 +217,7 @@ class DataHandler {
 					let inputNumber = this.input();
 					if (!regexPattern.test(e.key)) {
 						let maxRecords = this.recordsPerPage();
-						let end =(Math.ceil(inputNumber / maxRecords) * (maxRecords)) + 1;
+						let end = (Math.ceil(inputNumber / maxRecords) * (maxRecords)) + 1;
 						let start = end - maxRecords;
 						if ((end - maxRecords) === 0) {
 							start = end - maxRecords;
@@ -249,7 +249,7 @@ class DataHandler {
 				});
 		});
 
-		/** Will take the range on the DOM and return records based on that range. */
+		// Will take the range on the DOM and return records based on that range.
 		$('.heading').on('click', '.results-select', (event: any) => {
 			$('.results-select').prop('disabled', true);
 			let startID: number;
@@ -323,12 +323,10 @@ class DataHandler {
 					this.currentFromID = (this.currentPage - 1) * maxRecords + 1;
 				}
 				if (this.currentFromID === 0) {
-					pageEnd = Math.ceil(Math.floor(this.currentToID / (maxRecords - 1)) / 10) * 10;
-					if (screenHeight < 136) {
-						pageEnd = Math.ceil(Math.floor(this.currentToID / (maxRecords)) / 10) * 10;
-					}
+					let divisor = screenHeight < 136 ? maxRecords : maxRecords - 1;
+					pageEnd = Math.ceil(Math.floor(this.currentToID / divisor) / 10) * 10;
 				} else {
-					pageEnd = Math.ceil(Math.floor(this.currentToID / (maxRecords)) / 10) * 10;
+					pageEnd = Math.ceil(Math.floor(this.currentToID / maxRecords) / 10) * 10;
 				}
 				pageStart = pageEnd - 9;
 				this.paginationStart = pageStart;
