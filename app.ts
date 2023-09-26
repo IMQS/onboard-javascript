@@ -42,7 +42,7 @@ class RecordManager {
 	}
 
 	/** calculates the number of rows that can fit the screen */
-	calculatingRows(): number {
+	getNumberOfCalculatingRows(): number {
 		const screenHeight = window.innerHeight;
 		const availableHeight = screenHeight - 105;
 		const rowHeight = 35;
@@ -56,35 +56,24 @@ class RecordManager {
 
 	/** fetching records that fit the screen */
 	updateAndDisplayRecords(): Promise<void> {
-		const inputValue = <string>($('#searchInput').val());
-		let errorMessage = '';
-		if (inputValue !== '') {
-		  errorMessage = 'Failed to search, reload the page and search again';
-		  $('#loader').show();
-		  this.searchRecordsAndResize();
-		} else {
-		  errorMessage = 'Error to fetch and display records, reload the page';
-		  $('#loader').show();
-		}
+		$('#loader').show();
 		this.calculateFirstAndLastNumbers();
 		this.updateArrowVisibility();
 		return this.fetchAndDisplayRecords()
-		  .then(() => {
-			$('#loader').hide();
-		  })
-		  .catch(err => {
-			alert(errorMessage);
-			throw err;
-		  });
-	  }	  
+			.then(() => {
+				$('#loader').hide();
+			})
+			.catch(err => {
+				alert('Error to fetch and display records, reload the page');
+				throw err;
+			});
+	}
 
 	/** Calculates the firstNumber and lastNumber */
 	calculateFirstAndLastNumbers() {
-		let rowsPerPage = this.calculatingRows();
+		let rowsPerPage = this.getNumberOfCalculatingRows();
 		if (this.firstNumber < 0) {
 			this.firstNumber = 0;
-		} else {
-			this.firstNumber = this.firstNumber;
 		}
 		this.lastNumber = this.firstNumber + (rowsPerPage - 1);
 		if (this.lastNumber >= this.recordCount) {
@@ -144,7 +133,7 @@ class RecordManager {
 			$('#searchInput').val('');
 			return;
 		}
-		let calculatedRows = this.calculatingRows();
+		let calculatedRows = this.getNumberOfCalculatingRows();
 		// divides the calculated max rows in half
 		const halfRange = Math.floor(calculatedRows / 2);
 		this.firstNumber = Math.max(0, inputValue - halfRange);
@@ -152,43 +141,24 @@ class RecordManager {
 	}
 
 	/** Navigates to the next set of records */
-	rightArrow() {
+	navigateToNextPage() {
 		$('#searchInput').val('');
-		// retrieves the last row
-		const lastRow = document.querySelector("#recordsTable tbody .row:last-child");
-		// checks if the last row exists 
-		if (lastRow) {
-			const cells = lastRow.querySelectorAll("td");
-			if (cells.length > 0) {
-				// Get the value of the first cell 
-				const lastID = parseFloat(cells[0].textContent || "");
-				// checks if the last value is within range 
-				if (0 <= lastID && lastID <= this.recordCount) {
-					// calculates the first number of the page 
-					this.firstNumber = lastID + 1;
-					const calculatedRows = this.calculatingRows();
-					// calculates the last number of the page 
-					this.lastNumber = this.firstNumber + (calculatedRows - 1);
-				}
-			}
+		if (0 <= this.lastNumber && this.lastNumber <= this.recordCount) {
+			// calculates the first number of the page 
+			this.firstNumber = this.lastNumber + 1;
+			const calculatedRows = this.getNumberOfCalculatingRows();
+			// calculates the last number of the page 
+			this.lastNumber = this.firstNumber + (calculatedRows - 1);
 		}
 		this.updateAndDisplayRecords();
 	}
 
-	leftArrow() {
+	navigateToPreviousPage() {
 		$('#searchInput').val('');
-		// retrieves the first row 
-		const firstRow = document.querySelector("#recordsTable tbody .row:first-child");
-		if (firstRow) {
-			const cells = firstRow.querySelectorAll("td");
-			if (cells.length > 0) {
-				const firstID = parseFloat(cells[0].textContent || "");
-				if (0 <= firstID && firstID <= this.recordCount) {
-					const calculatedRows = this.calculatingRows();
-					this.lastNumber = firstID - 1;
-					this.firstNumber = this.lastNumber - (calculatedRows - 1);
-				}
-			}
+		if (0 <= this.firstNumber && this.firstNumber <= this.recordCount) {
+			const calculatedRows = this.getNumberOfCalculatingRows();
+			this.lastNumber = this.firstNumber - 1;
+			this.firstNumber = this.lastNumber - (calculatedRows - 1);
 		}
 		this.updateAndDisplayRecords();
 	}
@@ -216,15 +186,16 @@ class RecordManager {
 	recordEventHandlers() {
 		$('#btnSearch').on('click', (event) => {
 			event.preventDefault();
+			this.searchRecordsAndResize();
 			this.updateAndDisplayRecords();
 		});
 
 		$('.arrow-right').on('click', () => {
-			this.rightArrow();
+			this.navigateToNextPage();
 		});
 
 		$('.arrow-left').on('click', () => {
-			this.leftArrow();
+			this.navigateToPreviousPage();
 		});
 
 		$('#closeModalBtn').on("click", () => {
@@ -232,16 +203,11 @@ class RecordManager {
 			$('.modal').css('display', 'none');
 		});
 
-		$('#searchInput').on('keydown', (event) => {
-			if (event.key === 'e' || event.key === 'E') {
-				event.preventDefault();
-			}
-		});
-
 		$('#searchInput').on('input', () => {
 			const inputValue = <string>$('#searchInput').val();
-			if (inputValue.includes('.')) {
-				$('#searchInput').val(inputValue.replace('.', ''));
+			if (inputValue !== undefined) {
+				let sanitizedValue = inputValue.replace(/[^0-9]/g, '');
+				$('#searchInput').val(sanitizedValue);
 			}
 		});
 	}
