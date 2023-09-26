@@ -106,7 +106,7 @@ class ApiData {
 		let to = Math.min(from + this.pageSize, this.maxRange);
 
 		if (to >= this.maxRange) {
-			const lastPage = Math.floor(this.maxRange / this.pageSize) + 1;
+			const lastPage = Math.ceil(this.maxRange / (this.pageSize + 1)) + 1;
 			this.currentPage = lastPage;
 			from = this.maxRange - this.pageSize;
 			to = this.maxRange;
@@ -127,7 +127,10 @@ class ApiData {
 	searchRecords(searchValue: number): Promise<void> {
 		if (searchValue >= 0 && searchValue <= this.maxRange) {
 			this.firstVal = searchValue;
-			this.currentPage = Math.ceil(this.firstVal / this.pageSize) + 1;
+			if (searchValue + this.pageSize > this.maxRange) {
+				this.firstVal = Math.max(0, this.maxRange - this.pageSize);
+			}
+			this.currentPage = Math.ceil(this.firstVal / (this.pageSize + 1)) + 1;
 			// empty search input after searching 
 			$('#fromInput').val('');
 			return this.fetchAndDisplayRecords();
@@ -169,7 +172,7 @@ class ApiData {
 
 	/** Update the page information and records display based on the current state of the grid. */
 	private updatePageInfo(): void {
-		const totalPages = Math.ceil(this.totalItems / this.pageSize);
+		const totalPages = Math.ceil(this.totalItems /(this.pageSize + 1));
 		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
 		const from = this.firstVal;
 		let to = Math.min(from + this.pageSize, this.maxRange);
@@ -189,23 +192,23 @@ class ApiData {
 		let nextBtn = $('#nextBtn');
 
 		// Check if delta(change in page number) is positive and disable the next page if firstval + pageSize exceeds the MaxRange.
-		if (delta > 0 && this.firstVal + delta * this.pageSize > this.maxRange ) {
+		if (delta > 0 && this.firstVal + delta * this.pageSize > this.maxRange) {
 			this.firstVal = this.maxRange - this.pageSize;
 			prevBtn.attr("disabled", null);
 			nextBtn.attr("disabled", "disabled");
-		} else if (delta < 0 && this.firstVal + delta * this.pageSize < 0 ) {
+		} else if (delta < 0 && this.firstVal + delta * this.pageSize < 0) {
 			// If delta is negative then reset firstVal to 0 and disable prev button 
 			this.firstVal = 0;
 			prevBtn.attr("disabled", "disabled");
 			nextBtn.attr("disabled", null);
 		} else {
-			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * this.pageSize, this.maxRange));
+			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * (this.pageSize + 1), this.maxRange));
 			prevBtn.attr("disabled", null);
 			nextBtn.attr("disabled", null);
 		}
 
 		this.lastVal = this.firstVal + delta * this.pageSize;
-		this.currentPage = Math.floor(this.firstVal / this.pageSize) + 1;
+		this.currentPage = Math.ceil(this.firstVal / (this.pageSize + 1)) + 1;
 
 		this.fetchAndDisplayRecords()
 			.catch(error => {
