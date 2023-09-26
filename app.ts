@@ -152,36 +152,28 @@ class DataHandler {
 		$(".pagination").on("click", ".pagination-item", (event) => {
 			$('.pagination-item').prop('disabled', true);
 			this.getRecordCount()
-				.then(count => {
-					$('.search-input').val('');
-					let returnedId = <string>($(event.target).attr("value"));
-					this.currentPage = parseInt(returnedId);
-					const maxRecords = this.recordsPerPage();
-					let fromID = Math.ceil(this.currentPage * maxRecords - (maxRecords - 1));
-					if (this.difference > 0 && this.difference < maxRecords) {
-						fromID = fromID + this.difference;
-					}
-					let toID = fromID + (maxRecords - 1);
-					if (fromID > count || toID > count) {
-						toID = (count - 1);
-						fromID = toID - maxRecords;
-						this.currentFromID = fromID;
-					}
-					this.currentFromID = fromID;
-					$(".pagination-item").removeClass("active");
-					$(event.target).addClass("active");
-					const self = this;
-					$(".pagination-item").each(() => {
-						let elementID = <string>($(this).attr('value'));
-						let currentPageString = self.currentPage.toString();
-						if (elementID == currentPageString) {
-							$(this).addClass('active');
-						}
-					});
-					return this.showRecords(fromID, toID)
-						.then(() => {
-							$('.pagination-item').prop('disabled', false)
-						});
+			$('.search-input').val('');
+			let returnedId = <string>($(event.target).attr("value"));
+			let maxRecords = this.recordsPerPage();
+			this.currentPage = parseInt(returnedId);
+			let toID = (this.currentPage * maxRecords) + (this.currentPage - 1);
+			if (this.difference > 0) {
+				toID = toID - this.difference;
+			}
+			let fromID = toID - maxRecords;
+			this.currentFromID = fromID;
+			$(".pagination-item").removeClass("active");
+			$(event.target).addClass("active");
+			$(".pagination-item").each(() => {
+				let elementID = <string>($(this).attr('value'));
+				let currentPageString = this.currentPage.toString();
+				if (elementID == currentPageString) {
+					$(this).addClass('active');
+				}
+			});
+			return this.showRecords(fromID, toID)
+				.then(() => {
+					$('.pagination-item').prop('disabled', false)
 				})
 				.catch(error => {
 					throw new Error(`Failed showing the records when clicking on the page button: ${error}`);
@@ -224,24 +216,18 @@ class DataHandler {
 				.then(count => {
 					let inputNumber = this.input();
 					if (!regexPattern.test(e.key)) {
-						const maxRecords = this.recordsPerPage();
-						let end = Math.ceil(inputNumber / maxRecords) * (maxRecords);
-						if (end > (count + 1)) {
-							end = count;
-							this.currentToID = end;
-						}
-						let start = (end - (maxRecords - 1));
+						let maxRecords = this.recordsPerPage();
+						let end =(Math.ceil(inputNumber / maxRecords) * (maxRecords)) + 1;
+						let start = end - maxRecords;
 						if ((end - maxRecords) === 0) {
-							end = Math.ceil(inputNumber / maxRecords) * (maxRecords);
 							start = end - maxRecords;
 						}
-						this.currentPage = Math.floor(end / maxRecords);
-						if (inputNumber < count && inputNumber > 0) {
-							if (end === count) {
-								end = end - 1;
-							} else {
-								null;
-							}
+						if (end >= count) {
+							end = (count - 1);
+							this.currentToID = end;
+						}
+						this.currentPage = Math.floor((end + 1) / (maxRecords + 1));
+						if (inputNumber < count && inputNumber > -1) {
 							$('.results-box').remove();
 							$('.search-container').append(
 								`<div class="results-box">
@@ -280,7 +266,7 @@ class DataHandler {
 					endID = parseInt(rangeArray[1]);
 					if (!isNaN(endID) && Number.isInteger(endID)) {
 						let maxRecords = this.recordsPerPage();
-						this.currentPage = Math.ceil(endID / maxRecords);
+						this.currentPage = Math.floor((endID + 1) / (maxRecords + 1));
 						pageEnd = Math.ceil(this.currentPage / 10) * 10;
 						pageStart = pageEnd - 9;
 						if (endID >= count) {
@@ -325,8 +311,8 @@ class DataHandler {
 					}
 					this.currentToID = this.currentFromID + maxRecords;
 					this.currentPage = newCurrentPage;
-					let originalID = (Math.floor(maxRecords * this.currentPage) - (maxRecords - 1));
-					this.difference = this.currentFromID - originalID;
+					let originalID = ((this.currentPage * maxRecords) + (this.currentPage - 1)) - maxRecords;
+					this.difference = originalID - this.currentFromID;
 				} else {
 					if (this.currentToID >= count) {
 						this.currentToID = (count - 1);
