@@ -40,18 +40,19 @@ td:hover {
 	text-align: center;
 	text-decoration: underline;
 	color: #4B3832;
+	padding: 0px 16px;
 }
 
 .showRecords {
-	top: 0.8%;
+	top: 0;
 	right: 0;
-	padding: 16px;
+	padding: 22px;
 	position: absolute;
 }
 
 .showRecords #page {
 	display: inline-block;
-	font-size: 19px;
+	font-size: 20px;
 }
 
 .arrow-right,
@@ -72,7 +73,6 @@ td:hover {
 .arrow-right:hover,
 .arrow-left:hover {
 	color: black;
-
 }
 
 .arrow-right {
@@ -88,7 +88,8 @@ td:hover {
 .search-container {
 	left: 0;
 	position: absolute;
-	top: 2.15%;
+	top: 0;
+	padding: 16px;
 }
 
 .search-container input[type=number] {
@@ -168,27 +169,56 @@ td:hover {
 }
 
 @media only screen and (max-width: 1071px) {
-    .heading {
-      scale: 0.9;
-    }
-	
-    .showRecords {
-       scale: 0.9;
-    }
+	.heading {
+		scale: 0.9;
+	}
 
-	.search-container{
+	.showRecords {
+		scale: 0.9;
+	}
+
+	.search-container {
 		scale: 0.9;
 	}
 
 	td {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 
-    td:hover {
-        overflow: visible;
-        white-space: normal;
-        text-overflow: unset;
-    }
+	td:hover {
+		overflow: visible;
+		white-space: normal;
+		text-overflow: unset;
+	}
+}
+
+@media only screen and (max-width: 900px) {
+	.heading {
+		scale: 0.8;
+	}
+
+	.showRecords {
+		scale: 0.8;
+	}
+
+	.search-container {
+		scale: 0.8;
+	}
+}
+
+@media only screen and (max-width: 770px) {
+	.heading {
+		scale: 0.6;
+		margin-top: 40px;
+	}
+
+	.showRecords {
+		scale: 0.7;
+	}
+
+	.search-container {
+		scale: 0.7;
+	}
 }

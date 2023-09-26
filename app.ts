@@ -126,13 +126,6 @@ class RecordManager {
 	/** recalculates the record range that includes inputValue fromm user */
 	searchRecordsAndResize() {
 		let inputValue = <number>($('#searchInput').val());
-		if (inputValue < 0 || inputValue > this.recordCount) {
-			$('.modal').css('display', 'block');
-			$('.content').append(`<p>${inputValue} is not a number within the range. Please try a different number</p>`);
-			$('#page').empty().append(`Showing record: ${this.firstNumber} - ${this.lastNumber}`);
-			$('#searchInput').val('');
-			return;
-		}
 		let calculatedRows = this.getNumberOfCalculatingRows();
 		// divides the calculated max rows in half
 		const halfRange = Math.floor(calculatedRows / 2);
@@ -166,10 +159,14 @@ class RecordManager {
 	/** calls to re-display records when screen is adjusted */
 	handleResize() {
 		let resizeTimeout: number;
+		let inputValue = <string>($('#searchInput').val());
 		$(window).on('resize', () => {
 			clearTimeout(resizeTimeout);
 			resizeTimeout = setTimeout(() => {
 				$('#loader').show();
+				if (inputValue !== '') {
+					this.searchRecordsAndResize();
+				}
 				this.updateAndDisplayRecords()
 					.then(() => {
 						$('#loader').hide();
@@ -196,11 +193,6 @@ class RecordManager {
 
 		$('.arrow-left').on('click', () => {
 			this.navigateToPreviousPage();
-		});
-
-		$('#closeModalBtn').on("click", () => {
-			$('.content').empty();
-			$('.modal').css('display', 'none');
 		});
 
 		$('#searchInput').on('input', () => {
