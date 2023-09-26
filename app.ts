@@ -1,3 +1,5 @@
+import { error } from "jquery";
+
 class InitializeApp {
 	IMQS: string = "http://localhost:2050";
 	/** Current value of the first record being displayed */
@@ -18,9 +20,12 @@ class InitializeApp {
 	isButtonDisabled: boolean = false;
 
 	constructor() {
-		$(window).on("resize", this.debounce(() => {
-			this.updateScreen();
-		}, 250));
+		$(window).on(
+			"resize",
+			this.debounce(() => {
+				this.updateScreen();
+			}, 250)
+		);
 		this.fetchColumns();
 		this.updateScreen();
 		this.eventHandlers();
@@ -29,16 +34,16 @@ class InitializeApp {
 	/** Fetch the total number of records from the server */
 	totalRecords(): Promise<number> {
 		return fetch(`${this.IMQS}/recordCount`)
-			.then(recordCountResponse => {
+			.then((recordCountResponse) => {
 				if (!recordCountResponse.ok) {
-					throw new Error('Error trying to get recordCount');
+					throw new Error("Error trying to get recordCount");
 				}
 				return recordCountResponse.text();
 			})
-			.then(recordCountData => {
+			.then((recordCountData) => {
 				return parseInt(recordCountData);
 			})
-			.catch(error => {
+			.catch((error) => {
 				throw error;
 			});
 	}
@@ -46,9 +51,9 @@ class InitializeApp {
 	/** Fetch column names and create them as table headings */
 	fetchColumns(): Promise<string[]> {
 		return fetch(`${this.IMQS}/columns`)
-			.then(columnsResponse => {
+			.then((columnsResponse) => {
 				if (!columnsResponse.ok) {
-					throw new Error('Error trying to fetch the columns');
+					throw new Error("Error trying to fetch the columns");
 				}
 				return columnsResponse.json();
 			})
@@ -60,7 +65,7 @@ class InitializeApp {
 				}
 				return columns;
 			})
-			.catch(error => {
+			.catch((error) => {
 				throw error;
 			});
 	}
@@ -68,15 +73,20 @@ class InitializeApp {
 	/** Fetch records within a specified range */
 	fetchRecords(fromRecord: number, toRecord: number): Promise<string[]> {
 		if (fromRecord > toRecord) {
-			return Promise.reject(new Error('Invalid arguments: fromRecord cannot be greater than toRecord'));
+			return Promise.reject(
+				new Error(
+					"Invalid arguments: fromRecord cannot be greater than toRecord"
+				)
+			);
 		}
-		return fetch(`${this.IMQS}/records?from=${fromRecord}&to=${toRecord}`)
-			.then(response => {
+		return fetch(`${this.IMQS}/records?from=${fromRecord}&to=${toRecord}`).then(
+			(response) => {
 				if (!response.ok) {
-					throw new Error('Network response was not ok');
+					throw new Error("Network response was not ok");
 				}
 				return response.json();
-			})
+			}
+		);
 	}
 
 	displayData(fromRecord: number, recordsDisplayed: number): void {
@@ -85,22 +95,25 @@ class InitializeApp {
 		const adjustedFromRecord = Math.max(fromRecord, 0);
 		let recordCount: number;
 		this.totalRecords()
-			.then(count => {
+			.then((count) => {
 				recordCount = count;
 				this.totalPages = Math.ceil(recordCount / this.recordsPerPage);
 				if (this.currentPage > this.totalPages) {
 					this.currentPage = this.totalPages;
-					this.currentFirstRecordIndex = Math.max(0, (this.currentPage - 1) * this.recordsPerPage);
+					this.currentFirstRecordIndex =
+						Math.max(0, (this.currentPage - 1) * this.recordsPerPage);
 				}
-				const maxToRecord = Math.min(adjustedFromRecord + recordsDisplayed - 1, recordCount - 1);
+				const maxToRecord =
+					Math.min(adjustedFromRecord + recordsDisplayed - 1, recordCount - 1);
 				// Check if the calculated range exceeds the total records
 				if (maxToRecord < adjustedFromRecord) {
-					throw new Error('Error trying to display the data');
+					throw new Error("Error trying to display the data");
 				}
-				return this.fetchRecords(adjustedFromRecord, maxToRecord)
-					.then(data => {
+				return this.fetchRecords(adjustedFromRecord, maxToRecord).then(
+					(data) => {
 						return { data, maxToRecord };
-					});
+					}
+				);
 			})
 			.then(({ data, maxToRecord }) => {
 				let tableData = "";
@@ -122,19 +135,27 @@ class InitializeApp {
 					$("#nextPageButton").show();
 				}
 				if (this.searchedIndex !== null) {
-					this.currentPage = Math.ceil((this.searchedIndex + 1) / this.recordsPerPage);
-					this.currentFirstRecordIndex = Math.max(this.searchedIndex - this.recordsPerPage + 1, 0);
+					this.currentPage = Math.ceil(
+						(this.searchedIndex + 1) / this.recordsPerPage
+					);
+					this.currentFirstRecordIndex = Math.max(
+						this.searchedIndex - this.recordsPerPage + 1, 0
+					);
 					this.searchedIndex = null;
 				}
 				$("#tableBody").html(tableData);
 				$("#loader").hide();
 				$("#tableWrapper").show();
 			})
-			.catch(() => {
+			.catch(error => {
 				$("#loader").hide();
 				$("#tableWrapper").show();
 				// Prompt the user to try again
-				if (confirm("An error occurred while fetching and displaying data. Do you want to try again?")) {
+				if (
+					confirm(
+						"An error occurred while fetching and displaying data. Do you want to try again?"
+						+ error)
+				) {
 					$("#searchForm").submit();
 				}
 			});
@@ -143,17 +164,20 @@ class InitializeApp {
 	/** Handle the search method */
 	async searchMethod(searchValue: number): Promise<void> {
 		const totalRecCount = await this.totalRecords()
-			.catch(() => {
-				throw new Error('No valid records found');
+			.catch(error => {
+				throw new Error("No valid records found" + error);
 			});
 		if (searchValue < 0 || searchValue >= totalRecCount) {
-			window.alert('Record not found on this database');
+			window.alert("Record not found on this database");
 			return;
 		}
 		const lastRecordIndex = totalRecCount - 1;
 		const targetPage = Math.ceil((searchValue + 1) / this.recordsPerPage);
 		const fromRecord = (targetPage - 1) * this.recordsPerPage;
-		const toRecord = Math.min(fromRecord + this.recordsPerPage, lastRecordIndex);
+		const toRecord = Math.min(
+			fromRecord + this.recordsPerPage,
+			lastRecordIndex
+		);
 		this.currentPage = targetPage;
 		this.searchedValue = searchValue;
 		this.currentFirstRecordIndex = fromRecord;
@@ -165,7 +189,7 @@ class InitializeApp {
 		const newScreenHeight = window.innerHeight;
 		this.recordsPerPage = this.windowAdjustments(newScreenHeight);
 		this.totalRecords()
-			.then(totalRecCount => {
+			.then((totalRecCount) => {
 				let fromRecord: number;
 				if (this.searchedValue !== null) {
 					const searchIndex = Math.min(this.searchedValue, totalRecCount - 1);
@@ -173,7 +197,9 @@ class InitializeApp {
 					fromRecord = (targetPage - 1) * this.recordsPerPage;
 				} else {
 					const previousFirstRecordIndex = this.currentFirstRecordIndex;
-					this.currentPage = Math.ceil((previousFirstRecordIndex + 1) / this.recordsPerPage);
+					this.currentPage = Math.ceil(
+						(previousFirstRecordIndex + 1) / this.recordsPerPage
+					);
 					fromRecord = this.currentFirstRecordIndex;
 				}
 				if (this.currentPage * this.recordsPerPage > totalRecCount - 1) {
@@ -183,8 +209,8 @@ class InitializeApp {
 				}
 				this.displayData(fromRecord, this.recordsPerPage);
 			})
-			.catch(() => {
-				throw new Error('Error updating screen:');
+			.catch(error => {
+				throw new Error("Error updating screen:" + error);
 			});
 	}
 
@@ -193,8 +219,10 @@ class InitializeApp {
 		const estimatedRowHeightFactor = 1;
 		const estimatedRowHeight = estimatedRowHeightFactor * 50;
 		const availableScreenHeight = screenHeight - 140;
-		this.recordsPerPage = Math.floor(availableScreenHeight / estimatedRowHeight);
-		// This ensures that will at least be 1 record on display 
+		this.recordsPerPage = Math.floor(
+			availableScreenHeight / estimatedRowHeight
+		);
+		// This ensures that will at least be 1 record on display
 		return Math.max(this.recordsPerPage, 1);
 	}
 
@@ -211,8 +239,7 @@ class InitializeApp {
 
 	/** Handles the events such as pagination buttons, input handling and search form */
 	eventHandlers(): void {
-
-		/* Ensures that only valid input (e.g., positive integers) is accepted */
+		/* Ensures that only positive numbers is accepted */
 		$("#searchInput").on("input", (e) => {
 			const inputElement = e.target as HTMLInputElement;
 			const inputValue = inputElement.value;
@@ -234,8 +261,8 @@ class InitializeApp {
 					$("#tableWrapper").hide();
 					$("#loader").show();
 				})
-				.catch(() => {
-					window.alert('An error occurred during search. Please try again.');
+				.catch(error => {
+					window.alert("An error occurred during search. Please try again." + error);
 					$("#loader").hide();
 					$("#tableWrapper").show();
 				});
@@ -249,12 +276,13 @@ class InitializeApp {
 			if (this.currentFirstRecordIndex <= 0) {
 				const errorMessage = "Already on the first page";
 				window.alert(errorMessage);
-				return
+				return;
 			}
 			$("#prevPageButton").addClass("hidden");
 			this.searchedIndex = null;
 			this.searchedValue = null;
-			const firstRecordOfCurrentPage = (this.currentPage - 1) * this.recordsPerPage;
+			const firstRecordOfCurrentPage =
+				(this.currentPage - 1) * this.recordsPerPage;
 			let fromRecord = firstRecordOfCurrentPage;
 			$("#nextPageButton").hide();
 			$("#prevPageButton").hide();
@@ -282,8 +310,8 @@ class InitializeApp {
 					fromRecord = this.currentFirstRecordIndex;
 					this.displayData(fromRecord, this.recordsPerPage);
 				})
-				.catch(() => {
-					throw new Error('Error while trying go to the previous page');
+				.catch(error => {
+					throw new Error("Error while trying go to the previous page" + error);
 				});
 		});
 
@@ -312,7 +340,10 @@ class InitializeApp {
 					$("#tableWrapper").show();
 					$("#nextPageButton").show();
 					$("#prevPageButton").show();
-					if (typeof totalRecCount === 'number' && this.currentFirstRecordIndex >= totalRecCount) {
+					if (
+						typeof totalRecCount === "number" &&
+						this.currentFirstRecordIndex >= totalRecCount
+					) {
 						$("#nextPageButton").hide();
 					}
 				})
@@ -327,7 +358,7 @@ class InitializeApp {
 					this.displayData(fromRecord, this.recordsPerPage);
 				})
 				.catch(() => {
-					throw new Error('Error while trying go to the next page');
+					throw new Error("Error while trying go to the next page");
 				});
 		});
 	}
