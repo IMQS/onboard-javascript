@@ -24,22 +24,22 @@
 /*** Main Script ***/
 
 window.onload = async () => {
-  console.log("Event #1 - Executing window.onload");
-
   // Initialize data.ts
-  const apiManager = new ApiManager(); 
+  const apiManager = new ApiManager();
 
   // Initialize model.ts
-  const stateManager = new StateManager(apiManager); 
-  await stateManager.initializeState(); 
+  const stateManager = new StateManager(apiManager);
+  await stateManager.initializeState();
 
   // Initialize views.ts
-  const tableRenderer = new TableRenderer(stateManager); 
-  await tableRenderer.initialRender(stateManager);
+  const tableRenderer = new TableRenderer(stateManager);
+  await tableRenderer.initialRender();
 
   // Initialize controllers.ts
-  const paginationManager = new PaginationManager(tableRenderer, stateManager); 
-  const windowResizeHandler = new WindowResizeHandler(tableRenderer, stateManager, paginationManager); 
+  const paginationManager = new PaginationManager(tableRenderer, stateManager);
+  const windowResizeHandler = new WindowResizeHandler(
+    tableRenderer,
+    stateManager,
+    paginationManager
+  );
 };
-
-

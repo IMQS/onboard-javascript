@@ -48,22 +48,21 @@ var TableRenderer = /** @class */ (function () {
      * Renders the initial table layout including column names and initial data set.
      * @param {StateManager} stateManager - The manager to fetch state from.
      */
-    TableRenderer.prototype.initialRender = function (stateManager) {
+    TableRenderer.prototype.initialRender = function () {
         return __awaiter(this, void 0, void 0, function () {
             var columnNames, records, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        console.log("Function #9 - Executing initialRender");
-                        columnNames = stateManager.getColumnNames();
+                        columnNames = this.stateManager.getColumnNames();
                         if (columnNames !== null) {
                             this.renderColumnNames(columnNames);
                         }
-                        return [4 /*yield*/, stateManager.retrieveRecords()];
+                        return [4 /*yield*/, this.stateManager.retrieveRecords()];
                     case 1:
                         _a.sent();
-                        records = stateManager.getRecords();
+                        records = this.stateManager.getRecords();
                         if (records !== null) {
                             this.renderRecords(records);
                         }
@@ -78,16 +77,15 @@ var TableRenderer = /** @class */ (function () {
         });
     };
     TableRenderer.prototype.renderColumnNames = function (columnNames) {
-        console.log("Function #11 - Executing renderColumnNames");
         try {
-            var thead = document.querySelector('thead');
+            var thead = document.querySelector("thead");
             if (thead === null) {
-                throw new Error('Table header not found.');
+                throw new Error("Table header not found.");
             }
-            var row = document.createElement('tr');
+            var row = document.createElement("tr");
             for (var _i = 0, columnNames_1 = columnNames; _i < columnNames_1.length; _i++) {
                 var columnName = columnNames_1[_i];
-                var cell = document.createElement('th');
+                var cell = document.createElement("th");
                 cell.textContent = columnName;
                 row.appendChild(cell);
             }
@@ -105,7 +103,6 @@ var TableRenderer = /** @class */ (function () {
     };
     // Sets the widths of table columns evenly.
     TableRenderer.prototype.setColumnWidths = function () {
-        console.log("Function #11.1 - Executing setColumnWidths");
         try {
             var table = document.getElementById("myTable");
             if (!table) {
@@ -125,25 +122,26 @@ var TableRenderer = /** @class */ (function () {
     //Populates the table body with records. Optionally highlights a specified row if searched.
     TableRenderer.prototype.renderRecords = function (records, highlightId) {
         if (highlightId === void 0) { highlightId = null; }
-        console.log("Function #14 - Executing renderRecords");
         // Use the state's highlightedId if no highlightId is provided.
         highlightId = highlightId !== null && highlightId !== void 0 ? highlightId : this.stateManager.getHighlightedId();
         try {
             if (records === null) {
                 throw new Error("No records to render.");
             }
-            var tbody_1 = document.querySelector('tbody');
+            var tbody_1 = document.querySelector("tbody");
             if (tbody_1 === null) {
-                throw new Error('Table body not found.');
+                throw new Error("Table body not found.");
             }
-            tbody_1.innerHTML = '';
+            tbody_1.innerHTML = "";
             records.forEach(function (record) {
-                var row = document.createElement('tr');
-                if (highlightId !== null && record.length > 0 && parseInt(record[0].toString(), 10) === highlightId) {
-                    row.classList.add('highlight');
+                var row = document.createElement("tr");
+                if (highlightId !== null &&
+                    record.length > 0 &&
+                    parseInt(record[0].toString(), 10) === highlightId) {
+                    row.classList.add("highlight");
                 }
                 record.forEach(function (cell) {
-                    var td = document.createElement('td');
+                    var td = document.createElement("td");
                     td.textContent = cell.toString();
                     row.appendChild(td);
                 });

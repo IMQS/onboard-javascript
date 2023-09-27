@@ -48,26 +48,23 @@ var ApiManager = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        console.log("Function #3 - Executing fetchTotalRecordCount");
-                        _a.label = 1;
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, fetch("http://localhost:2050/recordCount")];
                     case 1:
-                        _a.trys.push([1, 4, , 5]);
-                        return [4 /*yield*/, fetch('http://localhost:2050/recordCount')];
-                    case 2:
                         response = _a.sent();
                         if (!response.ok) {
                             throw new Error("Failed to fetch total record count: " + response.statusText);
                         }
                         return [4 /*yield*/, response.json()];
-                    case 3:
+                    case 2:
                         data = _a.sent();
                         this.totalRecordCount = data;
-                        return [3 /*break*/, 5];
-                    case 4:
+                        return [3 /*break*/, 4];
+                    case 3:
                         error_1 = _a.sent();
                         console.error("Error fetching total record count: " + error_1);
-                        return [3 /*break*/, 5];
-                    case 5: return [2 /*return*/];
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
@@ -78,26 +75,23 @@ var ApiManager = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        console.log("Function #5 - Executing fetchColumnNames");
-                        _a.label = 1;
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, fetch("http://localhost:2050/columns")];
                     case 1:
-                        _a.trys.push([1, 4, , 5]);
-                        return [4 /*yield*/, fetch('http://localhost:2050/columns')];
-                    case 2:
                         response = _a.sent();
                         if (!response.ok) {
                             throw new Error("Failed to fetch column names: " + response.statusText);
                         }
                         return [4 /*yield*/, response.json()];
-                    case 3:
+                    case 2:
                         data = _a.sent();
                         this.columnNames = data;
-                        return [3 /*break*/, 5];
-                    case 4:
+                        return [3 /*break*/, 4];
+                    case 3:
                         error_2 = _a.sent();
                         console.error("Error fetching column names: " + error_2);
-                        return [3 /*break*/, 5];
-                    case 5: return [2 /*return*/];
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
@@ -108,25 +102,22 @@ var ApiManager = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        console.log("Function #12.1 - Executing fetchRecords with from: " + from + ", to: " + to);
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 4, , 5]);
+                        _a.trys.push([0, 3, , 4]);
                         return [4 /*yield*/, fetch("http://localhost:2050/records?from=" + from + "&to=" + to)];
-                    case 2:
+                    case 1:
                         response = _a.sent();
                         if (!response.ok) {
                             throw new Error("Failed to fetch records: " + response.statusText);
                         }
                         return [4 /*yield*/, response.json()];
-                    case 3:
+                    case 2:
                         data = _a.sent();
                         return [2 /*return*/, data];
-                    case 4:
+                    case 3:
                         error_3 = _a.sent();
                         console.error("Error fetching records: " + error_3);
                         return [2 /*return*/, null];
-                    case 5: return [2 /*return*/];
+                    case 4: return [2 /*return*/];
                 }
             });
         });

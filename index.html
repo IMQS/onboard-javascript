@@ -1,33 +1,37 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Riaan JS Onboard Project</title>
-  <script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
-  <script src="data.js"></script>
-  <script src="model.js"></script>
-  <script src="controllers.js"></script>
-  <script src="views.js"></script>
-  <script src="app.js"></script>
-  <link rel="stylesheet" href="stylesheet.css">
-</head>
-<body>
-  <div id="main-container">  
-    <table id="myTable">
-		<h1 id="main-heading">Area 51's Grocery List</h1>
-      <thead>
-        <!--Table headings generated here-->
-      </thead>
-      <tbody>
-        <!--Table rows generated here-->
-      </tbody>
-    </table>
-    <div id="pagination" class="pagination-1">
-      <button id="prevPage" disabled>Previous</button>
-      <button id="nextPage">Next</button>
-      <input type="text" id="filterInput" placeholder="Search by ID ...">
-      <button id="searchButton">Search</button>
-      <div id="errorMessage"></div>
+  <head>
+    <title>Riaan JS Onboard Project</title>
+    <script
+      type="text/javascript"
+      charset="utf-8"
+      src="third_party/jquery-2.0.3.min.js"
+    ></script>
+    <script src="data.js"></script>
+    <script src="model.js"></script>
+    <script src="controllers.js"></script>
+    <script src="views.js"></script>
+    <script src="app.js"></script>
+    <link rel="stylesheet" href="stylesheet.css" />
+  </head>
+  <body>
+    <div id="main-container">
+      <table id="myTable">
+        <h1 id="main-heading">Area 51's Grocery List</h1>
+        <thead>
+          <!--Table headings generated here-->
+        </thead>
+        <tbody>
+          <!--Table rows generated here-->
+        </tbody>
+      </table>
+      <div id="pagination" class="pagination-1">
+        <button id="prevPage" disabled>Previous</button>
+        <button id="nextPage">Next</button>
+        <input type="text" id="filterInput" placeholder="Search by ID ..." />
+        <button id="searchButton">Search</button>
+        <div id="errorMessage"></div>
+      </div>
     </div>
-  </div>  
-</body>
+  </body>
 </html>

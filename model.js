@@ -65,23 +65,20 @@ var StateManager = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        console.log("Function #1 - Executing initialize");
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 4, , 5]);
+                        _a.trys.push([0, 3, , 4]);
                         return [4 /*yield*/, this.fetchAndStoreTotalRecordCount()];
-                    case 2:
+                    case 1:
                         _a.sent();
                         return [4 /*yield*/, this.retrieveColumnNames()];
-                    case 3:
+                    case 2:
                         _a.sent();
                         this.adjustWindowSize();
-                        return [3 /*break*/, 5];
-                    case 4:
+                        return [3 /*break*/, 4];
+                    case 3:
                         error_1 = _a.sent();
                         console.error("Error in initializeState:", error_1);
-                        return [3 /*break*/, 5];
-                    case 5: return [2 /*return*/];
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
@@ -92,22 +89,19 @@ var StateManager = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        console.log("Function #4 - Executing retrieveColumnNames");
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
+                        _a.trys.push([0, 2, , 3]);
                         return [4 /*yield*/, this.apiManager.fetchColumnNames()];
-                    case 2:
+                    case 1:
                         _a.sent();
                         if (this.apiManager.columnNames !== null) {
                             this.columnNames = this.apiManager.columnNames;
                         }
-                        return [3 /*break*/, 4];
-                    case 3:
+                        return [3 /*break*/, 3];
+                    case 2:
                         error_2 = _a.sent();
                         console.error("Error in retrieveColumnNames:", error_2);
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
                 }
             });
         });
@@ -118,20 +112,17 @@ var StateManager = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        console.log("Function #2 - Executing fetchAndStoreTotalRecordCount");
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
+                        _a.trys.push([0, 2, , 3]);
                         return [4 /*yield*/, this.apiManager.fetchTotalRecordCount()];
-                    case 2:
+                    case 1:
                         _a.sent();
                         this.totalRecordCount = this.apiManager.totalRecordCount;
-                        return [3 /*break*/, 4];
-                    case 3:
+                        return [3 /*break*/, 3];
+                    case 2:
                         error_3 = _a.sent();
                         console.error("Error in fetchAndStoreTotalRecordCount:", error_3);
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
                 }
             });
         });
@@ -140,38 +131,31 @@ var StateManager = /** @class */ (function () {
         return this.totalRecordCount;
     };
     StateManager.prototype.getColumnNames = function () {
-        console.log("Function #10 - Executing getColumnNames");
         return this.columnNames;
     };
     StateManager.prototype.getRecords = function () {
-        console.log("Function #13 - Executing getRecords");
         return this.records;
     };
     StateManager.prototype.getFrom = function () {
-        console.log("Function #18 - Executing getFrom");
         return this.from;
     };
     StateManager.prototype.setFrom = function (value) {
-        console.log("Function #7 - Executing setFrom");
         this.from = value;
     };
     StateManager.prototype.getTo = function () {
-        console.log("Function #19 - Executing getTo");
         return this.to;
     };
     StateManager.prototype.setTo = function (value) {
-        console.log("Function #8 - Executing setTo");
         this.to = value;
     };
     StateManager.prototype.goToNextPage = function () {
         try {
-            console.log("Function #17 - Executing goToNextPage");
             var from = this.getFrom();
             var to = this.getTo();
             var recordsPerPage = this.numRows;
             var newFrom = from + recordsPerPage;
             var newTo = newFrom + recordsPerPage - 1;
-            // Check that 'to' does not exceed totalRecordCount
+            // Check that 'to' does not exceed totalRecordCount.
             if (newTo >= this.totalRecordCount) {
                 this.setTo(this.totalRecordCount - 1);
                 this.setFrom(this.totalRecordCount - recordsPerPage);
@@ -187,13 +171,12 @@ var StateManager = /** @class */ (function () {
     };
     StateManager.prototype.goToPreviousPage = function () {
         try {
-            console.log("Function #22 - Executing goToPreviousPage");
             var from = this.getFrom();
             var to = this.getTo();
             var recordsPerPage = this.numRows;
-            // Calculate the new 'from' and 'to' values
             var newFrom = from - recordsPerPage;
             var newTo = newFrom + recordsPerPage - 1;
+            // Check that 'from' does not exceed 0.
             if (newFrom < 0) {
                 this.setFrom(0);
                 this.setTo(recordsPerPage - 1);
@@ -214,11 +197,10 @@ var StateManager = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        console.log("Function #24 - Executing searchByIdStateChange");
                         newFrom = id;
                         newTo = id + this.numRows - 1;
                         recordsPerPage = this.numRows;
-                        // Checking that 'to' does not exceed totalRecordCount
+                        // Checking that 'to' does not exceed totalRecordCount.
                         if (newTo >= this.totalRecordCount) {
                             this.setTo(this.totalRecordCount - 1);
                             this.setFrom(this.totalRecordCount - recordsPerPage);
@@ -242,15 +224,25 @@ var StateManager = /** @class */ (function () {
     };
     // Adjusts the available height based on window size and recalculates the number of rows.
     StateManager.prototype.adjustWindowSize = function () {
-        console.log("Function #6 - Executing adjustWindowSize");
         try {
             if (typeof window === "undefined" || !window.innerHeight) {
                 throw new Error("Unable to access window dimensions");
             }
+            // Determine the dynamic height of the header and pagination.
+            var mainHeadingElement = document.getElementById("main-heading");
+            var paginationElement = document.getElementById("pagination");
+            if (mainHeadingElement && paginationElement) {
+                this.headerHeight =
+                    mainHeadingElement.clientHeight + paginationElement.clientHeight;
+            }
+            else {
+                console.error("Could not find main-heading and/or pagination elements");
+            }
             if (!this.rowHeight) {
                 throw new Error("Row height is not properly configured");
             }
-            this.availableHeight = window.innerHeight - this.headerHeight;
+            this.availableHeight =
+                window.innerHeight - this.headerHeight - this.rowHeight * 2;
             this.numRows = Math.floor(this.availableHeight / this.rowHeight);
             if (this.numRows <= 0) {
                 console.log("Window size too small, setting minimum number of rows to 1");
@@ -259,19 +251,23 @@ var StateManager = /** @class */ (function () {
             // Calculating new values without modifying the state immediately.
             var newFrom = this.from;
             var newTo = this.from + this.numRows - 1;
-            // If it's the first set of records, start from 0.
+            // If it's the first set of records ("first page"), start from 0 and populate the whole window size.
             if (this.from === 0) {
                 newFrom = 0;
                 newTo = this.numRows - 1;
             }
-            // Ensure `newTo` doesn't exceed totalRecordCount and adjust `newFrom` accordingly.
+            // Ensure `newTo` doesn't exceed totalRecordCount and adjust `newFrom` accordingly,
+            // meaning populate the whole window size.
             if (newTo >= this.totalRecordCount) {
                 newTo = this.totalRecordCount - 1;
                 newFrom = newTo - this.numRows + 1;
             }
-            // Check if the highlighted ID is currently between from and to.
-            var highlightedId = this.getHighlightedId(); // Assuming you have a method to get the highlighted ID.
-            if (highlightedId !== null && highlightedId >= this.from && highlightedId <= this.to) {
+            // Check if the highlighted ID is currently between from and to,
+            // too enable priority functionality (always visible in the window).
+            var highlightedId = this.getHighlightedId();
+            if (highlightedId !== null &&
+                highlightedId >= this.from &&
+                highlightedId <= this.to) {
                 // If newTo would be smaller than highlightedId, adjust to keep highlightedId in view.
                 if (newTo < highlightedId) {
                     newTo = highlightedId;
@@ -292,20 +288,17 @@ var StateManager = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        console.log("Function #12 - Executing retrieveRecords");
-                        _b.label = 1;
-                    case 1:
-                        _b.trys.push([1, 3, , 4]);
+                        _b.trys.push([0, 2, , 3]);
                         _a = this;
                         return [4 /*yield*/, this.apiManager.fetchRecords(this.from, this.to)];
-                    case 2:
+                    case 1:
                         _a.records = _b.sent();
-                        return [3 /*break*/, 4];
-                    case 3:
+                        return [3 /*break*/, 3];
+                    case 2:
                         error_5 = _b.sent();
                         console.error("Error retrieving records: " + (error_5 instanceof Error ? error_5.message : error_5));
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
                 }
             });
         });
