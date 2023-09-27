@@ -168,7 +168,7 @@ td:hover {
 	cursor: pointer;
 }
 
-@media only screen and (max-width: 1071px) {
+@media only screen and (max-width: 1330px) {
 	.heading {
 		scale: 0.9;
 	}

@@ -44,7 +44,7 @@ class RecordManager {
 	/** calculates the number of rows that can fit the screen */
 	getNumberOfCalculatingRows(): number {
 		const screenHeight = window.innerHeight;
-		const availableHeight = screenHeight - 105;
+		const availableHeight = screenHeight - 110;
 		const rowHeight = 35;
 		if (availableHeight <= 0) {
 			return 0;
