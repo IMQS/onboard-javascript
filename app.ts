@@ -126,11 +126,15 @@ class RecordManager {
 	/** recalculates the record range that includes inputValue fromm user */
 	searchRecordsAndResize() {
 		let inputValue = <number>($('#searchInput').val());
-		let calculatedRows = this.getNumberOfCalculatingRows();
+		if(inputValue >= 0 && inputValue <= this.recordCount){
+			let calculatedRows = this.getNumberOfCalculatingRows();
 		// divides the calculated max rows in half
 		const halfRange = Math.floor(calculatedRows / 2);
 		this.firstNumber = Math.max(0, inputValue - halfRange);
 		this.lastNumber = Math.min(this.recordCount, this.firstNumber + (calculatedRows - 1));
+		}else{
+			alert('Input value must be between 0 and 999999.');
+		}
 	}
 
 	/** Navigates to the next set of records */
