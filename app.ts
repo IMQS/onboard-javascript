@@ -148,16 +148,7 @@ class InitializeApp {
 				$("#tableWrapper").show();
 			})
 			.catch(error => {
-				$("#loader").hide();
-				$("#tableWrapper").show();
-				// Prompt the user to try again
-				if (
-					confirm(
-						"An error occurred while fetching and displaying data. Do you want to try again?"
-						+ error)
-				) {
-					$("#searchForm").submit();
-				}
+				throw new Error("An error occurred while fetching and displaying data." + error);
 			});
 	}
 
