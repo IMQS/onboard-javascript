@@ -34,16 +34,16 @@ class InitializeApp {
 	/** Fetch the total number of records from the server */
 	totalRecords(): Promise<number> {
 		return fetch(`${this.IMQS}/recordCount`)
-			.then((recordCountResponse) => {
+			.then(recordCountResponse => {
 				if (!recordCountResponse.ok) {
 					throw new Error("Error trying to get recordCount");
 				}
 				return recordCountResponse.text();
 			})
-			.then((recordCountData) => {
+			.then(recordCountData => {
 				return parseInt(recordCountData);
 			})
-			.catch((error) => {
+			.catch(error => {
 				throw error;
 			});
 	}
@@ -95,7 +95,7 @@ class InitializeApp {
 		const adjustedFromRecord = Math.max(fromRecord, 0);
 		let recordCount: number;
 		this.totalRecords()
-			.then((count) => {
+			.then(count => {
 				recordCount = count;
 				this.totalPages = Math.ceil(recordCount / this.recordsPerPage);
 				if (this.currentPage > this.totalPages) {
@@ -189,7 +189,7 @@ class InitializeApp {
 		const newScreenHeight = window.innerHeight;
 		this.recordsPerPage = this.windowAdjustments(newScreenHeight);
 		this.totalRecords()
-			.then((totalRecCount) => {
+			.then(totalRecCount => {
 				let fromRecord: number;
 				if (this.searchedValue !== null) {
 					const searchIndex = Math.min(this.searchedValue, totalRecCount - 1);
