@@ -233,7 +233,8 @@ var StateManager = /** @class */ (function () {
             var paginationElement = document.getElementById("pagination");
             if (mainHeadingElement && paginationElement) {
                 this.headerHeight =
-                    mainHeadingElement.clientHeight + paginationElement.clientHeight;
+                    mainHeadingElement.clientHeight +
+                        paginationElement.clientHeight;
             }
             else {
                 console.error("Could not find main-heading and/or pagination elements");

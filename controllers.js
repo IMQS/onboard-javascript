@@ -125,13 +125,19 @@ var PaginationManager = /** @class */ (function () {
     PaginationManager.prototype.setupEventListeners = function () {
         var _this = this;
         if (this.prevButton) {
-            this.prevButton.addEventListener("click", function () { return _this.decrementPage(); });
+            this.prevButton.addEventListener("click", function () {
+                return _this.decrementPage();
+            });
         }
         if (this.nextButton) {
-            this.nextButton.addEventListener("click", function () { return _this.incrementPage(); });
+            this.nextButton.addEventListener("click", function () {
+                return _this.incrementPage();
+            });
         }
         if (this.searchButton) {
-            this.searchButton.addEventListener("click", function () { return _this.searchById(); });
+            this.searchButton.addEventListener("click", function () {
+                return _this.searchById();
+            });
         }
         if (this.filterInput) {
             this.filterInput.addEventListener("keyup", function (event) {
@@ -142,7 +148,9 @@ var PaginationManager = /** @class */ (function () {
             });
         }
         if (this.mainHeading) {
-            this.mainHeading.addEventListener("click", function () { return _this.navigateToHome(); });
+            this.mainHeading.addEventListener("click", function () {
+                return _this.navigateToHome();
+            });
         }
         if (this.filterInput && this.errorMessage) {
             this.setupLiveValidation();
