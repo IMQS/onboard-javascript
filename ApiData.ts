@@ -218,7 +218,7 @@ class ApiData {
 	}
 
 	private handleResize(): void {
-		const newGridSize = (Math.ceil((Math.ceil(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT)) - 1;
+		const newGridSize = Math.ceil((Math.ceil(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT)- 1;
 
 		// Check if the new grid size is non-negative
 		if (newGridSize >= 0) {
