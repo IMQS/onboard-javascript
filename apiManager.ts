@@ -10,9 +10,9 @@ class ApiManager {
 		return fetch(url)
 			.then(res => {
 				if (res.ok) {
-					return res.json()
+					return res.json();
 				} else {
-					throw new Error(`HTTP error! Status: ${res.status}`)
+					throw new Error(`HTTP error! Status: ${res.status}`);
 				}
 			})
 			.catch(error => {
@@ -32,6 +32,19 @@ class ApiManager {
 
 	/** Retrieves the number of records there are */
 	getRecordCount(): Promise<number> {
-		return this.fetchJson(`${this.mainUrl}/recordCount`);
+		return fetch(`${this.mainUrl}/recordCount`)
+		.then(res => {
+			if(res.ok) {
+				return res.text();
+			} else {
+				throw new Error(`HTTP error? Status: ${res.status}`);
+			}
+		})
+		.then (recordCount => {
+			return parseInt(recordCount);
+		})
+		.catch(error => {
+			throw error;
+		});
 	}
 }

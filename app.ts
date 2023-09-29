@@ -1,7 +1,7 @@
 class DataHandler {
-	/** It tracks if the showRecords function is running and would the value would be false if it's not. */
+	/** It tracks if the showRecords function is running. Is false if it's not. */
 	private isFunctionRunning: boolean;
-	/** This is an instance of the ApiManager class and passing a string when being used. */
+	/** Provides the url to the server during initialization. */
 	private apiManager: ApiManager;
 	/** The following track what page the user is on when navigating through the web app. */
 	private currentPage: number;
@@ -44,11 +44,12 @@ class DataHandler {
 				return this.recordCount;
 			})
 			.catch(error => {
-				throw new Error(`Failed trying to fetch the records count: ${error}`);
-			})
+				console.error("Failed getting the record count: ", error);
+				throw error;
+			});
 	}
 
-	/** Returning columns and rendering it on the table in the dom. */
+	/** Fetching the columns and rendering it on the table in the dom. */
 	showColumns(): Promise<void> {
 		$(".head-row").empty();
 		return this.apiManager.getColumns()
@@ -58,7 +59,8 @@ class DataHandler {
 				}
 			})
 			.catch(error => {
-				throw new Error(`Failed to retrieve columns: ${error}`);
+				console.error("Failed showing the columns: ", error);
+				throw error;
 			});
 	}
 
@@ -103,10 +105,10 @@ class DataHandler {
 				}
 				this.isFunctionRunning = false;
 			})
-			.catch(() => {
-				alert("Something went wrong. Click on the button to refresh the page.");
-				location.reload();
+			.catch(error => {
 				this.isFunctionRunning = false;
+				console.error("Failed showing the records: ", error);
+				throw error;
 			});
 	}
 
@@ -141,7 +143,8 @@ class DataHandler {
 				}
 			})
 			.catch(error => {
-				throw new Error(`Failed rendering the pagination: ${error}`);
+				console.error("Failed when showing the page numbers: ", error);
+				throw error;
 			});
 	}
 
@@ -151,12 +154,11 @@ class DataHandler {
 		// element's attribute value. 
 		$(".pagination").on("click", ".pagination-item", (event) => {
 			$('.pagination-item').prop('disabled', true);
-			this.getRecordCount()
 			$('.search-input').val('');
 			let returnedId = <string>($(event.target).attr("value"));
 			let maxRecords = this.recordsPerPage();
 			this.currentPage = parseInt(returnedId);
-			let toID = (this.currentPage * maxRecords) + (this.currentPage - 1);
+			let toID = this.currentPage * (maxRecords + 1) - 1;
 			if (this.difference > 0) {
 				toID = toID - this.difference;
 			}
@@ -173,10 +175,12 @@ class DataHandler {
 			});
 			return this.showRecords(fromID, toID)
 				.then(() => {
-					$('.pagination-item').prop('disabled', false)
+					$('.pagination-item').prop('disabled', false);
 				})
 				.catch(error => {
-					throw new Error(`Failed showing the records when clicking on the page button: ${error}`);
+					console.error("Failed when clicking on the pagination: ", error);
+					alert("An error occurred while trying to load the page. Please try again.");
+					throw error;
 				});
 		})
 
@@ -184,14 +188,24 @@ class DataHandler {
 		$(".next").on("click", () => {
 			this.paginationStart = this.paginationEnd + 1;
 			this.paginationEnd = this.paginationStart + 9;
-			this.pageNumbers(this.paginationStart, this.paginationEnd);
+			this.pageNumbers(this.paginationStart, this.paginationEnd)
+				.catch(error => {
+					alert("An error occurred while trying to load the next set of pages. Please try again.");
+					console.error("Failed when clicking on the next button: ", error);
+					throw error;
+				})
 		});
 
 		// Gives the previous set of pages numbers based on the last page in the pagination
 		$(".prev").on("click", () => {
 			this.paginationEnd = this.paginationStart - 1;
 			this.paginationStart = this.paginationEnd - 9;
-			this.pageNumbers(this.paginationStart, this.paginationEnd);
+			this.pageNumbers(this.paginationStart, this.paginationEnd)
+				.catch(error => {
+					alert("An error occurred while trying to load the previous set of pages. Please try again.");
+					console.error("Failed when clicking on the previous button: ", error);
+					throw error;
+				})
 		});
 	}
 
@@ -217,10 +231,12 @@ class DataHandler {
 					let inputNumber = this.input();
 					if (!regexPattern.test(e.key)) {
 						let maxRecords = this.recordsPerPage();
-						let end = (Math.ceil(inputNumber / maxRecords) * (maxRecords)) + 1;
+						let pageNumber = Math.ceil(inputNumber / (maxRecords + 1));
+						let end = pageNumber * (maxRecords + 1) - 1;
 						let start = end - maxRecords;
-						if ((end - maxRecords) === 0) {
-							start = end - maxRecords;
+						if (start < 0 || start < maxRecords) {
+							start = 0;
+							end = start + maxRecords;
 						}
 						if (end >= count) {
 							end = (count - 1);
@@ -245,7 +261,9 @@ class DataHandler {
 					}
 				})
 				.catch(error => {
-					throw new Error(`Failed when attempting to search: ${error}`);
+					console.error("Failed when searching: ", error);
+					alert("An error occurred while trying to search. Please try again.");
+					throw error;
 				});
 		});
 
@@ -289,29 +307,32 @@ class DataHandler {
 					$('.results-select').prop('disabled', false);
 				})
 				.catch(error => {
-					throw new Error(`Failed when clicking on the search range: ${error}`);
+					alert("An error occurred while trying to search. Please try again.");
+					console.error("Failed when clicking on the results: ", error);
+					throw error;
 				});
 		});
 	}
 
 	/** Will calculate the amount records to be shown according to the screen height. */
 	adjustDisplayedRecords(): Promise<void> {
-		let screenHeight = <number>($('#records-table-body').height());
 		let pageStart: number;
 		let pageEnd: number;
 		return this.getRecordCount()
 			.then(count => {
 				let maxRecords = this.recordsPerPage();
 				let inputNumber = this.input();
+				let newToID = this.currentToID === 0 ? this.currentToID + 1 : this.currentToID;
+				let newMaxRecords = maxRecords === 0 ? maxRecords + 1 : maxRecords;
 				if (inputNumber === -1) {
-					let newCurrentPage = Math.ceil(this.currentFromID / maxRecords);
+					let newCurrentPage = Math.ceil(this.currentFromID / newMaxRecords);
 					if (newCurrentPage === 0) {
 						this.currentFromID = 0;
 						newCurrentPage = 1;
 					}
 					this.currentToID = this.currentFromID + maxRecords;
 					this.currentPage = newCurrentPage;
-					let originalID = ((this.currentPage * maxRecords) + (this.currentPage - 1)) - maxRecords;
+					let originalID = (this.currentPage - 1) * (maxRecords + 1);
 					this.difference = originalID - this.currentFromID;
 				} else {
 					if (this.currentToID >= count) {
@@ -322,12 +343,8 @@ class DataHandler {
 					this.currentPage = newCurrentPage;
 					this.currentFromID = (this.currentPage - 1) * maxRecords + 1;
 				}
-				if (this.currentFromID === 0) {
-					let divisor = screenHeight < 136 ? maxRecords : maxRecords - 1;
-					pageEnd = Math.ceil(Math.floor(this.currentToID / divisor) / 10) * 10;
-				} else {
-					pageEnd = Math.ceil(Math.floor(this.currentToID / maxRecords) / 10) * 10;
-				}
+				pageEnd = Math.ceil(Math.floor(newToID / newMaxRecords) / 10) * 10;
+				pageEnd = pageEnd === 0 ? 10 : pageEnd;
 				pageStart = pageEnd - 9;
 				this.paginationStart = pageStart;
 				this.paginationEnd = pageEnd;
@@ -338,7 +355,9 @@ class DataHandler {
 				return this.pageNumbers(pageStart, pageEnd);
 			})
 			.catch(error => {
-				throw new Error(`Failed when resizing the window: ${error}`);
+				console.error("Failed when adjusting the records: ", error);
+				alert("An error occurred while trying to adjust the records. Please try again.");
+				throw error;
 			});
 	}
 
@@ -349,8 +368,9 @@ class DataHandler {
 			clearTimeout(this.resizeTimer);
 		}
 		this.resizeTimer = setTimeout(() => {
-			return this.adjustDisplayedRecords()
+			this.adjustDisplayedRecords()
 				.catch(error => {
+					alert("An error occurred while trying to resize the window. Please try again.");
 					throw error;
 				});
 		}, 250);
@@ -370,7 +390,6 @@ class DataHandler {
 	recordsPerPage(): number {
 		const screenHeight = <number>($('#records-table-body').height());
 		let maxRecords = Math.floor(screenHeight / 68);
-		maxRecords = maxRecords - 1;
 		return maxRecords;
 	}
 
@@ -398,6 +417,7 @@ window.onload = () => {
 			dataHandler.initializeSearch();
 		})
 		.catch(error => {
+			alert("An error occurred while trying to load your page. Please try again.");
 			throw new Error(`An error occurred when loading your page: ${error}`);
 		});
 	$(window).on('resize', () => {
