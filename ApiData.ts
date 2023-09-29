@@ -228,7 +228,7 @@ class ApiData {
 			}
 
 			this.pageSize = newGridSize;
-			this.lastVal = this.firstVal + newGridSize;
+			this.lastVal = this.firstVal + newGridSize - 1;
 
 			this.adjustGridHeight();
 
