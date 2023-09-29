@@ -1,5 +1,5 @@
 class ApiManager {
-	
+
 	private mainUrl: string;
 
 	constructor(mainUrl: string) {
@@ -33,18 +33,18 @@ class ApiManager {
 	/** Retrieves the number of records there are */
 	getRecordCount(): Promise<number> {
 		return fetch(`${this.mainUrl}/recordCount`)
-		.then(res => {
-			if(res.ok) {
-				return res.text();
-			} else {
-				throw new Error(`HTTP error? Status: ${res.status}`);
-			}
-		})
-		.then (recordCount => {
-			return parseInt(recordCount);
-		})
-		.catch(error => {
-			throw error;
-		});
+			.then(res => {
+				if (res.ok) {
+					return res.text();
+				} else {
+					throw new Error(`HTTP error? Status: ${res.status}`);
+				}
+			})
+			.then(recordCount => {
+				return parseInt(recordCount);
+			})
+			.catch(error => {
+				throw error;
+			});
 	}
 }

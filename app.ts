@@ -173,16 +173,15 @@ class DataHandler {
 					$(this).addClass('active');
 				}
 			});
-			return this.showRecords(fromID, toID)
+			this.showRecords(fromID, toID)
 				.then(() => {
 					$('.pagination-item').prop('disabled', false);
 				})
 				.catch(error => {
 					console.error("Failed when clicking on the pagination: ", error);
 					alert("An error occurred while trying to load the page. Please try again.");
-					throw error;
 				});
-		})
+		});
 
 		// Gives the next set of page numbers based on the last page on the pagination.
 		$(".next").on("click", () => {
@@ -190,10 +189,9 @@ class DataHandler {
 			this.paginationEnd = this.paginationStart + 9;
 			this.pageNumbers(this.paginationStart, this.paginationEnd)
 				.catch(error => {
-					alert("An error occurred while trying to load the next set of pages. Please try again.");
 					console.error("Failed when clicking on the next button: ", error);
-					throw error;
-				})
+					alert("An error occurred while trying to load the next set of pages. Please try again.");
+				});
 		});
 
 		// Gives the previous set of pages numbers based on the last page in the pagination
@@ -202,10 +200,9 @@ class DataHandler {
 			this.paginationStart = this.paginationEnd - 9;
 			this.pageNumbers(this.paginationStart, this.paginationEnd)
 				.catch(error => {
-					alert("An error occurred while trying to load the previous set of pages. Please try again.");
 					console.error("Failed when clicking on the previous button: ", error);
-					throw error;
-				})
+					alert("An error occurred while trying to load the previous set of pages. Please try again.");
+				});
 		});
 	}
 
@@ -226,7 +223,7 @@ class DataHandler {
 		// on to the DOM.
 		$(".search-input").on("input", (e: any) => {
 			e.preventDefault();
-			return this.getRecordCount()
+			this.getRecordCount()
 				.then(count => {
 					let inputNumber = this.input();
 					if (!regexPattern.test(e.key)) {
@@ -263,7 +260,6 @@ class DataHandler {
 				.catch(error => {
 					console.error("Failed when searching: ", error);
 					alert("An error occurred while trying to search. Please try again.");
-					throw error;
 				});
 		});
 
@@ -274,7 +270,7 @@ class DataHandler {
 			let endID: number;
 			let pageEnd: number;
 			let pageStart: number;
-			return this.getRecordCount()
+			this.getRecordCount()
 				.then(count => {
 					let idRange = $('.results-select').text();
 					let rangeArray = null;
@@ -298,18 +294,17 @@ class DataHandler {
 					}
 				})
 				.then(() => {
-					return this.pageNumbers(pageStart, pageEnd);
+					this.pageNumbers(pageStart, pageEnd);
 				})
 				.then(() => {
-					return this.showRecords(startID, endID);
+					this.showRecords(startID, endID);
 				})
 				.then(() => {
 					$('.results-select').prop('disabled', false);
 				})
 				.catch(error => {
-					alert("An error occurred while trying to search. Please try again.");
 					console.error("Failed when clicking on the results: ", error);
-					throw error;
+					alert("An error occurred while trying to search. Please try again.");
 				});
 		});
 	}
@@ -356,7 +351,6 @@ class DataHandler {
 			})
 			.catch(error => {
 				console.error("Failed when adjusting the records: ", error);
-				alert("An error occurred while trying to adjust the records. Please try again.");
 				throw error;
 			});
 	}
@@ -370,8 +364,8 @@ class DataHandler {
 		this.resizeTimer = setTimeout(() => {
 			this.adjustDisplayedRecords()
 				.catch(error => {
+					console.log("Failed when resizing the window: ", error)
 					alert("An error occurred while trying to resize the window. Please try again.");
-					throw error;
 				});
 		}, 250);
 	}
@@ -417,8 +411,8 @@ window.onload = () => {
 			dataHandler.initializeSearch();
 		})
 		.catch(error => {
+			console.error("Failed when loading the page: ", error);
 			alert("An error occurred while trying to load your page. Please try again.");
-			throw new Error(`An error occurred when loading your page: ${error}`);
 		});
 	$(window).on('resize', () => {
 		dataHandler.resize();
