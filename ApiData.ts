@@ -224,7 +224,7 @@ class ApiData {
 		if (newGridSize >= 0) {
 			// Adjust firstVal for the last page
 			if (this.firstVal + newGridSize > this.maxRange) {
-				this.firstVal = this.maxRange - newGridSize;
+				this.firstVal = this.maxRange - newGridSize + 1;
 			}
 
 			this.pageSize = newGridSize;
