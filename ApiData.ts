@@ -103,12 +103,12 @@ class ApiData {
 	fetchAndDisplayRecords(): Promise<void> {
 		this.maxRange = this.totalItems - 1;
 		let from = this.firstVal;
-		let to = Math.min(from + this.pageSize, this.maxRange);
+		let to = Math.min(from + this.pageSize - 1, this.maxRange);
 
 		if (to >= this.maxRange) {
-			const lastPage = Math.ceil(this.maxRange / this.pageSize) + 1;
+			const lastPage = Math.ceil(this.firstVal / this.pageSize ) + 1;
 			this.currentPage = lastPage;
-			from = this.maxRange - this.pageSize;
+			from = this.maxRange - this.pageSize + 1;
 			to = this.maxRange;
 		}
 
@@ -128,9 +128,9 @@ class ApiData {
 		if (searchValue >= 0 && searchValue <= this.maxRange) {
 			this.firstVal = searchValue;
 			if (searchValue + this.pageSize > this.maxRange) {
-				this.firstVal = Math.max(0, this.maxRange - this.pageSize);
+				this.firstVal = Math.max(0, this.maxRange - this.pageSize + 1);
 			}
-			this.currentPage = Math.ceil(this.firstVal / this.pageSize) + 1;
+			this.currentPage = Math.ceil(this.firstVal / this.pageSize ) + 1;
 			// empty search input after searching 
 			$('#fromInput').val('');
 			return this.fetchAndDisplayRecords();
@@ -172,10 +172,10 @@ class ApiData {
 
 	/** Update the page information and records display based on the current state of the grid. */
 	private updatePageInfo(): void {
-		const totalPages = Math.ceil(this.totalItems / this.pageSize);
+		const totalPages = Math.ceil(this.totalItems / this.pageSize );
 		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
 		const from = this.firstVal;
-		let to = Math.min(from + this.pageSize, this.maxRange);
+		let to = Math.min(from + this.pageSize - 1, this.maxRange);
 		$('#pageInfo').text(`${pageInfo}`);
 		$('.records').text(`Showing records ${from} to ${to}`);
 	}
@@ -193,7 +193,7 @@ class ApiData {
 
 		// Check if delta(change in page number) is positive and disable the next page if firstval + pageSize exceeds the MaxRange.
 		if (delta > 0 && this.firstVal + delta * this.pageSize > this.maxRange) {
-			this.firstVal = this.maxRange - this.pageSize;
+			this.firstVal = this.maxRange - this.pageSize + 1;
 			prevBtn.attr("disabled", null);
 			nextBtn.attr("disabled", "disabled");
 		} else if (delta < 0 && this.firstVal + delta * this.pageSize < 0) {
@@ -202,7 +202,7 @@ class ApiData {
 			prevBtn.attr("disabled", "disabled");
 			nextBtn.attr("disabled", null);
 		} else {
-			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * (this.pageSize + 1), this.maxRange));
+			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * this.pageSize , this.maxRange));
 			prevBtn.attr("disabled", null);
 			nextBtn.attr("disabled", null);
 		}
@@ -218,7 +218,7 @@ class ApiData {
 	}
 
 	private handleResize(): void {
-		const newGridSize = Math.ceil((Math.ceil(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT) - 1;
+		const newGridSize = (Math.ceil((Math.ceil(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT)) - 1;
 
 		// Check if the new grid size is non-negative
 		if (newGridSize >= 0) {
