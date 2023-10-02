@@ -1,20 +1,20 @@
-import { ajax, css } from "jquery";
-
 class RecordManager {
 	firstNumber: number;
 	lastNumber: number;
 	recordCount: number;
+	data: dataManager;
 
 	constructor() {
+		this.data = new dataManager();
 		this.firstNumber = 0;
 		this.lastNumber = 0;
 		this.recordCount = 0;
-		this.initialize();
 	}
 
 	initialize() {
-		this.createTableHeader();
-		dataManager.fetchRecordCount()
+		let promiseArray: Promise<void>[] = [];
+		promiseArray.push(this.createTableHeader());
+		let recordCountPromise = this.data.fetchRecordCount()
 			.then(count => {
 				this.recordCount = count - 1;
 				this.updateAndDisplayRecords();
@@ -22,14 +22,15 @@ class RecordManager {
 				this.handleResize();
 			})
 			.catch(err => {
-				alert('Error fetching and displaying the table records, reload the page');
-				throw err;
+				throw new Error('Error fetching and displaying the table records, reload the page' + err);
 			});
+		promiseArray.push(recordCountPromise);
+		return Promise.all(promiseArray);
 	}
 
 	/** Initializes the table head */
-	createTableHeader() {
-		return dataManager.fetchColumns()
+	createTableHeader(): Promise<void> {
+		return this.data.fetchColumns()
 			.then(columns => {
 				for (const col of columns) {
 					$(".head").append(`<th>${col}</th>`);
@@ -37,7 +38,6 @@ class RecordManager {
 			})
 			.catch(err => {
 				alert('Error creating table heading');
-				throw err;
 			});
 	}
 
@@ -65,7 +65,6 @@ class RecordManager {
 			})
 			.catch(err => {
 				alert('Error to fetch and display records, reload the page');
-				throw err;
 			});
 	}
 
@@ -96,7 +95,7 @@ class RecordManager {
 	}
 
 	fetchAndDisplayRecords(): Promise<void> {
-		return dataManager.fetchRecords(this.firstNumber, this.lastNumber)
+		return this.data.fetchRecords(this.firstNumber, this.lastNumber)
 			.then(records => {
 				const inputValue = <string>($('#searchInput').val());
 				$("#tableBody").empty();
@@ -118,22 +117,21 @@ class RecordManager {
 				$('#loader').hide();
 			})
 			.catch(err => {
-				alert('Error while displaying records, reload the page');
-				throw err;
+				alert('Error while displaying records, reload the page'+ err);
 			});
 	}
 
 	/** recalculates the record range that includes inputValue fromm user */
 	searchRecordsAndResize() {
 		let inputValue = <number>($('#searchInput').val());
-		if(inputValue >= 0 && inputValue <= this.recordCount){
+		if (inputValue >= 0 && inputValue <= this.recordCount) {
 			let calculatedRows = this.getNumberOfCalculatingRows();
-		// divides the calculated max rows in half
-		const halfRange = Math.floor(calculatedRows / 2);
-		this.firstNumber = Math.max(0, inputValue - halfRange);
-		this.lastNumber = Math.min(this.recordCount, this.firstNumber + (calculatedRows - 1));
-		}else{
-			alert('Input value must be between 0 and 999999.');
+			// divides the calculated max rows in half
+			const halfRange = Math.floor(calculatedRows / 2);
+			this.firstNumber = Math.max(0, inputValue - halfRange);
+			this.lastNumber = Math.min(this.recordCount, this.firstNumber + (calculatedRows - 1));
+		} else {
+			alert(`Input value must be between 0 and ${this.recordCount}`);
 		}
 	}
 
@@ -147,7 +145,11 @@ class RecordManager {
 			// calculates the last number of the page 
 			this.lastNumber = this.firstNumber + (calculatedRows - 1);
 		}
-		this.updateAndDisplayRecords();
+		return this.updateAndDisplayRecords()
+			.catch(err => {
+				alert('Error to fetch and display records, reload the page' + err);
+			});
+
 	}
 
 	navigateToPreviousPage() {
@@ -157,7 +159,10 @@ class RecordManager {
 			this.lastNumber = this.firstNumber - 1;
 			this.firstNumber = this.lastNumber - (calculatedRows - 1);
 		}
-		this.updateAndDisplayRecords();
+		return this.updateAndDisplayRecords()
+			.catch(err => {
+				alert('Error to fetch and display records, reload the page' + err);
+			});
 	}
 
 	/** calls to re-display records when screen is adjusted */
@@ -176,9 +181,8 @@ class RecordManager {
 						$('#loader').hide();
 					})
 					.catch(err => {
-						alert('Error occurred while resizing, reload the page');
+						alert('Error occurred while resizing, reload the page' + err);
 						$('#loader').hide();
-						throw err;
 					});
 			}, 250);
 		});
@@ -188,7 +192,10 @@ class RecordManager {
 		$('#btnSearch').on('click', (event) => {
 			event.preventDefault();
 			this.searchRecordsAndResize();
-			this.updateAndDisplayRecords();
+			return this.updateAndDisplayRecords()
+				.catch(err => {
+					alert('Error to fetch and display records, reload the page' + err);
+				});
 		});
 
 		$('.arrow-right').on('click', () => {
@@ -210,5 +217,7 @@ class RecordManager {
 }
 
 window.onload = () => {
-	new RecordManager();
+	const record = new RecordManager();
+	record.initialize();
+	console.log('Application loaded');
 }

@@ -1,20 +1,21 @@
 class dataManager {
-	static backend: string = "http://localhost:2050";
+	backend: string = "http://localhost:2050";
 
-	/** fetches the number of records from backend */
-	static fetchRecordCount(): Promise<number> {
+	/** fcetches the number of records from backend */
+	fetchRecordCount(): Promise<number> {
 		return fetch(`${this.backend}/recordCount`)
 			.then(res => {
 				if (!res.ok) {
 					throw 'Failed to fetch record count';
 				}
-				return res.json();
+				return res.text();
 			})
 			.then(totalRecords => {
-				if(typeof totalRecords !== 'number'){
+				const value = parseInt(totalRecords, 10);
+				if (isNaN(value)) {
 					throw new Error('Invalid response format');
 				}
-				return totalRecords;
+				return value;
 			})
 			.catch(err => {
 				throw 'Error fetching the record count: ' + err;
@@ -22,7 +23,7 @@ class dataManager {
 	}
 
 	/** fetches columns from backend */
-	static fetchColumns(): Promise<string[]> {
+	fetchColumns(): Promise<string[]> {
 		return fetch(`${this.backend}/columns`)
 			.then(res => {
 				if (!res.ok) {
@@ -36,7 +37,7 @@ class dataManager {
 	}
 
 	/** fetches records from backend */
-	static fetchRecords(from: number, to: number): Promise<string[]> {
+	fetchRecords(from: number, to: number): Promise<string[]> {
 		return fetch(`${this.backend}/records?from=${from}&to=${to}`)
 			.then(res => {
 				if (!res.ok) {
