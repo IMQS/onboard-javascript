@@ -207,7 +207,6 @@ class ApiData {
 			nextBtn.attr("disabled", null);
 		}
 
-		// this.lastVal = this.firstVal + this.pageSize;
 		this.currentPage = Math.ceil(this.firstVal / this.pageSize) + 1;
 
 		this.fetchAndDisplayRecords()
