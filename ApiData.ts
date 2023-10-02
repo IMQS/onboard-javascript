@@ -55,7 +55,6 @@ class ApiData {
 			})
 			.catch(error => {
 				console.error('Failed to fetch record count:', error);
-				alert('Failed to fetch record count.');
 				throw error;
 			});
 	}
