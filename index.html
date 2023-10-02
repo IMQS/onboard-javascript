@@ -1,13 +1,37 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+	<link rel="stylesheet" href="./style.css">
+	<script defer src="./apiManager.js"></script>
+	<script defer src="./app.js"></script>
 </head>
 
 <body>
-	<p>Hello</p>
+	<div class="heading">
+		<p class="results"></p>
+		<div class="search-container" id="search-container">
+			<input class="search-input" type="number" placeholder="Search a record by ID" min="1" max="999999" required>
+		</div>
+	</div>
+	<div class="table-container">
+		<table class="table">
+			<thead id="records-table-heading">
+			</thead>
+			<tbody id="records-table-body">
+				<tr class="head-row">
+			</tbody>
+			</tr>
+		</table>
+	</div>
+	<div class="wrapper">
+		<a class="prev">&laquo;</a>
+		<div class="pagination">
+		</div>
+		<a class="next">&raquo;</a>
+	</div>
 </body>
 
 </html>
-

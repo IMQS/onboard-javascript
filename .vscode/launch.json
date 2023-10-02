@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Debug in Chrome",
+            "url": "http://localhost:2050/",
+            "webRoot": "${workspaceFolder}",
+            "sourceMapPathOverrides": {
+                "webpack:///./*": "${webRoot}/*"
+            }
+        }
+    ]
+}
