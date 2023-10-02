@@ -51,6 +51,7 @@ class ApiData {
 		return this.fetchNumData('http://localhost:2050/recordCount')
 			.then((response: number) => {
 				this.totalItems = response;
+				this.maxRange = this.totalItems - 1;
 			})
 			.catch(error => {
 				console.error('Failed to fetch record count:', error);
@@ -101,12 +102,11 @@ class ApiData {
 
 	/** Fetches records using fetchAndProcessRecords(), processes them, displays them, and updates page information. */
 	fetchAndDisplayRecords(): Promise<void> {
-		this.maxRange = this.totalItems - 1;
 		let from = this.firstVal;
 		let to = Math.min(from + this.pageSize - 1, this.maxRange);
 
 		if (to >= this.maxRange) {
-			const lastPage = Math.ceil(this.firstVal / this.pageSize ) + 1;
+			const lastPage = Math.ceil(this.firstVal / this.pageSize) + 1;
 			this.currentPage = lastPage;
 			from = this.maxRange - this.pageSize + 1;
 			to = this.maxRange;
@@ -130,7 +130,7 @@ class ApiData {
 			if (searchValue + this.pageSize > this.maxRange) {
 				this.firstVal = Math.max(0, this.maxRange - this.pageSize + 1);
 			}
-			this.currentPage = Math.ceil(this.firstVal / this.pageSize ) + 1;
+			this.currentPage = Math.ceil(this.firstVal / this.pageSize) + 1;
 			// empty search input after searching 
 			$('#fromInput').val('');
 			return this.fetchAndDisplayRecords();
@@ -172,7 +172,7 @@ class ApiData {
 
 	/** Update the page information and records display based on the current state of the grid. */
 	private updatePageInfo(): void {
-		const totalPages = Math.ceil(this.totalItems / this.pageSize );
+		const totalPages = Math.ceil(this.totalItems / this.pageSize);
 		const pageInfo = `Page ${this.currentPage} of ${totalPages}`;
 		const from = this.firstVal;
 		let to = Math.min(from + this.pageSize - 1, this.maxRange);
@@ -202,12 +202,12 @@ class ApiData {
 			prevBtn.attr("disabled", "disabled");
 			nextBtn.attr("disabled", null);
 		} else {
-			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * this.pageSize , this.maxRange));
+			this.firstVal = Math.max(0, Math.min(this.firstVal + delta * this.pageSize, this.maxRange));
 			prevBtn.attr("disabled", null);
 			nextBtn.attr("disabled", null);
 		}
 
-		this.lastVal = this.firstVal + this.pageSize;
+		// this.lastVal = this.firstVal + this.pageSize;
 		this.currentPage = Math.ceil(this.firstVal / this.pageSize) + 1;
 
 		this.fetchAndDisplayRecords()
@@ -218,7 +218,7 @@ class ApiData {
 	}
 
 	private handleResize(): void {
-		const newGridSize = Math.ceil((Math.ceil(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT)- 1;
+		const newGridSize = Math.ceil((Math.ceil(<number>($(window).innerHeight())) * GRID_RATIO) / ROW_HEIGHT) - 1;
 
 		// Check if the new grid size is non-negative
 		if (newGridSize >= 0) {
