@@ -1,7 +1,7 @@
 class dataManager {
 	backend: string = "http://localhost:2050";
 
-	/** fcetches the number of records from backend */
+	/** fetches the number of records from backend */
 	fetchRecordCount(): Promise<number> {
 		return fetch(`${this.backend}/recordCount`)
 			.then(res => {

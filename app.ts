@@ -37,7 +37,7 @@ class RecordManager {
 				}
 			})
 			.catch(err => {
-				alert('Error creating table heading');
+				alert('Error creating table heading'+ err);
 			});
 	}
 
@@ -64,7 +64,7 @@ class RecordManager {
 				$('#loader').hide();
 			})
 			.catch(err => {
-				alert('Error to fetch and display records, reload the page');
+				alert('Error to fetch and display records, reload the page'+ err);
 			});
 	}
 
@@ -149,7 +149,6 @@ class RecordManager {
 			.catch(err => {
 				alert('Error to fetch and display records, reload the page' + err);
 			});
-
 	}
 
 	navigateToPreviousPage() {
@@ -209,8 +208,8 @@ class RecordManager {
 		$('#searchInput').on('input', () => {
 			const inputValue = <string>$('#searchInput').val();
 			if (inputValue !== undefined) {
-				let sanitizedValue = inputValue.replace(/[^0-9]/g, '');
-				$('#searchInput').val(sanitizedValue);
+				let correctValue = inputValue.replace(/[^0-9]/g, '');
+				$('#searchInput').val(correctValue);
 			}
 		});
 	}
@@ -219,5 +218,4 @@ class RecordManager {
 window.onload = () => {
 	const record = new RecordManager();
 	record.initialize();
-	console.log('Application loaded');
 }
