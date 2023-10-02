@@ -350,7 +350,7 @@ class DataHandler {
 				return this.pageNumbers(pageStart, pageEnd);
 			})
 			.catch(error => {
-				console.error("Failed when adjusting the records: ", error);
+				console.error("Failed when adjusting the window size: ", error);
 				throw error;
 			});
 	}
@@ -364,7 +364,7 @@ class DataHandler {
 		this.resizeTimer = setTimeout(() => {
 			this.adjustDisplayedRecords()
 				.catch(error => {
-					console.log("Failed when resizing the window: ", error)
+					console.log("Failed when resizing the window: ", error);
 					alert("An error occurred while trying to resize the window. Please try again.");
 				});
 		}, 250);
