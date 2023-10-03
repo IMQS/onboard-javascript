@@ -1,0 +1,25 @@
+{
+	"name": "onboard-javascript",
+	"version": "1.0.0",
+	"description": "This is a JavaScript project for all new developers to complete before venturing into our web frontend codebase.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "tsc",
+		"start": "npm run build -- -w"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Ntobe99/onboard-javascript.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Ntobe99/onboard-javascript/issues"
+	},
+	"homepage": "https://github.com/Ntobe99/onboard-javascript#readme",
+	"dependencies": {
+		"@types/jquery": "^3.5.16",
+		"typescript": "^3.8.3"
+	}
+}

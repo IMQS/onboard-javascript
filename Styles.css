@@ -1,0 +1,107 @@
+html,
+body,
+#grid {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	overflow: hidden;
+	font-family: system-ui;
+}
+
+#overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(231, 238, 238, 0.815);
+	z-index: 900;
+	display: none;
+}
+
+.spinner-container {
+	text-align: center;
+}
+
+#grid {
+	border: 1px solid #333333;
+	text-align: center;
+	background-color: #f2f6f7;
+	display: grid;
+	grid-template-rows: 1fr;
+}
+
+/* table */
+table {
+	width: 100%;
+	height: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+tr {
+	border: 1px solid #333333;
+}
+
+th {
+	background-color: #333333;
+	font-weight: 450;
+	color: white;
+}
+
+td {
+	border: 1px solid #333333;
+	align-content: center;
+	width: 1%;
+}
+
+.grid-controls {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	color: white;
+	background-color: #333333;
+	position: sticky;
+	bottom: 0;
+}
+
+#pageInfo,
+.records {
+	font-weight: 450;
+	background-color: #333333;
+}
+
+#fromInput {
+	padding: 5px 10px;
+	margin: 0 5px;
+	background-color: #232425;
+	color: white;
+}
+
+/* button */
+.btn {
+	cursor: pointer;
+	padding: 5px 10px;
+	margin: 0 5px;
+	color: white;
+	background-color: #5a5f61;
+}
+
+@media screen and (max-width: 1300px) {
+	td {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	td:hover {
+		overflow: visible;
+		white-space: normal;
+		text-overflow: unset;
+	}
+
+	#pageInfo {
+		display: none;
+	}
+}
