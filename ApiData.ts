@@ -82,7 +82,7 @@ class ApiData {
 		return this.fetchStrData(`http://localhost:2050/records?from=${from}&to=${to}`)
 			.then((response: string) => {
 				const res = JSON.parse(response);
-				const processedData = res.map((record: string) => {
+				const processedData = res.map((record: string[]) => {
 					const obj: GridData = {};
 					for (let j = 0; j < this.columnNames.length && j < record.length; j++) {
 						obj[this.columnNames[j].name] = record[j];
