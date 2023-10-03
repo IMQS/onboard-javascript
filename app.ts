@@ -37,7 +37,7 @@ class RecordManager {
 				}
 			})
 			.catch(err => {
-				alert('Error creating table heading'+ err);
+				alert('Error creating table heading' + err);
 			});
 	}
 
@@ -64,7 +64,7 @@ class RecordManager {
 				$('#loader').hide();
 			})
 			.catch(err => {
-				alert('Error to fetch and display records, reload the page'+ err);
+				alert('Error to fetch and display records, reload the page' + err);
 			});
 	}
 
@@ -117,7 +117,7 @@ class RecordManager {
 				$('#loader').hide();
 			})
 			.catch(err => {
-				alert('Error while displaying records, reload the page'+ err);
+				alert('Error while displaying records, reload the page' + err);
 			});
 	}
 
@@ -167,12 +167,11 @@ class RecordManager {
 	/** calls to re-display records when screen is adjusted */
 	handleResize() {
 		let resizeTimeout: number;
-		let inputValue = <string>($('#searchInput').val());
 		$(window).on('resize', () => {
 			clearTimeout(resizeTimeout);
 			resizeTimeout = setTimeout(() => {
 				$('#loader').show();
-				if (inputValue !== '') {
+				if ($('#searchInput').val() !== '') {
 					this.searchRecordsAndResize();
 				}
 				this.updateAndDisplayRecords()
