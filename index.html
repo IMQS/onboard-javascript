@@ -1,13 +1,38 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>JS Onboard Project</title>
 	<script type="text/javascript" charset="utf-8" src="third_party/jquery-2.0.3.min.js"></script>
+	<link rel="stylesheet" href="style.css">
+	<script src="dataManager.js" ></script>
+	<script src="app.js" ></script>
 </head>
 
 <body>
-	<p>Hello</p>
+	<div id="loader">
+		<div class="loader-spinner"></div>
+	</div>
+	<h1 class="heading">Javascript Project</h1>
+	<div class="search-container">
+		<form id="searchForm">
+			<input type="number" id="searchInput" placeholder="Search.." name="search" autocomplete="off">
+			<button id="btnSearch" class="btnSearch" type="submit" >Submit</button>
+		</form>
+	</div>
+	<div class="showRecords">
+		<button class="arrow-right"></button>
+		<div id="page"></div>
+		<button class="arrow-left"></button>
+	</div>
+	<table id="recordsTable">
+		<thead>
+			<tr class="head">
+			</tr>
+		</thead>
+		<tbody id="tableBody">
+		</tbody>
+	</table>
 </body>
 
 </html>
-
