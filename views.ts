@@ -4,7 +4,6 @@
  * TableRenderer is responsible for rendering data into an HTML table.
  * It fetches data from the StateManager and populates the table accordingly.
  */
-
 class TableRenderer {
 	private stateManager: StateManager;
 
@@ -59,7 +58,7 @@ class TableRenderer {
 		}
 	}
 
-	// Sets the widths of table columns evenly.
+	/** Sets the widths of table columns evenly. */
 	setColumnWidths(): void {
 		try {
 			const table = document.getElementById("myTable");

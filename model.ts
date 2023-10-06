@@ -1,6 +1,6 @@
 //*** Model ***/
 
-// Manages the application's state for data display, navigation, and search functionalities.
+/** Manages the application's state for data display, navigation, and search functionalities. */
 class StateManager {
 	private highlightedId: number | null = null;
 	private rowHeight: number;
@@ -34,7 +34,7 @@ class StateManager {
 		this.highlightedId = value;
 	}
 
-	// Sets up initial state, fetches record count and column names, and adjusts the display window size.
+	/** Sets up initial state, fetches record count and column names, and adjusts the display window size. */
 	async initializeState(): Promise<void> {
 		try {
 			await this.fetchAndStoreTotalRecordCount();
@@ -170,7 +170,8 @@ class StateManager {
 			);
 		}
 	}
-	// Adjusts the available height based on window size and recalculates the number of rows.
+	
+	/** Adjusts the available height based on window size and recalculates the number of rows. */
 	adjustWindowSize(): void {
 		try {
 			if (typeof window === "undefined" || !window.innerHeight) {
@@ -263,4 +264,11 @@ class StateManager {
 			);
 		}
 	}
+	
+
+
+
+
+
+
 }

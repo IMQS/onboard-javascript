@@ -1,5 +1,5 @@
 "use strict";
-//*** Controllers ***/
+/*** Controllers ***/
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,14 +36,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-// Handles window resize events to update the view of the application.
+/** Handles window resize events to update the view of the application. */
 var WindowResizeHandler = /** @class */ (function () {
     /**
      * @param {TableRenderer} tableRenderer - Used for re-rendering table data.
      * @param {StateManager} stateManager - State control for retrieving/updating application data.
      */
     function WindowResizeHandler(tableRenderer, stateManager, paginationManager) {
-        this.debouncedUpdate = this.debounce(this.updateAfterResize.bind(this), 350);
+        this.debouncedUpdate = this.debounce(this.updateAfterResize.bind(this), 250);
         this.paginationManager = paginationManager;
         this.tableRenderer = tableRenderer;
         this.stateManager = stateManager;
@@ -57,7 +57,7 @@ var WindowResizeHandler = /** @class */ (function () {
     WindowResizeHandler.prototype.handleResize = function () {
         this.debouncedUpdate();
     };
-    //Debounce function to reduce the number of function calls while user is dragging the browser window.
+    // Debounce function to reduce the number of function calls while user is dragging the browser window.
     WindowResizeHandler.prototype.debounce = function (func, delay) {
         var timeout = null;
         return function () {
@@ -77,13 +77,16 @@ var WindowResizeHandler = /** @class */ (function () {
     };
     WindowResizeHandler.prototype.updateAfterResize = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var records, error_1;
+            var records;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
                         this.stateManager.adjustWindowSize();
-                        return [4 /*yield*/, this.stateManager.retrieveRecords()];
+                        return [4 /*yield*/, this.stateManager.retrieveRecords().catch(function (error) {
+                                console.error("Error retrieving records: " + (error instanceof Error ? error.message : error));
+                                alert("An error occurred while retrieving records. Please try again later.");
+                                return;
+                            })];
                     case 1:
                         _a.sent();
                         records = this.stateManager.getRecords();
@@ -91,19 +94,14 @@ var WindowResizeHandler = /** @class */ (function () {
                             this.tableRenderer.renderRecords(records);
                         }
                         this.paginationManager.updateButtonStates();
-                        return [3 /*break*/, 3];
-                    case 2:
-                        error_1 = _a.sent();
-                        console.error("Error in updateAfterResize: " + (error_1 instanceof Error ? error_1.message : error_1));
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
+                        return [2 /*return*/];
                 }
             });
         });
     };
     return WindowResizeHandler;
 }());
-// Handles pagination and search functionalities for the application's table view.
+/** Handles pagination and search functionalities for the application's table view. */
 var PaginationManager = /** @class */ (function () {
     /**
      * @param {TableRenderer} tableRenderer - Used for re-rendering table data.
@@ -112,16 +110,36 @@ var PaginationManager = /** @class */ (function () {
     function PaginationManager(tableRenderer, stateManager) {
         this.tableRenderer = tableRenderer;
         this.stateManager = stateManager;
-        this.prevButton = document.getElementById("prevPage");
-        this.nextButton = document.getElementById("nextPage");
-        this.searchButton = document.getElementById("searchButton");
-        this.mainHeading = document.getElementById("main-heading");
-        this.filterInput = document.getElementById("filterInput");
-        this.errorMessage = document.getElementById("errorMessage");
+        // DOM elements required for pagination and search.
+        this.prevButton = null;
+        this.nextButton = null;
+        this.searchButton = null;
+        this.mainHeading = null;
+        this.filterInput = null;
+        this.errorMessage = null;
+        this.initializeDOMElements();
         // Attach event listeners for buttons and other UI elements.
         this.setupEventListeners();
     }
-    // Attaches event listeners to the relevant DOM elements to handle user interactions.
+    PaginationManager.prototype.initializeDOMElements = function () {
+        this.prevButton = this.retrieveElement("prevPage", "button");
+        this.nextButton = this.retrieveElement("nextPage", "button");
+        this.searchButton = this.retrieveElement("searchButton", "button");
+        this.mainHeading = this.retrieveElement("main-heading", "heading");
+        this.filterInput = this.retrieveElement("filterInput", "input box");
+        this.errorMessage = this.retrieveElement("errorMessage", "error message");
+    };
+    PaginationManager.prototype.retrieveElement = function (id, description) {
+        var element = document.getElementById(id);
+        if (!element) {
+            console.error("Element with ID '" + id + "' not found");
+            if (description) {
+                alert("A critical " + description + " is missing on the page. Some functionalities might not work as expected.");
+            }
+        }
+        return element;
+    };
+    /** Attaches event listeners to the relevant DOM elements to handle user interactions. */
     PaginationManager.prototype.setupEventListeners = function () {
         var _this = this;
         if (this.prevButton) {
@@ -141,7 +159,6 @@ var PaginationManager = /** @class */ (function () {
         }
         if (this.filterInput) {
             this.filterInput.addEventListener("keyup", function (event) {
-                // Check if the "Enter" key was pressed
                 if (event.key === "Enter") {
                     _this.searchById();
                 }
@@ -156,7 +173,7 @@ var PaginationManager = /** @class */ (function () {
             this.setupLiveValidation();
         }
     };
-    // Navigates to the home page by reloading the window.
+    /** Navigates to the home page by reloading the window.*/
     PaginationManager.prototype.navigateToHome = function () {
         try {
             window.location.reload();
@@ -166,10 +183,10 @@ var PaginationManager = /** @class */ (function () {
             alert("Failed to reload the page. Please try again.");
         }
     };
-    // Fetches the next set of records and updates the view.
+    /** Fetches the next set of records and updates the view. */
     PaginationManager.prototype.incrementPage = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var records, error_2;
+            var records, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -185,18 +202,18 @@ var PaginationManager = /** @class */ (function () {
                         this.updateButtonStates();
                         return [3 /*break*/, 3];
                     case 2:
-                        error_2 = _a.sent();
-                        console.error("Unexpected error in incrementPage: " + (error_2 instanceof Error ? error_2.message : error_2));
+                        error_1 = _a.sent();
+                        console.error("Unexpected error in incrementPage: " + (error_1 instanceof Error ? error_1.message : error_1));
                         return [3 /*break*/, 3];
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    // Fetches the previous set of records and updates the view.
+    /** Fetches the previous set of records and updates the view. */
     PaginationManager.prototype.decrementPage = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var records, error_3;
+            var records, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -212,22 +229,25 @@ var PaginationManager = /** @class */ (function () {
                         this.updateButtonStates();
                         return [3 /*break*/, 3];
                     case 2:
-                        error_3 = _a.sent();
-                        console.error("Error in decrementPage: " + (error_3 instanceof Error ? error_3.message : error_3));
+                        error_2 = _a.sent();
+                        console.error("Error in decrementPage: " + (error_2 instanceof Error ? error_2.message : error_2));
                         return [3 /*break*/, 3];
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    // Searches for a record by its ID and updates the view.
+    /** Searches for a record by its ID and updates the view. */
     PaginationManager.prototype.searchById = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var searchValue, records, error_4;
+            var searchValue, records, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
+                        if (!this.filterInput) {
+                            throw new Error("Filter input element is missing");
+                        }
                         searchValue = parseInt(this.filterInput.value, 10);
                         if (isNaN(searchValue)) {
                             throw new Error("Invalid search value or none");
@@ -243,15 +263,16 @@ var PaginationManager = /** @class */ (function () {
                         this.updateButtonStates();
                         return [3 /*break*/, 3];
                     case 2:
-                        error_4 = _a.sent();
-                        console.error("Error in searchById function: " + (error_4 instanceof Error ? error_4.message : error_4));
+                        error_3 = _a.sent();
+                        console.error("Error in searchById function: " + (error_3 instanceof Error ? error_3.message : error_3));
+                        alert("A Serious Error ocurred, please try again later");
                         return [3 /*break*/, 3];
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    // Validates input for the search bar in real-time.
+    /** Validates input for the search bar in real-time. */
     PaginationManager.prototype.setupLiveValidation = function () {
         var _this = this;
         if (!this.filterInput || !this.errorMessage) {
@@ -259,7 +280,8 @@ var PaginationManager = /** @class */ (function () {
             return;
         }
         this.filterInput.addEventListener("input", function () {
-            var inputValue = _this.filterInput.value;
+            var inputValue = _this.filterInput.value; // The "!" here asserts non-null, because I already checked for null above.
+            var maxValue = _this.stateManager.getTotalRecordCount() - 1;
             if (inputValue.length === 0) {
                 _this.errorMessage.textContent = "";
             }
@@ -267,16 +289,19 @@ var PaginationManager = /** @class */ (function () {
                 inputValue.length > 6 ||
                 !/^\d+$/.test(inputValue)) {
                 _this.errorMessage.textContent =
-                    "Invalid input. Please enter a number between 0 and 999 999.";
+                    "Invalid input. Please enter a number between 0 and " + maxValue + ".";
             }
             else {
                 _this.errorMessage.textContent = "";
             }
         });
     };
-    // Updates the state of the pagination buttons based on the current view.
+    /** Updates the state of the pagination buttons based on the current view. */
     PaginationManager.prototype.updateButtonStates = function () {
         try {
+            if (!this.prevButton || !this.nextButton) {
+                throw new Error("Button elements are missing");
+            }
             var from = this.stateManager.getFrom();
             var to = this.stateManager.getTo();
             var totalRecordCount = this.stateManager.getTotalRecordCount();

@@ -2,7 +2,7 @@
 
 type CityData = [number, string, number];
 
-// Manages API requests for fetching record count, column names, and data records.
+/** Manages API requests for fetching record count, column names, and data records.*/
 class ApiManager {
 	totalRecordCount: number;
 	columnNames: string[] | null;

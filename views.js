@@ -101,7 +101,7 @@ var TableRenderer = /** @class */ (function () {
             }
         }
     };
-    // Sets the widths of table columns evenly.
+    /** Sets the widths of table columns evenly. */
     TableRenderer.prototype.setColumnWidths = function () {
         try {
             var table = document.getElementById("myTable");

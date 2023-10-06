@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-// Manages the application's state for data display, navigation, and search functionalities.
+/** Manages the application's state for data display, navigation, and search functionalities. */
 var StateManager = /** @class */ (function () {
     function StateManager(apiManager) {
         this.highlightedId = null;
@@ -58,7 +58,7 @@ var StateManager = /** @class */ (function () {
     StateManager.prototype.setHighlightedId = function (value) {
         this.highlightedId = value;
     };
-    // Sets up initial state, fetches record count and column names, and adjusts the display window size.
+    /** Sets up initial state, fetches record count and column names, and adjusts the display window size. */
     StateManager.prototype.initializeState = function () {
         return __awaiter(this, void 0, void 0, function () {
             var error_1;
@@ -222,7 +222,7 @@ var StateManager = /** @class */ (function () {
             });
         });
     };
-    // Adjusts the available height based on window size and recalculates the number of rows.
+    /** Adjusts the available height based on window size and recalculates the number of rows. */
     StateManager.prototype.adjustWindowSize = function () {
         try {
             if (typeof window === "undefined" || !window.innerHeight) {

@@ -1,6 +1,6 @@
-//*** Controllers ***/
+/*** Controllers ***/
 
-// Handles window resize events to update the view of the application.
+/** Handles window resize events to update the view of the application. */
 class WindowResizeHandler {
 	private debouncedUpdate: Function;
 	private paginationManager: PaginationManager;
@@ -19,7 +19,7 @@ class WindowResizeHandler {
 	) {
 		this.debouncedUpdate = this.debounce(
 			this.updateAfterResize.bind(this),
-			350
+			250
 		);
 		this.paginationManager = paginationManager;
 		this.tableRenderer = tableRenderer;
@@ -37,7 +37,7 @@ class WindowResizeHandler {
 		this.debouncedUpdate();
 	}
 
-	//Debounce function to reduce the number of function calls while user is dragging the browser window.
+	// Debounce function to reduce the number of function calls while user is dragging the browser window.
 	debounce(func: Function, delay: number): Function {
 		let timeout: ReturnType<typeof setTimeout> | null = null;
 		return (...args: any[]) => {
@@ -53,67 +53,95 @@ class WindowResizeHandler {
 	}
 
 	async updateAfterResize(): Promise<void> {
-		try {
-			this.stateManager.adjustWindowSize();
-			await this.stateManager.retrieveRecords();
-			const records = this.stateManager.getRecords();
-
-			if (records !== null) {
-				this.tableRenderer.renderRecords(records);
-			}
-			this.paginationManager.updateButtonStates();
-		} catch (error) {
+		this.stateManager.adjustWindowSize();
+		await this.stateManager.retrieveRecords().catch((error) => {
 			console.error(
-				`Error in updateAfterResize: ${error instanceof Error ? error.message : error
+				`Error retrieving records: ${
+					error instanceof Error ? error.message : error
 				}`
 			);
+			alert(
+				"An error occurred while retrieving records. Please try again later."
+			);
+			return;
+		});
+
+		const records = this.stateManager.getRecords();
+
+		if (records !== null) {
+			this.tableRenderer.renderRecords(records);
 		}
+		this.paginationManager.updateButtonStates();
 	}
 }
 
-// Handles pagination and search functionalities for the application's table view.
+/** Handles pagination and search functionalities for the application's table view. */
 class PaginationManager {
 	// DOM elements required for pagination and search.
-	private prevButton: HTMLButtonElement;
-	private nextButton: HTMLButtonElement;
-	private searchButton: HTMLButtonElement;
-	private mainHeading: HTMLElement;
-	private filterInput: HTMLInputElement;
-	private errorMessage: HTMLElement;
+	private prevButton: HTMLButtonElement | null = null;
+	private nextButton: HTMLButtonElement | null = null;
+	private searchButton: HTMLButtonElement | null = null;
+	private mainHeading: HTMLElement | null = null;
+	private filterInput: HTMLInputElement | null = null;
+	private errorMessage: HTMLElement | null = null;
 
 	/**
 	 * @param {TableRenderer} tableRenderer - Used for re-rendering table data.
 	 * @param {StateManager} stateManager - State control for retrieving/updating application data.
 	 */
-
 	constructor(
 		private tableRenderer: TableRenderer,
 		private stateManager: StateManager
 	) {
-		this.prevButton = document.getElementById(
-			"prevPage"
-		) as HTMLButtonElement;
-		this.nextButton = document.getElementById(
-			"nextPage"
-		) as HTMLButtonElement;
-		this.searchButton = document.getElementById(
-			"searchButton"
-		) as HTMLButtonElement;
-		this.mainHeading = document.getElementById(
-			"main-heading"
-		) as HTMLElement;
-		this.filterInput = document.getElementById(
-			"filterInput"
-		) as HTMLInputElement;
-		this.errorMessage = document.getElementById(
-			"errorMessage"
-		) as HTMLElement;
-
+		this.initializeDOMElements();
 		// Attach event listeners for buttons and other UI elements.
 		this.setupEventListeners();
 	}
 
-	// Attaches event listeners to the relevant DOM elements to handle user interactions.
+	private initializeDOMElements(): void {
+		this.prevButton = this.retrieveElement(
+			"prevPage",
+			"button"
+		) as HTMLButtonElement;
+		this.nextButton = this.retrieveElement(
+			"nextPage",
+			"button"
+		) as HTMLButtonElement;
+		this.searchButton = this.retrieveElement(
+			"searchButton",
+			"button"
+		) as HTMLButtonElement;
+		this.mainHeading = this.retrieveElement(
+			"main-heading",
+			"heading"
+		) as HTMLElement;
+		this.filterInput = this.retrieveElement(
+			"filterInput",
+			"input box"
+		) as HTMLInputElement;
+		this.errorMessage = this.retrieveElement(
+			"errorMessage",
+			"error message"
+		) as HTMLElement;
+	}
+
+	private retrieveElement(
+		id: string,
+		description?: string
+	): HTMLElement | null {
+		const element = document.getElementById(id);
+		if (!element) {
+			console.error(`Element with ID '${id}' not found`);
+			if (description) {
+				alert(
+					`A critical ${description} is missing on the page. Some functionalities might not work as expected.`
+				);
+			}
+		}
+		return element;
+	}
+
+	/** Attaches event listeners to the relevant DOM elements to handle user interactions. */
 	private setupEventListeners(): void {
 		if (this.prevButton) {
 			this.prevButton.addEventListener("click", () =>
@@ -135,7 +163,6 @@ class PaginationManager {
 
 		if (this.filterInput) {
 			this.filterInput.addEventListener("keyup", (event) => {
-				// Check if the "Enter" key was pressed
 				if (event.key === "Enter") {
 					this.searchById();
 				}
@@ -153,20 +180,21 @@ class PaginationManager {
 		}
 	}
 
-	// Navigates to the home page by reloading the window.
+	/** Navigates to the home page by reloading the window.*/
 	navigateToHome(): void {
 		try {
 			window.location.reload();
 		} catch (error) {
 			console.error(
-				`Error while navigating to home: ${error instanceof Error ? error.message : error
+				`Error while navigating to home: ${
+					error instanceof Error ? error.message : error
 				}`
 			);
 			alert("Failed to reload the page. Please try again.");
 		}
 	}
 
-	// Fetches the next set of records and updates the view.
+	/** Fetches the next set of records and updates the view. */
 	async incrementPage(): Promise<void> {
 		try {
 			this.stateManager.goToNextPage();
@@ -179,13 +207,14 @@ class PaginationManager {
 			this.updateButtonStates();
 		} catch (error) {
 			console.error(
-				`Unexpected error in incrementPage: ${error instanceof Error ? error.message : error
+				`Unexpected error in incrementPage: ${
+					error instanceof Error ? error.message : error
 				}`
 			);
 		}
 	}
 
-	// Fetches the previous set of records and updates the view.
+	/** Fetches the previous set of records and updates the view. */
 	async decrementPage(): Promise<void> {
 		try {
 			this.stateManager.goToPreviousPage();
@@ -199,15 +228,20 @@ class PaginationManager {
 			this.updateButtonStates();
 		} catch (error) {
 			console.error(
-				`Error in decrementPage: ${error instanceof Error ? error.message : error
+				`Error in decrementPage: ${
+					error instanceof Error ? error.message : error
 				}`
 			);
 		}
 	}
 
-	// Searches for a record by its ID and updates the view.
+	/** Searches for a record by its ID and updates the view. */
 	async searchById(): Promise<void> {
 		try {
+			if (!this.filterInput) {
+				throw new Error("Filter input element is missing");
+			}
+
 			const searchValue = parseInt(this.filterInput.value, 10);
 			if (isNaN(searchValue)) {
 				throw new Error("Invalid search value or none");
@@ -225,13 +259,15 @@ class PaginationManager {
 			this.updateButtonStates();
 		} catch (error) {
 			console.error(
-				`Error in searchById function: ${error instanceof Error ? error.message : error
+				`Error in searchById function: ${
+					error instanceof Error ? error.message : error
 				}`
 			);
+			alert("A Serious Error ocurred, please try again later");
 		}
 	}
 
-	// Validates input for the search bar in real-time.
+	/** Validates input for the search bar in real-time. */
 	setupLiveValidation(): void {
 		if (!this.filterInput || !this.errorMessage) {
 			console.error(
@@ -241,26 +277,30 @@ class PaginationManager {
 		}
 
 		this.filterInput.addEventListener("input", () => {
-			const inputValue = this.filterInput.value;
-
+			const inputValue = this.filterInput!.value; // The "!" here asserts non-null, because I already checked for null above.
+			const maxValue = this.stateManager.getTotalRecordCount() - 1;
 			if (inputValue.length === 0) {
-				this.errorMessage.textContent = "";
+				this.errorMessage!.textContent = "";
 			} else if (
 				inputValue.length < 1 ||
 				inputValue.length > 6 ||
 				!/^\d+$/.test(inputValue)
 			) {
-				this.errorMessage.textContent =
-					"Invalid input. Please enter a number between 0 and 999 999.";
+				this.errorMessage!.textContent =
+					`Invalid input. Please enter a number between 0 and ${maxValue}.`;
 			} else {
-				this.errorMessage.textContent = "";
+				this.errorMessage!.textContent = "";
 			}
 		});
 	}
 
-	// Updates the state of the pagination buttons based on the current view.
+	/** Updates the state of the pagination buttons based on the current view. */
 	public updateButtonStates(): void {
 		try {
+			if (!this.prevButton || !this.nextButton) {
+				throw new Error("Button elements are missing");
+			}
+
 			const from = this.stateManager.getFrom();
 			const to = this.stateManager.getTo();
 			const totalRecordCount = this.stateManager.getTotalRecordCount();
@@ -269,7 +309,8 @@ class PaginationManager {
 			this.nextButton.disabled = to === totalRecordCount - 1;
 		} catch (error) {
 			console.error(
-				`Unexpected error in updateButtonStates: ${error instanceof Error ? error.message : error
+				`Unexpected error in updateButtonStates: ${
+					error instanceof Error ? error.message : error
 				}`
 			);
 		}
