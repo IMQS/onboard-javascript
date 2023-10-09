@@ -1,5 +1,3 @@
-import { error } from "jquery";
-
 class InitializeApp {
 	IMQS: string = "http://localhost:2050";
 	/** Current value of the first record being displayed */
@@ -248,14 +246,8 @@ class InitializeApp {
 			const searchValue = Number(searchInputValue);
 			this.searchedIndex = null;
 			this.searchMethod(searchValue)
-				.then(() => {
-					$("#tableWrapper").hide();
-					$("#loader").show();
-				})
 				.catch(error => {
 					window.alert("An error occurred during search. Please try again." + error);
-					$("#loader").hide();
-					$("#tableWrapper").show();
 				});
 		});
 
