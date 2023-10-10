@@ -7,7 +7,7 @@
 class TableRenderer {
 	private stateManager: StateManager;
 
-	constructor(stateManager: StateManager) {
+	constructor (stateManager: StateManager) {
 		this.stateManager = stateManager;
 	}
 
@@ -16,45 +16,50 @@ class TableRenderer {
 	 * @param {StateManager} stateManager - The manager to fetch state from.
 	 */
 	async initialRender(): Promise<void> {
-		try {
-			const columnNames = this.stateManager.getColumnNames();
-			if (columnNames !== null) {
-				this.renderColumnNames(columnNames);
-			}
+		const columnNames = this.stateManager.getColumnNames();
+		if (columnNames !== null) {
+			this.renderColumnNames(columnNames);
+		}
 
-			await this.stateManager.retrieveRecords();
-			const records = this.stateManager.getRecords();
+		await this.stateManager.retrieveRecords().catch((error) => {
+			console.error("Error retrieving records in initialRender:", error);
+			throw error;
+		});
 
-			if (records !== null) {
-				this.renderRecords(records);
-			}
-		} catch (error) {
-			console.error(`Error during initialRender: ${error}`);
+		const records = this.stateManager.getRecords();
+
+		if (records !== null) {
+			this.renderRecords(records);
 		}
 	}
 
 	renderColumnNames(columnNames: string[]): void {
+		const thead = document.querySelector("thead");
+		if (thead === null) {
+			throw new Error("Table header not found.");
+		}
+
+		const row = document.createElement("tr");
+		for (const columnName of columnNames) {
+			const cell = document.createElement("th");
+			cell.textContent = columnName;
+			row.appendChild(cell);
+		}
+		thead.appendChild(row);
+
 		try {
-			const thead = document.querySelector("thead");
-			if (thead === null) {
-				throw new Error("Table header not found.");
-			}
-
-			const row = document.createElement("tr");
-			for (const columnName of columnNames) {
-				const cell = document.createElement("th");
-				cell.textContent = columnName;
-				row.appendChild(cell);
-			}
-			thead.appendChild(row);
-
 			this.setColumnWidths();
 		} catch (error) {
 			if (error instanceof Error) {
-				console.error(`An error occurred: ${error.message}`);
+				console.error(
+					`An error occurred in setColumnWidths: ${error.message}`
+				);
 			} else {
-				console.error(`An unknown error occurred: ${error}`);
+				console.error(
+					`An unknown error occurred in setColumnWidths: ${error}`
+				);
 			}
+			throw error;
 		}
 	}
 
@@ -79,43 +84,33 @@ class TableRenderer {
 		}
 	}
 
-	//Populates the table body with records. Optionally highlights a specified row if searched.
-	renderRecords(
-		records: CityData[] | null,
-		highlightId: number | null = null
-	) {
+	/** Populates the table body with records. Optionally highlights a specified row if searched. */
+	renderRecords(records: CityData[], highlightId: number | null = null) {
 		// Use the state's highlightedId if no highlightId is provided.
 		highlightId = highlightId ?? this.stateManager.getHighlightedId();
-		try {
-			if (records === null) {
-				throw new Error("No records to render.");
+
+		const tbody = document.querySelector("tbody");
+		if (tbody === null) {
+			throw new Error("Table body not found.");
+		}
+
+		tbody.innerHTML = "";
+
+		for (const record of records) {
+			const row = document.createElement("tr");
+			if (
+				highlightId !== null &&
+				record.length > 0 &&
+				parseInt(record[0].toString(), 10) === highlightId
+			) {
+				row.classList.add("highlight");
 			}
-
-			const tbody = document.querySelector("tbody");
-			if (tbody === null) {
-				throw new Error("Table body not found.");
+			for (const cell of record) {
+				const td = document.createElement("td");
+				td.textContent = cell.toString();
+				row.appendChild(td);
 			}
-
-			tbody.innerHTML = "";
-
-			records.forEach((record) => {
-				const row = document.createElement("tr");
-				if (
-					highlightId !== null &&
-					record.length > 0 &&
-					parseInt(record[0].toString(), 10) === highlightId
-				) {
-					row.classList.add("highlight");
-				}
-				record.forEach((cell) => {
-					const td = document.createElement("td");
-					td.textContent = cell.toString();
-					row.appendChild(td);
-				});
-				tbody.appendChild(row);
-			});
-		} catch (error) {
-			console.error(`An error occurred: ${error}`);
+			tbody.appendChild(row);
 		}
 	}
 }

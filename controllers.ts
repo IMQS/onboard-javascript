@@ -12,7 +12,7 @@ class WindowResizeHandler {
 	 * @param {StateManager} stateManager - State control for retrieving/updating application data.
 	 */
 
-	constructor(
+	constructor (
 		tableRenderer: TableRenderer,
 		stateManager: StateManager,
 		paginationManager: PaginationManager
@@ -34,9 +34,18 @@ class WindowResizeHandler {
 	}
 
 	handleResize(): void {
-		this.debouncedUpdate();
+		try {
+			this.debouncedUpdate();
+		} catch (error) {
+			console.error(
+				`Error in handleResize: ${
+					error instanceof Error ? error.message : error
+				}`
+			);
+			alert("An error occurred while resizing. Please try again.");
+		}
 	}
-
+	
 	// Debounce function to reduce the number of function calls while user is dragging the browser window.
 	debounce(func: Function, delay: number): Function {
 		let timeout: ReturnType<typeof setTimeout> | null = null;
@@ -89,7 +98,7 @@ class PaginationManager {
 	 * @param {TableRenderer} tableRenderer - Used for re-rendering table data.
 	 * @param {StateManager} stateManager - State control for retrieving/updating application data.
 	 */
-	constructor(
+	constructor (
 		private tableRenderer: TableRenderer,
 		private stateManager: StateManager
 	) {
@@ -196,75 +205,81 @@ class PaginationManager {
 
 	/** Fetches the next set of records and updates the view. */
 	async incrementPage(): Promise<void> {
-		try {
-			this.stateManager.goToNextPage();
-			await this.stateManager.retrieveRecords();
-			const records = this.stateManager.getRecords();
+		this.stateManager.goToNextPage();
 
-			if (records !== null) {
-				this.tableRenderer.renderRecords(records);
-			}
-			this.updateButtonStates();
-		} catch (error) {
+		await this.stateManager.retrieveRecords().catch((error) => {
 			console.error(
-				`Unexpected error in incrementPage: ${
+				`Error in retrieveRecords while incrementing page: ${
 					error instanceof Error ? error.message : error
 				}`
 			);
+			alert("Failed to increment the page. Please contact support.");
+		});
+
+		const records = this.stateManager.getRecords();
+
+		if (records !== null) {
+			this.tableRenderer.renderRecords(records);
 		}
+		this.updateButtonStates();
 	}
 
 	/** Fetches the previous set of records and updates the view. */
 	async decrementPage(): Promise<void> {
-		try {
-			this.stateManager.goToPreviousPage();
-			await this.stateManager.retrieveRecords();
-			const records = this.stateManager.getRecords();
+		this.stateManager.goToPreviousPage();
 
-			if (records !== null) {
-				this.tableRenderer.renderRecords(records);
-			}
-
-			this.updateButtonStates();
-		} catch (error) {
+		await this.stateManager.retrieveRecords().catch((error) => {
 			console.error(
-				`Error in decrementPage: ${
+				`Error in retrieveRecords while decrementing page: ${
 					error instanceof Error ? error.message : error
 				}`
 			);
+			alert("Failed to decrement the page. Please contact support.");
+		});
+
+		const records = this.stateManager.getRecords();
+
+		if (records !== null) {
+			this.tableRenderer.renderRecords(records);
 		}
+
+		this.updateButtonStates();
 	}
 
 	/** Searches for a record by its ID and updates the view. */
 	async searchById(): Promise<void> {
-		try {
-			if (!this.filterInput) {
-				throw new Error("Filter input element is missing");
-			}
-
-			const searchValue = parseInt(this.filterInput.value, 10);
-			if (isNaN(searchValue)) {
-				throw new Error("Invalid search value or none");
-			}
-
-			this.stateManager.setHighlightedId(searchValue);
-			await this.stateManager.searchByIdStateChange(searchValue);
-
-			const records = this.stateManager.getRecords();
-
-			if (records !== null) {
-				this.tableRenderer.renderRecords(records, searchValue);
-			}
-
-			this.updateButtonStates();
-		} catch (error) {
-			console.error(
-				`Error in searchById function: ${
-					error instanceof Error ? error.message : error
-				}`
-			);
-			alert("A Serious Error ocurred, please try again later");
+		if (!this.filterInput) {
+			alert("Filter input element is missing");
+			return;
 		}
+
+		const searchValue = parseInt(this.filterInput.value, 10);
+		if (isNaN(searchValue)) {
+			alert("Invalid search value or none");
+			return;
+		}
+
+		this.stateManager.setHighlightedId(searchValue);
+
+		await this.stateManager
+			.searchByIdStateChange(searchValue)
+			.catch((error) => {
+				console.error(
+					`Error in searchByIdStateChange: ${
+						error instanceof Error ? error.message : error
+					}`
+				);
+				alert("A serious error occurred, please try again later");
+				return;
+			});
+
+		const records = this.stateManager.getRecords();
+
+		if (records !== null) {
+			this.tableRenderer.renderRecords(records, searchValue);
+		}
+
+		this.updateButtonStates();
 	}
 
 	/** Validates input for the search bar in real-time. */
@@ -286,8 +301,7 @@ class PaginationManager {
 				inputValue.length > 6 ||
 				!/^\d+$/.test(inputValue)
 			) {
-				this.errorMessage!.textContent =
-					`Invalid input. Please enter a number between 0 and ${maxValue}.`;
+				this.errorMessage!.textContent = `Invalid input. Please enter a number between 0 and ${maxValue}.`;
 			} else {
 				this.errorMessage!.textContent = "";
 			}
@@ -296,23 +310,16 @@ class PaginationManager {
 
 	/** Updates the state of the pagination buttons based on the current view. */
 	public updateButtonStates(): void {
-		try {
-			if (!this.prevButton || !this.nextButton) {
-				throw new Error("Button elements are missing");
-			}
-
-			const from = this.stateManager.getFrom();
-			const to = this.stateManager.getTo();
-			const totalRecordCount = this.stateManager.getTotalRecordCount();
-
-			this.prevButton.disabled = from === 0;
-			this.nextButton.disabled = to === totalRecordCount - 1;
-		} catch (error) {
-			console.error(
-				`Unexpected error in updateButtonStates: ${
-					error instanceof Error ? error.message : error
-				}`
-			);
+		if (!this.prevButton || !this.nextButton) {
+			alert("Button elements are missing");
+			return;
 		}
+
+		const from = this.stateManager.getFrom();
+		const to = this.stateManager.getTo();
+		const totalRecordCount = this.stateManager.getTotalRecordCount();
+
+		this.prevButton.disabled = from === 0;
+		this.nextButton.disabled = to === totalRecordCount - 1;
 	}
 }
