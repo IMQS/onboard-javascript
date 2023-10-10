@@ -1,0 +1,98 @@
+#main-heading {
+	font-family: "Agency FB", sans-serif;
+	font-size: 2.5em;
+	font-weight: bold;
+	text-align: center;
+	margin: 10px 0;
+	color: #333;
+	text-shadow: #00ff00;
+	cursor: pointer;
+}
+
+#main-container {
+	margin: 0 auto;
+	background-color: #fff;
+}
+
+html,
+body {
+	font-family: "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	color: #333;
+	margin-bottom: 0;
+	overflow: hidden;
+}
+
+th {
+	font-family: "Agency FB", sans-serif;
+	text-align: center;
+	font-size: 16px;
+	border: 1px solid #a1e3a1;
+	background-color: #333333;
+	color: #4caf50;
+}
+
+td {
+	font-family: "Agency FB", sans-serif;
+	font-size: 14px;
+	border: 1px solid #a1e3a1;
+	text-align: center;
+	color: #333333;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+#myTable {
+	table-layout: fixed;
+
+	width: 100%;
+	height: 100%;
+	border: 1px solid #a1e3a1;
+	border-radius: 12px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.highlight {
+	background-color: #00ff00;
+	color: #4caf50; 
+}
+
+.pagination-1 {
+	text-align: center;
+	padding-top: 25px;
+	padding-bottom: 25px;
+	font-family: "Agency FB", sans-serif;
+}
+
+button {
+	padding: 10px 20px;
+	border: 1px solid #00ff00;
+	background-color: #1e1e1e; 
+	color: #00ff00; 
+	border-radius: 5px;
+	font-family: "Agency FB", sans-serif;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+button:disabled {
+	background-color: #555; 
+	color: #ccc; 
+}
+
+button:hover:not(:disabled) {
+	background-color: #333; 
+}
+
+#filterInput {
+	padding: 10px;
+	border: 1px solid #00ff00; 
+	border-radius: 5px;
+	font-family: "Agency FB", sans-serif;
+	color: #00ff00; 
+	background-color: #1e1e1e; 
+}
